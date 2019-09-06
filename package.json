@@ -1,0 +1,29 @@
+{
+  "name": "express-barefoot-nomad",
+  "version": "1.0.0",
+  "description": "A Social platform for the creative at heart",
+  "main": "index.js",
+  "scripts": {
+    "build": "rm -rf ./src/dist && babel ./src/. --out-dir ./src/dist",
+    "start": "npm run build && node ./src/dist/index.js",
+    "dev": "nodemon --exec babel-node src/index.js"
+  },
+  "author": "Andela Simulations Programme",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.4",
+    "dotenv": "^6.2.0",
+    "express": "^4.16.3",
+    "jsonwebtoken": "^8.3.0",
+    "mongoose": "^5.6.13"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/node": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@babel/register": "^7.5.5",
+    "nodemon": "^1.19.2"
+  }
+}
