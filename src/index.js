@@ -1,10 +1,10 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+import config from './config'
 const app = express();
-dotenv.config();
+
 mongoose
-  .connect("mongodb+srv://n3m3sis:nAdia123@kftv-cinetie-rqa0s.mongodb.net/test?retryWrites=true&w=majority", { useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false })
+  .connect(config.mongoURI, { useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false })
   .then(() => console.log('MongoDB Connected...'))
   .catch(err => console.log(err));
 app.get('/', (req, res) => {
