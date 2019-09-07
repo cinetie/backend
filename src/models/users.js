@@ -2,19 +2,15 @@ import mongoose from 'mongoose';
 
 const schema = mongoose.Schema;
 const userSchema = new schema({
-    FirstName :{
+    firstName :{
         type:String,
         required:true
 
     },
-    Lastname :{
+    lastName :{
         type:String,
         required:true
 
-    },
-    username :{
-        type:String,
-        required:true,
     },
     email:{
         type:String,
@@ -24,14 +20,20 @@ const userSchema = new schema({
         type:String,
         required:true
     },
-    typeOfAccount:{
+    plan:{
         type:String,
         required:true
     },
     hasReachedMaximumProfiles:{
         type:Boolean,
         required:true
-    }
+    },
+    accounts : [ new schema({
+        name :{
+            type:String,
+            required:true
+        }
+    })]
     
 
 
