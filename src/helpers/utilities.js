@@ -25,56 +25,56 @@ export default class Util {
         this.message = message;
         this.type = "Error";
     }
-    encrypt(plainPassword) {
-        const newPass = bcrypt.hashSync(plainPassword, bcrypt.genSaltSync(10), null);
+
+    encrypt(plainPassword){
+        const newPass = bcrypt.hashSync(plainPassword, bcrypt.genSaltSync(10),null);
         return newPass;
 
     }
-    compare(plainPassword, encrypted) {
-        if (plainPassword == null || plainPassword == undefined || encrypted == null || encrypted == undefined) {
-            return "password is null";
-
-        } else {
-            const status = bcrypt.compareSync(plainPassword, encrypted);
-            if (status) {
-                return  status;
-            } else {
-                return  status;
-            }
-        }
-
-
+    compare(plainPassword,encrpted){
+        return bcrypt.compareSync(plainPassword,encrpted);
     }
     send(res) {
         const result = {
-            statusCode: this.statusCode,
+            statusCode:this.statusCode,
+
             status: this.type,
             message: this.message,
             data: this.data
         };
         if (this.type === 'success') {
             return res.status(this.statusCode).json(result);
-        }
+
+        } 
         return res.status(this.statusCode).json({
-            statusCode: this.statusCode,
+            statusCode:this.statusCode,
+
             status: this.type,
             message: this.message,
         });
     }
     sendPost(res) {
         const result = {
-            statusCode: this.statusCode,
+
+            statusCode:this.statusCode,
             status: this.type,
             message: this.message,
-
+          
         };
         if (this.type === 'success') {
             return res.status(this.statusCode).json(result);
-        }
+        } 
         return res.status(this.statusCode).json({
-            statusCode: this.statusCode,
+            statusCode:this.statusCode,
+
             status: this.type,
             message: this.message,
         });
     }
+
 }
+
+}
+  
+    
+

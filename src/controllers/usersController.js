@@ -1,11 +1,12 @@
 import userService from '../services/userServices';
 import validation from '../validators/validation';
 import Util from '../helpers/utilities';
-import jwt from  'jsonwebtoken';
+
 // import {validation} from '../validators/validation';
 const util = new Util();
-class userController {
-    static async signupUser(req, res) {
+class signupController {
+    static async createUser(req, res) {
+
 
         try {
             const newUser = req.body;
@@ -34,31 +35,8 @@ class userController {
             return util.send(res);
         }
     }
-     
-    static async loginUser(req,res){
-       
-        try {
-            const user = await userService.getUserByMail(req.body.email);
-            if(user){
-                const status = util.compare(req.body.password,user.password);
-                if(status == true){
-                    let token = jwt.sign(user.email,process.env.SECRET);
-                    util.setSuccess("Logged In",200,token);
-                    return util.send(res);
-                } else{
-                    util.setError(403,"Email or password incorrect here " + status +"  "+ user.password);
-                    return util.send(res);
-                }
-                
-            }else{
-                    util.setError(403,"Email or password incorrect");
-                    return util.send(res);
-            }
-        } catch (error) {
-            util.setError(500,`${error}` );
-            return util.send(res);
-        }
-    }
+
+
 }
 
-export default userController;
+export default signupController;

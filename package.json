@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build": "rm -rf ./src/dist && babel ./src/. --out-dir ./src/dist",
-    "start": "npm run build && node ./src/dist/index.js",
+
+    "start": "npm run migrate && npm run build && node ./src/dist/index.js",
+
     "dev": "nodemon --exec babel-node src/index.js",
     "migrate": "sequelize db:migrate --env production",
     "migrate:dev": "sequelize db:migrate --env development"
