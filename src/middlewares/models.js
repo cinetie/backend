@@ -1,9 +1,7 @@
-import userServices from '../services/userServices';
 import userService from '../services/userServices';
 
-
 class userModelMiddleware{
-    static async getUserByEmail(email){
+    static async getUserByEmail(){
         try {
             const foundUser = userService.getUserByMail(mail);
             if(foundUser){

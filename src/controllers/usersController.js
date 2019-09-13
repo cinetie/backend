@@ -181,6 +181,20 @@ class userController {
 
 
     }
+    static async socialLogin(req, res) {
+        try {
+            let user = await userService.getUserByMail(req.user.email);
+            if (! user) {
+                user = await userService.createNewUser(req.user, req.user.email);
+            }
+            let token = jwt.sign(user.email, process.env.SECRET);
+            util.setSuccessPost("Logged In", 200);
+            return util.sendPost(res);
+        } catch (error) {
+            util.setError(500, `${error}`);
+            return util.send(res);
+        }
+    }
 }
 
 export default userController;
