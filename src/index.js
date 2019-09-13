@@ -2,7 +2,6 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import signup from './routes/usersRoute';
-import doorman from './middlewares/doorman';
 const app = express();
 
 app.get('/', (req, res) => {

@@ -6,10 +6,29 @@ class userService {
         try {
             const foundUser = await database.User.findOne({
                 attributes:{
-                    exclude:['id','createdAt','updatedAt','firstName','lastName']
+                    exclude:['createdAt','updatedAt']
                 },
                 where:{
                     email:email
+                }
+            });
+            if(foundUser){
+                return foundUser;
+            }else{
+                return null;
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+    static async getUserById(id){
+        try {
+            const foundUser = await database.User.findOne({
+                attributes:{
+                    exclude:['createdAt','updatedAt','lastName']
+                },
+                where:{
+                   id:id
                 }
             });
             if(foundUser){
@@ -43,15 +62,15 @@ class userService {
             throw error;
         }
     }
-    static async updateUser(email,oldUser){
+    static async updateUser(id,oldUser){
         try {
             const newUser = await database.User.update(oldUser,{
                 where: {
-                    email :email
+                    id:id
                 }
             });
-            if(Object.values(newUser).length >1){
-                return added;
+            if(newUser){
+                return newUser;
             }else {
                 return null;
             }
