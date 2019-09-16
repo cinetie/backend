@@ -1,4 +1,5 @@
 import Joi from '@hapi/joi';
+import { join } from 'path';
 
 class validation {
   static userValidation(req, res, next) {
@@ -25,6 +26,20 @@ class validation {
           error: err.details[0].message,
         });
       } 
+    });
+  }
+  static profileValidator(req,res,next){
+    const schema = Joi.object().keys({
+     email: Joi.string().email({minDomainSegments: 2}).required(),
+     name: Joi.string().alphanum().min(3).max(15).min(3).required()
+    });
+    schema.validate(req.body,(err)=>{
+      if(err){
+        res.status(422).json({
+          status:422,
+          error:err.details[0].message
+        });
+      }
     });
   }
 }
