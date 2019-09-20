@@ -2,57 +2,49 @@ import database from '../database/models';
 
 class planServices {
     static async addPlan(newPlan) {
-
-        const addedPlan = await database.plans.create(newPlan);
-        if (addedPlan) {
-            return addedPlan;
-        } else {
-            return null;
+        try {
+            return await database.plans.create(newPlan);
+        } catch(error) {
+            throw error;
         }
-
     }
+
     static async deletePlan(id) {
-        const deletedPlan = await database.plans.destroy({
-            where: {
-                id: id
-            }
-        });
-        if (deletedPlan) {
-            return deletedPlan;
-        } else {
-            return null;
+        try {
+            return await database.plans.destroy({
+                where: { id }
+            });
+        } catch(error){ 
+            throw error;
         }
     }
+
     static async updatePlans(id, plan) {
-        const updatedPlan = await database.plans.update(plan, {
-            where: {
-                id: id
-            }
-        });
-        if (updatedPlan) {
-            return updatedPlan;
-        } else {
-            return null;
+        try {
+            return await database.plans.update(plan, {
+                returning: true,
+                where: { id }
+            });
+        } catch(error) {
+            throw error;
         }
     }
+
     static async getParticalPlan(id) {
-        const foundPlan = await database.plans.findOne({
-            where: {
-                id: id
-            }
-        });
-        if (foundPlan) {
-            return foundPlan;
-        } else {
-            return null;
+        try {
+            return await database.plans.findOne({
+                where: { id }
+            });
+        } catch(error) {
+            throw error;
         }
     }
+
     static async getAllPlan() {
-        const foundPlans = await database.plans.findAll();
-        if (foundPlans) {
-            return foundPlans;
-        }else{
-            return null;
+        try {
+            return await database.plans.findAll();
+        } catch(error) {
+            throw error;
         }
     }
 }

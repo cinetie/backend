@@ -1,5 +1,4 @@
 import Joi from '@hapi/joi';
-import { join } from 'path';
 
 class validation {
   static userValidation(req, res, next) {

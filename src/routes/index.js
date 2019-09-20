@@ -1,10 +1,12 @@
-import swagger from 'swagger-ui-express';
-import swaggerDoc from '../swagger.json';
+import { Router } from 'express';
+import usersRoute from './usersRoute';
+import profileRoute from './profileRoute';
+import planRoute from './planRoute';
 
-const router = require('express').Router();
+const router = Router();
 
-router.use('/api', require('./api'));
+router.use('/auth', usersRoute);
+router.use('/plan', planRoute);
+router.use('/profile', profileRoute);
 
-router.use('/api/docs', swagger.serve, swagger.setup(swaggerDoc));
-
-module.exports = router;
+export default router

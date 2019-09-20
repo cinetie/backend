@@ -1,59 +1,54 @@
-import Util from '../helpers/utilities';
+import response from '../helpers/response';
 import profileServices from '../services/profileService';
-import validator from '../validators/validation';
 
-const util = new Util();
 class profileController {
     static async addProfile(req, res) {
-        validator.profileValidator(req, res);
-        const addedProfile = await profileServices.addProfile(req.body);
-        if (Object.values(addedProfile).length >= 3) {
-            util.setSuccessPost("Added profile", 201);
-            return util.sendPost(res);
-        } else {
-            util.setError(500, "Can't add a new profile");
-            return util.send(res);
+        try {
+            const addedProfile = await profileServices.addProfile(req.body);
+            response.successResponse(res, 201, 'Profile successfully added!', addedProfile);
+        } catch(error) {
+            response.errorResponse(res, 500, 'Something went wrong', error);
         }
     }
+
     static async getProfile(req,res){
-        const returned = await profileServices.getParticalProfile(req.params.id);
-        if(returned){
-            util.setSuccess("Found profile",200,returned);
-            return util.send(res);
-        }else{
-            util.setError(500,"Can't fetch asked profile");
-            return util.send(res);
+        try {
+            const returned = await profileServices.getParticalProfile(req.params.id);
+            if(!returned) response.errorResponse(res, 404, 'Profile not found');
+            response.successResponse(res, 200, 'Profile successfully retrieved!', returned);
+        } catch(error) {
+            response.errorResponse(res, 500, 'Something went wrong', error);
         }
     }
+
     static async deleteProfile(req,res){
-        const deletedProfile = await profileServices.deleteProfile(req.params.id);
-        if(deletedProfile){
-            util.setSuccessPost("deleted successfully",200);
-            return util.sendPost(res);
-        }else{
-            util.setError(500,"Can't delete profile");
-            return util.send(res);
+        try {
+            const returned = await profileServices.getParticalProfile(req.params.id);
+            if(!returned) response.errorResponse(res, 404, 'Profile not found');
+            const deletedProfile = await profileServices.deleteProfile(req.params.id);
+            response.successResponse(res, 200, 'Profile successfully deleted!', deletedProfile);
+        } catch(error) {
+            response.errorResponse(res, 500, 'Something went wrong', error);
         }
     }
+
     static async getAllProfiles(req,res){
-        const returned = await profileServices.getAllProfiles();
-        if(Object.values(returned).length >=3){
-            util.setSuccess("Found profiles",200,returned);
-            return util.send(res);
-        }else{
-            util.setError(500,"Can't fetch asked profile");
-            return util.send(res);
+        try {
+            const returned = await profileServices.getAllProfiles();
+            response.successResponse(res, 200, 'Profiles successfully retrieved!', returned);
+        } catch(error) {
+            response.errorResponse(res, 500, 'Something went wrong', error);
         }
     }
     static async updateProfile(req,res){
-        const toUpdate = req.body;
-        const updated = await profileServices.updateProfile(req.params.id,toUpdate);
-        if(updated  >0){
-            util.setSuccessPost("updated easily",202);
-            return util.sendPost(res);
-        }else {
-            util.setError(502,"Can't update new profile");
-            return util.sendPost(res);
+        try {
+            const returned = await profileServices.getParticalProfile(req.params.id);
+            if(!returned) response.errorResponse(res, 404, 'Profile not found');
+            const toUpdate = req.body;
+            const updated = await profileServices.updateProfile(req.params.id,toUpdate);
+            response.successResponse(res, 200, 'Profile successfully updated!', updated[1][0]);
+        } catch(error) {
+            response.errorResponse(res, 500, 'Something went wrong', error);
         }
     }
 }
