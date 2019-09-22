@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import profileController from '../controllers/profileController';
-import validator from '../validators/profileValidator'
+import validator from '../validators/profileValidator';
 
 const router = new Router();
 

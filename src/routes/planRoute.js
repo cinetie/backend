@@ -9,4 +9,4 @@ router.post('/new',planController.addPlan);
 router.delete('/:id',planController.deleteAplan);
 router.put('/:id',planController.updatePlan);
 
-export default router
+export default router;

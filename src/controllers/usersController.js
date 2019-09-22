@@ -2,9 +2,10 @@ import userService from '../services/userServices';
 import tokenService from '../services/tokenService';
 import validation from '../validators/validation';
 import Util from '../helpers/utilities';
-import jwt from 'jsonwebtoken';
+import jwt from '../helpers/jwt';
+import cry from '../helpers/crypto';
 import mdw from '../helpers/mailer';
-import crypto from 'crypto';
+
 // import {validation} from '../validators/validation';
 const util = new Util();
 class userController {
@@ -17,7 +18,14 @@ class userController {
             // validation.emailValidation(req, res);
             // validation.passwordValidation(res, res);
             newUser.password = util.encrypt(newUser.password);
-            const createdUser = await userService.createNewUser(newUser, newUser.email);
+            newUser.isVerified = false;
+            const checkUser = await userService.getUserByMail(newUser.email);
+            if (checkUser) {
+                util.setError(422, "User already exists");
+                return util.send(res);
+            }
+            const createdUser = await userService.createNewUser(newUser);
+
 
             if (Object.values(createdUser).length >= 8) {
                 util.setError(501, "Something just wrong just happened");
@@ -27,15 +35,14 @@ class userController {
                     util.setError(402, "User already exists");
                     return util.send(res);
                 } else {
-                    let part1 = '';
-                    crypto.randomBytes(20, function (err, buffer) {
-                        part1 = buffer.toString('hex');
-                    });
-                    const token = jwt.sign(newUser.firstName + part1, process.env.SECRET);
+                    const part1 = cry.crypto();
+                   
+                    const token = jwt.jwtSign(`${part1}${newUser.email}`, process.env.SECRET);
+                   
                     const tokenToSave = {
-                        email:newUser.email,
+                        email: newUser.email,
                         token: token,
-                        
+
                     };
                     const savedToken = tokenService.createNewToken(tokenToSave, token);
                     if (!savedToken) {
@@ -46,11 +53,11 @@ class userController {
                         to: req.body.email,
                         from: process.env.EMAIL_USER,
                         subject: 'Please verify your email!',
-                        text: 'Dear ' + newUser.firstName + ' please follow this link to verify your email http://localhost:5000/users/auth/verify/?id=' + createdUser.id + '&&token=' + token + '',
+                        text: 'Dear ' + newUser.firstName + ' please follow this link to verify your email http://localhost:5000/auth/verify/?id=' + createdUser.id + '&&token=' + token,
                     };
                     mdw.mailer(emailTosend);
-                    util.setSuccessPost("Successfully registered check your email for verification", 200);
-                    return util.sendPost(res);
+                    util.setSuccess("Successfully registered check your email for verification", 200, createdUser);
+                    return util.send(res);
                 }
 
             }
@@ -65,7 +72,8 @@ class userController {
             const id = req.query.id;
             const token = req.query.token;
             const user = userService.getUserById(id);
-            const decoded = jwt.verify(token, process.env.SECRET);
+
+            const decoded = jwt.jwtVerify(token, process.env.SECRET);
             if (decoded) {
                 if (user) {
                     const newUser = {
@@ -77,7 +85,7 @@ class userController {
                         return util.send(res);
                     }
                     const updatedUser = userService.updateUser(id, newUser);
-                    
+
                     if (updatedUser) {
                         util.setSuccessPost("Verified successfully", 202);
                         return util.sendPost(res);
@@ -94,7 +102,7 @@ class userController {
                 return util.send(res);
             }
         } catch (error) {
-            util.setError(503, error.message);
+            util.setError(503, error);
             return util.send(res);
         }
     }
@@ -104,10 +112,10 @@ class userController {
             const user = await userService.getUserByMail(req.body.email);
             if (user) {
                 const status = util.compare(req.body.password, user.password);
-                if (status == true && user.isVerified==true) {
-                    let token = jwt.sign(user.email, process.env.SECRET);
-                    util.setSuccessPost("Logged In", 200);
-                    return util.sendPost(res);
+                if (status == true && user.isVerified == true) {
+                    let token = jwt.jwtSign(user.email, process.env.SECRET);
+                    util.setSuccess("Logged In", 200, token);
+                    return util.send(res);
                 } else {
                     util.setError(401, "Either email or password are incorrect or email is not verified ");
                     return util.send(res);
@@ -126,17 +134,14 @@ class userController {
         try {
             const user = await userService.getUserByMail(req.body.email);
             if (user) {
-                let part1 = '';
-                crypto.randomBytes(20, function (err, buffer) {
-                    part1 = buffer.toString('hex');
-                });
-                const token = jwt.sign(user.firstName + part1, process.env.SECRET);
+                const part1 = cry.crypto();
+                const token = jwt.jwtSign(user.firstName + part1, process.env.SECRET);
                 const emailTosend = {
                     to: req.body.email,
                     from: process.env.EMAIL_USER,
                     template: 'forgot-password',
                     subject: 'Password help has arrived!',
-                    text: 'Dear ' + user.firstName + ' please follow this link to reset your password http://localhost:5000/users/auth/reset_password/?id=' + user.id + '&&token=' + token + '',
+                    text: 'Dear ' + user.firstName + ' please follow this link to reset your password http://localhost:5000/auth/reset_password/?id=' + user.id + '&&token=' + token + '',
                 };
                 mdw.mailer(emailTosend);
                 util.setSuccessPost("Check your Email ", 201);
@@ -155,41 +160,39 @@ class userController {
 
         const token = req.query.token;
         const id = req.query.id;
-        jwt.verify(token, process.env.SECRET, function (err, res) {
-            if (err) {
-                return res.status(422).send({
-                    message: "Link expired or Invalid"
-                });
+        const decoded = jwt.jwtVerify(token, process.env.SECRET);
 
-            }
-        });
+        if (decoded.Error) {
+            util.setError(422, "Link expired or is invalid");
+            return util.send(res);
+        }
 
-            const user_ = userService.getUserById(id);
-            const hash = util.encrypt(req.body.password);
-            const newPass = {
-                password: hash
-            };
-            const updatedPassword = userService.updateUser(id, newPass);
-            if (updatedPassword) {
-                util.setSuccessPost("Password set successfully", 200);
-                return util.sendPost(res);
-            } else {
-                util.setError(500, "Can't update password contact support");
-                return util.send(res);
-            }
-       
+        const user_ = userService.getUserById(id);
+        const hash = util.encrypt(req.body.password);
+        const newPass = {
+            password: hash
+        };
+        const updatedPassword = userService.updateUser(id, newPass);
+        if (updatedPassword) {
+            util.setSuccessPost("Password set successfully", 200);
+            return util.sendPost(res);
+        } else {
+            util.setError(500, "Can't update password contact support");
+            return util.send(res);
+        }
+
 
 
     }
     static async socialLogin(req, res) {
         try {
             let user = await userService.getUserByMail(req.user.email);
-            if (! user) {
+            if (!user) {
                 user = await userService.createNewUser(req.user, req.user.email);
             }
-            let token = jwt.sign(user.email, process.env.SECRET);
-            util.setSuccessPost("Logged In", 200);
-            return util.sendPost(res);
+            let token = jwt.jwtSign(user.email, process.env.SECRET);
+            util.setSuccess("Logged In", 201, token);
+            return util.send(res);
         } catch (error) {
             util.setError(500, `${error}`);
             return util.send(res);

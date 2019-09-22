@@ -31,7 +31,7 @@ class userService {
         }
     }
     
-    static async createNewUser(newUser,email){
+    static async createNewUser(newUser){
         try {
             return await database.User.create(newUser);
         } catch(error) {
