@@ -21,14 +21,14 @@ app.use((req, res, next) => {
 });
 
 app.get('/', (req, res) => {
-  response.successResponse(res, 200, 'Welcome to Cinetie')
+  response.successResponse(res, 200, 'Welcome to Cinetie');
 });
 
 app.use('/', routes);
 
 app.use((req, res, next) => {
-  response.errorResponse(res, 404, 'Not found')
-})
+  response.errorResponse(res, 404, 'Not found');
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log('Up and running'));
