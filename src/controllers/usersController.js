@@ -1,201 +1,120 @@
 import userService from '../services/userServices';
 import tokenService from '../services/tokenService';
 import validation from '../validators/validation';
-import Util from '../helpers/utilities';
+import bcrypt from '../helpers/bcrypt';
+import response from '../helpers/response';
 import jwt from '../helpers/jwt';
 import cry from '../helpers/crypto';
 import mdw from '../helpers/mailer';
 
-// import {validation} from '../validators/validation';
-const util = new Util();
 class userController {
     static async signupUser(req, res) {
-
         try {
             const newUser = req.body;
-            // const validator = new validation();
             validation.userValidation(req, res);
-            // validation.emailValidation(req, res);
-            // validation.passwordValidation(res, res);
-            newUser.password = util.encrypt(newUser.password);
+            newUser.password = await bcrypt.encrypt(newUser.password);
             newUser.isVerified = false;
             const checkUser = await userService.getUserByMail(newUser.email);
             if (checkUser) {
-                util.setError(422, "User already exists");
-                return util.send(res);
+                response.errorResponse(res, 409, 'User already exists');
             }
             const createdUser = await userService.createNewUser(newUser);
+            const part1 = await cry.crypto();
+            const token = await jwt.jwtSign(`${part1}${newUser.email}`, process.env.SECRET);
+            const tokenToSave = {
+                email: newUser.email,
+                token: token,
 
-
-            if (Object.values(createdUser).length >= 8) {
-                util.setError(501, "Something just wrong just happened");
-                return util.send(res);
-            } else {
-                if (createdUser.Error) {
-                    util.setError(402, "User already exists");
-                    return util.send(res);
-                } else {
-                    const part1 = cry.crypto();
-                   
-                    const token = jwt.jwtSign(`${part1}${newUser.email}`, process.env.SECRET);
-                   
-                    const tokenToSave = {
-                        email: newUser.email,
-                        token: token,
-
-                    };
-                    const savedToken = tokenService.createNewToken(tokenToSave, token);
-                    if (!savedToken) {
-                        util.setError(401, "Can't save token");
-                        return util.send(res);
-                    }
-                    const emailTosend = {
-                        to: req.body.email,
-                        from: process.env.EMAIL_USER,
-                        subject: 'Please verify your email!',
-                        text: 'Dear ' + newUser.firstName + ' please follow this link to verify your email http://localhost:5000/auth/verify/?id=' + createdUser.id + '&&token=' + token,
-                    };
-                    mdw.mailer(emailTosend);
-                    util.setSuccess("Successfully registered check your email for verification", 200, createdUser);
-                    return util.send(res);
-                }
-
-            }
-
+            };
+            await tokenService.createNewToken(tokenToSave, token);
+            const emailTosend = {
+                to: req.body.email,
+                from: process.env.EMAIL_USER,
+                subject: 'Please verify your email!',
+                text: 'Dear ' + newUser.firstName + ' please follow this link to verify your email http://localhost:5000/auth/verify/?id=' + createdUser.id + '&&token=' + token,
+            };
+            await mdw.mailer(emailTosend);
+            const userToken = await jwt.jwtSign(user.email, process.env.SECRET);
+            createdUser.token = userToken;
+            delete createdUser.password;
+            response.successResponse(res, 201, 'Signed up successfully!', createdUser);
         } catch (error) {
-            util.setError(500, `${error}`);
-            return util.send(res);
+            response.errorResponse(res, 500, 'Something went wrong!', error);
         }
     }
     static async verify(req, res) {
         try {
-            const id = req.query.id;
-            const token = req.query.token;
-            const user = userService.getUserById(id);
-
-            const decoded = jwt.jwtVerify(token, process.env.SECRET);
-            if (decoded) {
-                if (user) {
-                    const newUser = {
-                        isVerified: true
-                    };
-                    const savedToken = tokenService.destroyToken(token);
-                    if (!savedToken) {
-                        util.setError(401, "Can't delete token");
-                        return util.send(res);
-                    }
-                    const updatedUser = userService.updateUser(id, newUser);
-
-                    if (updatedUser) {
-                        util.setSuccessPost("Verified successfully", 202);
-                        return util.sendPost(res);
-                    } else {
-                        util.setError(502, "Can't verify you");
-                        return util.send(res);
-                    }
-                } else {
-                    util.setError(502, "Something went wrong");
-                    return util.send(res);
-                }
-            } else {
-                util.setError(502, err);
-                return util.send(res);
-            }
+            const { id } = req.query;
+            const { token } = req.query;
+            const user = await userService.getUserById(id);
+            if(!user) response.errorResponse(res, 404, 'User not found');
+            await jwt.jwtVerify(token, process.env.SECRET);
+            const newUser = { isVerified: true };
+            await tokenService.destroyToken(token);
+            const updatedUser = await userService.updateUser(id, newUser);
+            delete updatedUser.password;
+            response.successResponse(res, 200, 'Verified successfully!', updatedUser);
         } catch (error) {
-            util.setError(503, error);
-            return util.send(res);
+            response.errorResponse(res, 500, 'Something went wrong', error);
         }
     }
     static async loginUser(req, res) {
-
         try {
             const user = await userService.getUserByMail(req.body.email);
-            if (user) {
-                const status = util.compare(req.body.password, user.password);
-                if (status == true && user.isVerified == true) {
-                    let token = jwt.jwtSign(user.email, process.env.SECRET);
-                    util.setSuccess("Logged In", 200, token);
-                    return util.send(res);
-                } else {
-                    util.setError(401, "Either email or password are incorrect or email is not verified ");
-                    return util.send(res);
-                }
-
-            } else {
-                util.setError(401, "Email or password incorrect");
-                return util.send(res);
-            }
+            const status = await bcrypt.compare(req.body.password, user.password);
+            if(!status || !user) response.errorResponse(res, 400, 'Invalid email or password!', error);
+            if(!user.isVerified) response.errorResponse(res, 401, 'Verify your account first!', error);
+            const token = await jwt.jwtSign(user.email, process.env.SECRET);
+            user.token = token;
+            delete user.password;
+            response.successResponse(res, 200, 'Logged in successfully!', user);
         } catch (error) {
-            util.setError(500, `${error}`);
-            return util.send(res);
+            response.errorResponse(res, 500, 'Something went wrong!', error);
         }
     }
     static async forgotPassword(req, res) {
         try {
             const user = await userService.getUserByMail(req.body.email);
-            if (user) {
-                const part1 = cry.crypto();
-                const token = jwt.jwtSign(user.firstName + part1, process.env.SECRET);
-                const emailTosend = {
-                    to: req.body.email,
-                    from: process.env.EMAIL_USER,
-                    template: 'forgot-password',
-                    subject: 'Password help has arrived!',
-                    text: 'Dear ' + user.firstName + ' please follow this link to reset your password http://localhost:5000/auth/reset_password/?id=' + user.id + '&&token=' + token + '',
-                };
-                mdw.mailer(emailTosend);
-                util.setSuccessPost("Check your Email ", 201);
-                return util.sendPost(res);
-
-            } else {
-                util.setError(403, "Email not found");
-                return util.send(res);
-            }
+            if (!user) response.errorResponse(res, 404, 'User not found!');
+            const part1 = await ry.crypto();
+            const token = await jwt.jwtSign(user.firstName + part1, process.env.SECRET);
+            const emailTosend = {
+                to: req.body.email,
+                from: process.env.EMAIL_USER,
+                template: 'forgot-password',
+                subject: 'Password help has arrived!',
+                text: 'Dear ' + user.firstName + ' please follow this link to reset your password http://localhost:5000/auth/reset_password/?id=' + user.id + '&&token=' + token + '',
+            };
+            await mdw.mailer(emailTosend);
+            response.successResponse(res, 200, 'Reset password link sent successfully!');
         } catch (error) {
-            util.setError(500, `${error}`);
-            return util.send(res);
+            response.errorResponse(res, 500, 'Something went wrong!', error);
         }
     }
     static async resetPassword(req, res) {
-
-        const token = req.query.token;
-        const id = req.query.id;
-        const decoded = jwt.jwtVerify(token, process.env.SECRET);
-
-        if (decoded.Error) {
-            util.setError(422, "Link expired or is invalid");
-            return util.send(res);
+        try {
+            const token = req.query.token;
+            const id = req.query.id;
+            await jwt.jwtVerify(token, process.env.SECRET);
+            const user_ = userService.getUserById(id);
+            if(!user_) response.errorResponse(res, 404, 'User not found!', error); 
+            const hash = bcrypt.encrypt(req.body.password);
+            const newPass = { password: hash };
+            await userService.updateUser(id, newPass);
+            response.successResponse(res, 200, 'Password reset successfully!');
+        } catch (error) {
+            response.errorResponse(res, 500, 'Something went wrong!', error);
         }
-
-        const user_ = userService.getUserById(id);
-        const hash = util.encrypt(req.body.password);
-        const newPass = {
-            password: hash
-        };
-        const updatedPassword = userService.updateUser(id, newPass);
-        if (updatedPassword) {
-            util.setSuccessPost("Password set successfully", 200);
-            return util.sendPost(res);
-        } else {
-            util.setError(500, "Can't update password contact support");
-            return util.send(res);
-        }
-
-
-
     }
     static async socialLogin(req, res) {
         try {
             let user = await userService.getUserByMail(req.user.email);
-            if (!user) {
-                user = await userService.createNewUser(req.user, req.user.email);
-            }
-            let token = jwt.jwtSign(user.email, process.env.SECRET);
-            util.setSuccess("Logged In", 201, token);
-            return util.send(res);
+            if (!user) user = await userService.createNewUser(req.user, req.user.email);
+            let token = await jwt.jwtSign(user.email, process.env.SECRET);
+            user.token = token;
+            response.successResponse(res, 200, 'Logged in successfully', user)
         } catch (error) {
-            util.setError(500, `${error}`);
-            return util.send(res);
+            response.errorResponse(res, 500, 'Something went wrong!', error);
         }
     }
 }
