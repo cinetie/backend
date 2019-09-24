@@ -1,13 +1,20 @@
 import response from '../helpers/response';
 import planServices from '../services/planServices';
+import Util from '../helpers/utilities';
 
+const util = new Util();
 class planController {
     static async addPlan(req, res) {
         try {
-            const addedPlan = await planServices.addPlan(req.body);
-            response.successResponse(res, 201, 'Plan successfully added!', addedPlan);
+            const getPlan  = await planServices.getParticalPlan(req.body.type);
+            if(getPlan){
+                util.setErrorResponse(res,"Plan exists already should you consider updating it instead",422);
+            }else {
+                const addedPlan = await planServices.addPlan(req.body);
+                util.setSuccessResponse(res, 'Plan successfully added!', 201, addedPlan);
+            }  
         } catch(error) {
-            response.errorResponse(res, 500, 'Something went wrong', error);
+            util.setErrorResponse(res, 'Something went wrong : ' + error , 503);
         }
     }
 

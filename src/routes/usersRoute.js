@@ -10,9 +10,12 @@ router.use(passport.session());
 
 router.post('/signup',auth.signupUser);
 router.post('/login',auth.loginUser);
+router.delete('/delete_acc',auth.deleteAccount);
+router.get('/all',auth.getAllAccounts);
 router.post('/reset_password/',auth.resetPassword);
 router.post('/forgot_password',auth.forgotPassword);
 router.get('/verify/',auth.verify);
+router.put('/update',auth.updateAccount);
 router.get(
     '/google',
     passport.authenticate('google', {
