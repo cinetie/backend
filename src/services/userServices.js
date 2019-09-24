@@ -42,6 +42,7 @@ class userService {
     static async updateUser(id,oldUser){
         try {
             return await database.User.update(oldUser,{
+                returning: true,
                 where: {
                     id:id
                 }

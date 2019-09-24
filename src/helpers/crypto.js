@@ -1,11 +1,15 @@
 import crypt from 'crypto';
 
 const crypto = () => {
-   let payload = '';
-    crypt.randomBytes(20, function (err, buffer) {
-       payload = buffer.toString('hex');
-        
-    });
-    return payload;
+   try {
+      let payload = '';
+      crypt.randomBytes(20, function (err, buffer) {
+         payload = buffer.toString('hex');
+         
+      });
+      return payload;
+   } catch (error) {
+      throw error;
+   }
 };
 export default { crypto };

@@ -1,22 +1,24 @@
 import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 class mailerMiddleware{
     static async mailer(emailTosend){
+        try {
         const options = {
             host: "smtp.mailtrap.io",
             port: 2525,
             auth: {
-              user: "12d7d5e199e9ca",
-              pass: "9bb14817f05d00"
+              user: process.env.MAIL_USER,
+              pass: process.env.MAIL_PASS
             }
         };
-        const client = nodemailer.createTransport(options);
-        client.sendMail(emailTosend,function(err,info){
-            if(err){
-                console.log(err);
-            }else{
-                console.log(info);
-            }
-        });
+        const client = await nodemailer.createTransport(options);
+        await client.sendMail(emailTosend);
+    } catch (error) {
+        throw error;
+    }
     }
 }
 
