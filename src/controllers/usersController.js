@@ -6,78 +6,90 @@ import response from '../helpers/response';
 import jwt from '../helpers/jwt';
 import cry from '../helpers/crypto';
 import mdw from '../helpers/mailer';
-
+import Util from '../helpers/utilities';
+const util = new Util();
 class userController {
     static async signupUser(req, res) {
+     let user = null;
         try {
             const newUser = req.body;
             validation.userValidation(req, res);
             newUser.password = await bcrypt.encrypt(newUser.password);
             newUser.isVerified = false;
             const checkUser = await userService.getUserByMail(newUser.email);
-            if (checkUser) {
-                response.errorResponse(res, 409, 'User already exists');
+            if (checkUser != null) {
+                util.setErrorResponse(res,"User already exists",422);
+            } else {
+                const createdUser = await userService.createNewUser(newUser);
+                const part1 = cry.crypto();
+                const token = jwt.jwtSign(`${part1}${newUser.email}`, process.env.SECRET);
+                const tokenToSave = {
+                    email: newUser.email,
+                    token: token,
+    
+                };
+               
+                await tokenService.createNewToken(tokenToSave, token);
+                const emailTosend = {
+                    to: req.body.email,
+                    from: process.env.EMAIL_USER,
+                    subject: 'Please verify your email!',
+                    text: 'Dear ' + newUser.firstName + ' please follow this link to verify your email http://localhost:5000/auth/verify/?id=' + createdUser.id + '&&token=' + token,
+                };
+                 await mdw.mailer(emailTosend);
+                const userToken = jwt.jwtSign(createdUser.email, process.env.SECRET);
+                createdUser.token = userToken;
+                delete createdUser.password;
+                util.setSuccessResponse(res,"Signed up successfully",201,createdUser);
+                
             }
-            const createdUser = await userService.createNewUser(newUser);
-            const part1 = await cry.crypto();
-            const token = await jwt.jwtSign(`${part1}${newUser.email}`, process.env.SECRET);
-            const tokenToSave = {
-                email: newUser.email,
-                token: token,
-
-            };
-            await tokenService.createNewToken(tokenToSave, token);
-            const emailTosend = {
-                to: req.body.email,
-                from: process.env.EMAIL_USER,
-                subject: 'Please verify your email!',
-                text: 'Dear ' + newUser.firstName + ' please follow this link to verify your email http://localhost:5000/auth/verify/?id=' + createdUser.id + '&&token=' + token,
-            };
-            await mdw.mailer(emailTosend);
-            const userToken = await jwt.jwtSign(user.email, process.env.SECRET);
-            createdUser.token = userToken;
-            delete createdUser.password;
-            response.successResponse(res, 201, 'Signed up successfully!', createdUser);
+           //  checkUser !=null ?  util.setErrorResponse(res,"error occured",500): console.log(1);
+        
         } catch (error) {
-            response.errorResponse(res, 500, 'Something went wrong!', error);
+            console.error(error);
         }
     }
     static async verify(req, res) {
         try {
-            const { id } = req.query;
-            const { token } = req.query;
+            const {
+                id
+            } = req.query;
+            const {
+                token
+            } = req.query;
             const user = await userService.getUserById(id);
-            if(!user) response.errorResponse(res, 404, 'User not found');
-            await jwt.jwtVerify(token, process.env.SECRET);
-            const newUser = { isVerified: true };
+            if (!user) response.errorResponse(res, 404, 'User not found');
+            jwt.jwtVerify(token, process.env.SECRET);
+            const newUser = {
+                isVerified: true
+            };
             await tokenService.destroyToken(token);
             const updatedUser = await userService.updateUser(id, newUser);
             delete updatedUser.password;
-            response.successResponse(res, 200, 'Verified successfully!', updatedUser);
+            util.setSuccessResponse(res,'Verified successfully!', 200, updatedUser);
         } catch (error) {
-            response.errorResponse(res, 500, 'Something went wrong', error);
+            util.setErrorResponse(res, 'Something went wrong', 500, error);
         }
     }
     static async loginUser(req, res) {
         try {
             const user = await userService.getUserByMail(req.body.email);
-            const status = await bcrypt.compare(req.body.password, user.password);
-            if(!status || !user) response.errorResponse(res, 400, 'Invalid email or password!', error);
-            if(!user.isVerified) response.errorResponse(res, 401, 'Verify your account first!', error);
-            const token = await jwt.jwtSign(user.email, process.env.SECRET);
+            const status = bcrypt.compare(req.body.password, user.password);
+            if (!status || !user) util.setErrorResponse(res, 'Invalid email or password!', 400, error);
+            if (!user.isVerified) util.setErrorResponse(res, 'Verify your account first!', 401, error);
+            const token = jwt.jwtSign(`${cry.crypto()}${req.body.email}`, process.env.SECRET);
             user.token = token;
             delete user.password;
-            response.successResponse(res, 200, 'Logged in successfully!', user);
+            util.setSuccessResponse(res, 'Logged in successfully!', 200,token);
         } catch (error) {
-            response.errorResponse(res, 500, 'Something went wrong!', error);
+            util.setErrorResponse(res, 'Something went wrong!  ', 500, error);
         }
     }
     static async forgotPassword(req, res) {
         try {
             const user = await userService.getUserByMail(req.body.email);
             if (!user) response.errorResponse(res, 404, 'User not found!');
-            const part1 = await ry.crypto();
-            const token = await jwt.jwtSign(user.firstName + part1, process.env.SECRET);
+            const token = jwt.jwtSign(`${cry.crypto()}${user.firstName}`, process.env.SECRET);
             const emailTosend = {
                 to: req.body.email,
                 from: process.env.EMAIL_USER,
@@ -95,11 +107,13 @@ class userController {
         try {
             const token = req.query.token;
             const id = req.query.id;
-            await jwt.jwtVerify(token, process.env.SECRET);
+            jwt.jwtVerify(token, process.env.SECRET);
             const user_ = userService.getUserById(id);
-            if(!user_) response.errorResponse(res, 404, 'User not found!', error); 
+            if (!user_) response.errorResponse(res, 404, 'User not found!', error);
             const hash = bcrypt.encrypt(req.body.password);
-            const newPass = { password: hash };
+            const newPass = {
+                password: hash
+            };
             await userService.updateUser(id, newPass);
             response.successResponse(res, 200, 'Password reset successfully!');
         } catch (error) {
@@ -110,13 +124,45 @@ class userController {
         try {
             let user = await userService.getUserByMail(req.user.email);
             if (!user) user = await userService.createNewUser(req.user, req.user.email);
-            let token = await jwt.jwtSign(user.email, process.env.SECRET);
+            let token =  jwt.jwtSign(user.email, process.env.SECRET);
             user.token = token;
-            response.successResponse(res, 200, 'Logged in successfully', user)
+            response.successResponse(res, 200, 'Logged in successfully', user);
         } catch (error) {
             response.errorResponse(res, 500, 'Something went wrong!', error);
         }
     }
+    static async deleteAccount(req, res) {
+        try {
+            const {
+                id
+            } = req.query;
+            
+            const status = await userService.deleteUser(id);
+           
+           status !=0 ? util.setSuccessResponse(res,"deleted successfully",200,status) : util.setErrorResponse(res,"An error occured",422)
+        } catch (error) {
+            util.setErrorResponse(res,"An error occured : " + error,522);
+        }
+    }
+    static async updateAccount(req,res){
+        try {
+            const  { id } = req.query;
+            const  newInfo = req.body;
+            const updated =  await userService.updateUser(id,newInfo);
+            updated !=0  ? util.setSuccessResponse(res,"updated successfully",200,updated) : util.setErrorResponse(res,"An error occured",422);
+        } catch (error) {
+            util.setErrorResponse(res,error,522);
+        }
+    }
+    static async getAllAccounts(req,res){
+        try {
+            const users = await userService.getAllUsers();
+            response.successResponse(res,200,"List of users",users)
+        } catch (error) {
+          console.log(error)
+        }
+    }
+
 }
 
 export default userController;

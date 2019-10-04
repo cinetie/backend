@@ -77,4 +77,12 @@ export default class Util {
             message: this.message,
         });
     }
+    setSuccessResponse(res,message,statusCode,data){
+        this.setSuccess(message,statusCode,data);
+        return this.send(res);
+    }
+    setErrorResponse(res,message,statusCode){
+        this.setError(statusCode,message);
+        return this.send(res);
+    }
 }
