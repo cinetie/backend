@@ -1,6 +1,5 @@
 import userService from '../services/userServices';
 import tokenService from '../services/tokenService';
-import validation from '../validators/validation';
 import bcrypt from '../helpers/bcrypt';
 import response from '../helpers/response';
 import jwt from '../helpers/jwt';
@@ -13,7 +12,7 @@ class userController {
      let user = null;
         try {
             const newUser = req.body;
-            validation.userValidation(req, res);
+            
             newUser.password = await bcrypt.encrypt(newUser.password);
             newUser.isVerified = false;
             const checkUser = await userService.getUserByMail(newUser.email);
