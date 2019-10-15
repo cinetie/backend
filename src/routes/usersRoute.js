@@ -3,16 +3,18 @@ import validation from '../middlewares/validators/userValidation';
 import passport from 'passport';
 import '../config/passport';
 import {Router} from 'express';
-
+import access from '../middlewares/access';
+import screenValidator from '../middlewares/screenValidation';
+import billing from '../middlewares/billing';
 const router = new Router();
 
 router.use(passport.initialize());
 router.use(passport.session());
 
-router.post('/signup',validation.user,auth.signupUser);
-router.post('/login',auth.loginUser);
-router.delete('/delete_acc',auth.deleteAccount);
-router.get('/all',auth.getAllAccounts);
+router.post('/signup',billing.registerSubscription,validation.user,auth.signupUser);
+router.post('/login',billing.payment,screenValidator.validateNumberOfScreens,auth.loginUser);
+router.delete('/delete_acc',access.isNormalUser,auth.deleteAccount);
+router.get('/all',access.isAdmin,auth.getAllAccounts);
 router.post('/reset_password/',auth.resetPassword);
 router.post('/forgot_password',auth.forgotPassword);
 router.get('/verify/',auth.verify);

@@ -26,6 +26,12 @@ module.exports = {
       isVerified: {
         type: Sequelize.BOOLEAN
       },
+      permissionLevel: {
+        type :Sequelize.INTEGER
+      },
+      isBilledAnnually :{
+        type : Sequelize.BOOLEAN
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
