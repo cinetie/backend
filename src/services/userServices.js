@@ -25,7 +25,7 @@ class userService {
         try {
             return await database.User.findOne({
                 attributes: {
-                    exclude: ['createdAt', 'updatedAt', 'lastName']
+                    exclude: ['createdAt', 'updatedAt']
                 },
                 where: {
                     id: id

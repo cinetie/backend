@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 
-const jwtSign = (string,secret)=>{
+const jwtSign = (string,secret,exp)=>{
     try{
+        //add an expiration option to the token
         return jwt.sign(string,secret);
     } catch(error) {
         throw error;
