@@ -17,6 +17,10 @@ class userValidation {
         .error(() => 'You have to enter a valid phone number. Example: +250788888888'),
       plan: Joi.string()
         .error(() => 'You have to enter a valid plan'),
+      isBilledAnnually:Joi.boolean().required()
+      .error(()=>'Please provide a valid billing cycle'),
+      permissionLevel: Joi.number().min(0).max(2).required()
+      .error(()=>'Permission level incorrect or unsupplied')
     });
     schema.validate(req.body, (err) => {
       if (err) {
@@ -26,6 +30,7 @@ class userValidation {
         });
       } 
     });
+    next();
   }
   static updateUser(req, res, next) {
     const schema = Joi.object().keys({

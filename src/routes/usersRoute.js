@@ -11,7 +11,7 @@ const router = new Router();
 router.use(passport.initialize());
 router.use(passport.session());
 
-router.post('/signup',billing.registerSubscription,validation.user,auth.signupUser);
+router.post('/signup',validation.user,billing.registerSubscription,auth.signupUser);
 router.post('/login',billing.payment,screenValidator.validateNumberOfScreens,auth.loginUser);
 router.delete('/delete_acc',access.isNormalUser,auth.deleteAccount);
 router.get('/all',access.isAdmin,auth.getAllAccounts);

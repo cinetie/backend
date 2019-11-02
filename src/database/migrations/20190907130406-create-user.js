@@ -32,6 +32,9 @@ module.exports = {
       isBilledAnnually :{
         type : Sequelize.BOOLEAN
       },
+      phoneNumber:{
+          type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

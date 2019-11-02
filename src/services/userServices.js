@@ -1,5 +1,6 @@
 import database from '../database/models';
 
+
 class userService {
     static async getUserByMail(email) {
         try {
