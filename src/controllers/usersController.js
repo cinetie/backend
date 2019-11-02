@@ -1,5 +1,6 @@
 import userService from '../services/userServices';
 import tokenService from '../services/tokenService';
+import sessionService from '../services/loginSessionServices';
 import bcrypt from '../helpers/bcrypt';
 import response from '../helpers/response';
 import jwt from '../helpers/jwt';
@@ -24,7 +25,7 @@ class userController {
                 const token = jwt.jwtSign(`${part1}${newUser.email}`, process.env.SECRET,"1d");
                 const tokenToSave = {
                     email: newUser.email,
-                    token: token,
+                    token: token
     
                 };
                
@@ -88,11 +89,11 @@ class userController {
                 timeOut:null,
                 state:"in"
             };
-            const addedSession = await logiSessionService.addSession(session);
+            const addedSession = await sessionService.addSession(session);
             if(!addedSession)util.setErrorResponse(res,`Can't register session`,500);
             util.setSuccessResponse(res, 'Logged in successfully!', 200,token);
         } catch (error) {
-            util.setErrorResponse(res,'Something Went wrong logging in',500);
+            util.setErrorResponse(res,'Something Went wrong logging in '+error.message,500);
         }
     }
     static async forgotPassword(req, res) {
@@ -138,7 +139,7 @@ class userController {
             user.token = token;
             response.successResponse(res, 200, 'Logged in successfully', user);
         } catch (error) {
-            response.errorResponse(res, 500, 'Something went wrong!', error);
+            response.errorResponse(res, 500, 'Something went wrong!', error.message);
         }
     }
     static async deleteAccount(req, res) {
