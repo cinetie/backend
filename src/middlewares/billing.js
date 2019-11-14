@@ -31,12 +31,18 @@ class billing {
                         "callbackUrl": "http://localhost:8000/trans/new",
                         "transactionId": uuid.generator()
                     }
+                   
                     const url = "https://opay-api.oltranz.com/opay/paymentrequest";
+                    
                     axios.post(url, data);
+                    
+                    next();
+                }else{
                     next();
                 }
             } else {
-                next();
+
+                util.setErrorResponse(res,"Something went wrong ",500);
             }
         } catch (error) {
             util.setErrorResponse(res, error.message, 500);

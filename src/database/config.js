@@ -8,7 +8,10 @@ module.exports = {
   },
   development: {
     use_env_variable: 'DEV_DATABASE_URL',
-    dialect: 'DIALECT'
+    dialect: 'DIALECT',
+    dialectOptions:{
+      typeCast:true
+    }
   },
   test: {
     use_env_variable: 'DATABASE_URL_TEST',

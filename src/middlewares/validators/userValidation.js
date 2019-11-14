@@ -20,7 +20,11 @@ class userValidation {
       isBilledAnnually:Joi.boolean().required()
       .error(()=>'Please provide a valid billing cycle'),
       permissionLevel: Joi.number().min(0).max(2).required()
-      .error(()=>'Permission level incorrect or unsupplied')
+      .error(()=>'Permission level incorrect or unsupplied'),
+      cityOfResidence:Joi.string().min(3).max(30).required()
+      .error(()=> 'You have to enter a valid city of residence. Example: Kigali,New york'),
+      nationality: Joi.string().min(3).max(30).required()
+      .error(()=> 'You have to a valid nationality. Example: Rwandan,American')
     });
     schema.validate(req.body, (err) => {
       if (err) {
