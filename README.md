@@ -35,34 +35,42 @@ start by creating an account: POST request
 REQUEST BODY:
 ```
 {
-    "firstName": "John"
-    "lastName": "DOe",
-    "email": "jdoe@mailer.com",
-    "password": "XXXXXX",
-    "plan": "gold",
-    "permissionLevel":2
-}
+    "firstName": "Jane",
+    "lastName": "doe",
+    "email": "jane@gmail.com",
+    "password": "nAdia123",
+    "plan": "Premium",
+    "phoneNumber":"+250780964422",
+    "isBilledAnnually":"true",
+    "permissionLevel":2,
+    "cityOfResidence":"kigali",
+    "nationality":"Rwandan"
+} 
 
 ```
 RESPONSE:
 
 ```
 {
-    "statusCode": 201,
-    "status": "success",
-    "message": "Signed up successfully",
-    "data": {
-        "id": XXX,
-        "firstName":john,
-        "lastName": doe,
-        "email": "jdoe@mailer.com",
-        "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx",
-        "plan": "gold",
-        "permissionLevel": 2,
-        "isVerified": false,
-        "updatedAt": "2019-10-12T07:13:45.850Z",
-        "createdAt": "2019-10-12T07:13:45.850Z"
-    }
+  "statusCode": 201,
+  "status": "success",
+  "message": "Signed up successfully",
+  "data": {
+    "id": 3,
+    "firstName": "Jane",
+    "lastName": "doe",
+    "email": "jane@gmail.com",
+    "password": "$2b$10$bDXbI8pGB0D09H5ciH16qOvk7r7wAzGgiCsFe466SQjZRX0dXbFzG",
+    "plan": "Premium",
+    "phoneNumber": "+250780964422",
+    "isBilledAnnually": true,
+    "permissionLevel": 2,
+    "cityOfResidence": "kigali",
+    "nationality": "Rwandan",
+    "isVerified": false,
+    "updatedAt": "2019-11-16T20:42:27.805Z",
+    "createdAt": "2019-11-16T20:42:27.805Z"
+  }
 }
 ```
 2.Then proceed with the Account verification
