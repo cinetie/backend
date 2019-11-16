@@ -1,5 +1,6 @@
 import userService from '../services/userServices';
 import tokenService from '../services/tokenService';
+import billingServices from '../services/billingServices';
 import sessionService from '../services/loginSessionServices';
 import bcrypt from '../helpers/bcrypt';
 import response from '../helpers/response';
@@ -7,6 +8,7 @@ import jwt from '../helpers/jwt';
 import cry from '../helpers/crypto';
 import mdw from '../helpers/mailer';
 import Util from '../helpers/utilities';
+import date from '../helpers/date';
 const util = new Util();
 class userController {
     static async signupUser(req, res) {
@@ -78,7 +80,7 @@ class userController {
             const status = bcrypt.compare(req.body.password, user.password);
             if (!status || !user) util.setErrorResponse(res, 'Invalid email or password!', 400);
             if (!user.isVerified) util.setErrorResponse(res, 'Verify your account first!', 401);
-            const token = jwt.jwtSign({key:cry.crypto(),id:user.id}, process.env.SECRET,"1d");
+            const token = jwt.jwtSign({key:cry.crypto(),email:req.body.email}, process.env.SECRET,"1d");
             user.token = token;
             delete user.password;
             const date = new Date();
@@ -93,7 +95,7 @@ class userController {
             if(!addedSession)util.setErrorResponse(res,`Can't register session`,500);
             util.setSuccessResponse(res, 'Logged in successfully!', 200,token);
         } catch (error) {
-            util.setErrorResponse(res,'Something Went wrong logging in '+error.message,500);
+            util.setErrorResponse(res,'Something Went wrong logging in '+error,500);
         }
     }
     static async forgotPassword(req, res) {
@@ -169,6 +171,30 @@ class userController {
             response.successResponse(res,200,"List of users",users)
         } catch (error) {
           util.setErrorResponse(res,error,503);
+        }
+    }
+    static async getSubscribersInRange(req,res){
+        try {
+            //in Milliseconds since epoch.
+            const start = date.convertToTimestamp(req.body.start)
+            const end = date.convertToTimestamp(req.body.end);
+            const data = await billingServices.getMonthlySubscribers(start,end);
+            if(Object.values(data).length>0){
+                util.setSuccessResponse(res,"Data was found",200,data)
+            }else{
+                util.setErrorResponse(res,"Data was not found",400);
+            }
+
+        } catch (error) {
+            return response.errorResponse(res,500,"Something wrong happened "+error.message,error);
+        }
+    }
+    static async getLiveUsers(req,res){
+        try {
+            const data = await sessionService.getLiveSessions();
+            (data) ? util.setSuccessResponse(res,"Found ",200,data) : util.setErrorResponse(res,"Can't find Live users " + JSON.stringify(data),404)
+        } catch (error) {
+            util.setErrorResponse(res,error.message,500);
         }
     }
 

@@ -9,6 +9,8 @@ module.exports = (sequelize, DataTypes) => {
     isVerified: DataTypes.BOOLEAN,
     isBilledAnnually:DataTypes.BOOLEAN,
     permissionLevel:DataTypes.INTEGER,
+    nationality:DataTypes.STRING,
+    cityOfResidence:DataTypes.STRING,
     phoneNumber:DataTypes.STRING
   }, {});
   User.associate = function(models) {

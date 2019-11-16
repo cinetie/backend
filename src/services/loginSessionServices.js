@@ -34,6 +34,22 @@ class loginSessionServices {
         }
 
     }
+    static async getLiveSessions(){
+        try {
+            const session = await database.loginSessions.findAll({
+                where : {
+                    state: "in"
+                }
+            });
+            if(session){
+                return session
+            } else{
+                return null;
+            }
+        } catch (error) {
+            
+        }
+    }
     static async getAllSession() {
 
         try {

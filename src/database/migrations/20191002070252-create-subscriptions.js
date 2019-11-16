@@ -1,6 +1,7 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
+    const now =  Date.now();
     return queryInterface.createTable('subscriptions', {
       id: {
         allowNull: false,
@@ -28,11 +29,11 @@ module.exports = {
     },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       }
     });
   },
