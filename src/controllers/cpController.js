@@ -7,6 +7,7 @@ import jwt from '../helpers/jwt';
 import cry from '../helpers/crypto';
 import mdw from '../helpers/mailer';
 import Util from '../helpers/utilities';
+import uuid from '../helpers/uuid';
 const util = new Util();
 //add an isVerified column to cp
 class cpController {
@@ -17,6 +18,7 @@ class cpController {
             
             newUser.password = await bcrypt.encrypt(newUser.password);
             newUser.isVerified = false;
+            newUser.clientId = uuid.generator();
             const checkUser = await cp.getCpByMail(newUser.email);
             if (checkUser != null) {
                 util.setErrorResponse(res,"User already exists",422);
@@ -35,7 +37,7 @@ class cpController {
                     to: req.body.email,
                     from: process.env.EMAIL_USER,
                     subject: 'Please verify your email!',
-                    text: 'Dear ' + newUser.firstName + ' please follow this link to verify your email http://localhost:5000/auth/verify/?id=' + createdUser.id + '&&token=' + token,
+                    text: 'Dear ' + newUser.firstName + ' please follow this link to verify your email http://localhost:5000/cp/verify/?id=' + createdUser.id + '&&token=' + token,
                 };
                  await mdw.mailer(emailTosend);
                 const userToken = jwt.jwtSign(createdUser.email, process.env.SECRET,"1d");
@@ -59,7 +61,7 @@ class cpController {
                 token
             } = req.query;
             const user = await cp.getCpById(id);
-            if (!user) response.errorResponse(res, 404, 'User not found');
+            if (!user) response.errorResponse(res, 404, 'User not found '+id);
             jwt.jwtVerify(token, process.env.SECRET);
             const newUser = {
                 isVerified: true
@@ -79,7 +81,7 @@ class cpController {
             const status = bcrypt.compare(req.body.password, user.password);
             if (!status || !user) util.setErrorResponse(res, 'Invalid email or password!', 400);
             if (!user.isVerified) util.setErrorResponse(res, 'Verify your account first!', 401);
-            const token = jwt.jwtSign({key:cry.crypto(),email:user.email}, process.env.SECRET,"1d");
+            const token = jwt.jwtSign({key:cry.crypto(),email:user.email,clientId:user.clientId}, process.env.SECRET,"1d");
             user.token = token;
             delete user.password;
             const date = new Date();

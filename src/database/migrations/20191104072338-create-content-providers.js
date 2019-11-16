@@ -11,6 +11,15 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
+      password: {
+        type: Sequelize.STRING
+      },
+      isVerified:{
+        type:Sequelize.BOOLEAN
+      },
+      clientId:{
+        type:Sequelize.STRING
+      },
       phoneLine: {
         type: Sequelize.STRING
       },

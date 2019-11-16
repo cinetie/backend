@@ -2,7 +2,7 @@ import viewingSessions from '../services/viewingSessionsServices';
 import response from '../helpers/response';
 import ipServices from '../helpers/iplocation';
 
-class viewingSessions {
+class viewingSession {
 
     static async createNewWatchCount(req, res, next) {
         try {
@@ -23,4 +23,4 @@ class viewingSessions {
         }
     }
 }
-export default viewingSessions;
+export default viewingSession;

@@ -1,6 +1,9 @@
 import database from '../database/models';
+import date from '../helpers/date';
+import sequelize from 'sequelize';
+import checker from '../helpers/If';
 
-
+const op =  sequelize.Op;
 class earningsService {
     static async getEarningsByVideo(videoId) {
         try {
@@ -8,7 +11,9 @@ class earningsService {
                 attributes: {
                     exclude: ['createdAt', 'updatedAt']
                 },
-                where: { videoId }
+                where: {
+                    videoId
+                }
             });
             if (user) {
                 return user;
@@ -26,7 +31,9 @@ class earningsService {
                 attributes: {
                     exclude: ['createdAt', 'updatedAt']
                 },
-                where: { id }
+                where: {
+                    id
+                }
             });
         } catch (error) {
             throw error;
@@ -35,7 +42,7 @@ class earningsService {
 
     static async createNewEarnings(newEarnings) {
         try {
-          return  await database.earnings.create(newEarnings);
+            return await database.earnings.create(newEarnings);
         } catch (error) {
             throw error;
         }
@@ -44,7 +51,9 @@ class earningsService {
     static async updateEarnings(id, newEarnings) {
         try {
             return await database.earnings.update(newEarnings, {
-                where: { id }
+                where: {
+                    id
+                }
             });
         } catch (error) {
             throw error;
@@ -54,7 +63,9 @@ class earningsService {
         try {
             return await database.earnings.destroy({
                 returning: true,
-                where: { id }
+                where: {
+                    id
+                }
             });
         } catch (error) {
             throw error;
@@ -65,6 +76,36 @@ class earningsService {
             return await database.earnings.findAll();
         } catch (error) {
             throw error;
+        }
+    }
+    //get All active earnings from the last 6 months
+    static async getAllFromThreeshold(clientId,min) {
+        try {
+            const origin = date.removeDays(180);
+            const newOrigin = date.convertToTimestamp(origin)
+            const data = await database.earnings.findAll({
+                attributes: {
+                    include: [
+                        [sequelize.fn('sum', sequelize.col('amount')), 'sum'],
+                        [sequelize.fn('avg',sequelize.col('amount')),'avg']
+                    ]
+                },
+                where: {
+                    [op.and]: [{
+                        createdAt: {
+                            [op.lte]: newOrigin
+                        },
+                        state:"Active",
+                        amount:{
+                            [op.gte]:min
+                        },
+                        clientId:clientId
+                    }]
+                }
+            });
+            checker.checker(data);
+        } catch (error) {
+            throw error
         }
     }
 }

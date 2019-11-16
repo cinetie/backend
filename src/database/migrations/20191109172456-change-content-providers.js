@@ -1,3 +1,4 @@
+import uuid from '../../helpers/uuid';
 'use strict';
 
 module.exports = {
@@ -8,7 +9,10 @@ module.exports = {
       return  queryInterface.addColumn('contentProviders','isVerified',Sequelize.BOOLEAN)
     })
     .then(()=>{
-      return queryInterface.addColumn('contentProviders','permissionLevel')
+      return queryInterface.addColumn('contentProviders','clientId',{
+        type:Sequelize.STRING,
+        defaultValue:uuid.generator()
+      })
     })
   },
 
@@ -17,6 +21,9 @@ module.exports = {
     return queryInterface.removeColumn('contentProviders','password')
     .then(()=>{
       return queryInterface.removeColumn('contentProviders','isVerified')
+    })
+    .then(()=>{
+      return queryInterface.removeColumn('contentProviders','clientId')
     })
   }
 };
