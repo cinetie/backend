@@ -8,6 +8,12 @@ const addMoreDays = (days) =>{
     date.setDate(date.getDate()+days);
     return date;
 };
+const removeDays = (days) =>{
+    const start = new Date();
+    const date = new Date(start.valueOf);
+    date.setDate(date.getDate()-days);
+    return date;
+}
 //if today's date is 30 and tommorow is 31 then return 0 if tommorow !=31 and today is 30 return 1
 //if today's date == 31 return 1 and lastly if today's date !=30 then return 0
 // 0 :false 1: true
@@ -33,4 +39,4 @@ const convertToTimestamp =(date) =>{
     return newDate;
 }
 
-export default { getCurrentDate,addMoreDays,isEndOfMonth,convertToTimestamp};
+export default { getCurrentDate,addMoreDays,isEndOfMonth,convertToTimestamp,removeDays};

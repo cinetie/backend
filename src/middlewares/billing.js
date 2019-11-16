@@ -4,7 +4,6 @@ import Util from '../helpers/utilities';
 import date from '../helpers/date';
 import axios from '../helpers/axios';
 import uuid from '../helpers/uuid';
-import userService from '../services/userServices';
 //opay@123
 const util = new Util();
 class billing {
