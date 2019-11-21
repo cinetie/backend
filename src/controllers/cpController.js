@@ -8,6 +8,7 @@ import cry from '../helpers/crypto';
 import mdw from '../helpers/mailer';
 import Util from '../helpers/utilities';
 import uuid from '../helpers/uuid';
+import cloudinary from '../helpers/cloudinary';
 const util = new Util();
 //add an isVerified column to cp
 class cpController {
@@ -19,6 +20,9 @@ class cpController {
             newUser.password = await bcrypt.encrypt(newUser.password);
             newUser.isVerified = false;
             newUser.clientId = uuid.generator();
+            const image = req.files.image;
+            const imageToUpload = await cloudinary(image.tempFilePath);
+            newUser.idLink = imageToUpload.url;
             const checkUser = await cp.getCpByMail(newUser.email);
             if (checkUser != null) {
                 util.setErrorResponse(res,"User already exists",422);
@@ -54,24 +58,27 @@ class cpController {
     }
     static async verify(req, res) {
         try {
-            const {
-                id
-            } = req.query;
-            const {
-                token
-            } = req.query;
+            const { id } = req.query;
+            const { token } = req.query;
             const user = await cp.getCpById(id);
-            if (!user) response.errorResponse(res, 404, 'User not found '+id);
+            if (!user) return response.errorResponse(res, 404, 'User not found ');
             jwt.jwtVerify(token, process.env.SECRET);
             const newUser = {
                 isVerified: true
             };
             await tokenService.destroyToken(token);
             const updatedUser = await cp.updateCp(id, newUser);
+            const emailTosend = {
+                to: user.email,
+                from: process.env.EMAIL_USER,
+                subject: 'CINETIE email verification',
+                text: 'Dear ' + user.name + ' Your Email has been verified successfully '
+            };
+             await mdw.mailer(emailTosend);
             delete updatedUser.password;
-            util.setSuccessResponse(res,'Verified successfully!', 200, updatedUser);
+            res.redirect("https://www.google.com")
         } catch (error) {
-            util.setErrorResponse(res, 'Something went wrong', 500, error);
+            util.setErrorResponse(res, 'Something went wrong '+error.message, 500);
         }
     }
     static async loginUser(req, res) {
@@ -102,7 +109,7 @@ class cpController {
     static async forgotPassword(req, res) {
         try {
             const user = await cp.getCpByMail(req.body.email);
-            if (!user) response.errorResponse(res, 404, 'User not found!');
+            if (!user) return response.errorResponse(res, 404, 'User not found! '+JSON.stringify(user));
             const token = jwt.jwtSign(`${cry.crypto()}${user.firstName}`, process.env.SECRET,"1d");
             const emailTosend = {
                 to: req.body.email,

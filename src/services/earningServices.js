@@ -48,13 +48,13 @@ class earningsService {
         }
     }
 
-    static async updateEarnings(id, newEarnings) {
+    static async updateEarnings(id, updates) {
         try {
-            return await database.earnings.update(newEarnings, {
-                where: {
-                    id
-                }
+          return  await database.earnings.update(updates, {
+                returning:true,
+                where: { id }
             });
+        
         } catch (error) {
             throw error;
         }
@@ -82,31 +82,32 @@ class earningsService {
     static async getAllFromThreeshold(clientId,min) {
         try {
             const origin = date.removeDays(180);
-            const newOrigin = date.convertToTimestamp(origin)
             const data = await database.earnings.findAll({
-                attributes: {
-                    include: [
-                        [sequelize.fn('sum', sequelize.col('amount')), 'sum'],
-                        [sequelize.fn('avg',sequelize.col('amount')),'avg']
-                    ]
-                },
                 where: {
                     [op.and]: [{
-                        createdAt: {
-                            [op.lte]: newOrigin
+                        monthYear: {
+                            [op.lte]: 1574160508810
+
                         },
                         state:"Active",
                         amount:{
-                            [op.gte]:min
+                            [op.gte]:0
                         },
                         clientId:clientId
                     }]
                 }
             });
-            checker.checker(data);
+            // console.log(JSON.stringify(data))
+            if(data){
+                return data
+            }else{
+                return null;
+            }
         } catch (error) {
             throw error
         }
     }
+   
+    
 }
 export default earningsService;

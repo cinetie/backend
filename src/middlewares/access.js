@@ -14,11 +14,9 @@ class Access {
     // level 2 permission checkpoint
     static async isAdmin(req, res, next) {
         try {
-
-            const decoded = jwt.jwtVerify(req.query.auth_token, process.env.SECRET);
+            const decoded = jwt.jwtVerify(req.query.authToken, process.env.SECRET);
             const email = decoded.email
-            const user = await userService.getUserByMail(email) 
-            
+            const user = await userService.getUserByMail(email)
             if (!user) util.setErrorResponse(res, "Can't find user", 404);
             (user.permissionLevel != 2) ? util.setErrorResponse(res, "Access denied  ", 403): next();
         } catch (error) {
@@ -29,10 +27,10 @@ class Access {
     //level 1 permission checkpoint
     static async isProducer(req, res, next) {
         try {
-            const decoded = jwt.jwtVerify(req.query.auth_token, process.env.SECRET);
+            const decoded = jwt.jwtVerify(req.query.authToken, process.env.SECRET);
             const email = decoded.email
-            const user =  await cpService.getCpByMail(email);
-            (user) ? util.setErrorResponse(res, "Access denied", 403): next();
+            const user = await cpService.getCpByMail(email);
+            (!user) ? util.setErrorResponse(res, "Access denied", 403): next();
         } catch (error) {
             throw error;
         }
@@ -43,7 +41,7 @@ class Access {
             const decoded = jwt.jwtVerify(req.query.auth_token, process.env.SECRET);
             const email = decoded.email
             const user = await userService.getUserByMail(email)
-            (user.permissionLevel == 0) ? util.setErrorResponse(res, "Access denied ", 403): next();
+                (user.permissionLevel == 0) ? util.setErrorResponse(res, "Access denied ", 403) : next();
         } catch (error) {
             throw error;
         }

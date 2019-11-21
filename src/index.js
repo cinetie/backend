@@ -2,6 +2,7 @@ import '@babel/polyfill';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import fileUpload from 'express-fileupload';
 import response from './helpers/response';
 import routes from './routes';
 
@@ -19,6 +20,10 @@ app.use((req, res, next) => {
   }
   next();
 });
+app.use(fileUpload({
+  useTempFiles: true,
+  tempFileDir: '/tmp/'
+}));
 
 app.get('/', (req, res) => {
   response.successResponse(res, 200, 'Welcome to Cinetie');

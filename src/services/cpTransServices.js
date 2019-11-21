@@ -1,4 +1,4 @@
-import database from '../database';
+import database from '../database/models';
 import checker from '../helpers/If';
 
 //Services for  handling Content providers cash transactions like withdrawals and invoicing
