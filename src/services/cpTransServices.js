@@ -27,7 +27,11 @@ class cpTransServices{
             const data = await database.cpTransactions.findAll({
                 where : {clientId}
             });
-            checker.checker(data)
+            if(data){
+                return data;
+            }else{
+                return null;
+            }
         } catch (error) {
             throw error;
         }
