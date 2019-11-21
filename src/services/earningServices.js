@@ -82,22 +82,23 @@ class earningsService {
     static async getAllFromThreeshold(clientId,min) {
         try {
             const origin = date.removeDays(180);
+            console.log(origin);
             const data = await database.earnings.findAll({
                 where: {
                     [op.and]: [{
                         monthYear: {
-                            [op.lte]: 1574160508810
+                            [op.gte]: origin
 
                         },
                         state:"Active",
                         amount:{
-                            [op.gte]:0
+                            [op.gte]:min
                         },
                         clientId:clientId
                     }]
                 }
             });
-            // console.log(JSON.stringify(data))
+             console.log(JSON.stringify(data))
             if(data){
                 return data
             }else{
