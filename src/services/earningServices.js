@@ -98,7 +98,7 @@ class earningsService {
                     }]
                 }
             });
-             console.log(JSON.stringify(data))
+             
             if(data){
                 return data
             }else{
