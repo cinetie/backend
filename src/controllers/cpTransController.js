@@ -54,7 +54,7 @@ class cpTransController {
 
     }
     static async checkout(req, res) {
-        // try {
+     try {
         const token = req.query.authToken;
         const raw = jwt.jwtVerify(token, process.env.SECRET);
         const data = await earningService.getAllFromThreeshold(raw.clientId,process.env.MIN_CASHOUT);
@@ -62,14 +62,14 @@ class cpTransController {
         for (let i = 0; i < Object.values(data).length; i++) {
             sum += Number(data[i].amount);
         }
-        // console.log(sum);
+        
         if (Object.values(data).length > 0) {
             const transactInfo = {
                 clientId: raw.clientId,
                 date: new Date().getTime(),
                 amount: sum
             }
-            // console.log(JSON.stringify(transactInfo));
+           
             await services.createTrans(transactInfo);
             for (let i = 0; i < Object.values(data).length; i++) {
                 const updates = {
@@ -83,9 +83,9 @@ class cpTransController {
             helpers.setErrorResponse(res, "Can't Cash out", 400);
         }
 
-        // } catch (error) {
-        //     helpers.setErrorResponse(res,error.message,500);
-        // }
+        } catch (error) {
+            helpers.setErrorResponse(res,error.message,500);
+        }
     }
 
 }
