@@ -7,6 +7,7 @@ import transRoute from '../routes/transRoute';
 import videoRoute from '../routes/videoRoutes';
 import videoSessionRoute from '../routes/videoSessionRoutes';
 import cpRoutes from '../routes/cpRoutes';
+import cpTransRoutes from '../routes/cpTransRoutes';
 const router = Router();
 
 router.use('/cp',cpRoutes);
@@ -14,6 +15,7 @@ router.use('/auth', usersRoute);
 router.use('/plan' ,planRoute);
 router.use('/trans',transRoute);
 router.use('/video',videoRoute);
+router.use('/cp/trans',access.isProducer,cpTransRoutes);
 router.use('/sessions/video',access.isAdmin,videoSessionRoute);
 router.use('/profile',access.isNormalUser, profileRoute);
 

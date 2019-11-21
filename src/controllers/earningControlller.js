@@ -29,7 +29,7 @@ class earningController {
     static async calculateRatePerVideo(email) {
         const sessionDetails = await this.getCurrentViewingSessions(email)
         const subscriptionDetails = await this.getCurrentSubscriptionDetails(email);
-        const rate = subscriptionDetails.price / Object.values(sessionDetails).length;
+        const rate = (subscriptionDetails.price)*0.7 / Object.values(sessionDetails).length;
         if(rate){
             return rate;
         }else{
@@ -45,13 +45,14 @@ class earningController {
             const sessions = await this.getCurrentViewingSessions(email);
             const rate = await this.calculateRatePerVideo(email);
             const date = new Date();
+            console.log(JSON.stringify(sessions))
             sessions.forEach(async data => {
                 const earnings = {
                     videoId: data.videoId,
                     clientId: data.clientId,
                     amount: rate.toPrecision(4),
                     state:"Active",
-                    monthYear: date.valueOf()
+                    monthYear: date.getTime()
                 }
              results =  await earningService.createNewEarnings(earnings);
             });

@@ -44,9 +44,9 @@ class viewingSessionservices {
     static async getActiveSessionsPerUser(userId){
         try {
             const sessions = await database.viewingSessions.findAll({
-               attributes:{
-                   include : [[sequelize.fn('count',sequelize.col('userId')),'watchCount']]
-               },
+            //    attributes:{
+            //        include : [[sequelize.fn('count',sequelize.col('userId')),'watchCount']]
+            //    },
                where :{
                 [op.and]:[
                     {userId},

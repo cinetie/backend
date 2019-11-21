@@ -12,7 +12,7 @@ router.post('/signup',auth.signupCp);
 router.post('/login',auth.loginUser);
 router.delete('/delete_acc',access.isProducer,auth.deleteAccount);
 router.get('/all',access.isAdmin,auth.getAllAccounts);
-router.post('/reset_password/',auth.resetPassword);
+router.get('/reset_password/',auth.resetPassword);
 router.post('/forgot_password',auth.forgotPassword);
 router.get('/verify/',auth.verify);
 router.put('/update',access.isProducer,auth.updateAccount);

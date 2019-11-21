@@ -85,4 +85,5 @@ export default class Util {
         this.setError(statusCode,message);
         return this.send(res);
     }
+    
 }

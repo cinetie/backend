@@ -20,16 +20,19 @@ class cpService {
         }
     }
 
-    static async getCpById(clientId) {
+    static async getCpById(id) {
         try {
-            return await database.contentProviders.findOne({
+            const user = await database.contentProviders.findOne({
                 attributes: {
                     exclude: ['createdAt', 'updatedAt']
                 },
-                where: {
-                    clientId: clientId
-                }
+                where: { id }
             });
+            if(user){
+                return user;
+            }else{
+                return null;
+            }
         } catch (error) {
             throw error;
         }
@@ -43,12 +46,10 @@ class cpService {
         }
     }
 
-    static async updateCp(clientId, oldCp) {
+    static async updateCp(id, oldCp) {
         try {
             return await database.contentProviders.update(oldCp, {
-                where: {
-                    clientId: clientId
-                }
+                where: { id }
             });
         } catch (error) {
             throw error;

@@ -68,7 +68,14 @@ class userController {
             await tokenService.destroyToken(token);
             const updatedUser = await userService.updateUser(id, newUser);
             delete updatedUser.password;
-            util.setSuccessResponse(res,'Verified successfully!', 200, updatedUser);
+            const emailTosend = {
+                to: user.email,
+                from: process.env.EMAIL_USER,
+                subject: 'Success email has been sent',
+                text: 'Dear ' + user.firstName + ' Your Email has been verified successfully '
+            };
+             await mdw.mailer(emailTosend);
+             res.redirect("https://www.google.com")
         } catch (error) {
             util.setErrorResponse(res, 'Something went wrong', 500, error);
         }
