@@ -15,12 +15,11 @@ class Access {
     static async isAdmin(req, res, next) {
         try {
             const decoded = jwt.jwtVerify(req.query.authToken, process.env.SECRET);
-            const email = decoded.email
-            const user = await userService.getUserByMail(email)
-            if (!user) util.setErrorResponse(res, "Can't find user", 404);
-            (user.permissionLevel != 2) ? util.setErrorResponse(res, "Access denied  ", 403): next();
+            const user = decoded.user
+            if (!user) util.setErrorResponse(res, "Invalid access token", 400);
+            (user != process.env.ADMIN_USER) ? util.setErrorResponse(res, "Access denied  ", 403): next();
         } catch (error) {
-            throw error;
+            util.setErrorResponse(res,error.message,500);
         }
 
     }
@@ -32,7 +31,7 @@ class Access {
             const user = await cpService.getCpByMail(email);
             (!user) ? util.setErrorResponse(res, "Access denied", 403): next();
         } catch (error) {
-            throw error;
+            util.setErrorResponse(res,error.message,500);
         }
     }
     //level 0 permission checkpoint
@@ -43,7 +42,7 @@ class Access {
             const user = await userService.getUserByMail(email)
                 (user.permissionLevel == 0) ? util.setErrorResponse(res, "Access denied ", 403) : next();
         } catch (error) {
-            throw error;
+            util.setErrorResponse(res,error.message,500);
         }
     }
 
