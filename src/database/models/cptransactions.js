@@ -4,7 +4,8 @@ module.exports = (sequelize, DataTypes) => {
     clientId: DataTypes.STRING,
     date: DataTypes.BIGINT,
     amount: DataTypes.FLOAT,
-    cashableBalance: DataTypes.FLOAT
+    cashableBalance: DataTypes.FLOAT,
+    state :DataTypes.STRING
   }, {});
   cpTransactions.associate = function(models) {
     // associations can be defined here

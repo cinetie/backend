@@ -42,7 +42,6 @@ class cpTransController {
                 data: data,
                 sum: sum
             }
-            console.log(JSON.stringify(finalData))
             if (data) {
                 helpers.setSuccessResponse(res, "Success", 200, finalData)
             } else {
@@ -54,39 +53,55 @@ class cpTransController {
 
     }
     static async checkout(req, res) {
-     try {
-        const token = req.query.authToken;
-        const raw = jwt.jwtVerify(token, process.env.SECRET);
-        const data = await earningService.getAllFromThreeshold(raw.clientId,process.env.MIN_CASHOUT);
-        let sum = 0;
-        for (let i = 0; i < Object.values(data).length; i++) {
-            sum += Number(data[i].amount);
-        }
-        
-        if (Object.values(data).length > 0) {
-            const transactInfo = {
-                clientId: raw.clientId,
-                date: new Date().getTime(),
-                amount: sum
-            }
-           
-            await services.createTrans(transactInfo);
+        try {
+            const token = req.query.authToken;
+            const raw = jwt.jwtVerify(token, process.env.SECRET);
+            const data = await earningService.getAllFromThreeshold(raw.clientId, process.env.MIN_CASHOUT);
+            let sum = 0;
             for (let i = 0; i < Object.values(data).length; i++) {
-                const updates = {
-                    state : "inActive"
-                }
-                await earningService.updateEarnings(data[i].id, updates);
-
+                sum += Number(data[i].amount);
             }
-            helpers.setSuccessResponse(res, "Successfully checkout", 200)
-        } else {
-            helpers.setErrorResponse(res, "Can't Cash out", 400);
-        }
+
+            if (Object.values(data).length > 0) {
+                const transactInfo = {
+                    clientId: raw.clientId,
+                    date: new Date().getTime(),
+                    amount: sum
+                }
+
+                await services.createTrans(transactInfo);
+                for (let i = 0; i < Object.values(data).length; i++) {
+                    const updates = {
+                        state: "inActive"
+                    }
+                    await earningService.updateEarnings(data[i].id, updates);
+
+                }
+                helpers.setSuccessResponse(res, "Successfully checkout", 200)
+            } else {
+                helpers.setErrorResponse(res, "Can't Cash out", 400);
+            }
 
         } catch (error) {
-            helpers.setErrorResponse(res,error.message,500);
+            helpers.setErrorResponse(res, error.message, 500);
         }
     }
 
+    static async patchNonApprovedTrans(req,res) {
+
+        try {
+            const id = req.query.id;
+            const data = await services.updateTrans(id,{state: "Approved"});
+            console.log(JSON.stringify(data));
+            if (data) {
+                helpers.setSuccessResponse(res, "Successfully Approved cashout", 200);
+            } else {
+                helpers.setErrorResponse(res, "can't approve cashout", 403);
+            }
+        } catch (error) {
+            helpers.setErrorResponse(res,error.message,500);
+        }
+
+    }
 }
 export default cpTransController;
