@@ -14,7 +14,9 @@ class Access {
     // level 2 permission checkpoint
     static async isAdmin(req, res, next) {
         try {
-            const decoded = jwt.jwtVerify(req.query.authToken, process.env.SECRET);
+            console.log(req.headers)
+            const token = req.headers.authorization.slice(7)
+            const decoded = jwt.jwtVerify(token, process.env.SECRET);
             const user = decoded.user
             if (!user) util.setErrorResponse(res, "Invalid access token", 400);
             (user != process.env.ADMIN_USER) ? util.setErrorResponse(res, "Access denied  ", 403): next();
@@ -26,7 +28,8 @@ class Access {
     //level 1 permission checkpoint
     static async isProducer(req, res, next) {
         try {
-            const decoded = jwt.jwtVerify(req.query.authToken, process.env.SECRET);
+            const token = req.headers.authorization.slice(7)
+            const decoded = jwt.jwtVerify(token, process.env.SECRET);
             const email = decoded.email
             const user = await cpService.getCpByMail(email);
             (!user) ? util.setErrorResponse(res, "Access denied", 403): next();
@@ -37,7 +40,8 @@ class Access {
     //level 0 permission checkpoint
     static async isNormalUser(req, res, next) {
         try {
-            const decoded = jwt.jwtVerify(req.query.auth_token, process.env.SECRET);
+            const token = req.headers.authorization.slice(7)
+            const decoded = jwt.jwtVerify(token, process.env.SECRET);
             const email = decoded.email
             const user = await userService.getUserByMail(email)
                 (user.permissionLevel == 0) ? util.setErrorResponse(res, "Access denied ", 403) : next();

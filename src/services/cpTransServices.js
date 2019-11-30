@@ -1,6 +1,8 @@
 import database from '../database/models';
 import checker from '../helpers/If';
+import sequelize from 'sequelize';
 
+const op = sequelize.Op;
 //Services for  handling Content providers cash transactions like withdrawals and invoicing
 
 class cpTransServices{
@@ -36,6 +38,25 @@ class cpTransServices{
             throw error;
         }
        
+    }
+    static async updateTrans(id,updates){
+        try {
+            const data = await database.cpTransactions.update(updates,{
+                where : {
+                    [op.and]:[
+                        {id},
+                        {state:"Not Approved"}
+                    ]
+                }
+            });
+            if(data){
+                return data;
+            }else{
+                return null;
+            }
+        } catch (error) {
+            throw error;
+        }
     }
 }
 export default cpTransServices;

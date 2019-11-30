@@ -15,7 +15,7 @@ router.use('/auth', usersRoute);
 router.use('/plan' ,planRoute);
 router.use('/trans',transRoute);
 router.use('/video',videoRoute);
-router.use('/cp/trans',access.isProducer,cpTransRoutes);
+router.use('/cp/trans',cpTransRoutes);
 router.use('/sessions/video',access.isAdmin,videoSessionRoute);
 router.use('/profile',access.isNormalUser, profileRoute);
 
