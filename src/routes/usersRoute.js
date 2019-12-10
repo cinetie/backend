@@ -7,7 +7,6 @@ import access from '../middlewares/access'
 import screenValidator from '../middlewares/screenValidation'
 import billing from '../middlewares/billing'
 import earnings from '../middlewares/earnings'
-import admin  from '../middlewares/isAdmin'
 const router = new Router()
 
 router.use(passport.initialize())

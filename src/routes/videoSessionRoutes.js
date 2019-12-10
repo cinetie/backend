@@ -1,8 +1,8 @@
-import controller from '../controllers/viewingSessionsController';
-import { Router } from 'express';
+import controller from '../controllers/viewingSessionsController'
+import { Router } from 'express'
 
-const router = new Router();
+const router = new Router()
 
-router.get('/',controller.getSpecificSessions);
-
-export default router;
+router.get('/',controller.getSpecificSessions)
+router.get('/user',controller.getAllSessionsPerUser)
+export default router

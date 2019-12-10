@@ -3,6 +3,7 @@ import planService from '../services/planServices'
 import Util from '../helpers/utilities'
 import date from '../helpers/date'
 import axios from '../helpers/axios'
+import fetch from 'node-fetch'
 import uuid from '../helpers/uuid'
 //opay@123
 const util = new Util()
@@ -20,8 +21,10 @@ class billing {
 		try {
 			const details = await billing.fetchCurrentSubscription(req, res)
 			if (details != null && details.phoneNumber != null) {
+
 				const date = new Date()
 				if (details.endDate == date.toDateString()) {
+
 					const data = {
 						'telephoneNumber': details.phoneNumber,
 						'amount': details.price,
@@ -30,18 +33,16 @@ class billing {
 						'callbackUrl': 'http://localhost:8000/trans/new',
 						'transactionId': uuid.generator()
 					}
-                   
+
 					const url = 'https://opay-api.oltranz.com/opay/paymentrequest' 
-                    
-					axios.post(url, data)
-                    
+					await axios.post(url, data)
 					next()
-				}else{
+				} else {
 					next()
 				}
 			} else {
 
-				util.setErrorResponse(res,'Something went wrong ',500)
+				util.setErrorResponse(res, 'Something went wrong ', 500)
 			}
 		} catch (error) {
 			util.setErrorResponse(res, error.message, 500)
@@ -59,7 +60,7 @@ class billing {
 			data.phoneNumber = req.body.phoneNumber
 			data.endDate = date.addMoreDays(30).toDateString()
 			const bill = await billingService.registerSubscription(data);
-			(!bill) ?  util.setErrorResponse(res, 'Subscription unsuccessfull', 500): next()
+			(!bill) ? util.setErrorResponse(res, 'Subscription unsuccessfull', 500): next()
 		} catch (error) {
 			util.setErrorResponse(res, error.message, 500)
 		}
