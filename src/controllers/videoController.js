@@ -21,6 +21,7 @@ class videoController {
 				const data = req.body
 				const decodedVideoHash = jwt.jwtVerify(data.videoUrl,process.env.SECRET)
 				data.videoUrl = decodedVideoHash.videoUri
+				data.videoClientId = decodedVideoHash.clientId
 				data.videoThumbnailLink = thumbnail.url
 				data.creationTime = new Date().getTime()
 				data.videoId = uuid.generator()

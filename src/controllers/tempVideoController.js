@@ -11,7 +11,7 @@ class tempVideoController {
 			const data = req.body
 			const video = req.files.video
 			const videoUri =  await cloudinary(video.tempFilePath,'video')
-			data.videoUri =  jwt.jwtSign({videoUri :videoUri.url},process.env.SECRET)
+			data.videoUri =  jwt.jwtSign({videoUri :videoUri.url,clientId:data.clientId},process.env.SECRET)
 			// const decoded = jwt.jwtVerify(videoUri,process.env.SECRET)
 			// console.log(JSON.stringify(videoUri.url))
 			const uploadedVideo = await services.createNewVideos(data)
