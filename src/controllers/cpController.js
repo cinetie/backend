@@ -21,7 +21,7 @@ class cpController {
 			newUser.isVerified = false
 			newUser.clientId = uuid.generator()
 			const image = req.files.image
-			const imageToUpload = await cloudinary(image.tempFilePath)
+			const imageToUpload = await cloudinary(image.tempFilePath,'image')
 			newUser.idLink = imageToUpload.url
 			const checkUser = await cp.getCpByMail(newUser.email)
 			if (checkUser != null) {
@@ -130,7 +130,7 @@ class cpController {
 			const id = req.query.id
 			jwt.jwtVerify(token, process.env.SECRET)
 			const user_ = cp.getCpById(id)
-			if (!user_) response.errorResponse(res, 404, 'User not found!', error)
+			if (!user_) response.errorResponse(res, 404, 'User not found!', 'NotFoundError')
 			const hash = bcrypt.encrypt(req.body.password)
 			const newPass = {
 				password: hash
