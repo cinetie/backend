@@ -8,6 +8,7 @@ import videoRoute from '../routes/videoRoutes'
 import videoSessionRoute from '../routes/videoSessionRoutes'
 import cpRoutes from '../routes/cpRoutes'
 import cpTransRoutes from '../routes/cpTransRoutes'
+import tempVideoRouters from '../routes/tempVideoRoute'
 const router = Router()
 
 router.use('/cp',cpRoutes)
@@ -18,5 +19,5 @@ router.use('/video',videoRoute)
 router.use('/cp/trans',cpTransRoutes)
 router.use('/sessions/video',access.isAdmin,videoSessionRoute)
 router.use('/profile',access.isNormalUser, profileRoute)
-
+router.use('/temp',tempVideoRouters)
 export default router

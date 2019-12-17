@@ -17,8 +17,10 @@ class videoController {
 			const decoded = jwt.jwtVerify(authToken, process.env.SECRET)
 			if (decoded.user === process.env.ADMIN_USER) {
 				const image = req.files.image
-				const thumbnail = await cloudinary(image.tempFilePath)
+				const thumbnail = await cloudinary(image.tempFilePath,'image')
 				const data = req.body
+				const decodedVideoHash = jwt.jwtVerify(data.videoUrl,process.env.SECRET)
+				data.videoUrl = decodedVideoHash.videoUri
 				data.videoThumbnailLink = thumbnail.url
 				data.creationTime = new Date().getTime()
 				data.videoId = uuid.generator()
