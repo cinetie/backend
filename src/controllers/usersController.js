@@ -15,50 +15,38 @@ class userController {
 		// console.log("signup launched");
 		try {
 			const newUser = req.body
-            
 			newUser.password = await bcrypt.encrypt(newUser.password)
 			newUser.isVerified = false
-			const checkUser = await userService.getUserByMail(newUser.email)
-			if (checkUser != null) {
-				util.setErrorResponse(res,'User already exists',422)
-			} else {
-				const createdUser = await userService.createNewUser(newUser)
-				const part1 = cry.crypto()
-				const token = jwt.jwtSign(`${part1}${newUser.email}`, process.env.SECRET,'1d')
-				const tokenToSave = {
-					email: newUser.email,
-					token: token
-    
-				}
-               
-				await tokenService.createNewToken(tokenToSave, token)
-				const emailTosend = {
-					to: req.body.email,
-					from: process.env.EMAIL_USER,
-					subject: 'Please verify your email!',
-					text: 'Dear ' + newUser.firstName + ' please follow this link to verify your email http://localhost:5000/auth/verify/?id=' + createdUser.id + '&&token=' + token,
-				}
-				await mdw.mailer(emailTosend)
-				const userToken = jwt.jwtSign(createdUser.email, process.env.SECRET,'1d')
-				createdUser.token = userToken
-				delete createdUser.password
-				util.setSuccessResponse(res,'Signed up successfully',201,createdUser)
-                
+			const createdUser = await userService.createNewUser(newUser)
+			const part1 = cry.crypto()
+			const token = jwt.jwtSign(`${part1}${newUser.email}`, process.env.SECRET, '1d')
+			const tokenToSave = {
+				email: newUser.email,
+				token: token
+
 			}
+			await tokenService.createNewToken(tokenToSave, token)
+			const emailTosend = {
+				to: req.body.email,
+				from: process.env.EMAIL_USER,
+				subject: 'CINETIE - Please verify your email!',
+				text: 'Dear ' + newUser.firstName + ' please follow this link to verify your email http://localhost:5000/auth/verify/?id=' + createdUser.id + '&&token=' + token,
+			}
+			await mdw.mailer(emailTosend)
+			const userToken = jwt.jwtSign(createdUser.email, process.env.SECRET, '1d')
+			createdUser.token = userToken
+			delete createdUser.password
+			util.setSuccessResponse(res, 'Signed up successfully', 201, createdUser)
 			//  checkUser !=null ?  util.setErrorResponse(res,"error occured",500): console.log(1);
-        
+
 		} catch (error) {
-			util.setErrorResponse(res,error.message,500)
+			util.setErrorResponse(res, error.message, 500)
 		}
 	}
 	static async verify(req, res) {
 		try {
-			const {
-				id
-			} = req.query
-			const {
-				token
-			} = req.query
+			const { id } = req.query
+			const { token } = req.query
 			const user = await userService.getUserById(id)
 			if (!user) response.errorResponse(res, 404, 'User not found')
 			jwt.jwtVerify(token, process.env.SECRET)
@@ -71,7 +59,7 @@ class userController {
 			const emailTosend = {
 				to: user.email,
 				from: process.env.EMAIL_USER,
-				subject: 'Success email has been sent',
+				subject: 'Success email has been verified',
 				text: 'Dear ' + user.firstName + ' Your Email has been verified successfully '
 			}
 			await mdw.mailer(emailTosend)
@@ -82,34 +70,37 @@ class userController {
 	}
 	static async loginUser(req, res) {
 		try {
-            
+
 			const user = await userService.getUserByMail(req.body.email)
 			const status = bcrypt.compare(req.body.password, user.password)
 			if (!status || !user) util.setErrorResponse(res, 'Invalid email or password!', 400)
 			if (!user.isVerified) util.setErrorResponse(res, 'Verify your account first!', 401)
-			const token = jwt.jwtSign({key:cry.crypto(),email:req.body.email}, process.env.SECRET,'1d')
+			const token = jwt.jwtSign({
+				key: cry.crypto(),
+				email: req.body.email
+			}, process.env.SECRET, '1d')
 			user.token = token
 			delete user.password
 			const date = new Date()
 			const session = {
-				email:user.email,
-				date:date.toDateString(),
-				timeIn:date.toTimeString(),
-				timeOut:null,
-				state:'in'
+				email: user.email,
+				date: date.toDateString(),
+				timeIn: date.toTimeString(),
+				timeOut: null,
+				state: 'in'
 			}
 			const addedSession = await sessionService.addSession(session)
-			if(!addedSession)util.setErrorResponse(res,'Can\'t register session',500)
-			util.setSuccessResponse(res, 'Logged in successfully!', 200,token)
+			if (!addedSession) util.setErrorResponse(res, 'Can\'t register session', 500)
+			util.setSuccessResponse(res, 'Logged in successfully!', 200, token)
 		} catch (error) {
-			util.setErrorResponse(res,'Something Went wrong logging in '+error,500)
+			util.setErrorResponse(res, 'Something Went wrong logging in ' + error, 500)
 		}
 	}
 	static async forgotPassword(req, res) {
 		try {
 			const user = await userService.getUserByMail(req.body.email)
 			if (!user) response.errorResponse(res, 404, 'User not found!')
-			const token = jwt.jwtSign(`${cry.crypto()}${user.firstName}`, process.env.SECRET,'1d')
+			const token = jwt.jwtSign(`${cry.crypto()}${user.firstName}`, process.env.SECRET, '1d')
 			const emailTosend = {
 				to: req.body.email,
 				from: process.env.EMAIL_USER,
@@ -144,7 +135,7 @@ class userController {
 		try {
 			let user = await userService.getUserByMail(req.user.email)
 			if (!user) user = await userService.createNewUser(req.user, req.user.email)
-			let token =  jwt.jwtSign(user.email, process.env.SECRET,'1d')
+			let token = jwt.jwtSign(user.email, process.env.SECRET, '1d')
 			user.token = token
 			response.successResponse(res, 200, 'Logged in successfully', user)
 		} catch (error) {
@@ -153,55 +144,59 @@ class userController {
 	}
 	static async deleteAccount(req, res) {
 		try {
-            
-			const { id } = req.query
+
+			const {
+				id
+			} = req.query
 			const status = await userService.deleteUser(id)
-			status !=0 ? util.setSuccessResponse(res,'deleted successfully',200,status) : util.setErrorResponse(res,'An error occured',422)
+			status != 0 ? util.setSuccessResponse(res, 'deleted successfully', 200, status) : util.setErrorResponse(res, 'An error occured', 422)
 		} catch (error) {
-			util.setErrorResponse(res,'An error occured : ' + error,522)
+			util.setErrorResponse(res, 'An error occured : ' + error, 522)
 		}
 	}
-	static async updateAccount(req,res){
+	static async updateAccount(req, res) {
 		try {
-			const  { id } = req.query
-			const  newInfo = req.body
-			const updated =  await userService.updateUser(id,newInfo)
-			updated !=0  ? util.setSuccessResponse(res,'updated successfully',200,updated) : util.setErrorResponse(res,'An error occured',422)
+			const {
+				id
+			} = req.query
+			const newInfo = req.body
+			const updated = await userService.updateUser(id, newInfo)
+			updated != 0 ? util.setSuccessResponse(res, 'updated successfully', 200, updated) : util.setErrorResponse(res, 'An error occured', 422)
 		} catch (error) {
-			util.setErrorResponse(res,error,522)
+			util.setErrorResponse(res, error, 522)
 		}
 	}
-	static async getAllAccounts(req,res){
-        
+	static async getAllAccounts(req, res) {
+
 		try {
 			const users = await userService.getAllUsers()
-			response.successResponse(res,200,'List of users',users)
+			response.successResponse(res, 200, 'List of users', users)
 		} catch (error) {
-			util.setErrorResponse(res,error,503)
+			util.setErrorResponse(res, error, 503)
 		}
 	}
-	static async getSubscribersInRange(req,res){
+	static async getSubscribersInRange(req, res) {
 		try {
 			//in Milliseconds since epoch.
 			const start = date.convertToTimestamp(req.body.start)
 			const end = date.convertToTimestamp(req.body.end)
-			const data = await billingServices.getMonthlySubscribers(start,end)
-			if(Object.values(data).length>0){
-				util.setSuccessResponse(res,'Data was found',200,data)
-			}else{
-				util.setErrorResponse(res,'Data was not found',400)
+			const data = await billingServices.getMonthlySubscribers(start, end)
+			if (Object.values(data).length > 0) {
+				util.setSuccessResponse(res, 'Data was found', 200, data)
+			} else {
+				util.setErrorResponse(res, 'Data was not found', 400)
 			}
 
 		} catch (error) {
-			return response.errorResponse(res,500,'Something wrong happened '+error.message,error)
+			return response.errorResponse(res, 500, 'Something wrong happened ' + error.message, error)
 		}
 	}
-	static async getLiveUsers(req,res){
+	static async getLiveUsers(req, res) {
 		try {
 			const data = await sessionService.getLiveSessions();
-			(data) ? util.setSuccessResponse(res,'Found ',200,data) : util.setErrorResponse(res,'Can\'t find Live users ' + JSON.stringify(data),404)
+			(data) ? util.setSuccessResponse(res, 'Found ', 200, data): util.setErrorResponse(res, 'Can\'t find Live users ' + JSON.stringify(data), 404)
 		} catch (error) {
-			util.setErrorResponse(res,error.message,500)
+			util.setErrorResponse(res, error.message, 500)
 		}
 	}
 

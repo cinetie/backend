@@ -101,9 +101,7 @@ class billingServices {
 	static async updateSubscription(email, updated) {
 		try {
 			const status = await database.subscriptions.update(updated, {
-				where: {
-					email
-				}
+				where: { email }
 			})
 			if (status) {
 				return status
@@ -111,7 +109,7 @@ class billingServices {
 				return null
 			}
 		} catch (error) {
-			throw error
+			throw error 
 		}
 	}
 }

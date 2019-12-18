@@ -13,7 +13,7 @@ router.use(passport.initialize())
 router.use(passport.session())
 
 router.post('/signup',validation.user,billing.registerSubscription,auth.signupUser)
-router.post('/login',earnings.registerEarnings,billing.payment,screenValidator.validateNumberOfScreens,auth.loginUser)
+router.post('/login',earnings.registerEarnings,screenValidator.validateNumberOfScreens,auth.loginUser)
 router.delete('/delete_acc',access.isNormalUser,auth.deleteAccount)
 router.get('/all',access.isAdmin,auth.getAllAccounts)
 router.post('/reset_password/',auth.resetPassword)
