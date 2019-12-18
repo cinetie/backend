@@ -1,0 +1,14 @@
+{
+    "id": 5,
+    "firstName": "bobos",
+    "lastName": "doe",
+    "email": "acm@gmail.com",
+    "password": "$2b$10$NiJnVKVRtVdLHLuG9tuCBeZuDD6Na4IJP9TuMxLGoJyCy1g1v2fH2",
+    "plan": "Premium",
+    "isVerified": true,
+    "isBilledAnnually": false,
+    "permissionLevel": 2,
+    "nationality": "Rwandan",
+    "cityOfResidence": "kigali",
+    "phoneNumber": "+250780964422"
+}
