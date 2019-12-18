@@ -8,7 +8,7 @@ module.exports = {
 		})
 			.then(()=> queryInterface.changeColumn('videos','videoWatchCount',{
 				type: Sequelize.INTEGER,
-				allowNull :false,
+				allowNull :true,
 				defaultValue:0
 			}))
 	},
