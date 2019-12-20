@@ -1,7 +1,6 @@
 import response from '../helpers/response'
 import planServices from '../services/planServices'
 import Util from '../helpers/utilities'
-
 const util = new Util()
 class planController {
 	static async addPlan(req, res) {

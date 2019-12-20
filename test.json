@@ -1,14 +1,171 @@
 {
-    "id": 5,
-    "firstName": "bobos",
-    "lastName": "doe",
-    "email": "acm@gmail.com",
-    "password": "$2b$10$NiJnVKVRtVdLHLuG9tuCBeZuDD6Na4IJP9TuMxLGoJyCy1g1v2fH2",
-    "plan": "Premium",
-    "isVerified": true,
-    "isBilledAnnually": false,
-    "permissionLevel": 2,
-    "nationality": "Rwandan",
-    "cityOfResidence": "kigali",
-    "phoneNumber": "+250780964422"
+    "id": "PAYID-LX5TCSY5M389320TM408020E",
+    "intent": "sale",
+    "state": "created",
+    "payer": {
+        "payment_method": "paypal"
+    },
+    "transactions": [
+        {
+            "amount": {
+                "total": "11.99",
+                "currency": "AUD"
+            },
+            "item_list": {
+                "items": [
+                    {
+                        "name": "acm@gmail.com",
+                        "sku": "Subscription",
+                        "price": "11.99",
+                        "currency": "AUD",
+                        "quantity": 1
+                    }
+                ]
+            },
+            "related_resources": []
+        }
+    ],
+    "create_time": "2019-12-19T08:14:02Z",
+    "links": [
+        {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payment/PAYID-LX5TCSY5M389320TM408020E",
+            "rel": "self",
+            "method": "GET"
+        },
+        {
+            "href": "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=EC-4R4302481U841971H",
+            "rel": "approval_url",
+            "method": "REDIRECT"
+        },
+        {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payment/PAYID-LX5TCSY5M389320TM408020E/execute",
+            "rel": "execute",
+            "method": "POST"
+        }
+    ],
+    "httpStatusCode": 201
+}
+
+// "Payment execution": 
+    {
+        "id": "PAYID-LX52F7I9HP737864H7483221",
+        "intent": "sale",
+        "state": "approved",
+        "cart": "5CX68953XV085353L",
+        "payer": {
+            "payment_method": "paypal",
+            "status": "VERIFIED",
+            "payer_info": {
+                "email": "sb-14ke2766584@personal.example.com",
+                "first_name": "John",
+                "last_name": "Doe",
+                "payer_id": "D9YAQLKSNWEK6",
+                "shipping_address": {
+                    "recipient_name": "John Doe",
+                    "line1": "1 Main St",
+                    "city": "San Jose",
+                    "state": "CA",
+                    "postal_code": "95131",
+                    "country_code": "US"
+                },
+                "country_code": "US"
+            }
+        },
+        "transactions": [
+            {
+                "amount": {
+                    "total": "11.99",
+                    "currency": "USD",
+                    "details": {
+                        "subtotal": "11.99",
+                        "shipping": "0.00",
+                        "insurance": "0.00",
+                        "handling_fee": "0.00",
+                        "shipping_discount": "0.00"
+                    }
+                },
+                "payee": {
+                    "merchant_id": "Z5X349K7N3UGY",
+                    "email": "sb-pl0x050297@business.example.com"
+                },
+                "description": "acm@gmail.com",
+                "item_list": {
+                    "items": [
+                        {
+                            "name": "acm@gmail.com",
+                            "sku": "Subscription for Cinetie",
+                            "price": "11.99",
+                            "currency": "USD",
+                            "tax": "0.00",
+                            "quantity": 1
+                        }
+                    ],
+                    "shipping_address": {
+                        "recipient_name": "John Doe",
+                        "line1": "1 Main St",
+                        "city": "San Jose",
+                        "state": "CA",
+                        "postal_code": "95131",
+                        "country_code": "US"
+                    }
+                },
+                "related_resources": [
+                    {
+                        "sale": {
+                            "id": "3YS91779HY651531Y",
+                            "state": "completed",
+                            "amount": {
+                                "total": "11.99",
+                                "currency": "USD",
+                                "details": {
+                                    "subtotal": "11.99",
+                                    "shipping": "0.00",
+                                    "insurance": "0.00",
+                                    "handling_fee": "0.00",
+                                    "shipping_discount": "0.00"
+                                }
+                            },
+                            "payment_mode": "INSTANT_TRANSFER",
+                            "protection_eligibility": "ELIGIBLE",
+                            "protection_eligibility_type": "ITEM_NOT_RECEIVED_ELIGIBLE,UNAUTHORIZED_PAYMENT_ELIGIBLE",
+                            "transaction_fee": {
+                                "value": "0.65",
+                                "currency": "USD"
+                            },
+                            "parent_payment": "PAYID-LX52F7I9HP737864H7483221",
+                            "create_time": "2019-12-19T16:20:29Z",
+                            "update_time": "2019-12-19T16:20:29Z",
+                            "links": [
+                                {
+                                    "href": "https://api.sandbox.paypal.com/v1/payments/sale/3YS91779HY651531Y",
+                                    "rel": "self",
+                                    "method": "GET"
+                                },
+                                {
+                                    "href": "https://api.sandbox.paypal.com/v1/payments/sale/3YS91779HY651531Y/refund",
+                                    "rel": "refund",
+                                    "method": "POST"
+                                },
+                                {
+                                    "href": "https://api.sandbox.paypal.com/v1/payments/payment/PAYID-LX52F7I9HP737864H7483221",
+                                    "rel": "parent_payment",
+                                    "method": "GET"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ],
+        "create_time": "2019-12-19T16:19:08Z",
+        "update_time": "2019-12-19T16:20:29Z",
+        "links": [
+            {
+                "href": "https://api.sandbox.paypal.com/v1/payments/payment/PAYID-LX52F7I9HP737864H7483221",
+                "rel": "self",
+                "method": "GET"
+            }
+        ],
+        "httpStatusCode": 200
+    }
 }

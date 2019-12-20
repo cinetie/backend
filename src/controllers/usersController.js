@@ -2,6 +2,7 @@ import userService from '../services/userServices'
 import tokenService from '../services/tokenService'
 import billingServices from '../services/billingServices'
 import sessionService from '../services/loginSessionServices'
+import payment from '../helpers/payment'
 import bcrypt from '../helpers/bcrypt'
 import response from '../helpers/response'
 import jwt from '../helpers/jwt'
@@ -22,7 +23,8 @@ class userController {
 			const token = jwt.jwtSign(`${part1}${newUser.email}`, process.env.SECRET, '1d')
 			const tokenToSave = {
 				email: newUser.email,
-				token: token
+				token: token,
+				desc: 'Login-Active'
 
 			}
 			await tokenService.createNewToken(tokenToSave, token)
@@ -166,6 +168,24 @@ class userController {
 			util.setErrorResponse(res, error, 522)
 		}
 	}
+	static async updateAccountAndSubscription(req,res) {
+		try {
+			const { email } = jwt.jwtVerify(req.headers.authorization.slice(7),process.env.SECRET)
+			const newInfo = req.body
+			const subscriptionData = {
+				paymentMethod:newInfo.paymentMethod,
+				email :email,
+				plan :newInfo.plan,
+				phoneNumber: newInfo.phoneNumber,
+				isBilledAnnually:newInfo.isBilledAnnually,
+			}
+			const paymentDetails = await payment.registerNewSubscription(subscriptionData)
+			const updates = await userService.updateUser(req.query.id,newInfo);
+			(paymentDetails && updates) ? util.setSuccessResponse(res,'User updated easily',201,{'user':updates,'paymentDetails':paymentDetails}):util.setErrorResponse(res,'user didn\'t update easily',400)
+		} catch (error) {
+			util.setErrorResponse(res, error.message, 522)
+		}
+	}
 	static async getAllAccounts(req, res) {
 
 		try {
@@ -197,6 +217,15 @@ class userController {
 			(data) ? util.setSuccessResponse(res, 'Found ', 200, data): util.setErrorResponse(res, 'Can\'t find Live users ' + JSON.stringify(data), 404)
 		} catch (error) {
 			util.setErrorResponse(res, error.message, 500)
+		}
+	}
+	static async getUserByEmail(req,res){
+		try {
+			const decoded =  jwt.jwtVerify(req.headers.authorization.slice(7),process.env.SECRET)
+			const user = await userService.getUserByMail(decoded.email);
+			(user) ? util.setSuccessResponse(res,'Found',200,user) : util.setErrorResponse(res,'Data not found',404)
+		} catch (error) {
+			util.setErrorResponse(res,error.message,500)
 		}
 	}
 
