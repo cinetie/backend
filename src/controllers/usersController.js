@@ -141,7 +141,7 @@ class userController {
 			} else {
 				message = 'Signed Up';	
 			}
-			const token = jwt.jwtSign({
+			const token = await jwt.jwtSign({
 				key: cry.crypto(),
 				email: req.user.email
 			}, process.env.SECRET, '1d')
