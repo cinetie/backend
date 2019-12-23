@@ -136,18 +136,16 @@ class userController {
 			let message;
 			let user = await userService.getUserByMail(req.user.email)
 			if (!user) {
-				message = 'Logged In';
+				message = 'Signed Up';
 				user = await userService.createNewUser(req.user, req.user.email);
 			} else {
-				message = 'Signed Up';	
+				message = 'Logged In';
 			}
 			const token = await jwt.jwtSign({
 				key: cry.crypto(),
 				email: req.user.email
 			}, process.env.SECRET, '1d')
-			user.token = token;
-			delete user.password;
-			response.successResponse(res, 200, message, user)
+			response.successResponse(res, 200, message, { token })
 		} catch (error) {
 			response.errorResponse(res, 500, 'Something went wrong!', error.message)
 		}
