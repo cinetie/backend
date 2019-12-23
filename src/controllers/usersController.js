@@ -134,18 +134,21 @@ class userController {
 	static async socialLogin(req, res) {
 		try {
 			let message;
+			let code;
 			let user = await userService.getUserByMail(req.user.email)
 			if (!user) {
 				message = 'Signed Up';
+				code = 201;
 				user = await userService.createNewUser(req.user, req.user.email);
 			} else {
 				message = 'Logged In';
+				code = 200;
 			}
 			const token = await jwt.jwtSign({
 				key: cry.crypto(),
 				email: req.user.email
 			}, process.env.SECRET, '1d')
-			response.successResponse(res, 200, message, { token })
+			response.successResponse(res, code, message, { token })
 		} catch (error) {
 			response.errorResponse(res, 500, 'Something went wrong!', error.message)
 		}
