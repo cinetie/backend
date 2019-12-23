@@ -148,7 +148,7 @@ class userController {
 				key: cry.crypto(),
 				email: req.user.email
 			}, process.env.SECRET, '1d')
-			response.successResponse(res, code, message, { token })
+			res.redirect(`https://cinetie-frontend.herokuapp.com/social_auth?token=${token}`)
 		} catch (error) {
 			response.errorResponse(res, 500, 'Something went wrong!', error.message)
 		}
