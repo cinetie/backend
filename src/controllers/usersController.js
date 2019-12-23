@@ -141,7 +141,10 @@ class userController {
 			} else {
 				message = 'Signed Up';	
 			}
-			let token = await jwt.jwtSign(user.email, process.env.SECRET, '1d')
+			const token = jwt.jwtSign({
+				key: cry.crypto(),
+				email: req.user.email
+			}, process.env.SECRET, '1d')
 			user.token = token;
 			delete user.password;
 			response.successResponse(res, 200, message, user)
