@@ -21,6 +21,7 @@ class earningsMiddleware {
 						util.setErrorResponse(res, 'error occured assigning rate here', 500)
 					}
 				} else {
+					console.log('----------hanging-------- register earnings')
 					next()
 				}
 			}else{

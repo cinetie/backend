@@ -5,20 +5,21 @@ import '../config/passport'
 import {Router} from 'express'
 import access from '../middlewares/access'
 import screenValidator from '../middlewares/screenValidation'
-import billing from '../middlewares/billing'
 import earnings from '../middlewares/earnings'
 const router = new Router()
 
 router.use(passport.initialize())
 router.use(passport.session())
 
-router.post('/signup',validation.user,billing.registerSubscription,auth.signupUser)
+router.post('/signup',validation.user,auth.signupUser)
+router.get('/particular',auth.getUserByEmail)
 router.post('/login',earnings.registerEarnings,screenValidator.validateNumberOfScreens,auth.loginUser)
 router.delete('/delete_acc',access.isNormalUser,auth.deleteAccount)
 router.get('/all',access.isAdmin,auth.getAllAccounts)
 router.post('/reset_password/',auth.resetPassword)
 router.post('/forgot_password',auth.forgotPassword)
 router.get('/verify/',auth.verify)
+router.put('/signup/cont',auth.updateAccountAndSubscription)
 router.put('/update',validation.updateUser,auth.updateAccount)
 router.get('/users',access.isAdmin, auth.getSubscribersInRange)
 router.get('/users/live',access.isProducer,auth.getLiveUsers)

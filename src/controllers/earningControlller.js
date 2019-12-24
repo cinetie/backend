@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import earningService from '../services/earningServices'
 import subscriptionService from '../services/billingServices'
 import viewSessionService from '../services/viewingSessionsServices'
@@ -52,7 +53,7 @@ class earningController {
 				}
 				results =  await earningService.createNewEarnings(earnings)
 			})
-
+			updates = await subscriptionService.setSubscriptionToSettled(email,{state:"settled"})
 			if(results){
 				return true
 			}else{

@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import database from '../database/models'
 import sequelize from 'sequelize'
 const op = sequelize.Op
@@ -6,6 +7,7 @@ const op = sequelize.Op
 class billingServices {
 
 	static async registerSubscription(newSubscription) {
+		// eslint-disable-next-line no-useless-catch
 		try {
 			const added = await database.subscriptions.create(newSubscription)
 			if (added) {
@@ -102,6 +104,25 @@ class billingServices {
 		try {
 			const status = await database.subscriptions.update(updated, {
 				where: { email }
+			})
+			if (status) {
+				return status
+			} else {
+				return null
+			}
+		} catch (error) {
+			throw error 
+		}
+	}
+	static async setSubscriptionToSettled(email, updated) {
+		try {
+			const status = await database.subscriptions.update(updated, {
+				where: {
+					[op.and]:[
+						{email},
+						{state:'current'}
+					]
+				}
 			})
 			if (status) {
 				return status

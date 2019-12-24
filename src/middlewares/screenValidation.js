@@ -38,6 +38,7 @@ class screenValidation {
 	static async validateNumberOfScreens(req,res,next){
        
 		try {
+			console.log('----------hanging-------- screen validators')
 			const details = await screenValidation.getPlan(req,res)
 			const activeSessions = await loginSessionService.getParticularSession(details.email)
            
