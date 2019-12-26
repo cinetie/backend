@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import userService from '../services/userServices'
 import tokenService from '../services/tokenService'
 import billingServices from '../services/billingServices'
@@ -18,6 +19,9 @@ class userController {
 			const newUser = req.body
 			newUser.password = await bcrypt.encrypt(newUser.password)
 			newUser.isVerified = false
+			newUser.plan = "Setup"
+			const search = await userService.getUserByMail(newUser.email)
+			if(search)util.setErrorResponse(res,"user already exists",403)
 			const createdUser = await userService.createNewUser(newUser)
 			const part1 = cry.crypto()
 			const token = jwt.jwtSign(`${part1}${newUser.email}`, process.env.SECRET, '1d')
@@ -39,7 +43,6 @@ class userController {
 			createdUser.token = userToken
 			delete createdUser.password
 			util.setSuccessResponse(res, 'Signed up successfully', 201, createdUser)
-			//  checkUser !=null ?  util.setErrorResponse(res,"error occured",500): console.log(1);
 
 		} catch (error) {
 			util.setErrorResponse(res, error.message, 500)
@@ -179,20 +182,51 @@ class userController {
 			util.setErrorResponse(res, error, 522)
 		}
 	}
-	static async updateAccountAndSubscription(req,res) {
+	static async updateAccountAndSubscription(req, res) {
 		try {
-			const { email } = jwt.jwtVerify(req.headers.authorization.slice(7),process.env.SECRET)
+			const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET)
 			const newInfo = req.body
 			const subscriptionData = {
-				paymentMethod:newInfo.paymentMethod,
-				email :email,
-				plan :newInfo.plan,
+				paymentMethod: newInfo.paymentMethod,
+				email: email,
+				plan: newInfo.plan,
 				phoneNumber: newInfo.phoneNumber,
-				isBilledAnnually:newInfo.isBilledAnnually,
+				isBilledAnnually: newInfo.isBilledAnnually,
 			}
 			const paymentDetails = await payment.registerNewSubscription(subscriptionData)
-			const updates = await userService.updateUser(req.query.id,newInfo);
-			(paymentDetails && updates) ? util.setSuccessResponse(res,'User updated easily',201,{'user':updates,'paymentDetails':paymentDetails}):util.setErrorResponse(res,'user didn\'t update easily',400)
+			let frequency = 0
+			if (newInfo.isBilledAnnually == true) {
+				frequency = "YEAR"
+			} else {
+				frequency = "MONTH"
+			}
+			const paymentData = {
+				user: {
+					"email": email,
+					"paymentMethod": newInfo.paymentMethod,
+					"isBilledAnnually": newInfo.isBilledAnnually,
+					"plan": newInfo.plan
+				},
+				opay: {
+					"price": paymentDetails.price,
+					"phoneNumber": newInfo.phoneNumber
+				},
+				paypal: {
+					"plan": newInfo.plan,
+					"price": paymentDetails.price,
+					"frequency": frequency,
+					"currency": "USD",
+					"total": paymentDetails.price,
+					"urls": {
+						"success": process.env.PAYPAL_SUCCESS,
+						"failOrCancel": process.env.PAYPAL_FAIL_CANCEL
+					}
+				}
+
+			}
+			await userService.updateUser(req.query.id, newInfo)
+			await payment.commitPayment(req,res,paymentData);
+			// (paymentDetails && updates) ? util.setSuccessResponse(res, 'User updated easily', 201, { 'user': updates, 'paymentDetails': paymentDetails }) : util.setErrorResponse(res, 'user didn\'t update easily', 400)
 		} catch (error) {
 			util.setErrorResponse(res, error.message, 522)
 		}
@@ -225,18 +259,18 @@ class userController {
 	static async getLiveUsers(req, res) {
 		try {
 			const data = await sessionService.getLiveSessions();
-			(data) ? util.setSuccessResponse(res, 'Found ', 200, data): util.setErrorResponse(res, 'Can\'t find Live users ' + JSON.stringify(data), 404)
+			(data) ? util.setSuccessResponse(res, 'Found ', 200, data) : util.setErrorResponse(res, 'Can\'t find Live users ' + JSON.stringify(data), 404)
 		} catch (error) {
 			util.setErrorResponse(res, error.message, 500)
 		}
 	}
-	static async getUserByEmail(req,res){
+	static async getUserByEmail(req, res) {
 		try {
-			const decoded =  jwt.jwtVerify(req.headers.authorization.slice(7),process.env.SECRET)
+			const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET)
 			const user = await userService.getUserByMail(decoded.email);
-			(user) ? util.setSuccessResponse(res,'Found',200,user) : util.setErrorResponse(res,'Data not found',404)
+			(user) ? util.setSuccessResponse(res, 'Found', 200, user) : util.setErrorResponse(res, 'Data not found', 404)
 		} catch (error) {
-			util.setErrorResponse(res,error.message,500)
+			util.setErrorResponse(res, error.message, 500)
 		}
 	}
 

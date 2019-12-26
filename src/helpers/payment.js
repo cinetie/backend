@@ -1,7 +1,11 @@
+/* eslint-disable quotes */
 /* eslint-disable no-useless-catch */
 import billingService from '../services/billingServices'
 import planService from '../services/planServices'
 import date from '../helpers/date'
+import util from '../helpers/utilities'
+import paypalHelper from '../helpers/paypal'
+import opay from '../helpers/opay'
 class payment {
 	static async registerNewSubscription(details) {
 		try {
@@ -20,15 +24,29 @@ class payment {
 			data.paymentMethod = details.paymentMethod
 			const bill = await billingService.registerSubscription(data);
 			console.log(JSON.stringify(bill));
-			if(bill){
+			if (bill) {
 				return bill
-			}else{
+			} else {
 				return null
 			}
 
 
 		} catch (error) {
 			throw error
+		}
+	}
+	static async commitPayment(req, res, details) {
+		try {
+			if (Number(details.user.paymentMethod) == 1) {
+				const status = await opay.payment(req,res,details.opay);
+				(status === 1) ? true : false
+			} else if (Number(details.user.paymentMethod) == 2) {
+				console.log('----------hanging-------- payment')
+				await paypalHelper.subscription(req, res, details.paypal)
+			}
+
+		} catch (error) {
+			util.setErrorResponse(res, error.message, 500)
 		}
 	}
 }

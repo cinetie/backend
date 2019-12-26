@@ -172,14 +172,21 @@ class paypal {
 	static async executeAggreement(req, res) {
 		let token = req.query.token
 
-		paypalHelper.billingAgreement.execute(token, {}, (error, billingAgreement) => {
+		paypalHelper.billingAgreement.execute(token, {}, async(error, billingAgreement) => {
 			if (error) {
 				throw error
 			} else {
+				const data = {
+					paymentId: billingAgreement.id,
+					state:'Approved-Pending',
+					payerEmail: billingAgreement.payer.payer_info.email,
+					payerId: billingAgreement.payer.payer_info.payer_id
+				}
+				await paypapTransServices.createTransaction(data)
 				console.log(billingAgreement)
 				//Billing agreement will have all the information about the agreement.
 				res.json({
-					message: "Successfully created the agreement."
+					message: "Successfully created the agreement. redirect to homepage"
 				})
 			}
 		})
