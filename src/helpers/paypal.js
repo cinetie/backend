@@ -6,6 +6,9 @@ import paypapTransServices from '../services/paypalTransServices'
 import billingServices from '../services/billingServices'
 import moment from 'moment'
 import _ from 'lodash'
+import Util from './utilities'
+
+const util = new Util()
 paypalHelper.configure({
 	'mode': process.env.PAYPAL_MODE,
 	'client_id': process.env.PAYPAL_CLIENT_ID,
@@ -185,8 +188,8 @@ class paypal {
 				await paypapTransServices.createTransaction(data)
 				console.log(billingAgreement)
 				//Billing agreement will have all the information about the agreement.
-				res.json({
-					message: "Successfully created the agreement. redirect to homepage"
+				util.setSuccessResponse(res,'User can now watch movies',202,{
+					"status":"Info updated"
 				})
 			}
 		})
