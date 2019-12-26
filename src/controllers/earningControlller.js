@@ -53,8 +53,8 @@ class earningController {
 				}
 				results =  await earningService.createNewEarnings(earnings)
 			})
-			updates = await subscriptionService.setSubscriptionToSettled(email,{state:"settled"})
-			if(results){
+			const updates = await subscriptionService.setSubscriptionToSettled(email,{state:"settled"})
+			if(results && updates){
 				return true
 			}else{
 				return false

@@ -27,7 +27,6 @@ class screenValidation {
 		try {
 			const details = await screenValidation.getEmail(req,res)
 			const plan = await planService.getParticalPlan(details.plan)
-			if(!plan) util.setErrorResponse(res,'an error occured',502)
 			const screensAndEmail = {screens : plan.numberOfScreens,email: details.email}
 			return screensAndEmail
 		} catch (error) {
