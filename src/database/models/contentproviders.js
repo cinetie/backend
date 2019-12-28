@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 module.exports = (sequelize, DataTypes) => {
 	const contentProviders = sequelize.define('contentProviders', {
 		name: DataTypes.STRING,

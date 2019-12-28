@@ -13,7 +13,7 @@ const addMoreDays = (days) =>{
 // 0 :false 1: true
 const isEndOfMonth = () => {
 	const now = new Date()
-	if (now.getDate() == 17) {
+	if (now.getDate() == 30) {
 		const tommorow = new Date(now.valueOf())
 		tommorow.setDate(tommorow.getDate() + 1)
 		if(tommorow.getDate()==31){
@@ -24,6 +24,14 @@ const isEndOfMonth = () => {
 	} else if (now.getDate() == 31) {
 		return 1
 	} else {
+		return 0
+	}
+}
+const isEndOfyear = () =>{
+	const now = new Date()
+	if(now.getMonth() == 12 && now.getDate() == 31){
+		return 1
+	}else{
 		return 0
 	}
 }
@@ -38,4 +46,4 @@ const removeDays = (days) =>{
 	return date.getTime()
 }
 
-export default { getCurrentDate,addMoreDays,isEndOfMonth,convertToTimestamp,removeDays}
+export default { getCurrentDate,addMoreDays,isEndOfMonth,isEndOfyear,convertToTimestamp,removeDays}

@@ -11,32 +11,38 @@ class earningsMiddleware {
 	static async registerEarnings(req, res, next) {
 		try {
 			const user = await userServices.getUserByMail(req.body.email)
-			if(user){
-				if (date.isEndOfMonth() == 1) {
+			if (user) {
+				if ((date.isEndOfMonth() == 1 && user.isBilledAnnually == false) || (date.isEndOfyear() == 1 && user.isBilledAnnually == true)) {
 					const data = await subscriptions.getCurrentSubscription(req.body.email)
-					const updates = await subscriptions.updateSubscription(req.body.email,{dueState: true})
+					const updates = await subscriptions.updateSubscription(req.body.email, {
+						dueState: true
+					})
 					const results = await earningController.assignRateToEachVideo(req.body.email)
-					if (results && updates >0){
+					if (results && updates > 0) {
 						const renewal = await subscriptions.registerSubscription(data)
-						if(user.paymentMethod == 1){
+						if (user.paymentMethod == 1) {
 							const opayDetails = await opay.payment({
-								phoneNumber:data.phoneNumber,
-								price:data.price
+								phoneNumber: data.phoneNumber,
+								price: data.price
 							})
-							if(renewal && opayDetails){
+							if (renewal && opayDetails) {
 								next()
 							}
-							
+
 						}
 					} else {
 						console.log('----------hanging-------- register earnings')
 						next()
 					}
-				}else{
+				} else {
+
 					next()
 				}
-			
-			} }catch (error) {
+
+			} else {
+				next()
+			}
+		} catch (error) {
 			util.setErrorResponse(res, 'error occured assigning rate : ' + error.message, 500)
 		}
 	}
