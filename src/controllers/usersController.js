@@ -224,7 +224,7 @@ class userController {
 				}
 
 			}
-			await userService.updateUser(req.query.id, newInfo)
+			await userService.updateUser(email, newInfo)
 			await payment.commitPayment(req,res,paymentData);
 			// (paymentDetails && updates) ? util.setSuccessResponse(res, 'User updated easily', 201, { 'user': updates, 'paymentDetails': paymentDetails }) : util.setErrorResponse(res, 'user didn\'t update easily', 400)
 		} catch (error) {

@@ -46,12 +46,10 @@ class userService {
 		}
 	}
 
-	static async updateUser(id, oldUser) {
+	static async updateUser(email, oldUser) {
 		try {
 			return await database.User.update(oldUser, {
-				where: {
-					id: id
-				}
+				where: { email }
 			})
 		} catch (error) {
 			throw error
