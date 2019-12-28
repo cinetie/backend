@@ -5,6 +5,6 @@ const router = new Router()
 router.get('/all',access.isAdmin,controllers.getAllVideosController)
 router.get('/',access.isAdmin,controllers.getParticularVideoController)
 router.delete('/',access.isAdmin,controllers.deleteParticularVideoController)
-router.post('/new',access.isAdmin,controllers.createVideoController)
+router.post('/new',access.isProducer,controllers.createVideoController)
 router.put('/update',access.isAdmin,controllers.updateParticularVideoController)
 export default router

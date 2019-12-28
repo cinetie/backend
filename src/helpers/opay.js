@@ -1,9 +1,9 @@
+/* eslint-disable no-useless-catch */
 /* eslint-disable quotes */
 import fetch from 'node-fetch'
 import uuid from '../helpers/uuid'
-import https from 'https'
 class opay {
-	static async payment(req,res,details){
+	static async payment(details){
 		try {
 			const date = new Date()
 			if (details.endDate == date.toDateString()) {
@@ -15,47 +15,23 @@ class opay {
 					'callbackUrl': 'http://localhost:5000/trans/new',
 					'transactionId': uuid.generator()
 				}
-				let jsonData = JSON.stringify(data)
 				const url = 'https://opay-api.oltranz.com/opay/paymentrequest' 
-				// const response = await fetch(url,{
-				// 	headers: {
-				// 		'Access-Control-Allow-Origin': '*',
-				// 		'Content-Type': 'application/json',
-				// 		'Accept':'*/*'
-				// 	},
-				// 	body :JSON.stringify(data),
-				// 	method : 'POST'
-				// })
-				// const responseToJson =  await response.json()
-				// console.log(JSON.stringify(responseToJson))
-				const options ={
-					host : "opay-api.oltranz.com",
-					path: "/opay/paymentrequest",
-					method: "POST",
-					headers :{
-						"Content-Type":"application/json",
-						"Accept":"application/json",
-						"Content-length": jsonData.length
-					}
-					
-				}
-				const res = https.request(options, res =>{
-					console.log(`${res.statusCode}`)
-					res.on('data', d => {
-						process.stdout.write(d)
-					})
+				const response = await fetch(url,{
+					headers: {
+						'Content-Type': 'application/json',
+						'Accept':'application/json'
+					},
+					body :JSON.stringify(data),
+					method : 'POST'
 				})
-				req.on('error', error => {
-					console.error(error)
-				})
-				req.write(jsonData)
-				req.end()
+				const responseToJson =  await response.json()
+				console.log(JSON.stringify(responseToJson))
 				return 1
 			} else {
 				return 0
 			}
 		} catch (error) {
-			console.log(error)
+			throw error
 		}
 	}
 }

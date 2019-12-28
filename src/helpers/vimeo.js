@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import fetch from 'node-fetch'
 class vimeo {
 	static async viemoUpload(data) {

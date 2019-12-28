@@ -13,6 +13,7 @@ const util = new Util()
 class videoController {
 	static async addVideo(req, res) {
 		try {
+			console.log("fwlenwl")
 			const authToken = req.headers.authorization.slice(7)
 			const decoded = jwt.jwtVerify(authToken, process.env.SECRET)
 			if (decoded.user === process.env.ADMIN_USER) {

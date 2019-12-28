@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import viewingSessions from '../services/viewingSessionsServices'
 import videoService from '../services/videoServices'
 import response from '../helpers/response'
