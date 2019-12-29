@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import database from '../database/models'
 
 
@@ -46,21 +47,21 @@ class cpService {
 		}
 	}
 
-	static async updateCp(id, oldCp) {
+	static async updateCp(email, oldCp) {
 		try {
 			return await database.contentProviders.update(oldCp, {
-				where: { id }
+				where: { email }
 			})
 		} catch (error) {
 			throw error
 		}
 	}
-	static async deleteCp(clientId) {
+	static async deleteCp(email) {
 		try {
 			return await database.contentProviders.destroy({
 				returning: true,
 				where: {
-					clientId: clientId
+					email
 				}
 			})
 		} catch (error) {

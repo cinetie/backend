@@ -13,7 +13,6 @@ const util = new Util()
 //add an isVerified column to cp
 class cpController {
 	static async signupCp(req, res) {
-		// console.log("signup launched");
 		try {
 			const newUser = req.body
             
@@ -50,7 +49,6 @@ class cpController {
 				util.setSuccessResponse(res,'Signed up successfully',201,createdUser)
                 
 			}
-			//  checkUser !=null ?  util.setErrorResponse(res,"error occured",500): console.log(1);
         
 		} catch (error) {
 			util.setErrorResponse(res, 'Something went wrong '+error.message, 500)
@@ -155,8 +153,9 @@ class cpController {
 	static async deleteAccount(req, res) {
 		try {
             
-			const { id } = req.query
-			const status = await cp.deleteCp(id)
+			const token = req.headers.authorization.slice(7)
+			const { email } = jwt.jwtVerify(token, process.env.SECRET)
+			const status = await cp.deleteCp(email)
 			status !=0 ? util.setSuccessResponse(res,'deleted successfully',200,status) : util.setErrorResponse(res,'An error occured',422)
 		} catch (error) {
 			util.setErrorResponse(res,'An error occured : ' + error,522)
@@ -164,9 +163,10 @@ class cpController {
 	}
 	static async updateAccount(req,res){
 		try {
-			const  { id } = req.query
+			const token = req.headers.authorization.slice(7)
+			const { email } = jwt.jwtVerify(token, process.env.SECRET)
 			const  newInfo = req.body
-			const updated =  await cp.updateCp(id,newInfo)
+			const updated =  await cp.updateCp(email,newInfo)
 			updated !=0  ? util.setSuccessResponse(res,'updated successfully',200,updated) : util.setErrorResponse(res,'An error occured',422)
 		} catch (error) {
 			util.setErrorResponse(res,error,522)
