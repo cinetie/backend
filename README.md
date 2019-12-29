@@ -488,3 +488,184 @@ RESPONSE :
 }
 
 ```
+##### +Content Providers
+
+1. Signup
+
+Request : POST
+
+Headers : 
+
+```
+{
+  "Content-Type" :"multipart/form-data"
+}
+
+```
+
+Url: `/cp/signup`
+
+Body:
+
+```
+{
+   "email":TEXT,
+   "image":file,
+   "password:TEXT,
+   "name":TEXT,
+   "nationality":TEXT,
+   "cityOfResidence":TEXT
+}
+
+```
+
+Response :
+
+```
+{
+    "statusCode": 201,
+    "status": "success",
+    "message": "Signed up successfully",
+    "data": {
+        "id": 3,
+        "name": "MArvel",
+        "email": "sales@marvel.com",
+        "nationality": "American",
+        "cityOfResidence": "Boston",
+        "password": "$2b$10$2J7rtQ1pJib4lB0.qY4SkuLDuVIo3WP/NN1TaFho.yRyBk5nVUpzK",
+        "isVerified": false,
+        "clientId": "598168c9-76af-47b2-8c25-a777acbc916a",
+        "idLink": "http://res.cloudinary.com/n3m3sis/image/upload/v1577550324/perkvq13z3yfbbohlsvo.jpg",
+        "updatedAt": "2019-12-28T16:25:25.561Z",
+        "createdAt": "2019-12-28T16:25:25.561Z",
+        "phoneLine": null
+    }
+}
+
+```
+
+2.Then proceed with the Account verification
+
+REQUEST URL :
+
+`/cp/verify?id=<Id>&&token=<access token>`
+
+RESPONSE :
+
+```
+{
+    "statusCode": 200,
+    "status": "success",
+    "message": "Verified successfully!",
+    "data": [
+        1
+    ]
+}
+
+```
+3.Proceed with Login : POST Request
+
+
+NOTE: login will be disabled as long as the account is not verified
+
+`/auth/login`
+
+REQUEST BODY :
+
+```
+{
+  "email": "jdoe@mailer.com",
+  "password": "pass1234"
+}
+
+```
+RESPONSE BODY :
+
+```
+{
+    "statusCode": 200,
+    "status": "success",
+    "message": "Logged in successfully!",
+    "data": "<access Token>"
+}
+
+```
+
+4.Update account
+
+REQUEST: PUT
+
+HEADERS: 
+
+`authorization` : `<access token>`
+
+`/cp/update`
+
+REQUEST BODY :
+
+```
+{
+	"firstName":"james",
+	"lastName":"Carick"
+}
+
+```
+NOTE : any can be updated; need just to be put in the object
+
+RESPONSE
+
+```
+{
+    "statusCode": 200,
+    "status": "success",
+    "message": "updated successfully",
+    "data": [
+        1
+    ]
+}
+
+```
+5. delete account
+
+REQUEST : DELETE
+
+`/cp/delete_acc`
+HEADERS
+`authorization` : `<access token>`
+
+RESPONSE :
+
+```
+{
+    "statusCode": 200,
+    "status": "success",
+    "message": "deleted successfully",
+    "data": 1
+}
+
+```
+8.Forgot password
+
+REQUEST : POST
+
+`/cp/forgot_password`
+
+BODY:
+
+```
+{
+	"email": "jdoe@mailer.com"
+}
+
+```
+
+RESPONSE :
+
+```
+{
+    "status": 200,
+    "message": "Reset password link sent successfully!",
+    "data": null
+}
+
+```
