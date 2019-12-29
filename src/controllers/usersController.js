@@ -264,6 +264,7 @@ class userController {
 			util.setErrorResponse(res, error.message, 500)
 		}
 	}
+
 	static async getUserByEmail(req, res) {
 		try {
 			const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET)
@@ -274,6 +275,11 @@ class userController {
 		}
 	}
 
+	static async getUserProfile(req, res) {
+		const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET)
+		const response = await userService.getUser(email)
+		util.setSuccessResponse(res, 'Found', 200, response)
+	}
 }
 
 export default userController

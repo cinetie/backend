@@ -75,5 +75,16 @@ class userService {
 			throw error
 		}
 	}
+	static async getUser(email) {
+		try {
+			return await database.User.findOne({
+				where: {
+					email: email
+				}
+			})
+		} catch (error) {
+			throw error
+		}
+	}
 }
 export default userService
