@@ -49,7 +49,8 @@ class userService {
 	static async updateUser(email, oldUser) {
 		try {
 			return await database.User.update(oldUser, {
-				where: { email }
+				where: { email },
+				returning: true
 			})
 		} catch (error) {
 			throw error
@@ -70,6 +71,17 @@ class userService {
 	static async getAllUsers() {
 		try {
 			return await database.User.findAll()
+		} catch (error) {
+			throw error
+		}
+	}
+	static async getUser(email) {
+		try {
+			return await database.User.findOne({
+				where: {
+					email: email
+				}
+			})
 		} catch (error) {
 			throw error
 		}
