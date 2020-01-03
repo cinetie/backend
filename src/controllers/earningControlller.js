@@ -26,8 +26,8 @@ class earningController {
 	//obtain amount to attribute to each distinct view based on their subscription
 	static async calculateRatePerVideo(email) {
 		const sessionDetails = await this.getCurrentViewingSessions(email)
-		const subscriptionDetails = await this.getCurrentSubscriptionDetails(email)
-		const rate = (subscriptionDetails.price)*0.7 / Object.values(sessionDetails).length
+		// const subscriptionDetails = await this.getCurrentSubscriptionDetails(email)
+		const rate = (100)*0.7 / Object.values(sessionDetails).length
 		if(rate){
 			return rate
 		}else{
