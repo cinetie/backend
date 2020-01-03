@@ -5,7 +5,6 @@ import cors from 'cors'
 import fileUpload from 'express-fileupload'
 import response from './helpers/response'
 import routes from './routes'
-
 const app = express()
 
 app.enable('trust proxy')
