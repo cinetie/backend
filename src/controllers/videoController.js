@@ -189,12 +189,12 @@ class videoController {
 	static async updateVideos(req, res) {
 		try {
 			const returned = await videoService.getVideoById(req.query.id)
-			if (!returned) response.errorResponse(res, 404, 'Video not found')
+			if (!returned) response.errorResponse(res, 404, 'Video not updated')
 			const toUpdate = req.body
 			const updated = await videoService.updateVideo(req.query.id, toUpdate)
-			response.successResponse(res, 200, 'Video successfully updated!', updated[1][0])
+			response.successResponse(res, 200, 'Video successfully updated!', updated)
 		} catch (error) {
-			response.errorResponse(res, 500, 'Something went wrong', error)
+			response.errorResponse(res, 500, 'Something went wrong', error.message)
 		}
 	}
 }
