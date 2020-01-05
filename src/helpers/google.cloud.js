@@ -16,7 +16,6 @@ const uploadToGoogleCloud = async (bucketName, file) => {
 		uuid: uuid.generator(),
 		type:mime.extensions[type][0],
 	}
-	console.log(JSON.stringify(fileData))
 	const blob = bucket.file(`${fileData.uuid}.${fileData.type}`)
 	await new Promise((resolve,reject)=>{
 		const readStream = createReadStream(file.tempFilePath,{highWaterMark: Math.pow(2,16)})

@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import database from '../database/models'
 import sequelize from 'sequelize'
 import date from '../helpers/date'
@@ -18,6 +19,24 @@ class videoService {
 			})
 			if (video) {
 				return video
+			} else {
+				return null
+			}
+		} catch (error) {
+			throw error
+		}
+	}
+	static async getNewVideos(){
+		try {
+			const videos = await database.videos.findAll({
+				where:{
+					creationTime: {
+						[op.gte]:date.removeDays(60)
+					}
+				}
+			})
+			if (videos) {
+				return videos
 			} else {
 				return null
 			}

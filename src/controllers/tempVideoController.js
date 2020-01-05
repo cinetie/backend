@@ -2,6 +2,7 @@ import helpers from '../helpers/utilities'
 import services from '../services/tempVideoServices'
 import jwt from '../helpers/jwt'
 import cloudinary from '../helpers/cloudinary'
+import google from '../helpers/google.cloud.normal'
 const util = new helpers()
 
 class tempVideoController {
@@ -10,15 +11,16 @@ class tempVideoController {
             
 			const data = req.body
 			const file = req.files.video
-			console.log(JSON.stringify(file))
-			const videoUri =  await cloudinary(file.tempFilePath,'video')
-			data.videoUri =  jwt.jwtSign({videoUri :videoUri.url,clientId:data.clientId},process.env.SECRET)
-			const uploadedVideo = await services.createNewVideos(data)
-			if(uploadedVideo){
-				util.setSuccessResponse(res,'video uploaded successfully',201,uploadedVideo)
-			}else{
-				util.setErrorResponse(res,'Video can\'t be saved',401)
-			}
+			await google.uploadToGoogleCloud('cinetie',file)
+				.then(async(videoUri)=>{
+					data.videoUri =  jwt.jwtSign({videoUri :videoUri,clientId:data.clientId},process.env.SECRET)
+					const uploadedVideo = await services.createNewVideos(data)
+					if(uploadedVideo){
+						util.setSuccessResponse(res,'video uploaded successfully',201,uploadedVideo)
+					}else{
+						util.setErrorResponse(res,'Video can\'t be saved',401)
+					}
+				})
 
 		} catch (error) {
 			util.setErrorResponse(res,`something happened ${error.message}`,503)

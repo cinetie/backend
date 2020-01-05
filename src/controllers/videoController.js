@@ -8,6 +8,7 @@ import fetch from 'node-fetch'
 import cloudinary from '../helpers/cloudinary'
 import jwt from '../helpers/jwt'
 import vimeoHelper from '../helpers/vimeo'
+import trailerServices from '../services/trailerService'
 const util = new Util()
 // const Vimeo = require('vimeo').Vimeo
 class videoController {
@@ -51,7 +52,6 @@ class videoController {
 			response.errorResponse(res, 500, 'Something went wrong', error)
 		}
 	}
-
 	static async getParticularVideo(req, res) {
 		try {
 			const id = req.query.videoId
@@ -78,7 +78,6 @@ class videoController {
 			return response.errorResponse(res, 500, 'Something went wrong ' + error, error)
 		}
 	}
-
 	static async getAllVideo(req, res) {
 		try {
 			const headers = {
@@ -99,7 +98,7 @@ class videoController {
 	static async getVideosByPopularity(req, res) {
 		try {
 			const videos = await videoService.getPopularVideos()
-			if (videos) util.setSuccessResponse(res, 'videos found', 200, videos)
+			if (Object.values(videos).length >0) util.setSuccessResponse(res, 'videos found', 200, videos)
 			util.setErrorResponse(res, 'Data not found', 404)
 		} catch (error) {
 			util.setErrorResponse(res, error.message, 500)
@@ -108,7 +107,7 @@ class videoController {
 	static async getVideosByTrend(req, res) {
 		try {
 			const videos = await videoService.getTrendingVideos()
-			if (videos) util.setSuccessResponse(res, 'videos found', 200, videos)
+			if (Object.values(videos).length >0) util.setSuccessResponse(res, 'videos found', 200, videos)
 			util.setErrorResponse(res, 'Data not found', 404)
 		} catch (error) {
 			util.setErrorResponse(res, error.message, 500)
@@ -117,7 +116,7 @@ class videoController {
 	static async getVideosByCategory(req, res) {
 		try {
 			const videos = await videoService.getVideosByCategory(req.query.q)
-			if (videos) {
+			if (Object.values(videos).length > 0) {
 				util.setSuccessResponse(res, `${req.query.q} videos found`, 200, videos)
 			} else {
 				util.setErrorResponse(res, 'Data not found', 404)
@@ -131,7 +130,7 @@ class videoController {
 		try {
 			const query = req.query.userId
 			const data = axios.get(`https://api.vimeo.com/videos/${query}`)
-			if (data) util.setSuccessResponse(res, 'Data found', 200, data)
+			if (Object.values(data).length >0) util.setSuccessResponse(res, 'Data found', 200, data)
 			util.setErrorResponse(res, 'Data not found', 404)
 		} catch (error) {
 			response.errorResponse(res, 500, 'Something went wrong', error)
@@ -149,6 +148,30 @@ class videoController {
 			}
 		} catch (error) {
 			util.setErrorResponse(res, `somethin went wrong : ${error.message}`, 503)
+		}
+	}
+	static async getFeaturedFilm(req,res){
+		try {
+			const video = await trailerServices.getAllTrailers(req.query.videoId)
+			if (video) {
+				util.setSuccessResponse(res, 'videos Found', 200, video)
+			} else {
+				util.setErrorResponse(res, 'Video can\'t be found', 404)
+			}
+		} catch (error) {
+			util.setErrorResponse(res, `something went wrong ${error.message}`, 503)
+		}
+	}
+	static async getAllNewVideos(req,res){
+		try {
+			const video = await videoService.getNewVideos()
+			if (video) {
+				util.setSuccessResponse(res, 'videos Found', 200, video)
+			} else {
+				util.setErrorResponse(res, 'Video can\'t be found', 404)
+			}
+		} catch (error) {
+			util.setErrorResponse(res, `something went wrong ${error.message}`, 503)
 		}
 	}
 	static async getVideoById(req, res) {
