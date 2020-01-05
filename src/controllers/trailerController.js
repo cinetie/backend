@@ -1,7 +1,7 @@
 import Util from '../helpers/utilities'
 import trailerServices from '../services/trailerService'
 import cloudinary from '../helpers/cloudinary'
-import googleCloud from '../helpers/google.cloud'
+import googleCloud from '../helpers/google.cloud.normal'
 const util = new Util()
 
 class trailerController {
@@ -9,8 +9,8 @@ class trailerController {
 	static async createNewTrailer(req, res) {
 		try {
 			const data = req.body
-			const trailer = req.files.trailer
-			await googleCloud.uploadToGoogleCloud('cinetie', trailer)
+			const file = req.files.trailer
+			await googleCloud.uploadToGoogleCloud('cinetie', file)
 				.then(async(uri) => {
 					if(!uri) util.setErrorResponse(res,'An error occured updating the trailer trailer',422)
 					data.trailerLink = uri
