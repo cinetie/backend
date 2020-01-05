@@ -14,6 +14,7 @@ router.get('/sort/trend',access.isNormalUser,video.getVideosByTrend)
 router.get('/search',access.isNormalUser,video.search)
 router.get('/unique',access.isNormalUser,session.createNewWatchCount,video.getVideoById)
 router.get('/arrivals',access.isNormalUser,video.getAllNewVideos)
+router.get('/featured',access.isNormalUser,video.getFeaturedFilm)
 router.put('/',access.isAdmin,video.updateVideos)
 router.delete('/',access.isAdmin,video.deleteAvideo)
 export default router
