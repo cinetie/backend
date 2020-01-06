@@ -176,5 +176,43 @@ class videoService {
 			throw error
 		}
 	}
+	static async getMainFeaturedVideo(){
+		try {
+			const videos = await database.videos.findAll({
+				where:{
+					[op.and]:[
+						{isFeatured:true},
+						{featureType:1}
+					]
+				}
+			})
+			if(videos){
+				return videos
+			}else{
+				return null
+			}
+		} catch (error) {
+			throw error			
+		}
+	}
+	static async getSecondFeaturedVideo(){
+		try {
+			const videos = await database.videos.findAll({
+				where:{
+					[op.and]:[
+						{isFeatured:true},
+						{featureType:2}
+					]
+				}
+			})
+			if(videos){
+				return videos
+			}else{
+				return null
+			}
+		} catch (error) {
+			throw error			
+		}
+	}
 }
 export default videoService

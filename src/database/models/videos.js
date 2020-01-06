@@ -12,7 +12,9 @@ module.exports = (sequelize, DataTypes) => {
 		videoClientId: DataTypes.STRING,
 		videoSuspensionState: DataTypes.STRING,
 		creationTime :DataTypes.BIGINT,
-		category :DataTypes.STRING
+		category :DataTypes.STRING,
+		featureType: DataTypes.INTEGER,
+		isFeatured:DataTypes.BOOLEAN
 	}, {})
 	// eslint-disable-next-line no-unused-vars
 	videos.associate = function(models) {
