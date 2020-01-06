@@ -150,11 +150,41 @@ class videoController {
 			util.setErrorResponse(res, `somethin went wrong : ${error.message}`, 503)
 		}
 	}
-	static async getFeaturedFilm(req,res){
+	static async getAllVideosLocal(req,res){
+		const videos = await videoService.getAllVideos()
+		if(videos){
+			util.setSuccessResponse(res,'Data found',200,videos)
+		}else{
+			util.setErrorResponse(res,'Data not found',400)
+		}
+	}
+	static async getMainFeaturedFilm(req,res){
 		try {
-			const video = await trailerServices.getAllTrailers(req.query.videoId)
-			if (video) {
-				util.setSuccessResponse(res, 'videos Found', 200, video)
+			const video = await videoService.getMainFeaturedVideo()
+			const trailer = await trailerServices.getAllTrailers(video[0].videoId)
+			const data = {
+				video: video,
+				trailer: trailer[0].trailerLink
+			}
+			if (data) {
+				util.setSuccessResponse(res, 'videos Found', 200, data)
+			} else {
+				util.setErrorResponse(res, 'Video can\'t be found', 404)
+			}
+		} catch (error) {
+			util.setErrorResponse(res, `something went wrong ${error.message}`, 503)
+		}
+	}
+	static async getSecondFeaturedFilm(req,res){
+		try {
+			const video = await videoService.getSecondFeaturedVideo()
+			const trailer = await trailerServices.getAllTrailers(video[0].videoId)
+			const data = {
+				video: video,
+				trailer: trailer[0].trailerLink
+			}
+			if (data) {
+				util.setSuccessResponse(res, 'videos Found', 200, data)
 			} else {
 				util.setErrorResponse(res, 'Video can\'t be found', 404)
 			}
