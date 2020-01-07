@@ -14,7 +14,6 @@ const util = new Util()
 class videoController {
 	static async addVideo(req, res) {
 		try {
-			console.log("fwlenwl")
 			const authToken = req.headers.authorization.slice(7)
 			const decoded = jwt.jwtVerify(authToken, process.env.SECRET)
 			if (decoded.user === process.env.ADMIN_USER) {
@@ -97,7 +96,7 @@ class videoController {
 	}
 	static async getVideosByPopularity(req, res) {
 		try {
-			const videos = await videoService.getPopularVideos()
+			let videos = await videoService.getPopularVideos(req.query.offset,req.query.limit)
 			if (Object.values(videos).length >0) util.setSuccessResponse(res, 'videos found', 200, videos)
 			util.setErrorResponse(res, 'Data not found', 404)
 		} catch (error) {
@@ -106,7 +105,7 @@ class videoController {
 	}
 	static async getVideosByTrend(req, res) {
 		try {
-			const videos = await videoService.getTrendingVideos()
+			const videos = await videoService.getTrendingVideos(req.query.offset,req.query.limit)
 			if (Object.values(videos).length >0) util.setSuccessResponse(res, 'videos found', 200, videos)
 			util.setErrorResponse(res, 'Data not found', 404)
 		} catch (error) {
@@ -194,7 +193,7 @@ class videoController {
 	}
 	static async getAllNewVideos(req,res){
 		try {
-			const video = await videoService.getNewVideos()
+			const video = await videoService.getNewVideos(req.query.limit,req.query.offset)
 			if (video) {
 				util.setSuccessResponse(res, 'videos Found', 200, video)
 			} else {
