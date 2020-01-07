@@ -26,12 +26,15 @@ class videoService {
 			throw error
 		}
 	}
-	static async getNewVideos(){
+	static async getNewVideos(limitValue, offsetValue) {
 		try {
+			
 			const videos = await database.videos.findAll({
-				where:{
+				offset: Number(offsetValue),
+				limit: Number(limitValue),
+				where: {
 					creationTime: {
-						[op.gte]:date.removeDays(60)
+						[op.gte]: date.removeDays(60)
 					}
 				}
 			})
@@ -40,14 +43,18 @@ class videoService {
 			} else {
 				return null
 			}
+			
+			
 		} catch (error) {
 			throw error
 		}
 	}
-	static async getTrendingVideos() {
+	static async getTrendingVideos(offsetValue, limit) {
 		try {
+			
 			const videos = await database.videos.findAll({
-
+				offset: Number(offsetValue),
+				limit: Number(limit),
 				where: {
 					[op.and]: [{
 						videoWatchCount: {
@@ -64,49 +71,54 @@ class videoService {
 			} else {
 				return null
 			}
+			
+			
 
 		} catch (error) {
 			throw error
 		}
 	}
-	static async search(query,offSetValue) {
+	static async search(query, offSetValue) {
 		try {
 			const data = await database.videos.findAll({
-				offset : Number(offSetValue),
-				limit : 1,
-				where : {
-					[op.or] : [
-						{ videoName : {[op.like]: `%${query}%` } },
-						{ category :  {[op.like]: `%${query}%`  } }
+				offset: Number(offSetValue),
+				limit: 20,
+				where: {
+					[op.or]: [
+						{ videoName: { [op.like]: `%${query}%` } },
+						{ category: { [op.like]: `%${query}%` } }
 					]
 				}
 			})
-			if(data){
+			if (data) {
 				return data
-			}else{
+			} else {
 				return null
 			}
 		} catch (error) {
 			throw error
 		}
 	}
-	static async incrementWatchCountService(videoId){
+	static async incrementWatchCountService(videoId) {
 		try {
-			const data = await database.videos.increment('videoWatchCount',{
-				where : { videoId }
+			const data = await database.videos.increment('videoWatchCount', {
+				where: { videoId }
 			})
-			if(data){
+			if (data) {
 				return data
-			}else{
+			} else {
 				return null
 			}
 		} catch (error) {
 			throw error
 		}
 	}
-	static async getPopularVideos() {
+	static async getPopularVideos(offSetValue, limitValue) {
 		try {
+			
 			const data = await database.videos.findAll({
+				offset: Number(offSetValue),
+				limit: Number(limitValue),
 				where: {
 					videoWatchCount: {
 						[op.gte]: process.env.TRENDING_WATCH_COUNT
@@ -118,6 +130,8 @@ class videoService {
 			} else {
 				return null
 			}
+			
+			
 		} catch (error) {
 			throw error
 		}
@@ -176,42 +190,42 @@ class videoService {
 			throw error
 		}
 	}
-	static async getMainFeaturedVideo(){
+	static async getMainFeaturedVideo() {
 		try {
 			const videos = await database.videos.findAll({
-				where:{
-					[op.and]:[
-						{isFeatured:true},
-						{featureType:1}
+				where: {
+					[op.and]: [
+						{ isFeatured: true },
+						{ featureType: 1 }
 					]
 				}
 			})
-			if(videos){
+			if (videos) {
 				return videos
-			}else{
+			} else {
 				return null
 			}
 		} catch (error) {
-			throw error			
+			throw error
 		}
 	}
-	static async getSecondFeaturedVideo(){
+	static async getSecondFeaturedVideo() {
 		try {
 			const videos = await database.videos.findAll({
-				where:{
-					[op.and]:[
-						{isFeatured:true},
-						{featureType:2}
+				where: {
+					[op.and]: [
+						{ isFeatured: true },
+						{ featureType: 2 }
 					]
 				}
 			})
-			if(videos){
+			if (videos) {
 				return videos
-			}else{
+			} else {
 				return null
 			}
 		} catch (error) {
-			throw error			
+			throw error
 		}
 	}
 }
