@@ -218,14 +218,17 @@ class userController {
 					"currency": "USD",
 					"total": paymentDetails.price,
 					"urls": {
-						"success": process.env.PAYPAL_SUCCESS,
+						"success": `${process.env.PAYPAL_SUCCESS}?user=${jwt.jwtSign(email,process.env.SECRET)}`,
 						"failOrCancel": process.env.PAYPAL_FAIL_CANCEL
 					}
 				}
 			}
 			const response = await userService.updateUser(email, newInfo)
-			if(newInfo.paymentMethod) await payment.commitPayment(req,res,paymentData)
-			util.setSuccessResponse(res, 'deleted successfully', 200, response[1][0])
+			if(newInfo.paymentMethod) {
+				await payment.commitPayment(req,res,paymentData)
+			}else{
+				util.setSuccessResponse(res, 'Payment done successfully', 200, response[1][0])
+			}
 			// (paymentDetails && updates) ? util.setSuccessResponse(res, 'User updated easily', 201, { 'user': updates, 'paymentDetails': paymentDetails }) : util.setErrorResponse(res, 'user didn\'t update easily', 400)
 		} catch (error) {
 			util.setErrorResponse(res, error.message, 522)
