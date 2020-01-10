@@ -3,8 +3,10 @@ import middleWares from '../middlewares/viewingSessions'
 import { Router } from 'express'
 import access from '../middlewares/access'
 import session from '../middlewares/viewingSessions'
+import validation from '../middlewares/validators/videoValidation'
+import imageValidation from '../middlewares/validators/imageValidator'
 const router = new Router()
-router.post('/new',access.isAdmin,video.addVideo)
+router.post('/new',access.isAdmin,imageValidation.validateSmall,imageValidation.validateNameTag,imageValidation.validateTall,validation.video,video.addVideo)
 router.get('/',access.isNormalUser,video.getParticularVideo)
 router.post('/watchCount',middleWares.createNewWatchCount)
 router.get('/all',access.isNormalUser,video.getAllVideo)
@@ -17,6 +19,6 @@ router.get('/unique',access.isNormalUser,session.createNewWatchCount,video.getVi
 router.get('/arrivals',access.isNormalUser,video.getAllNewVideos)
 router.get('/main/ft',access.isNormalUser,video.getMainFeaturedFilm)
 router.get('/second/ft',access.isNormalUser,video.getSecondFeaturedFilm)
-router.put('/',access.isAdmin,video.updateVideos)
+router.put('/',access.isAdmin,validation.updateVideo,video.updateVideos)
 router.delete('/',access.isAdmin,video.deleteAvideo)
 export default router

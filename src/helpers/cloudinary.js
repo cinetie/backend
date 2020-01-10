@@ -4,16 +4,24 @@ import { v2 as cloudinary } from 'cloudinary'
 dotenv.config()
 
 cloudinary.config({
-	cloud_name : process.env.CLOUD_NAME,
-	api_key : process.env.CLOUDINARY_API_KEY,
+	cloud_name: process.env.CLOUD_NAME,
+	api_key: process.env.CLOUDINARY_API_KEY,
 	api_secret: process.env.CLOUDINARY_API_SECRET
 })
 
-const upload = async (file,type) =>{
-	const  uploadedFile = await cloudinary.uploader.upload(file,{
+const upload = async (file, type) => {
+	const uploadedFile = await cloudinary.uploader.upload(file, {
 		resource_type: type,
-		overwrite :true,
+		overwrite: true,
 	})
 	return uploadedFile
 }
-export default upload
+const uploadCustom = async (file,width,height,cropType) => {
+	const modifiedFile =   cloudinary.url(file, {
+		aspect_ratio:"4:3",
+		crop: 'scale'
+	})
+	const originalFile = await upload(file,'image')
+	return {modifiedFile,originalFile}
+}
+export default {upload,uploadCustom}
