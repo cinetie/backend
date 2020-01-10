@@ -1,6 +1,5 @@
 import Util from '../helpers/utilities'
 import trailerServices from '../services/trailerService'
-import cloudinary from '../helpers/cloudinary'
 import googleCloud from '../helpers/google.cloud.normal'
 const util = new Util()
 

@@ -20,7 +20,7 @@ class cpController {
 			newUser.isVerified = false
 			newUser.clientId = uuid.generator()
 			const image = req.files.image
-			const imageToUpload = await cloudinary(image.tempFilePath,'image')
+			const imageToUpload = await cloudinary.upload(image.tempFilePath,'image')
 			newUser.idLink = imageToUpload.url
 			const checkUser = await cp.getCpByMail(newUser.email)
 			if (checkUser != null) {

@@ -17,13 +17,19 @@ class videoController {
 			const authToken = req.headers.authorization.slice(7)
 			const decoded = jwt.jwtVerify(authToken, process.env.SECRET)
 			if (decoded.user === process.env.ADMIN_USER) {
-				const image = req.files.image
-				const thumbnail = await cloudinary(image.tempFilePath,'image')
+				const small = req.files.small
+				const nameTag = req.files.nameTag
+				const tall = req.files.tall
+				const smallThumbnail = await cloudinary.upload(small.tempFilePath,'image')
+				const nameTagThumbNail = await cloudinary.upload(nameTag.tempFilePath,'image')
+				const tallThumbNail = await cloudinary.upload(tall.tempFilePath,'image')
 				const data = req.body
 				const decodedVideoHash = jwt.jwtVerify(data.videoUrl,process.env.SECRET)
+				data.tallThumbNailLink = tallThumbNail.url
+				data.nameTagThumbNailLink = nameTagThumbNail.url
 				data.videoUrl = decodedVideoHash.videoUri
 				data.videoClientId = decodedVideoHash.clientId
-				data.videoThumbnailLink = thumbnail.url
+				data.videoThumbnailLink = smallThumbnail.url
 				data.creationTime = new Date().getTime()
 				data.videoId = uuid.generator()
 				data.size = data.size * 1e+6
