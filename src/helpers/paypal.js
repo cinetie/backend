@@ -4,10 +4,11 @@ import paypalHelper from 'paypal-rest-sdk'
 import tokenService from '../services/tokenService'
 import paypapTransServices from '../services/paypalTransServices'
 import billingServices from '../services/billingServices'
+import paypalAggreementServices from '../services/paypalAggreementService'
 import moment from 'moment'
 import _ from 'lodash'
 import Util from './utilities'
-
+import jwt from '../helpers/jwt'
 const util = new Util()
 paypalHelper.configure({
 	'mode': process.env.PAYPAL_MODE,
@@ -174,7 +175,7 @@ class paypal {
 	}
 	static async executeAggreement(req, res) {
 		let token = req.query.token
-
+		let user = req.query.user
 		paypalHelper.billingAgreement.execute(token, {}, async(error, billingAgreement) => {
 			if (error) {
 				throw error
@@ -185,6 +186,12 @@ class paypal {
 					payerEmail: billingAgreement.payer.payer_info.email,
 					payerId: billingAgreement.payer.payer_info.payer_id
 				}
+				await paypalAggreementServices.createNewAggreement({
+					date:new Date().toDateString,
+					email:user.email,
+					aggreementId:billingAgreement.id,
+					state:'alive'
+				})
 				await paypapTransServices.createTransaction(data)
 				console.log(billingAgreement)
 				//Billing agreement will have all the information about the agreement.
@@ -193,6 +200,33 @@ class paypal {
 				})
 			}
 		})
+	}
+	static async cancelAggreement(details) {
+		let user = jwt.jwtVerify(details.token,process.env.SECRET)
+		const aggreement  = await paypalAggreementServices.getLiveAggreement(user.email)
+		if(aggreement){
+			const cancelNote = {
+				"note":"Cancel subscription to cinetie"
+			}
+			paypalHelper.billingAgreement.cancel(user.email,cancelNote,(error,response)=>{
+				if(error){
+					throw error
+				}else{
+					console.log(JSON.stringify(response))
+				}
+				paypalHelper.billingAgreement.get(aggreement.aggreementId,(error,billingAgreement)=>{
+					if(error){
+						throw error
+					}else{
+						console.log(billingAgreement.state)
+						return 1
+					}
+				})
+			})
+		}else{
+			return 0
+		}
+		
 	}
 }
 

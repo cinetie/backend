@@ -44,5 +44,10 @@ class transactionsController {
 	static async paypalCancelOrFail(req, res) {
 		util.setErrorResponse(res, "Message something happened transaction unsuccessful", 422)
 	}
+	static async paypalCancelSubscription(req,res){
+		await paypal.cancelAggreement({
+			token : req.headers.authorization
+		})
+	}
 }
 export default transactionsController
