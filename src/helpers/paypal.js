@@ -187,7 +187,7 @@ class paypal {
 					payerId: billingAgreement.payer.payer_info.payer_id
 				}
 				await paypalAggreementServices.createNewAggreement({
-					date:new Date().toDateString,
+					date:new Date().getTime,
 					email:user.email,
 					aggreementId:billingAgreement.id,
 					state:'alive'
@@ -208,7 +208,7 @@ class paypal {
 			const cancelNote = {
 				"note":"Cancel subscription to cinetie"
 			}
-			paypalHelper.billingAgreement.cancel(user.email,cancelNote,(error,response)=>{
+			paypalHelper.billingAgreement.cancel(aggreement.aggreementId,cancelNote,(error,response)=>{
 				if(error){
 					throw error
 				}else{

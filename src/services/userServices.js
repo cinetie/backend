@@ -46,9 +46,9 @@ class userService {
 		}
 	}
 
-	static async updateUser(email, oldUser) {
+	static async updateUser(email, updates) {
 		try {
-			return await database.User.update(oldUser, {
+			return await database.User.update(updates, {
 				where: { email },
 				returning: true
 			})

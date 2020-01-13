@@ -1,12 +1,10 @@
 import video from '../controllers/videoController'
-import middleWares from '../middlewares/viewingSessions'
 import { Router } from 'express'
 import access from '../middlewares/access'
 import session from '../middlewares/viewingSessions'
 const router = new Router()
 router.post('/new',access.isAdmin,video.addVideo)
 router.get('/',access.isNormalUser,video.getParticularVideo)
-router.post('/watchCount',middleWares.createNewWatchCount)
 router.get('/all',access.isNormalUser,video.getAllVideo)
 router.get('/all/local',access.isAdmin,video.getAllVideosLocal)
 router.get('/sort/pop',access.isNormalUser,video.getVideosByPopularity)

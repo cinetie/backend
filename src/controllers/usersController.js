@@ -52,6 +52,7 @@ class userController {
 		try {
 			const { id } = req.query
 			const { token } = req.query
+			const decoded = jwt.jwtVerify(token,process.env.SECRET)
 			const user = await userService.getUserById(id)
 			if (!user) response.errorResponse(res, 404, 'User not found')
 			jwt.jwtVerify(token, process.env.SECRET)
@@ -59,18 +60,18 @@ class userController {
 				isVerified: true
 			}
 			await tokenService.destroyToken(token)
-			const updatedUser = await userService.updateUser(id, newUser)
-			delete updatedUser.password
+			const updatedUser = await userService.updateUser(decoded, newUser)
+			if(!updatedUser) util.setErrorResponse(res,`Can't verify user ${decoded}`,400)
 			const emailTosend = {
 				to: user.email,
 				from: process.env.EMAIL_USER,
 				subject: 'Success email has been verified',
-				text: 'Dear ' + user.firstName + ' Your Email has been verified successfully '
+				text: 'Dear ' + user.lastName + ' Your Email has been verified successfully '
 			}
 			await mdw.mailer(emailTosend)
 			res.redirect('https://www.google.com')
 		} catch (error) {
-			util.setErrorResponse(res, 'Something went wrong', 500, error)
+			util.setErrorResponse(res, `Something went wrong ${error.message}`, 500)
 		}
 	}
 	static async loginUser(req, res) {
