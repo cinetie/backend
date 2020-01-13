@@ -211,7 +211,7 @@ class videoController {
 	}
 	static async getVideoById(req, res) {
 		try {
-			const video = await videoService.getVideoById(req.query.videoId)
+			const video = await videoService.getVideoById(req.query.id)
 			if (video) {
 				util.setSuccessResponse(res, 'videos Found', 200, video)
 			} else {
