@@ -669,3 +669,82 @@ RESPONSE :
 }
 
 ```
+### Analytics
+
+1.Analytics per video
+
+use this request for getting video analytics like video watchcount ( how many times a video has been viewed ) not that a user can view a video multiple times.
+
+1.1 getting video watchCount
+
+1.1.1 REQUEST :
+* Method: `POST`
+* URL: `/video/unique?id=<videoId>`
+* Headers:
+  * Authorization: Bearer `<token>` obtained after normal user login
+* 1.1.2 RESPONSE :
+
+```
+{
+    "statusCode": 200,
+    "status": "success",
+    "message": "videos Found",
+    "data": {
+        "id": 1,
+        "videoLink": "/videos/381770796",
+        "videoId": "3b817119-5845-4301-8cd1-ce42125a455c",
+        "videoName": "Infinity War",
+        "videoCast": "Robert Downey Jr",
+        "videoSynopsis": null,
+        "videoWatchCount": 10009,
+        "videoThumbnailLink": "http://res.cloudinary.com/n3m3sis/image/upload/v1577537869/mu1yjqotrctkeimqjsoc.jpg",
+        "videoIdVimeo": "381770796",
+        "videoClientId": "91e3ff0e-c8c3-455c-bdec-dad91883061a",
+        "videoSuspensionState": null,
+        "creationTime": 1577537870125,
+        "category": "sci-fi",
+        "featureType": 2,
+        "isFeatured": true
+    }
+}
+
+```
+then you can read the property `videoWatchCount`
+
+1.2  Video Watching sessions
+
+this provides information like location of each user when they watched the video
+
+1.2.1 REQUEST :
+* Method: `GET`
+* URL: `/sessions/video?videoId=`
+* Headers:
+  * ip:<user's request provided upon request>
+  * Authorization: Bearer `<token>` obtained after content provider login
+* 1.2.2 RESPONSE :
+
+```
+{
+    "status": 200,
+    "message": "Found details",
+    "data": [
+        
+        [   < many  more sessions  >
+            {
+                "id": 12,
+                "videoId": "3b817119-5845-4301-8cd1-ce42125a455c",
+                "clientId": "91e3ff0e-c8c3-455c-bdec-dad91883061a",
+                "time": "1578907050984",
+                "sessionState": "Active",
+                "userId": "janethdoe@gmail.com",
+                "location": "Mexico",
+                "ip": "187.243.2.74",
+                "createdAt": "2020-01-13T09:17:30.000Z",
+                "updatedAt": "2020-01-13T09:17:30.000Z"
+            }
+        ]
+    ]
+}
+
+```
+
