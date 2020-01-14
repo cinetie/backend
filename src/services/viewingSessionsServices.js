@@ -71,24 +71,14 @@ class viewingSessionservices {
 	}
 	static async getSessionsPerVideo(videoId) {
 		try {
-			const counts = await database.earnings.findAll({
-				attributes: {
-					include: [
-						[sequelize.fn('count', sequelize.col('videoId')), 'Count']
-					]
-				},
-				where: {
-					videoId
-				}
-			})
 			const sessions = await database.viewingSessions.findAll({
 				where: {
 					videoId
 				}
 			})
-			const data = [counts, sessions]
-			if (sessions && counts) {
-				return data
+			console.log(JSON.stringify(sessions))
+			if (sessions) {
+				return sessions
 			} else {
 				return null
 			}
@@ -136,7 +126,7 @@ class viewingSessionservices {
 			} else {
 				return null
 			}
-		} catch(error) {
+		} catch (error) {
 			throw error
 		}
 	}

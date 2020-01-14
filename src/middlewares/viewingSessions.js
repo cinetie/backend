@@ -4,7 +4,6 @@ import videoService from '../services/videoServices'
 import response from '../helpers/response'
 import fetch from 'node-fetch'
 import jwt from '../helpers/jwt'
-
 class viewingSession {
 	static async createNewWatchCount(req, res, next) {
 		try {
@@ -12,8 +11,8 @@ class viewingSession {
 			const { id } = req.query
 			const videoId = id
 			const videoData = await videoService.getVideoById(videoId)
-			console.log(JSON.stringify(videoData.videoClientId))
 			const token = req.headers.authorization.slice(7)
+			if(!ip&&!videoId&&Object.values(videoData).length === 0) return response.errorResponse(res,400,'Something went wrong','missingParameterError')
 			const decoded = jwt.jwtVerify(token, process.env.SECRET)
 			let data = req.body
 			data.sessionState = 'Active'
@@ -21,6 +20,7 @@ class viewingSession {
 			data.time = new Date().getTime()
 			const locationServiceData = await fetch(`http://api.ipstack.com/${ip}?access_key=${process.env.IP_STACK_ACCESS_TOKEN}`)
 			const JsonlocationData = await locationServiceData.json()
+			console.log(JsonlocationData.country_name)
 			const results = await viewingSessions.registerViewingSessions({
 				sessionState: 'Active',
 				userId: decoded.email,
