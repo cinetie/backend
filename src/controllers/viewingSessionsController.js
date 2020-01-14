@@ -5,11 +5,10 @@ class viewingSessionController {
 
 	static async getSpecificSessions(req, res) {
 		try {
-			const {
-				videoId
-			} = req.query
+			const { videoId } = req.query
 			const data = await viewingSessions.getSessionsPerVideo(videoId)
-			if (data) {
+			console.log(JSON.stringify(data))
+			if (Object.values(data).length >0) {
 				return response.successResponse(res, 200, 'Found details', data)
 			} else {
 
