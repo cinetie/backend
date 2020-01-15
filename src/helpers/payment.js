@@ -22,8 +22,7 @@ class payment {
 				data.endDate = date.addMoreDays(31).toDateString()
 			}
 			data.paymentMethod = details.paymentMethod
-			const bill = await billingService.registerSubscription(data);
-			console.log(JSON.stringify(bill));
+			const bill = await billingService.registerSubscription(data)
 			if (bill) {
 				return bill
 			} else {

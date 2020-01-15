@@ -46,7 +46,7 @@ class transactionsController {
 	}
 	static async paypalCancelSubscription(req,res){
 		await paypal.cancelAggreement({
-			token : req.headers.authorization
+			token : req.headers.authorization.slice(7)
 		})
 	}
 }

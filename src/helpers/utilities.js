@@ -37,9 +37,9 @@ export default class Util {
 		} else {
 			const status = bcrypt.compareSync(plainPassword, encrypted)
 			if (status) {
-				return  status
+				return status
 			} else {
-				return  status
+				return status
 			}
 		}
 
@@ -77,13 +77,28 @@ export default class Util {
 			message: this.message,
 		})
 	}
-	setSuccessResponse(res,message,statusCode,data){
-		this.setSuccess(message,statusCode,data)
+	setSuccessResponse(res, message, statusCode, data) {
+		this.setSuccess(message, statusCode, data)
 		return this.send(res)
 	}
-	setErrorResponse(res,message,statusCode){
-		this.setError(statusCode,message)
+	setErrorResponse(res, message, statusCode) {
+		this.setError(statusCode, message)
 		return this.send(res)
 	}
-    
+	getUnique(arr, comp) {
+
+		const unique = arr
+			 .map(e => e[comp])
+	  
+		   // store the keys of the unique objects
+		  .map((e, i, final) => final.indexOf(e) === i && i)
+	  
+		  // eliminate the dead keys & store unique objects
+		  .filter(e => arr[e]).map(e => arr[e]);
+	  
+		 return unique;
+	  }
+	  
+
+
 }

@@ -14,7 +14,6 @@ import date from '../helpers/date'
 const util = new Util()
 class userController {
 	static async signupUser(req, res) {
-		// console.log("signup launched");
 		try {
 			const newUser = req.body
 			newUser.password = await bcrypt.encrypt(newUser.password)
