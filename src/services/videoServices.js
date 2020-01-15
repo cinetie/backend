@@ -183,9 +183,11 @@ class videoService {
 			throw error
 		}
 	}
-	static async getAllVideos() {
+	static async getAllVideos(videoClientId) {
 		try {
-			return await database.videos.findAll()
+			return await database.videos.findAll({
+				where : { videoClientId }
+			})
 		} catch (error) {
 			throw error
 		}

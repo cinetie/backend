@@ -1,5 +1,6 @@
 import tokenService from '../services/tokenService'
 import sessionService from '../services/loginSessionServices'
+import videoService from '../services/videoServices'
 import cp from '../services/cpServices'
 import bcrypt from '../helpers/bcrypt'
 import response from '../helpers/response'
@@ -9,6 +10,7 @@ import mdw from '../helpers/mailer'
 import Util from '../helpers/utilities'
 import uuid from '../helpers/uuid'
 import cloudinary from '../helpers/cloudinary'
+import cpService from '../services/cpServices'
 const util = new Util()
 //add an isVerified column to cp
 class cpController {
@@ -179,6 +181,15 @@ class cpController {
 			response.successResponse(res,200,'List of users',users)
 		} catch (error) {
 			util.setErrorResponse(res,error,503)
+		}
+	}
+	static async getAllVideosLocal(req,res){
+		const decoded = jwt.jwtVerify(req.headers.authorization.slice(7),process.env.SECRET)
+		const videos = await videoService.getAllVideos(decoded.clientId)
+		if(videos){
+			util.setSuccessResponse(res,'Data found',200,videos)
+		}else{
+			util.setErrorResponse(res,'Data not found',400)
 		}
 	}
 
