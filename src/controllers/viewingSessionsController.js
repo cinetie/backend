@@ -29,7 +29,7 @@ class viewingSessionController {
 			let formattedArray = util.getUnique(cities,'city')
 			
 			if (Object.values(raw).length > 0) {
-				return response.successResponse(res, 200, 'Found details', formattedArray)
+				return response.successResponse(res, 200, 'Found details', {formattedData:formattedArray,totalCount:cities.length})
 			} else {
 
 				return response.errorResponse(res, 404, 'something went wrong', 'NotFoundError ')

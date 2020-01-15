@@ -16,6 +16,7 @@ router.get('/all',access.isAdmin,auth.getAllAccounts)
 router.get('/reset_password/',auth.resetPassword)
 router.post('/forgot_password',auth.forgotPassword)
 router.get('/verify/',auth.verify)
+router.get('/videos',access.isProducer,auth.getAllVideosLocal)
 router.put('/update',access.isProducer,auth.updateAccount)
 router.get(
 	'/google',
