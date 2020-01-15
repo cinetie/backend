@@ -1,18 +1,12 @@
-{
-    "id": 9,
-    "firstName": "Janeth",
-    "lastName": "doe",
-    "email": "janethAnn@gmail.com",
-    "password": "$2b$10$b0dTa0VSiMTzaixCy8Jb1etEkiwhhNnEO3F.LsKtQ2UYrVN0uiA.e",
-    "plan": "Basic",
-    "isVerified": true,
-    "isBilledAnnually": false,
-    "permissionLevel": null,
-    "nationality": null,
-    "cityOfResidence": null,
-    "phoneNumber": "078096644"
-}
-{
-    "phoneNumber": "078096644",
-    "price": "100"
-}
+[   
+    {"city": "Mexico","count": 1},
+    {"city": "New York","count": 1},
+    {"city": "Kigali","count": 4},
+    {"city": "Kigali","count": 4},
+    {"city": "Kigali","count": 4},
+    {"city": "Kigali","count": 4},
+    {"city": "Vancouver","count": 3},
+    {"city": "Vancouver","count": 3},
+    {"city": "Vancouver","count": 3}
+    
+]

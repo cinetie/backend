@@ -25,7 +25,7 @@ class paypalAggreementServices{
 					]
 				}
 			})
-			if(Object.values(data).length ===1){
+			if(data){
 				return data
 			}else{
 				return null

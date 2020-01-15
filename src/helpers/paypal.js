@@ -176,6 +176,8 @@ class paypal {
 	static async executeAggreement(req, res) {
 		let token = req.query.token
 		let user = req.query.user
+		const decoded = jwt.jwtVerify(user,process.env.SECRET)
+		console.log(decoded)
 		paypalHelper.billingAgreement.execute(token, {}, async(error, billingAgreement) => {
 			if (error) {
 				throw error
@@ -186,9 +188,10 @@ class paypal {
 					payerEmail: billingAgreement.payer.payer_info.email,
 					payerId: billingAgreement.payer.payer_info.payer_id
 				}
+				const date = new Date()
 				await paypalAggreementServices.createNewAggreement({
-					date:new Date().getTime,
-					email:user.email,
+					date:date.getTime(),
+					email:decoded,
 					aggreementId:billingAgreement.id,
 					state:'alive'
 				})
@@ -204,22 +207,28 @@ class paypal {
 	static async cancelAggreement(details) {
 		let user = jwt.jwtVerify(details.token,process.env.SECRET)
 		const aggreement  = await paypalAggreementServices.getLiveAggreement(user.email)
+		console.log(JSON.stringify(aggreement))
 		if(aggreement){
 			const cancelNote = {
 				"note":"Cancel subscription to cinetie"
 			}
+			console.log('start 1')
 			paypalHelper.billingAgreement.cancel(aggreement.aggreementId,cancelNote,(error,response)=>{
 				if(error){
 					throw error
 				}else{
 					console.log(JSON.stringify(response))
 				}
-				paypalHelper.billingAgreement.get(aggreement.aggreementId,(error,billingAgreement)=>{
+				paypalHelper.billingAgreement.get(aggreement.aggreementId,async(error,billingAgreement)=>{
 					if(error){
 						throw error
-					}else{
-						console.log(billingAgreement.state)
-						return 1
+					}else {
+						if(billingAgreement.state){
+							//cancel subscription in the database
+							const updates = await paypalAggreementServices.updateAggreement(aggreement.aggreementId,{state:'canceled'})
+							if(updates) return 1
+							return 0
+						}
 					}
 				})
 			})
