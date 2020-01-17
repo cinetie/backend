@@ -193,42 +193,51 @@ class userController {
 				phoneNumber: newInfo.phoneNumber,
 				isBilledAnnually: newInfo.isBilledAnnually,
 			}
-			const paymentDetails = await payment.registerNewSubscription(subscriptionData)
-			let frequency = 0
-			if (newInfo.isBilledAnnually == true) {
-				frequency = "YEAR"
-			} else {
-				frequency = "MONTH"
-			}
-			const paymentData = {
-				user: {
-					"email": email,
-					"paymentMethod": newInfo.paymentMethod,
-					"isBilledAnnually": newInfo.isBilledAnnually,
-					"plan": newInfo.plan
-				},
-				opay: {
-					"price": paymentDetails.price,
-					"phoneNumber": newInfo.phoneNumber
-				},
-				paypal: {
-					"plan": newInfo.plan,
-					"price": paymentDetails.price,
-					"frequency": frequency,
-					"currency": "USD",
-					"total": paymentDetails.price,
-					"urls": {
-						"success": `${process.env.PAYPAL_SUCCESS}?user=${jwt.jwtSign(email,process.env.SECRET)}`,
-						"failOrCancel": process.env.PAYPAL_FAIL_CANCEL
+			
+			//check if there is a current subscription
+			const currentSubsctption = await billingServices.getCurrentSubscription(email)
+			if(Object.values(currentSubsctption).length === 0){
+				const paymentDetails = await payment.registerNewSubscription(subscriptionData)
+				console.log('here')
+				let frequency = 0
+				if (newInfo.isBilledAnnually === true) {
+					frequency = "YEAR"
+				} else {
+					frequency = "MONTH"
+				}
+				const paymentData = {
+					user: {
+						"email": email,
+						"paymentMethod": newInfo.paymentMethod,
+						"isBilledAnnually": newInfo.isBilledAnnually,
+						"plan": newInfo.plan
+					},
+					opay: {
+						"price": paymentDetails.price,
+						"phoneNumber": newInfo.phoneNumber
+					},
+					paypal: {
+						"plan": newInfo.plan,
+						"price": paymentDetails.price,
+						"frequency": frequency,
+						"currency": "USD",
+						"total": paymentDetails.price,
+						"urls": {
+							"success": `${process.env.PAYPAL_SUCCESS}?user=${jwt.jwtSign(email,process.env.SECRET)}`,
+							"failOrCancel": process.env.PAYPAL_FAIL_CANCEL
+						}
 					}
 				}
-			}
-			const response = await userService.updateUser(email, newInfo)
-			if(newInfo.paymentMethod) {
-				await payment.commitPayment(req,res,paymentData)
+				const response = await userService.updateUser(email, newInfo)
+				if(newInfo.paymentMethod) {
+					await payment.commitPayment(req,res,paymentData)
+				}else{
+					util.setSuccessResponse(res, 'Payment done successfully', 200, response[1][0])
+				}
 			}else{
-				util.setSuccessResponse(res, 'Payment done successfully', 200, response[1][0])
+				util.setErrorResponse(res,'user has already a current subscription',422)
 			}
+			
 			// (paymentDetails && updates) ? util.setSuccessResponse(res, 'User updated easily', 201, { 'user': updates, 'paymentDetails': paymentDetails }) : util.setErrorResponse(res, 'user didn\'t update easily', 400)
 		} catch (error) {
 			util.setErrorResponse(res, error.message, 522)

@@ -10,7 +10,6 @@ import mdw from '../helpers/mailer'
 import Util from '../helpers/utilities'
 import uuid from '../helpers/uuid'
 import cloudinary from '../helpers/cloudinary'
-import cpService from '../services/cpServices'
 const util = new Util()
 //add an isVerified column to cp
 class cpController {

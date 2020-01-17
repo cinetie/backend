@@ -4,6 +4,7 @@ import '../config/passport'
 import {Router} from 'express'
 import access from '../middlewares/access'
 import isAdmin from '../middlewares/isAdmin'
+import earnings from '../controllers/earningControlller'
 const router = new Router()
 
 router.use(passport.initialize())
@@ -16,6 +17,9 @@ router.get('/all',access.isAdmin,auth.getAllAccounts)
 router.get('/reset_password/',auth.resetPassword)
 router.post('/forgot_password',auth.forgotPassword)
 router.get('/verify/',auth.verify)
+router.get('/earnings/active/video',access.isProducer,earnings.getActiveEarningsPerVideo)
+router.get('/earnings/active',access.isProducer,earnings.getActiveEarningsPerClient)
+router.get('/earnings',access.isProducer,earnings.getEarningsPerClient)
 router.get('/videos',access.isProducer,auth.getAllVideosLocal)
 router.put('/update',access.isProducer,auth.updateAccount)
 router.get(
