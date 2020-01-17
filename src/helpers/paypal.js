@@ -225,8 +225,9 @@ class paypal {
 					}else {
 						if(billingAgreement.state){
 							//cancel subscription in the database
-							const updates = await paypalAggreementServices.updateAggreement(aggreement.aggreementId,{state:'canceled'})
-							if(updates) return 1
+							const paypalUpdates = await paypalAggreementServices.updateAggreement(aggreement.aggreementId,{state:'canceled'})
+							const updates = await billingServices.updateSubscription(user.email,{state:"canceled"})
+							if(updates && paypalUpdates) return 1
 							return 0
 						}
 					}

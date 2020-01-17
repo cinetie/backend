@@ -12,29 +12,26 @@ class earningsMiddleware {
 		try {
 			const user = await userServices.getUserByMail(req.body.email)
 			const data = await subscriptions.getCurrentSubscription(req.body.email)
-			console.log(JSON.stringify(data))
 			if (user) {
-				if ((date.isEndOfMonth() == 0 && user.isBilledAnnually == false) || (date.isEndOfyear() == 1 && user.isBilledAnnually == true)) {
+				if ((date.isEndOfMonth() == 1 && user.isBilledAnnually == false) || (date.isEndOfyear() == 1 && user.isBilledAnnually == true)) {
 
 					const updates = await subscriptions.updateSubscription(req.body.email, {
 						dueState: true
 					})
 					const results = await earningController.assignRateToEachVideo(req.body.email)
 					if (results && updates > 0) {
-						const renewal = await subscriptions.registerSubscription(data)
-						if (user) {
-							console.log(`opay calling`)
-							console.log(JSON.stringify(data))
+						if (data.paymentMethod === 1) {
 							const opayDetails = await opay.payment({
 							// eslint-disable-next-line quotes
 								phoneNumber: user.phoneNumber.toString(),
 								price: data.price.toString()
 							})
-							console.log(JSON.stringify(opayDetails))
-							if (renewal && opayDetails) {
+							if (opayDetails) {
 								next()
 							}
 
+						}else{
+							next ()
 						}
 					} else {
 						console.log('----------hanging-------- register earnings')

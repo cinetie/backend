@@ -1,7 +1,6 @@
 /* eslint-disable no-useless-catch */
 import database from '../database/models'
 import sequelize from 'sequelize'
-
 const op = sequelize.Op
 //services for implementing the billing service
 
@@ -32,7 +31,7 @@ class viewingSessionservices {
 						videoId
 					},
 					{
-						sessionState: 'active'
+						sessionState: 'Active'
 					}
 					]
 				}
@@ -50,12 +49,13 @@ class viewingSessionservices {
 	static async getActiveSessionsPerUser(userId) {
 		try {
 			const sessions = await database.viewingSessions.findAll({
+
 				where: {
 					[op.and]: [{
 						userId
 					},
 					{
-						sessionState: 'active'
+						sessionState: 'Active'
 					}
 					]
 				}
@@ -76,7 +76,6 @@ class viewingSessionservices {
 					videoId
 				}
 			})
-			console.log(JSON.stringify(sessions))
 			if (sessions) {
 				return sessions
 			} else {
