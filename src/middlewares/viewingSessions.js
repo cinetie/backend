@@ -20,7 +20,6 @@ class viewingSession {
 			data.time = new Date().getTime()
 			const locationServiceData = await fetch(`http://api.ipstack.com/${ip}?access_key=${process.env.IP_STACK_ACCESS_TOKEN}`)
 			const JsonlocationData = await locationServiceData.json()
-			console.log(JsonlocationData.country_name)
 			//check if there is an exact session before same like the provided one
 			const sessions = await viewingSessions.getSesssionPerVideoUser(decoded.email,videoId)
 			if(Object.values(sessions).length >=1){

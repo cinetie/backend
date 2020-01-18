@@ -259,7 +259,7 @@ class userController {
 			const end = date.convertToTimestamp(req.body.end)
 			const data = await billingServices.getMonthlySubscribers(start, end)
 			if (Object.values(data).length > 0) {
-				util.setSuccessResponse(res, 'Data was found', 200, data)
+				util.setSuccessResponse(res, 'Data was found', 200, Object.values(data).length)
 			} else {
 				util.setErrorResponse(res, 'Data was not found', 400)
 			}
@@ -271,7 +271,7 @@ class userController {
 	static async getLiveUsers(req, res) {
 		try {
 			const data = await sessionService.getLiveSessions();
-			(data) ? util.setSuccessResponse(res, 'Found ', 200, data) : util.setErrorResponse(res, 'Can\'t find Live users ' + JSON.stringify(data), 404)
+			(data) ? util.setSuccessResponse(res, 'Found ', 200, Object.values(data).length) : util.setErrorResponse(res, 'Can\'t find Live users ' + JSON.stringify(data), 404)
 		} catch (error) {
 			util.setErrorResponse(res, error.message, 500)
 		}
