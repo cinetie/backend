@@ -13,7 +13,7 @@ const addMoreDays = (days) =>{
 // 0 :false 1: true
 const isEndOfMonth = () => {
 	const now = new Date()
-	if (now.getDate() == 16) {
+	if (now.getDate() == 18) {
 		const tommorow = new Date(now.valueOf())
 		tommorow.setDate(tommorow.getDate() + 1)
 		if(tommorow.getDate()==31){

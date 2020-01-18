@@ -31,9 +31,9 @@ class cpTransController {
 	}
 	static async loadStats(req, res) {
 		try {
-			const token = req.query.authToken
+			const token = req.headers.authorization.slice(7)
 			const raw = jwt.jwtVerify(token, process.env.SECRET)
-			const data = await earningService.getAllFromThreeshold(raw.clientId)
+			const data = await earningService.getAllFromThreeshold(raw.clientId,process.env.MIN_CASHOUT)
 			let sum = 0
 			data.forEach((x) => {
 				sum += Number(x.amount)
@@ -42,7 +42,7 @@ class cpTransController {
 				data: data,
 				sum: sum
 			}
-			if (data) {
+			if (Object.values(data).length > 0) {
 				helpers.setSuccessResponse(res, 'Success', 200, finalData)
 			} else {
 				helpers.setErrorResponse(res, 'Data unfound', 404)
@@ -54,7 +54,7 @@ class cpTransController {
 	}
 	static async checkout(req, res) {
 		try {
-			const token = req.query.authToken
+			const token = req.headers.authorization.slice(7)
 			const raw = jwt.jwtVerify(token, process.env.SECRET)
 			const data = await earningService.getAllFromThreeshold(raw.clientId, process.env.MIN_CASHOUT)
 			let sum = 0

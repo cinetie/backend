@@ -24,7 +24,7 @@ router.get('/my-account',auth.getUserProfile)
 router.put('/signup/cont',auth.updateAccountAndSubscription)
 router.put('/update',validation.updateUser,auth.updateAccount)
 router.get('/users',access.isAdmin, auth.getSubscribersInRange)
-router.get('/users/live',access.isProducer,auth.getLiveUsers)
+router.get('/users/live',access.isAdmin,auth.getLiveUsers)
 router.get(
 	'/google',
 	passport.authenticate('google', {

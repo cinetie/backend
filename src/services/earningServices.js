@@ -44,6 +44,28 @@ class earningsService {
 			throw error
 		}
 	}
+	static async getInactiveEarningsByClientId(clientId) {
+		try {
+			const user = await database.earnings.findAll({
+				attributes: {
+					exclude: ['createdAt', 'updatedAt']
+				},
+				where: {
+					[op.and]:[
+						{clientId},
+						{state:'inActive'}
+					]
+				}
+			})
+			if (user) {
+				return user
+			} else {
+				return null
+			}
+		} catch (error) {
+			throw error
+		}
+	}
 	static async getActiveEarningsByClientId(clientId) {
 		try {
 			const user = await database.earnings.findAll({
@@ -146,7 +168,6 @@ class earningsService {
 	static async getAllFromThreeshold(clientId,min) {
 		try {
 			const origin = date.removeDays(180)
-			console.log(origin)
 			const data = await database.earnings.findAll({
 				where: {
 					[op.and]: [{
