@@ -7,6 +7,11 @@ class cpTransController {
 	static async getAllTransactions(req, res) {
 		try {
 			const data = await services.getAllTrans()
+			
+			for(let i=0;i<Object.values(data).length;i++){
+				const date = new Date(Number(data[i].date));
+				data[i].date = `${date.toDateString()}  ${date.toLocaleTimeString()}`
+			}
 			if (data) {
 				helpers.setSuccessResponse(res, 'Success', 200, data)
 			} else {
@@ -20,6 +25,10 @@ class cpTransController {
 		try {
 			const id = req.query.clientId
 			const data = await services.getTransById(id)
+			for(let i=0;i<Object.values(data).length;i++){
+				const date = new Date(Number(data[i].date));
+				data[i].date = `${date.toDateString()}  ${date.toLocaleTimeString()}`
+			}
 			if (data) {
 				helpers.setSuccessResponse(res, 'Success', 200, data)
 			} else {
