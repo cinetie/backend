@@ -8,12 +8,12 @@ class validatePictures {
 				width: 1920,
 				height: 1080
 			},
-			aspectRatio: 1.7
-        })
+			aspectRatio: 1.8
+		})
 		if (results === 2) {
-			util.setErrorResponse(res, 'Wrong dimensions', 409)
+			util.setErrorResponse(res, 'Wrong dimensions for small image', 409)
 		} else if(results === 3) {
-			util.setErrorResponse(res, 'Wrong aspect ratio', 409)
+			util.setErrorResponse(res, 'Wrong aspect ratio for small image', 409)
 		} else{
 			next()
 		}
@@ -24,12 +24,12 @@ class validatePictures {
 				width: 1080,
 				height: 1620
 			},
-			aspectRatio: 0.6
+			aspectRatio: 0.7
 		})
 		if (results === 2) {
-			util.setErrorResponse(res, 'Wrong dimensions', 409)
+			util.setErrorResponse(res, 'Wrong dimensions for tall image', 409)
 		} else if(results === 3) {
-			util.setErrorResponse(res, 'Wrong aspect ratio', 409)
+			util.setErrorResponse(res, 'Wrong aspect ratio for tall image', 409)
 		} else{
 			next()
 		}
@@ -43,9 +43,9 @@ class validatePictures {
 			aspectRatio: 1
 		})
 		if (results === 2) {
-			util.setErrorResponse(res, 'Wrong dimensions', 409)
+			util.setErrorResponse(res, 'Wrong dimensions for nametag image', 409)
 		} else if(results === 3) {
-			util.setErrorResponse(res, 'Wrong aspect ratio', 409)
+			util.setErrorResponse(res, 'Wrong aspect ratio for name tag image', 409)
 		} else{
 			next()
 		}

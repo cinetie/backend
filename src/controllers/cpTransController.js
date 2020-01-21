@@ -79,13 +79,8 @@ class cpTransController {
 				}
 
 				await services.createTrans(transactInfo)
-				for (let i = 0; i < Object.values(data).length; i++) {
-					const updates = {
-						state: 'inActive'
-					}
-					await earningService.updateEarnings(data[i].id, updates)
-
-				}
+				const status = await earningService.setEarningsToInactive(raw.clientId)
+				if(!status) return helpers.setErrorResponse(res,'Can\'t cashout easily',500)
 				helpers.setSuccessResponse(res, 'Successfully checkout', 200)
 			} else {
 				helpers.setErrorResponse(res, 'Can\'t Cash out', 400)

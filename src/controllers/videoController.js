@@ -156,7 +156,7 @@ class videoController {
 		}
 	}
 	static async getAllVideosLocal(req,res){
-		const videos = await videoService.getAllVideos()
+		const videos = await videoService.getAllVideosForAdmin()
 		if(videos){
 			util.setSuccessResponse(res,'Data found',200,videos)
 		}else{
