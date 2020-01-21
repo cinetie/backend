@@ -133,14 +133,17 @@ class earningsService {
 			throw error
 		}
 	}
-
-	static async updateEarnings(id, updates) {
+	static async setEarningsToInactive(clientId){
 		try {
-			return  await database.earnings.update(updates, {
+			return await database.earnings.update({state:'inActive'},{
 				returning:true,
-				where: { id }
+				where:{
+					[op.and]:[
+						{clientId},
+						{state:'Active'}
+					]
+				}
 			})
-        
 		} catch (error) {
 			throw error
 		}

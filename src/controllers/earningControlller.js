@@ -76,16 +76,18 @@ class earningController {
 		try {
 			let sum  = 0
 			const data = await earningService.getEarningsByVideo(req.query.videoId)
+			console.log(data)
+
 			if(Object.values(data).length >0){
-				for(let i=0; i<=Object.values.length ; i ++){
+				for(let i=0; i<Object.values(data).length ; i ++){
 					sum += Number(data[i].amount)
 				}
 				return response.successResponse(res,200,'Earnings found ',sum)
 			}else{
-				return response.errorResponse(res,404,'can not find earnings at this time','NotFoundError')
+				return response.errorResponse(res,404,0,'NotFoundError')
 			}
 		} catch (error) {
-			return response.errorResponse(res,500,'Something happened','Server Error')
+			return response.errorResponse(res,500,'Something happened',error.message)
 		}
 	}
 	static async getActiveEarningsPerVideo(req,res){
@@ -93,12 +95,12 @@ class earningController {
 			let sum  = 0
 			const data = await earningService.getActiveEarningsByVideo(req.query.videoId)
 			if(Object.values(data).length >0){
-				for(let i=0; i<=Object.values.length ; i ++){
+				for(let i=0; i<Object.values(data).length ; i ++){
 					sum += Number(data[i].amount)
 				}
 				return response.successResponse(res,200,'Earnings found ',sum)
 			}else{
-				return response.errorResponse(res,404,'can not find earnings at this time','NotFoundError')
+				return response.errorResponse(res,404,0,'NotFoundError')
 			}
 		} catch (error) {
 			return response.errorResponse(res,500,'Something happened',error.message)
@@ -110,12 +112,12 @@ class earningController {
 			const { clientId } = jwt.jwtVerify(req.headers.authorization.slice(7),process.env.SECRET)
 			const data = await earningService.getActiveEarningsByClientId(clientId)
 			if(Object.values(data).length >0){
-				for(let i=0; i<=Object.values.length ; i ++){
+				for(let i=0; i<Object.values(data).length ; i ++){
 					sum += Number(data[i].amount)
 				}
 				return response.successResponse(res,200,'Earnings found ',sum)
 			}else{
-				return response.errorResponse(res,404,'can not find earnings at this time','NotFoundError')
+				return response.errorResponse(res,404,0,'NotFoundError')
 			}
 		} catch (error) {
 			return response.errorResponse(res,500,'Something happened',error.message)
@@ -127,12 +129,12 @@ class earningController {
 			const { clientId } = jwt.jwtVerify(req.headers.authorization.slice(7),process.env.SECRET)
 			const data = await earningService.getEarningsByClientId(clientId)
 			if(Object.values(data).length >0){
-				for(let i=0; i<=Object.values.length ; i ++){
+				for(let i=0; i<Object.values(data).length ; i ++){
 					sum += Number(data[i].amount)
 				}
 				return response.successResponse(res,200,'Earnings found ',sum)
 			}else{
-				return response.errorResponse(res,404,'can not find earnings at this time','NotFoundError')
+				return response.errorResponse(res,404,0,'NotFoundError')
 			}
 		} catch (error) {
 			return response.errorResponse(res,500,'Something happened',error.message)

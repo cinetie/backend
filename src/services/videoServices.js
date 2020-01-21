@@ -186,7 +186,21 @@ class videoService {
 	static async getAllVideos(videoClientId) {
 		try {
 			return await database.videos.findAll({
-				where : { videoClientId }
+				where : { videoClientId },
+				order:[
+					['id','DESC']
+				]
+			})
+		} catch (error) {
+			throw error
+		}
+	}
+	static async getAllVideosForAdmin() {
+		try {
+			return await database.videos.findAll({
+				order :[
+					['id','DESC']
+				]
 			})
 		} catch (error) {
 			throw error

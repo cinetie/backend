@@ -4,16 +4,16 @@ const properties = async (file, dimensions) => {
 	try {
 		const dim = image(file)
 		const aspectRatio = (dim.width / dim.height).toFixed(1)
-		if (aspectRatio === dimensions.aspectRatio) {
+		if (Number(aspectRatio) === Number(dimensions.aspectRatio)) {
 			if (dim.width === dimensions.resolution.width && dim.height === dimensions.resolution.height) {
 				console.log( 'True')
 				return 1
 			} else {
-				console.log('resolution')
+				// console.log(`${dim.width} by ${dim.height}`)
 				return 2
 			}
 		} else {
-			console.log('aspect ratio')
+			console.log(`expecting ${dimensions.aspectRatio} but got ${aspectRatio}`)
 			return 3
 		}
 	} catch (error) {
