@@ -6,7 +6,7 @@ import validation from '../middlewares/validators/videoValidation'
 import earnings from '../controllers/earningControlller'
 import imageValidation from '../middlewares/validators/imageValidator'
 const router = new Router()
-router.post('/new',access.isAdmin,imageValidation.validateSmall,imageValidation.validateNameTag,imageValidation.validateTall,validation.video,video.addVideo)
+router.post('/new',access.isAdmin,validation.video,video.addVideo)
 router.get('/',access.isNormalUser,video.getParticularVideo)
 router.get('/all',access.isNormalUser,video.getAllVideo)
 router.get('/all/local',access.isAdmin,video.getAllVideosLocal)
