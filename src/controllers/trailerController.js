@@ -1,9 +1,9 @@
 import Util from '../helpers/utilities'
 import trailerServices from '../services/trailerService'
-// import googleCloud from '../helpers/google.cloud.normal'
-import aws from '../helpers/aws'
-import multer from 'multer'
-const upload = multer({dest: '../../uploads'})
+import googleCloud from '../helpers/google.cloud.normal'
+// import aws from '../helpers/aws'
+// import multer from 'multer'
+// const upload = multer({dest: '../../uploads'})
 const util = new Util()
 
 class trailerController {
@@ -11,18 +11,18 @@ class trailerController {
 	static async createNewTrailer(req, res) {
 		try {
 			const data = req.body
-			const file = upload.single('trailer')
+			const file = req.files.trailer
 			console.log(JSON.stringify(file))
-			// await googleCloud.uploadToGoogleCloud('cinetie', file)
-			// 	.then(async(uri) => {
-			// 		if(!uri) util.setErrorResponse(res,'An error occured updating the trailer trailer',422)
-			// 		data.trailerLink = uri
-			// 		const uploadedTrailer = await trailerServices.createNewTrailers(data)
-			// 		if(!uploadedTrailer) util.setErrorResponse(res,'An error occured saving the trailer',422)
-			// 		util.setSuccessResponse(res,'successfully saved the trailer',201,uploadedTrailer) 
-			// 	})
+			await googleCloud.uploadToGoogleCloud('cinetie', file)
+				.then(async(uri) => {
+					if(!uri) util.setErrorResponse(res,'An error occured updating the trailer trailer',422)
+					data.trailerLink = uri
+					const uploadedTrailer = await trailerServices.createNewTrailers(data)
+					if(!uploadedTrailer) util.setErrorResponse(res,'An error occured saving the trailer',422)
+					util.setSuccessResponse(res,'successfully saved the trailer',201,uploadedTrailer) 
+				})
 
-			// await aws.uploadSingleFile()
+			await aws.uploadSingleFile()
 
 
 		} catch (error) {
