@@ -23,8 +23,9 @@ class cpTransController {
 	}
 	static async getAllTransById(req, res) {
 		try {
-			const id = req.query.clientId
-			const data = await services.getTransById(id)
+			const token = req.headers.authorization.slice(7)
+			const decoded = jwt.jwtVerify(token,process.env.SECRET)
+			const data = await services.getTransById(decoded.clientId)
 			for(let i=0;i<Object.values(data).length;i++){
 				const date = new Date(Number(data[i].date));
 				data[i].date = `${date.toDateString()}  ${date.toLocaleTimeString()}`

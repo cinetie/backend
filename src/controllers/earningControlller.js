@@ -76,15 +76,15 @@ class earningController {
 		try {
 			let sum  = 0
 			const data = await earningService.getEarningsByVideo(req.query.videoId)
-			console.log(data)
-
 			if(Object.values(data).length >0){
 				for(let i=0; i<Object.values(data).length ; i ++){
+					const date = new Date(Number(data[i].monthYear))
+					data[i].monthYear = `${date.toDateString().slice(4,7)}/${date.getFullYear()}`
 					sum += Number(data[i].amount)
 				}
-				return response.successResponse(res,200,'Earnings found ',sum)
+				return response.successResponse(res,200,'Earnings found ',{sum:sum,data:data})
 			}else{
-				return response.errorResponse(res,404,0,'NotFoundError')
+				return response.successResponse(res,200,'Data Not found',0)
 			}
 		} catch (error) {
 			return response.errorResponse(res,500,'Something happened',error.message)
@@ -100,7 +100,7 @@ class earningController {
 				}
 				return response.successResponse(res,200,'Earnings found ',sum)
 			}else{
-				return response.errorResponse(res,404,0,'NotFoundError')
+				return response.successResponse(res,200,'Data Not found',0)
 			}
 		} catch (error) {
 			return response.errorResponse(res,500,'Something happened',error.message)
@@ -117,7 +117,7 @@ class earningController {
 				}
 				return response.successResponse(res,200,'Earnings found ',sum)
 			}else{
-				return response.errorResponse(res,404,0,'NotFoundError')
+				return response.successResponse(res,200,'Data Not found',0)
 			}
 		} catch (error) {
 			return response.errorResponse(res,500,'Something happened',error.message)
@@ -130,11 +130,13 @@ class earningController {
 			const data = await earningService.getEarningsByClientId(clientId)
 			if(Object.values(data).length >0){
 				for(let i=0; i<Object.values(data).length ; i ++){
+					const date = new Date(Number(data[i].monthYear))
+					data[i].monthYear = `${date.toDateString().slice(4,7)}/${date.getFullYear()}`
 					sum += Number(data[i].amount)
 				}
-				return response.successResponse(res,200,'Earnings found ',sum)
+				return response.successResponse(res,200,'Earnings found ',{sum:sum,data:data})
 			}else{
-				return response.errorResponse(res,404,0,'NotFoundError')
+				return response.successResponse(res,200,'Data Not found',0)
 			}
 		} catch (error) {
 			return response.errorResponse(res,500,'Something happened',error.message)
