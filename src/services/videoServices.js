@@ -187,7 +187,7 @@ class videoService {
 		try {
 			return await database.videos.findAll({
 				attributes: {
-					exclude: ['videoLink','createdAt','updatedAt','videoCast','videoSynopsis','nameTagThumbNailLink','videoThumbnailLink','isFeatured','tallThumbNailLink','videoIdVimeo','videoClientId','featureType','category']
+					exclude: ['videoLink','createdAt','updatedAt','videoCast','videoSynopsis','nameTagThumbNailLink','isFeatured','tallThumbNailLink','videoIdVimeo','videoClientId','featureType','category']
 				},
 				where : { videoClientId },
 				order:[
@@ -202,7 +202,7 @@ class videoService {
 		try {
 			return await database.videos.findAll({
 				attributes: {
-					exclude: ['videoLink','createdAt','updatedAt','videoCast','videoSynopsis','nameTagThumbNailLink','videoThumbnailLink','isFeatured','tallThumbNailLink','videoIdVimeo','videoClientId','featureType','category']
+					exclude: ['videoLink','createdAt','updatedAt','videoCast','videoSynopsis','nameTagThumbNailLink','isFeatured','tallThumbNailLink','videoIdVimeo','videoClientId','featureType','category']
 				},
 				order :[
 					['id','DESC']
