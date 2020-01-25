@@ -70,7 +70,13 @@ class cpService {
 	}
 	static async getAllCps() {
 		try {
-			return await database.contentProviders.findAll()
+			const cps = await database.contentProviders.findAll({
+				attributes: {
+					exclude: ['createdAt', 'updatedAt','clientId','password','id','isVerified','cityOfResidence']
+				},
+			})
+			if(!cps) return null
+			return cps
 		} catch (error) {
 			throw error
 		}

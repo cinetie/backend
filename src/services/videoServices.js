@@ -186,6 +186,9 @@ class videoService {
 	static async getAllVideos(videoClientId) {
 		try {
 			return await database.videos.findAll({
+				attributes: {
+					exclude: ['videoLink','createdAt','updatedAt','videoCast','videoSynopsis','nameTagThumbNailLink','videoThumbnailLink','isFeatured','tallThumbNailLink','videoIdVimeo','videoClientId','featureType','category']
+				},
 				where : { videoClientId },
 				order:[
 					['id','DESC']
@@ -198,6 +201,9 @@ class videoService {
 	static async getAllVideosForAdmin() {
 		try {
 			return await database.videos.findAll({
+				attributes: {
+					exclude: ['videoLink','createdAt','updatedAt','videoCast','videoSynopsis','nameTagThumbNailLink','videoThumbnailLink','isFeatured','tallThumbNailLink','videoIdVimeo','videoClientId','featureType','category']
+				},
 				order :[
 					['id','DESC']
 				]

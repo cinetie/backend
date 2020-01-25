@@ -39,6 +39,7 @@ class cpTransController {
 			helpers.setErrorResponse(res, error.message, 500)
 		}
 	}
+	
 	static async loadStats(req, res) {
 		try {
 			const token = req.headers.authorization.slice(7)

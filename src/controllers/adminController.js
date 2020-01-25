@@ -1,0 +1,107 @@
+import earningService from '../services/earningServices'
+import videoService from '../services/videoServices'
+import response from '../helpers/response'
+import Util from '../helpers/utilities'
+const util = new Util()
+
+class adminController {
+	static async getEarningsPerClient(req, res) {
+		try {
+			let sum = 0
+			const  clientId  = req.query.clientId
+			const data = await earningService.getEarningsByClientId(clientId)
+			if (Object.values(data).length > 0) {
+				for (let i = 0; i < Object.values(data).length; i++) {
+					const date = new Date(Number(data[i].monthYear))
+					data[i].monthYear = `${date.toDateString().slice(4, 7)}/${date.getFullYear()}`
+					sum += Number(data[i].amount)
+				}
+				let formattedData = []
+				for (let i = 0; i < data.length; i++) {
+					let count = 0
+					for (let j = 0; j < data.length; j++) {
+						var monthYear = data[i].monthYear
+						if (data[i].monthYear == data[j].monthYear) {
+							count += Number(data[j].amount)
+						}
+					}
+					var obj = {
+						amount: Number(count.toFixed(2)),
+						period: monthYear
+					}
+					formattedData.push(obj)
+				}
+				//remove duplicates
+				let uniqueValues = util.getUnique(formattedData, 'monthYear')
+				return response.successResponse(res, 200, 'Earnings found ', {
+					sum: Number(sum.toFixed(2)),
+					data: uniqueValues
+				})
+			} else {
+				return response.successResponse(res, 200, 'Data Not found', 0)
+			}
+		} catch (error) {
+			return response.errorResponse(res, 500, 'Something happened', error.message)
+		}
+	}
+	static async getVideosPerCp(req,res){
+		const clientId = req.query.clientId
+		const videos = await videoService.getAllVideos(clientId)
+		for (let i = 0; i < Object.values(videos).length; i++) {
+			const date = new Date(Number(videos[i].creationTime))
+			videos[i].creationTime = `${date.toDateString()}`
+		}
+		if(!videos) util.setErrorResponse(res,'videos not found',400)
+		util.setSuccessResponse(res,'videos found',200,videos)
+		
+	}
+	static async getAllVideos(req,res){
+		const videos = await videoService.getAllVideosForAdmin()
+		for (let i = 0; i < Object.values(videos).length; i++) {
+			const date = new Date(Number(videos[i].creationTime))
+			videos[i].creationTime = `${date.toDateString()}`
+		}
+		if(!videos) util.setErrorResponse(res,'videos not found',400)
+		util.setSuccessResponse(res,'videos found',200,videos)
+	}
+	static async getAllEarningsPerVideo(req, res) {
+		try {
+			let sum = 0
+			const data = await earningService.getEarningsByVideo(req.query.videoId)
+			if (Object.values(data).length > 0) {
+				for (let i = 0; i < Object.values(data).length; i++) {
+					const date = new Date(Number(data[i].monthYear))
+					data[i].monthYear = `${date.toDateString().slice(4,7)}/${date.getFullYear()}`
+					sum += Number(data[i].amount)
+				}
+				let formattedData = []
+				for (let i = 0; i < data.length; i++) {
+					let count = 0
+					for (let j = 0; j < data.length; j++) {
+						var monthYear = data[i].monthYear
+						if (data[i].monthYear == data[j].monthYear) {
+							count += Number(data[j].amount)
+						}
+					}
+					var obj = {
+						amount: Number(count.toFixed(2)),
+						period: monthYear
+					}
+					formattedData.push(obj)
+				}
+				//remove duplicates
+				let uniqueValues = util.getUnique(formattedData, 'monthYear')
+				return response.successResponse(res, 200, 'Earnings found ', {
+					sum: Number(sum.toFixed(2)),
+					data: uniqueValues
+				})
+			} else {
+				return response.successResponse(res, 200, 'Data Not found', 0)
+			}
+		} catch (error) {
+			return response.errorResponse(res, 500, 'Something happened', error.message)
+		}
+	}
+}
+
+export default adminController

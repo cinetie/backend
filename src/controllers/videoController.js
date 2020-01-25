@@ -14,35 +14,28 @@ const util = new Util()
 class videoController {
 	static async addVideo(req, res) {
 		try {
-			const authToken = req.headers.authorization.slice(7)
-			const decoded = jwt.jwtVerify(authToken, process.env.SECRET)
-			if (decoded.user === process.env.ADMIN_USER) {
-				const small = req.files.small
-				const nameTag = req.files.nameTag
-				const tall = req.files.tall
-				const smallThumbnail = await cloudinary.upload(small.tempFilePath,'image')
-				const nameTagThumbNail = await cloudinary.upload(nameTag.tempFilePath,'image')
-				const tallThumbNail = await cloudinary.upload(tall.tempFilePath,'image')
-				const data = req.body
-				const decodedVideoHash = jwt.jwtVerify(data.videoUrl,process.env.SECRET)
-				data.tallThumbNailLink = tallThumbNail.url
-				data.nameTagThumbNailLink = nameTagThumbNail.url
-				data.videoUrl = decodedVideoHash.videoUri
-				data.videoClientId = decodedVideoHash.clientId
-				data.videoThumbnailLink = smallThumbnail.url
-				data.creationTime = new Date().getTime()
-				data.videoId = uuid.generator()
-				data.size = data.size * 1e+6
-				const uri = await vimeoHelper.viemoUpload(data)
-				if(uri){
-					data.videoLink = uri
-					data.videoIdVimeo = uri.slice(8)
-					const newVideo = await videoService.createNewVideo(data)
-					if (newVideo) util.setSuccessResponse(res, 'Video uploaded', 201, newVideo)
-				}else{
-					util.setErrorResponse(res, 'something went wrong while uploading', 503)
-				}
-			}
+			const smallThumbnail = await cloudinary.upload(req.files.small.tempFilePath,'image')
+			const nameTagThumbNail = await cloudinary.upload(req.files.nameTag.tempFilePath,'image')
+			const tallThumbNail = await cloudinary.upload(req.files.tall.tempFilePath,'image')
+			const data = req.body
+			const decodedVideoHash = jwt.jwtVerify(data.videoUrl,process.env.SECRET)
+			data.tallThumbNailLink = tallThumbNail.url
+			data.nameTagThumbNailLink = nameTagThumbNail.url
+			data.videoUrl = decodedVideoHash.videoUri
+			data.videoClientId = decodedVideoHash.clientId
+			data.videoThumbnailLink = smallThumbnail.url
+			data.creationTime = new Date().getTime()
+			data.videoId = uuid.generator()
+			data.videoSuspensionState=true
+			data.size = data.size * 1e+6
+			const uri = await vimeoHelper.viemoUpload(data)
+			if(!uri) util.setErrorResponse(res, 'something went wrong while uploading', 503)
+			data.videoLink = uri
+			data.videoIdVimeo = uri.slice(8)
+			const newVideo = await videoService.createNewVideo(data)
+			if (!newVideo) util.setErrorResponse(res, 'something went wrong while uploading', 503)
+			util.setSuccessResponse(res, 'Video uploaded', 201, newVideo)
+			
 		} catch (error) {
 			util.setErrorResponse(res, 'Something went wrong : ' + error.message, 503)
 		}
@@ -51,10 +44,10 @@ class videoController {
 		try {
 			const returned = await videoService.getVideoById(req.query.id)
 			if (!returned) response.errorResponse(res, 404, 'Video not found')
-			const deletedVideo = await videoService.deleteVideo(req.params.id)
-			response.successResponse(res, 200, 'Video successfully deleted!', deletedVideo)
+			const deletedVideo = await videoService.deleteVideo(req.query.id)
+			return response.successResponse(res, 200, 'Video successfully deleted!', deletedVideo)
 		} catch (error) {
-			response.errorResponse(res, 500, 'Something went wrong', error)
+			return response.errorResponse(res, 500, 'Something went wrong', error.message)
 		}
 	}
 	static async getParticularVideo(req, res) {
