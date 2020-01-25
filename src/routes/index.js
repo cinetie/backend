@@ -10,6 +10,7 @@ import cpRoutes from '../routes/cpRoutes'
 import cpTransRoutes from '../routes/cpTransRoutes'
 import tempVideoRouters from '../routes/tempVideoRoute'
 import trailerRoutes from '../routes/trailerRoutes'
+import admin from '../routes/adminRoutes'
 import series from '../routes/seriesRoutes'
 const router = Router()
 
@@ -23,5 +24,6 @@ router.use('/sessions/video',access.isProducer,videoSessionRoute)
 router.use('/profile',access.isNormalUser, profileRoute)
 router.use('/temp',tempVideoRouters)
 router.use('/trailer',trailerRoutes)
+router.use('/admin',admin)
 router.use('/series',series)
 export default router

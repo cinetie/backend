@@ -4,24 +4,26 @@ import subscriptionService from '../services/billingServices'
 import viewSessionService from '../services/viewingSessionsServices'
 import response from '../helpers/response'
 import jwt from '../helpers/jwt'
+import Util from '../helpers/utilities'
+const util = new Util()
 // IMPORTANT  when pulling earnings make sure to map a new 
 //understandable date format not just milliseconds
 class earningController {
 	//obtains details about the current users subscription
 	static async getCurrentSubscriptionDetails(email) {
 		const details = await subscriptionService.getCurrentSubscription(email)
-		if(details){
+		if (details) {
 			return details
-		}else{
+		} else {
 			return null
 		}
 	}
 	//obtains details about the current user viewing sessions
 	static async getCurrentViewingSessions(email) {
 		const details = await viewSessionService.getActiveSessionsPerUser(email)
-		if(details){
+		if (details) {
 			return details
-		}else{
+		} else {
 			return null
 		}
 	}
@@ -29,10 +31,10 @@ class earningController {
 	static async calculateRatePerVideo(email) {
 		const sessionDetails = await this.getCurrentViewingSessions(email)
 		const subscriptionDetails = await this.getCurrentSubscriptionDetails(email)
-		const rate = (Number(subscriptionDetails.price)*0.7) / Object.values(sessionDetails).length
-		if(rate){
+		const rate = (Number(subscriptionDetails.price) * 0.7) / Object.values(sessionDetails).length
+		if (rate) {
 			return rate
-		}else{
+		} else {
 			return null
 		}
 	}
@@ -41,29 +43,31 @@ class earningController {
 	//would solve the issue.
 	static async assignRateToEachVideo(email) {
 		try {
-			let results = [ ]
+			let results = []
 			let updatedSessions = []
 			const sessions = await this.getCurrentViewingSessions(email)
 			const rate = await this.calculateRatePerVideo(email)
 			const date = new Date()
-			sessions.forEach(async data=> {
-				const updates = {sessionState:'inActive'}
-				updatedSessions = await viewSessionService.updateViewingSessions(data.id,updates)
+			sessions.forEach(async data => {
+				const updates = {
+					sessionState: 'inActive'
+				}
+				updatedSessions = await viewSessionService.updateViewingSessions(data.id, updates)
 			})
 			sessions.forEach(async data => {
 				const earnings = {
 					videoId: data.videoId,
 					clientId: data.clientId,
 					amount: rate.toPrecision(4),
-					state:'Active',
+					state: 'Active',
 					monthYear: date.getTime()
 				}
-				results =  await earningService.createNewEarnings(earnings)
+				results = await earningService.createNewEarnings(earnings)
 			})
 			// const updates = await subscriptionService.setSubscriptionToSettled(email,{state:"settled"})
-			if(results){
+			if (results) {
 				return true
-			}else{
+			} else {
 				return false
 			}
 
@@ -71,75 +75,195 @@ class earningController {
 			throw error
 		}
 	}
+	static async getAllEarnings(req, res) {
+		try {
+			let sum = 0
+			const data = await earningService.getAllEarningss()
+			if (Object.values(data).length > 0) {
+				for (let i = 0; i < Object.values(data).length; i++) {
+					const date = new Date(Number(data[i].monthYear))
+					data[i].monthYear = `${date.toDateString().slice(4,7)}/${date.getFullYear()}`
+					sum += Number(data[i].amount)
+				}
+				let formattedData = []
+				for (let i = 0; i < data.length; i++) {
+					let count = 0
+					for (let j = 0; j < data.length; j++) {
+						var monthYear = data[i].monthYear
+						if (data[i].monthYear == data[j].monthYear) {
+							count += Number(data[j].amount)
+						}
+					}
+					var obj = {
+						amount: Number(count.toFixed(2)),
+						period: monthYear
+					}
+					formattedData.push(obj)
+				}
+				//remove duplicates
+				let uniqueValues = util.getUnique(formattedData, 'monthYear')
+				return response.successResponse(res, 200, 'Earnings found ', {
+					sum: Number(sum.toFixed(2)),
+					data: uniqueValues
+				})
+			} else {
+				return response.successResponse(res, 200, 'Data Not found', 0)
+			}
+		} catch (error) {
+			return response.errorResponse(res, 500, 'Something happened', error.message)
+		}
+	}
+	static async getAllActiveEarnings(req, res) {
+		try {
+			let sum = 0
+			const data = await earningService.getAllActiveEarnings()
+			if (Object.values(data).length > 0) {
+				for (let i = 0; i < Object.values(data).length; i++) {
+					const date = new Date(Number(data[i].monthYear))
+					data[i].monthYear = `${date.toDateString().slice(4,7)}/${date.getFullYear()}`
+					sum += Number(data[i].amount)
+				}
+				let formattedData = []
+				for (let i = 0; i < data.length; i++) {
+					let count = 0
+					for (let j = 0; j < data.length; j++) {
+						var monthYear = data[i].monthYear
+						if (data[i].monthYear == data[j].monthYear) {
+							count += Number(data[j].amount)
+						}
+					}
+					var obj = {
+						amount: Number(count.toFixed(2)),
+						period: monthYear
+					}
+					formattedData.push(obj)
+				}
+				//remove duplicates
+				let uniqueValues = util.getUnique(formattedData, 'monthYear')
+				return response.successResponse(res, 200, 'Earnings found ', {
+					sum: Number(sum.toFixed(2)),
+					data: uniqueValues
+				})
+			} else {
+				return response.successResponse(res, 200, 'Data Not found', 0)
+			}
+		} catch (error) {
+			return response.errorResponse(res, 500, 'Something happened', error.message)
+		}
+	}
 	//get earnings per video
-	static async getAllEarningsPerVideo(req,res){
+	static async getAllEarningsPerVideo(req, res) {
 		try {
-			let sum  = 0
+			let sum = 0
 			const data = await earningService.getEarningsByVideo(req.query.videoId)
-			if(Object.values(data).length >0){
-				for(let i=0; i<Object.values(data).length ; i ++){
+			if (Object.values(data).length > 0) {
+				for (let i = 0; i < Object.values(data).length; i++) {
 					const date = new Date(Number(data[i].monthYear))
 					data[i].monthYear = `${date.toDateString().slice(4,7)}/${date.getFullYear()}`
 					sum += Number(data[i].amount)
 				}
-				return response.successResponse(res,200,'Earnings found ',{sum:sum,data:data})
-			}else{
-				return response.successResponse(res,200,'Data Not found',0)
+				let formattedData = []
+				for (let i = 0; i < data.length; i++) {
+					let count = 0
+					for (let j = 0; j < data.length; j++) {
+						var monthYear = data[i].monthYear
+						if (data[i].monthYear == data[j].monthYear) {
+							count += Number(data[j].amount)
+						}
+					}
+					var obj = {
+						amount: Number(count.toFixed(2)),
+						period: monthYear
+					}
+					formattedData.push(obj)
+				}
+				//remove duplicates
+				let uniqueValues = util.getUnique(formattedData, 'monthYear')
+				return response.successResponse(res, 200, 'Earnings found ', {
+					sum: Number(sum.toFixed(2)),
+					data: uniqueValues
+				})
+			} else {
+				return response.successResponse(res, 200, 'Data Not found', 0)
 			}
 		} catch (error) {
-			return response.errorResponse(res,500,'Something happened',error.message)
+			return response.errorResponse(res, 500, 'Something happened', error.message)
 		}
 	}
-	static async getActiveEarningsPerVideo(req,res){
+	static async getActiveEarningsPerVideo(req, res) {
 		try {
-			let sum  = 0
+			let sum = 0
 			const data = await earningService.getActiveEarningsByVideo(req.query.videoId)
-			if(Object.values(data).length >0){
-				for(let i=0; i<Object.values(data).length ; i ++){
+			if (Object.values(data).length > 0) {
+				for (let i = 0; i < Object.values(data).length; i++) {
 					sum += Number(data[i].amount)
 				}
-				return response.successResponse(res,200,'Earnings found ',sum)
-			}else{
-				return response.successResponse(res,200,'Data Not found',0)
+				return response.successResponse(res, 200, 'Earnings found ', sum)
+			} else {
+				return response.successResponse(res, 200, 'Data Not found', 0)
 			}
 		} catch (error) {
-			return response.errorResponse(res,500,'Something happened',error.message)
+			return response.errorResponse(res, 500, 'Something happened', error.message)
 		}
 	}
-	static async getActiveEarningsPerClient(req,res){
+	static async getActiveEarningsPerClient(req, res) {
 		try {
-			let sum  = 0
-			const { clientId } = jwt.jwtVerify(req.headers.authorization.slice(7),process.env.SECRET)
+			let sum = 0
+			const {
+				clientId
+			} = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET)
 			const data = await earningService.getActiveEarningsByClientId(clientId)
-			if(Object.values(data).length >0){
-				for(let i=0; i<Object.values(data).length ; i ++){
+			if (Object.values(data).length > 0) {
+				for (let i = 0; i < Object.values(data).length; i++) {
 					sum += Number(data[i].amount)
 				}
-				return response.successResponse(res,200,'Earnings found ',sum)
-			}else{
-				return response.successResponse(res,200,'Data Not found',0)
+				return response.successResponse(res, 200, 'Earnings found ', sum)
+			} else {
+				return response.successResponse(res, 200, 'Data Not found', 0)
 			}
 		} catch (error) {
-			return response.errorResponse(res,500,'Something happened',error.message)
+			return response.errorResponse(res, 500, 'Something happened', error.message)
 		}
 	}
-	static async getEarningsPerClient(req,res){
+	static async getEarningsPerClient(req, res) {
 		try {
-			let sum  = 0
-			const { clientId } = jwt.jwtVerify(req.headers.authorization.slice(7),process.env.SECRET)
+			let sum = 0
+			const {
+				clientId
+			} = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET)
 			const data = await earningService.getEarningsByClientId(clientId)
-			if(Object.values(data).length >0){
-				for(let i=0; i<Object.values(data).length ; i ++){
+			if (Object.values(data).length > 0) {
+				for (let i = 0; i < Object.values(data).length; i++) {
 					const date = new Date(Number(data[i].monthYear))
 					data[i].monthYear = `${date.toDateString().slice(4,7)}/${date.getFullYear()}`
 					sum += Number(data[i].amount)
 				}
-				return response.successResponse(res,200,'Earnings found ',{sum:sum,data:data})
-			}else{
-				return response.successResponse(res,200,'Data Not found',0)
+				let formattedData = []
+				for (let i = 0; i < data.length; i++) {
+					let count = 0
+					for (let j = 0; j < data.length; j++) {
+						var monthYear = data[i].monthYear
+						if (data[i].monthYear == data[j].monthYear) {
+							count += Number(data[j].amount)
+						}
+					}
+					var obj = {
+						amount: Number(count.toFixed(2)),
+						period: monthYear
+					}
+					formattedData.push(obj)
+				}
+				//remove duplicates
+				let uniqueValues = util.getUnique(formattedData, 'monthYear')
+				return response.successResponse(res, 200, 'Earnings found ', {
+					sum: Number(sum.toFixed(2)),
+					data: uniqueValues
+				})
+			} else {
+				return response.successResponse(res, 200, 'Data Not found', 0)
 			}
 		} catch (error) {
-			return response.errorResponse(res,500,'Something happened',error.message)
+			return response.errorResponse(res, 500, 'Something happened', error.message)
 		}
 	}
 }

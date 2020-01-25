@@ -172,11 +172,11 @@ class userController {
 	}
 	static async updateAccount(req, res) {
 		try {
-			const {
-				id
-			} = req.query
+			const decoded = jwt.jwtVerify(req.headers.authorization.slice(7),process.env.SECRET)
+			const user = await userService.getUserByMail(decoded.email)
+			if(!user) util.setErrorResponse(res,'Can\'t find that user',422)
 			const newInfo = req.body
-			const updated = await userService.updateUser(id, newInfo)
+			const updated = await userService.updateUser(user.id, newInfo)
 			updated != 0 ? util.setSuccessResponse(res, 'updated successfully', 200, updated) : util.setErrorResponse(res, 'An error occured', 422)
 		} catch (error) {
 			util.setErrorResponse(res, error, 522)
@@ -259,7 +259,7 @@ class userController {
 			const end = date.convertToTimestamp(req.body.end)
 			const data = await billingServices.getMonthlySubscribers(start, end)
 			if (Object.values(data).length > 0) {
-				util.setSuccessResponse(res, 'Data was found', 200, Object.values(data).length)
+				util.setSuccessResponse(res, 'Data was found', 200, {size:Object.values(data).length,data:data})
 			} else {
 				util.setErrorResponse(res, 'Data was not found', 400)
 			}
@@ -271,7 +271,7 @@ class userController {
 	static async getLiveUsers(req, res) {
 		try {
 			const data = await sessionService.getLiveSessions();
-			(data) ? util.setSuccessResponse(res, 'Found ', 200, Object.values(data).length) : util.setErrorResponse(res, 'Can\'t find Live users ' + JSON.stringify(data), 404)
+			(data) ? util.setSuccessResponse(res, 'Found ', 200, {size:Object.values(data).length,data:data}) : util.setErrorResponse(res, 'Can\'t find Live users ' + JSON.stringify(data), 404)
 		} catch (error) {
 			util.setErrorResponse(res, error.message, 500)
 		}

@@ -1,7 +1,7 @@
 import helpers from '../helpers/utilities'
 import services from '../services/tempVideoServices'
 import jwt from '../helpers/jwt'
-import cloudinary from '../helpers/cloudinary'
+import { v2 as cloudinary } from 'cloudinary'
 import google from '../helpers/google.cloud.normal'
 const util = new helpers()
 
@@ -11,16 +11,26 @@ class tempVideoController {
             
 			const data = req.body
 			const file = req.files.video
-			await google.uploadToGoogleCloud('cinetie',file)
-				.then(async(videoUri)=>{
-					data.videoUri =  jwt.jwtSign({videoUri :videoUri,clientId:data.clientId},process.env.SECRET)
-					const uploadedVideo = await services.createNewVideos(data)
-					if(uploadedVideo){
-						util.setSuccessResponse(res,'video uploaded successfully',201,uploadedVideo)
-					}else{
-						util.setErrorResponse(res,'Video can\'t be saved',401)
-					}
-				})
+			cloudinary.uploader.upload(file.tempFilePath, {
+				resource_type: "video",
+				overwrite: true
+			}, async (err, result) => {
+				console.log(result.url)
+				data.videoUri =  jwt.jwtSign({videoUri :result.url,clientId:data.clientId},process.env.SECRET)
+				const uploadedVideo = await services.createNewVideos(data)
+				if(!uploadedVideo) util.setErrorResponse(res,'Video can\'t be saved',401)
+				util.setSuccessResponse(res,'video uploaded successfully',201,uploadedVideo)
+			})
+			// await google.uploadToGoogleCloud('cinetie',file)
+			// 	.then(async(videoUri)=>{
+			// 		data.videoUri =  jwt.jwtSign({videoUri :videoUri,clientId:data.clientId},process.env.SECRET)
+			// 		const uploadedVideo = await services.createNewVideos(data)
+			// 		if(uploadedVideo){
+			// 			util.setSuccessResponse(res,'video uploaded successfully',201,uploadedVideo)
+			// 		}else{
+			// 			util.setErrorResponse(res,'Video can\'t be saved',401)
+			// 		}
+			// 	})
 
 		} catch (error) {
 			util.setErrorResponse(res,`something happened ${error.message}`,503)

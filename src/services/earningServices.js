@@ -167,6 +167,15 @@ class earningsService {
 			throw error
 		}
 	}
+	static async getAllActiveEarnings() {
+		try {
+			return await database.earnings.findAll({
+				where: { state: 'Active' }
+			})
+		} catch (error) {
+			throw error
+		}
+	}
 	//get All active earnings from the last 6 months
 	static async getAllFromThreeshold(clientId,min) {
 		try {
