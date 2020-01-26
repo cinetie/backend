@@ -29,20 +29,6 @@ class tempVideoServices {
 			throw error
 		}
 	}
-	static async getParticularVideo(id){
-		try {
-			const video = await database.tempVideos.findOne({
-				where : {id}
-			})
-			if(video){
-				return video
-			}else{
-				return null
-			}
-		} catch (error) {
-			throw error
-		}
-	}
 	static async getAllVideos(){
 		try {
 			const videos = await database.tempVideos.findAll({

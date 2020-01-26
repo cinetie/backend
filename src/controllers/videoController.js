@@ -2,7 +2,6 @@
 import response from '../helpers/response'
 import videoService from '../services/videoServices'
 import Util from '../helpers/utilities'
-import uuid from '../helpers/uuid'
 import axios from '../helpers/axios'
 import fetch from 'node-fetch'
 import jwt from '../helpers/jwt'
