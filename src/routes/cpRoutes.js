@@ -11,6 +11,7 @@ router.use(passport.initialize())
 router.use(passport.session())
 
 router.post('/signup',auth.signupCp)
+router.get('/details',access.isProducer,auth.getCpDetails)
 router.post('/login',isAdmin.verifyAdmin,auth.loginUser)
 router.delete('/delete_acc',access.isProducer,auth.deleteAccount)
 router.get('/all',access.isAdmin,auth.getAllAccounts)

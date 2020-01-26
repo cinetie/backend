@@ -1,16 +1,39 @@
 /* eslint-disable quotes */
 import services from '../services/serieServices'
 import Util from '../helpers/utilities'
-
+import temp from '../services/tempSerieService'
+import jwt from '../helpers/jwt'
+import vimeo from '../helpers/vimeo'
 const util = new Util()
 
 class serieController{
 	static async create(req,res){
 		try {
-			const createdSerie = await services.createNewEpisode(req.body);
-			(createdSerie) ? util.setErrorResponse(res,'Created successfully',201) : util.setErrorResponse(res,'Can\'t upload',400)
+			//get id for temp video
+			const id = req.query.id
+			const tempVideo = await temp.getParticularVideo(id)
+			console.log(JSON.stringify(tempVideo))
+			const decoded = jwt.jwtVerify(tempVideo.uri,process.env.SECRET)
+			//set details for vimeo upload
+			const data = {
+				size: tempVideo.size,
+				videoUrl:decoded.uri
+
+			}
+			//get url after a successful upload to vimeo
+			const url = await vimeo.viemoUpload(data)
+			//patch serie object to fit suspensionSate and video url
+			const createdSerie = await services.update(decoded.id,{
+				suspensionState:false,
+				episode:url
+			})
+			if(createdSerie) {
+				util.setErrorResponse(res,'Created successfully',201)
+			} else{
+				util.setErrorResponse(res,'Can\'t upload',400)
+			} 
 		} catch (error) {
-			util.setErrorResponse(res,`Something happened ${error.message}`)   
+			util.setErrorResponse(res,`Something happened ${error.message}`,500)   
 		}
 	}
 	static async getSingleEpisode(req,res){

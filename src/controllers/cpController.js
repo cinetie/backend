@@ -105,6 +105,19 @@ class cpController {
 			util.setErrorResponse(res,'Something Went wrong logging in '+error.message,500)
 		}
 	}
+	static async getCpDetails(req,res){
+		try {
+			const decoded = jwt.jwtVerify(req.headers.authorization.slice(7),process.env.SECRET)
+			const user = await cp.getCpByMail(decoded.email)
+			if(!user){
+				util.setErrorResponse(res,'Data not found',404)
+			}else{
+				util.setSuccessResponse(res,'Data found',200,user)
+			}
+		} catch (error) {
+			util.setErrorResponse(res,'Something went wrong',500)	
+		}
+	}
 	static async forgotPassword(req, res) {
 		try {
 			const user = await cp.getCpByMail(req.body.email)

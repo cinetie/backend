@@ -4,13 +4,21 @@ const op = sequelize.Op
 class serieServices {
 	static async createNewEpisode(newSerie) {
 		const createdSerie = await database.series.create(newSerie);
-		(createdSerie) ? createdSerie : null
+		if(createdSerie) {
+			return createdSerie
+		}else{
+			return null
+		}
 	}
 	static async getSingleEpisode(id) {
 		const episode = await database.series.findOne({
 			where: { id }
-		});
-		(Object.values(episode).length == 1) ? episode : null
+		})
+		if(Object.values(episode).length == 1) {
+			return episode
+		}else{
+			return null
+		}
 	}
 	static async getSingleSeason(videoId, season) {
 		const data = await database.series.findAll({
@@ -21,7 +29,11 @@ class serieServices {
 				]
 			}
 		});
-		(Object.values(data).length > 0) ? data : null
+		if(Object.values(data).length > 0) {
+			return data
+		}else{
+			return null
+		}
 	}
 	static async getAllSeasons(videoId) {
 		const data = await database.series.findAll({
@@ -30,19 +42,31 @@ class serieServices {
                 { videoId }
 
 		});
-		(Object.values(data).length > 0) ? data : null
+		if(Object.values(data).length > 0) {
+			return data
+		}else{
+			return null
+		}
 	}
 	static async update(id, updates) {
 		const updated = await database.series.update(updates, {
 			where: { id }
 		});
-		(updated) ? updated : null
+		if(updated) {
+			return updated
+		}else{
+			return null
+		}
 	}
 	static async deleteEpisode(id) {
 		const deleted = await database.series.destroy(id, {
 			returning: true
 		});
-		(deleted) ? deleted : null
+		if(deleted) {
+			return deleted
+		}else{
+			return null
+		}
 	}
 }
 

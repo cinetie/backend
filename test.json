@@ -1,12 +1,7 @@
-[   
-    {"city": "Mexico","count": 1},
-    {"city": "New York","count": 1},
-    {"city": "Kigali","count": 4},
-    {"city": "Kigali","count": 4},
-    {"city": "Kigali","count": 4},
-    {"city": "Kigali","count": 4},
-    {"city": "Vancouver","count": 3},
-    {"city": "Vancouver","count": 3},
-    {"city": "Vancouver","count": 3}
-    
-]
+{
+    "episodeName": "Chapter 1",
+    "season": "Part 1",
+    "videoId": "91e3ff0e-c8c3-455c-bdec-dad91883061a",
+    "size": 1000000,
+    "uri": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmkiOiJodHRwOi8vcmVzLmNsb3VkaW5hcnkuY29tL24zbTNzaXMvdmlkZW8vdXBsb2FkL3YxNTgwMDQ4NDQxL2t3b3c2YWV5Y3EyY2JtMHM0OGx0LndlYm0iLCJpYXQiOjE1ODAwNDg0NDJ9.ONMiS9_2tVRkUb0seqQh2QeNq1enD934MCMEpMbsvOw"
+}
