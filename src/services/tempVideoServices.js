@@ -45,7 +45,11 @@ class tempVideoServices {
 	}
 	static async getAllVideos(){
 		try {
-			const videos = await database.tempVideos.findAll()
+			const videos = await database.tempVideos.findAll({
+				order: [
+					['id','DESC']
+				]
+			})
 			if(videos){
 				return videos
 			}else{
