@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import database from '../database/models'
 
 class tempVideoServices {
@@ -8,6 +9,20 @@ class tempVideoServices {
 			if (newVideo) {
 				return newVideo
 			} else {
+				return null
+			}
+		} catch (error) {
+			throw error
+		}
+	}
+	static async getParticularVideo(id){
+		try {
+			const video = await database.tempVideos.findOne({
+				where : {id}
+			})
+			if(video){
+				return video
+			}else{
 				return null
 			}
 		} catch (error) {
