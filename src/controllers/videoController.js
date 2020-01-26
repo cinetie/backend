@@ -5,34 +5,28 @@ import Util from '../helpers/utilities'
 import uuid from '../helpers/uuid'
 import axios from '../helpers/axios'
 import fetch from 'node-fetch'
-import cloudinary from '../helpers/cloudinary'
 import jwt from '../helpers/jwt'
 import vimeoHelper from '../helpers/vimeo'
 import trailerServices from '../services/trailerService'
+import tempService from '../services/tempVideoServices'
 const util = new Util()
 // const Vimeo = require('vimeo').Vimeo
 class videoController {
 	static async addVideo(req, res) {
 		try {
-			const smallThumbnail = await cloudinary.upload(req.files.small.tempFilePath,'image')
-			const nameTagThumbNail = await cloudinary.upload(req.files.nameTag.tempFilePath,'image')
-			const tallThumbNail = await cloudinary.upload(req.files.tall.tempFilePath,'image')
-			const data = req.body
-			const decodedVideoHash = jwt.jwtVerify(data.videoUrl,process.env.SECRET)
-			data.tallThumbNailLink = tallThumbNail.url
-			data.nameTagThumbNailLink = nameTagThumbNail.url
-			data.videoUrl = decodedVideoHash.videoUri
-			data.videoClientId = decodedVideoHash.clientId
-			data.videoThumbnailLink = smallThumbnail.url
-			data.creationTime = new Date().getTime()
-			data.videoId = uuid.generator()
-			data.videoSuspensionState=true
-			data.size = data.size * 1e+6
+			const tempVideo  = await tempService.getParticularVideo(req.query.id)
+			const decoded= jwt.jwtVerify(tempVideo.videoUri,process.env.SECRET)
+			const data = decoded
+			data.videoUrl = decoded.videoUri
+			data.videoClientId = decoded.clientId
+			data.videoSuspensionState=false
+			data.size = decoded.size
 			const uri = await vimeoHelper.viemoUpload(data)
 			if(!uri) util.setErrorResponse(res, 'something went wrong while uploading', 503)
+			console.log(uri)
 			data.videoLink = uri
 			data.videoIdVimeo = uri.slice(8)
-			const newVideo = await videoService.createNewVideo(data)
+			const newVideo = await videoService.updateVideo(decoded.videoId,data)
 			if (!newVideo) util.setErrorResponse(res, 'something went wrong while uploading', 503)
 			util.setSuccessResponse(res, 'Video uploaded', 201, newVideo)
 			

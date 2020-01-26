@@ -1,37 +1,48 @@
 import helpers from '../helpers/utilities'
 import services from '../services/tempVideoServices'
+import uuid from '../helpers/uuid'
 import jwt from '../helpers/jwt'
 import { v2 as cloudinary } from 'cloudinary'
-import google from '../helpers/google.cloud.normal'
+import cloduinaryHelper from '../helpers/cloudinary'
+// import google from '../helpers/google.cloud.normal'
+import videoService from '../services/videoServices'
 const util = new helpers()
 
 class tempVideoController {
 	static async createVideoController(req,res){
 		try {
-            
+			//get token
+			const decoded = jwt.jwtVerify(req.headers.authorization.slice(7),process.env.SECRET)
 			const data = req.body
+			//register thumbnails
+			const smallThumbnail = await cloduinaryHelper.upload(req.files.small.tempFilePath,'image')
+			const nameTagThumbNail = await cloduinaryHelper.upload(req.files.nameTag.tempFilePath,'image')
+			const tallThumbNail = await cloduinaryHelper.upload(req.files.tall.tempFilePath,'image')
+			data.tallThumbNailLink = tallThumbNail.url
+			data.nameTagThumbNailLink = nameTagThumbNail.url
+			data.videoThumbnailLink = smallThumbnail.url
+			//suspend video for verification
+			data.videoSuspensionState=true
+			//generate video parameters
+			data.creationTime = new Date().getTime()
+			data.videoId = uuid.generator()
 			const file = req.files.video
 			cloudinary.uploader.upload(file.tempFilePath, {
-				resource_type: "video",
+				resource_type: 'video',
 				overwrite: true
 			}, async (err, result) => {
+				//upload video to temp server i.e cloudinary
 				console.log(result.url)
-				data.videoUri =  jwt.jwtSign({videoUri :result.url,clientId:data.clientId},process.env.SECRET)
+				//hash video url
+				const size  = data.size * 1e+6
+				data.videoUri =  jwt.jwtSign({videoUri :result.url,size:size,clientId:decoded.clientId,videoId:data.videoId},process.env.SECRET)
+				// register to both temp server and real server
+				data.videoUrl = data.videoUri
 				const uploadedVideo = await services.createNewVideos(data)
-				if(!uploadedVideo) util.setErrorResponse(res,'Video can\'t be saved',401)
-				util.setSuccessResponse(res,'video uploaded successfully',201,uploadedVideo)
+				const newVideo = await videoService.createNewVideo(data)
+				if(!uploadedVideo && newVideo) util.setErrorResponse(res,'Video can\'t be saved',401)
+				util.setSuccessResponse(res,'video uploaded successfully',201,{status:'upload success'})
 			})
-			// await google.uploadToGoogleCloud('cinetie',file)
-			// 	.then(async(videoUri)=>{
-			// 		data.videoUri =  jwt.jwtSign({videoUri :videoUri,clientId:data.clientId},process.env.SECRET)
-			// 		const uploadedVideo = await services.createNewVideos(data)
-			// 		if(uploadedVideo){
-			// 			util.setSuccessResponse(res,'video uploaded successfully',201,uploadedVideo)
-			// 		}else{
-			// 			util.setErrorResponse(res,'Video can\'t be saved',401)
-			// 		}
-			// 	})
-
 		} catch (error) {
 			util.setErrorResponse(res,`something happened ${error.message}`,503)
 		}
