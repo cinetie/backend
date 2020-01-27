@@ -49,7 +49,11 @@ class tempVideoController {
 	}
 	static async getAllVideosController(req,res){
 		try {
-			const videos = await services.getAllVideos()
+			let videos = await services.getAllVideos()
+			for(let i=0;i<Object.values(videos).length;i++){
+				const decoded = jwt.jwtVerify(videos[i].videoUri,process.env.SECRET)
+				videos[i].videoUri = decoded.videoUri
+			}
 			if(videos){
 				util.setSuccessResponse(res,'Videos found',200,videos)
 			}else{
