@@ -26,16 +26,20 @@ class videoService {
 			throw error
 		}
 	}
-	static async getNewVideos(limitValue, offsetValue) {
+	static async getNewVideos(limitValue, offsetValue,type) {
 		try {
 			
 			const videos = await database.videos.findAll({
 				offset: Number(offsetValue),
 				limit: Number(limitValue),
 				where: {
-					creationTime: {
-						[op.gte]: date.removeDays(60)
-					}
+					[op.and]:[{
+						creationTime: {
+							[op.gte]: date.removeDays(60)
+						},
+						type
+					}]
+					
 				}
 			})
 			if (videos) {
@@ -49,7 +53,7 @@ class videoService {
 			throw error
 		}
 	}
-	static async getTrendingVideos(offsetValue, limit) {
+	static async getTrendingVideos(offsetValue, limit,type) {
 		try {
 			
 			const videos = await database.videos.findAll({
@@ -62,7 +66,8 @@ class videoService {
 						},
 						creationTime: {
 							[op.gte]: date.removeDays(180)
-						}
+						},
+						type
 					}]
 				}
 			})
@@ -115,16 +120,19 @@ class videoService {
 			throw error
 		}
 	}
-	static async getPopularVideos(offSetValue, limitValue) {
+	static async getPopularVideos(offSetValue, limitValue,type) {
 		try {
 			
 			const data = await database.videos.findAll({
 				offset: Number(offSetValue),
 				limit: Number(limitValue),
 				where: {
-					videoWatchCount: {
-						[op.gte]: process.env.TRENDING_WATCH_COUNT
-					}
+					[op.and]:[{
+						videoWatchCount: {
+							[op.gte]: process.env.TRENDING_WATCH_COUNT
+						},
+						type:type
+					}]
 				}
 			})
 			if (data) {
@@ -214,7 +222,7 @@ class videoService {
 			throw error
 		}
 	}
-	static async getMainFeaturedVideo() {
+	static async getMainFeaturedVideo(type) {
 		try {
 			const videos = await database.videos.findAll({
 				order:[
@@ -226,8 +234,13 @@ class videoService {
 				},
 				where: {
 					[op.and]: [
-						{ isFeatured: true },
-						{ featureType: 1 }
+						// { isFeatured: true },
+						// { featureType: 1 }
+						{
+							isFeatured:true,
+							type:type,
+							featureType:1,
+						}
 					]
 				}
 			})
@@ -240,7 +253,7 @@ class videoService {
 			throw error
 		}
 	}
-	static async getSecondFeaturedVideo() {
+	static async getSecondFeaturedVideo(type) {
 		try {
 			const videos = await database.videos.findAll({
 				order:[
@@ -252,8 +265,11 @@ class videoService {
 				},
 				where: {
 					[op.and]: [
-						{ isFeatured: true },
-						{ featureType: 2 }
+						{
+							isFeatured:true,
+							type:type,
+							featureType:2,
+						}
 					]
 				}
 			})

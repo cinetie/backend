@@ -88,24 +88,33 @@ class videoController {
 	}
 	static async getVideosByPopularity(req, res) {
 		try {
-			let videos = await videoService.getPopularVideos(req.query.offset,req.query.limit)
-			if (Object.values(videos).length >0) util.setSuccessResponse(res, 'videos found', 200, videos)
-			util.setErrorResponse(res, 'Data not found', 404)
+			const type = req.query.type
+			let videos = await videoService.getPopularVideos(req.query.offset,req.query.limit,type)
+			if (Object.values(videos).length >0){
+				util.setSuccessResponse(res, 'videos found', 200, videos)
+			} else{
+				util.setErrorResponse(res, 'Data not found', 404)
+			}
 		} catch (error) {
 			util.setErrorResponse(res, error.message, 500)
 		}
 	}
 	static async getVideosByTrend(req, res) {
 		try {
-			const videos = await videoService.getTrendingVideos(req.query.offset,req.query.limit)
-			if (Object.values(videos).length >0) util.setSuccessResponse(res, 'videos found', 200, videos)
-			util.setErrorResponse(res, 'Data not found', 404)
+			const type = req.query.type
+			const videos = await videoService.getTrendingVideos(req.query.offset,req.query.limit,type)
+			if (Object.values(videos).length >0){
+				util.setSuccessResponse(res, 'videos found', 200, videos)
+			} else{
+				util.setErrorResponse(res, 'Data not found', 404)
+			}
 		} catch (error) {
 			util.setErrorResponse(res, error.message, 500)
 		}
 	}
 	static async getVideosByCategory(req, res) {
 		try {
+
 			const videos = await videoService.getVideosByCategory(req.query.q)
 			if (Object.values(videos).length > 0) {
 				util.setSuccessResponse(res, `${req.query.q} videos found`, 200, videos)
@@ -151,7 +160,8 @@ class videoController {
 	}
 	static async getMainFeaturedFilm(req,res){
 		try {
-			const video = await videoService.getMainFeaturedVideo()
+			const type = req.query.type
+			const video = await videoService.getMainFeaturedVideo(type)
 			const trailer = await trailerServices.getAllTrailers(video[0].videoId)
 			const data = {
 				video: video,
@@ -168,7 +178,8 @@ class videoController {
 	}
 	static async getSecondFeaturedFilm(req,res){
 		try {
-			const video = await videoService.getSecondFeaturedVideo()
+			const type = req.query.type
+			const video = await videoService.getSecondFeaturedVideo(type)
 			const trailer = await trailerServices.getAllTrailers(video[0].videoId)
 			const data = {
 				video: video,
@@ -185,7 +196,7 @@ class videoController {
 	}
 	static async getAllNewVideos(req,res){
 		try {
-			const video = await videoService.getNewVideos(req.query.limit,req.query.offset)
+			const video = await videoService.getNewVideos(req.query.limit,req.query.offset,req.query.type)
 			if (video) {
 				util.setSuccessResponse(res, 'videos Found', 200, video)
 			} else {
