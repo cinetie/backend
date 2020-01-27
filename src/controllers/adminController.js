@@ -38,7 +38,7 @@ class adminController {
 					data: uniqueValues
 				})
 			} else {
-				return response.successResponse(res, 200, 'Data Not found', 0)
+				util.setErrorResponse(res, 'Data not found', 404)
 			}
 		} catch (error) {
 			return response.errorResponse(res, 500, 'Something happened', error.message)
@@ -96,7 +96,7 @@ class adminController {
 					data: uniqueValues
 				})
 			} else {
-				return response.successResponse(res, 200, 'Data Not found', 0)
+				util.setErrorResponse(res, 'Data not found', 404)
 			}
 		} catch (error) {
 			return response.errorResponse(res, 500, 'Something happened', error.message)
