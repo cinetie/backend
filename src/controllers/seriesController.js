@@ -39,25 +39,25 @@ class serieController{
 	static async getSingleEpisode(req,res){
 		try {
 			const episode = await services.getSingleEpisode(req.query.id);
-			(episode) ? util.setErrorResponse(res,'Retrieved successfully',200) : util.setErrorResponse(res,`Can't find what you requested`,400)
+			(episode) ? util.setSuccessResponse(res,'Retrieved successfully',200,episode) : util.setErrorResponse(res,`Can't find what you requested`,400)
 		} catch (error) {
-			util.setErrorResponse(res,`Something happened ${error.message}`)   
+			util.setErrorResponse(res,`Something happened ${error.message}`,500)   
 		}
 	}
 	static async getSingleSeason(req,res){
 		try {
-			const season = await services.getSingleSeason(req.query.videoId,season);
-			(season) ? util.setErrorResponse(res,'Retrieved successfully',200) : util.setErrorResponse(res,`Can't find what you requested`,400)
+			const season = await services.getSingleSeason(req.query.videoId,req.query.s);
+			(season) ? util.setSuccessResponse(res,'Retrieved successfully',200,season) : util.setErrorResponse(res,`Can't find what you requested`,400)
 		} catch (error) {
-			util.setErrorResponse(res,`Something happened ${error.message}`)   
+			util.setErrorResponse(res,`Something happened ${error.message}`,500)   
 		}
 	}
 	static async getAllSeasons(req,res){
 		try {
 			const seasons = await services.getAllSeasons(req.query.videoId);
-			(seasons) ? util.setErrorResponse(res,'Retrieved successfully',200) : util.setErrorResponse(res,`Can't find what you requested`,400)
+			(seasons) ? util.setSuccessResponse(res,'Retrieved successfully',200,seasons): util.setErrorResponse(res,`Can't find what you requested`,400)
 		} catch (error) {
-			util.setErrorResponse(res,`Something happened ${error.message}`)   
+			util.setErrorResponse(res,`Something happened ${error.message}`,500)   
 		}
 	}
 	static async updateSerie(req,res){
@@ -65,7 +65,7 @@ class serieController{
 			const updated = await services.update(req.body.id,req.body);
 			(updated) ? util.setSuccessResponse(res,'Updated easily',201,updated) : util.setErrorResponse(res,`Can't updated what you requested`,400)
 		} catch (error) {
-			util.setErrorResponse(res,`Something happened ${error.message}`)   
+			util.setErrorResponse(res,`Something happened ${error.message}`,500)   
 		}
 	}
 	static  async delete(req,res){
@@ -73,7 +73,7 @@ class serieController{
 			const deleted = await services.deleteEpisode(req.body.id);
 			(deleted) ? util.setSuccessResponse(res,`deleted easily`,200,deleted) : util.setErrorResponse(res,`Can't find what you requested`,400)
 		} catch (error) {
-			util.setErrorResponse(res,`Something happened ${error.message}`)   
+			util.setErrorResponse(res,`Something happened ${error.message}`,500)   
 		}
 	}
     

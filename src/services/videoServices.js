@@ -81,6 +81,9 @@ class videoService {
 	static async search(query, offSetValue) {
 		try {
 			const data = await database.videos.findAll({
+				order :[
+					['id','DESC']
+				],
 				offset: Number(offSetValue),
 				limit: 20,
 				where: {
@@ -215,6 +218,9 @@ class videoService {
 	static async getMainFeaturedVideo() {
 		try {
 			const videos = await database.videos.findAll({
+				order:[
+					['id','DESC']
+				],
 				where: {
 					[op.and]: [
 						{ isFeatured: true },
@@ -234,6 +240,9 @@ class videoService {
 	static async getSecondFeaturedVideo() {
 		try {
 			const videos = await database.videos.findAll({
+				order:[
+					['id','DESC']
+				],
 				where: {
 					[op.and]: [
 						{ isFeatured: true },

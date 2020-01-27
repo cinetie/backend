@@ -14,7 +14,7 @@ class serieServices {
 		const episode = await database.series.findOne({
 			where: { id }
 		})
-		if(Object.values(episode).length == 1) {
+		if(episode) {
 			return episode
 		}else{
 			return null
@@ -37,11 +37,12 @@ class serieServices {
 	}
 	static async getAllSeasons(videoId) {
 		const data = await database.series.findAll({
-			group: 'season',
-			where:
-                { videoId }
-
-		});
+			where:{ videoId },
+			order: [
+				['id','DESC']
+			],
+			group: ['id','season']
+		})
 		if(Object.values(data).length > 0) {
 			return data
 		}else{
