@@ -222,7 +222,9 @@ class videoService {
 					['id','DESC']
 				],
 				limit:1,
-				exclude: ['videoLink','createdAt','updatedAt','videoCast','videoSynopsis','isFeatured','tallThumbNailLink','videoIdVimeo','videoClientId','featureType','category']
+				attributes:{
+					exclude: ['videoLink','createdAt','updatedAt','videoCast','videoSynopsis','isFeatured','tallThumbNailLink','videoIdVimeo','videoClientId','featureType','category']
+				},
 				where: {
 					[op.and]: [
 						{ isFeatured: true },
@@ -246,7 +248,9 @@ class videoService {
 					['id','DESC']
 				],
 				limit:1,
-				exclude: ['videoLink','createdAt','updatedAt','videoCast','videoSynopsis','isFeatured','tallThumbNailLink','videoIdVimeo','videoClientId','featureType','category']
+				attributes:{
+					exclude: ['videoLink','createdAt','updatedAt','videoCast','videoSynopsis','isFeatured','tallThumbNailLink','videoIdVimeo','videoClientId','featureType','category']
+				},
 				where: {
 					[op.and]: [
 						{ isFeatured: true },
