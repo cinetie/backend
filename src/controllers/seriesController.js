@@ -27,7 +27,8 @@ class serieController{
 				suspensionState:false,
 				episode:url
 			})
-			if(createdSerie) {
+			const deleted = await temp.deleteSeries(id)
+			if(createdSerie&&deleted) {
 				util.setErrorResponse(res,'Created successfully',201)
 			} else{
 				util.setErrorResponse(res,'Can\'t upload',400)

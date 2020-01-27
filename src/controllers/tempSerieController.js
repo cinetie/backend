@@ -39,6 +39,10 @@ class tempSerieController {
 		try {
 			const episodes = await services.getAllSeries()
 			if(episodes){
+				for(let i=0;i<Object.values(episodes).length;i++){
+					const decoded = jwt.jwtVerify(episodes[i].uri,process.env.SECRET)
+					episodes[i].uri = decoded.uri
+				}
 				util.setSuccessResponse(res,'Data found',200,episodes)
 			}else{
 				util.setErrorResponse(res,'Data Not Found',404)

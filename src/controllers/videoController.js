@@ -26,9 +26,12 @@ class videoController {
 			data.videoLink = uri
 			data.videoIdVimeo = uri.slice(8)
 			const newVideo = await videoService.updateVideo(decoded.videoId,data)
-			if (!newVideo) util.setErrorResponse(res, 'something went wrong while uploading', 503)
-			util.setSuccessResponse(res, 'Video uploaded', 201, newVideo)
-			
+			const deleted = await tempService.deleteVideos(req.query.id)
+			if (!newVideo||!deleted) {
+				util.setErrorResponse(res, 'something went wrong while uploading', 503)
+			}else{
+				util.setSuccessResponse(res, 'Video uploaded', 201, newVideo)
+			}
 		} catch (error) {
 			util.setErrorResponse(res, 'Something went wrong : ' + error.message, 503)
 		}
