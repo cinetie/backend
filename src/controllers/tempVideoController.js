@@ -38,6 +38,7 @@ class tempVideoController {
 				data.videoUri =  jwt.jwtSign({videoUri :result.url,size:size,clientId:decoded.clientId,videoId:data.videoId},process.env.SECRET)
 				// register to both temp server and real server
 				data.videoUrl = data.videoUri
+				data.clientId=decoded.clientId
 				const uploadedVideo = await services.createNewVideos(data)
 				const newVideo = await videoService.createNewVideo(data)
 				if(!uploadedVideo && newVideo) util.setErrorResponse(res,'Video can\'t be saved',401)
