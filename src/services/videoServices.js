@@ -87,8 +87,8 @@ class videoService {
 				limit: 20,
 				where: {
 					[op.or]: [
-						{ videoName: { [op.like]: `%${query}%` } },
-						{ category: { [op.like]: `%${query}%` } }
+						{ videoName: { [op.iLike]: `%${query}%` } },
+						{ category: { [op.iLike]: `%${query}%` } }
 					]
 				}
 			})
