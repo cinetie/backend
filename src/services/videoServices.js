@@ -78,13 +78,12 @@ class videoService {
 			throw error
 		}
 	}
-	static async search(query, offSetValue) {
+	static async search(query) {
 		try {
 			const data = await database.videos.findAll({
 				order :[
 					['id','DESC']
 				],
-				offset: Number(offSetValue),
 				limit: 20,
 				where: {
 					[op.or]: [
