@@ -39,6 +39,24 @@ class cpService {
 		}
 	}
 
+	static async getCpByClientId(clientId) {
+		try {
+			const user = await database.contentProviders.findOne({
+				attributes: {
+					exclude: ['createdAt', 'updatedAt']
+				},
+				where: { clientId }
+			})
+			if(user){
+				return user
+			}else{
+				return null
+			}
+		} catch (error) {
+			throw error
+		}
+	}
+
 	static async createNewCp(newCp) {
 		try {
 			return  await database.contentProviders.create(newCp)

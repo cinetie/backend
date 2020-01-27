@@ -2,6 +2,7 @@ import services from '../services/cpTransServices'
 import earningService from '../services/earningServices'
 import Util from '../helpers/utilities'
 import jwt from '../helpers/jwt'
+import cpService from '../services/cpServices'
 const helpers = new Util()
 class cpTransController {
 	static async getAllTransactions(req, res) {
@@ -9,7 +10,9 @@ class cpTransController {
 			const data = await services.getAllTrans()
 			
 			for(let i=0;i<Object.values(data).length;i++){
+				const cp = await cpService.getCpByClientId(data[i].clientId)
 				const date = new Date(Number(data[i].date));
+				data[i].clientId = cp.name
 				data[i].date = `${date.toDateString()}  ${date.toLocaleTimeString()}`
 			}
 			if (data) {
