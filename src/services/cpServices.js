@@ -72,7 +72,7 @@ class cpService {
 		try {
 			const cps = await database.contentProviders.findAll({
 				attributes: {
-					exclude: ['createdAt', 'updatedAt','clientId','password','id','isVerified','cityOfResidence']
+					exclude: ['createdAt', 'updatedAt','password','id','isVerified','cityOfResidence']
 				},
 			})
 			if(!cps) return null
