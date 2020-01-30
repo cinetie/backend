@@ -6,6 +6,7 @@ import { v2 as cloudinary } from 'cloudinary'
 import cloduinaryHelper from '../helpers/cloudinary'
 // import google from '../helpers/google.cloud.normal'
 import videoService from '../services/videoServices'
+import cpService from '../services/cpServices'
 const util = new helpers()
 
 class tempVideoController {
@@ -52,8 +53,16 @@ class tempVideoController {
 		try {
 			let videos = await services.getAllVideos()
 			for(let i=0;i<Object.values(videos).length;i++){
+				console.log(videos[i].clientId)
+				const cp = await cpService.getCpByClientId(videos[i].clientId)
+				if(cp){
+					videos[i].clientId= cp.name
+				}else{
+					videos[i].clientId= "default"
+				}
 				const decoded = jwt.jwtVerify(videos[i].videoUri,process.env.SECRET)
 				videos[i].videoUri = decoded.videoUri
+				
 			}
 			if(videos){
 				util.setSuccessResponse(res,'Videos found',200,videos)
