@@ -4,6 +4,7 @@ import jwt from '../helpers/jwt'
 import { v2 as cloudinary } from 'cloudinary'
 import cloudinaryHelper from '../helpers/cloudinary'
 import series from '../services/serieServices'
+import videoServices from '../services/videoServices'
 const util = new helpers()
 
 class tempSerieController {
@@ -40,7 +41,14 @@ class tempSerieController {
 			const episodes = await services.getAllSeries()
 			if(episodes){
 				for(let i=0;i<Object.values(episodes).length;i++){
+					const video = await videoServices.getVideoById(episodes[i].videoId)
 					const decoded = jwt.jwtVerify(episodes[i].uri,process.env.SECRET)
+					
+					if(video){
+						episodes[i].videoId=video.videoName 
+					}else{
+						episodes[i].videoId="default"
+					}
 					episodes[i].uri = decoded.uri
 				}
 				util.setSuccessResponse(res,'Data found',200,episodes)
