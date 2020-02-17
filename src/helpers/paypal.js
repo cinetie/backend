@@ -9,6 +9,9 @@ import moment from 'moment'
 import _ from 'lodash'
 import Util from './utilities'
 import jwt from '../helpers/jwt'
+import date from '../helpers/date'
+import fetch from 'node-fetch'
+import base64 from 'Base64'
 const util = new Util()
 paypalHelper.configure({
 	'mode': process.env.PAYPAL_MODE,
@@ -164,6 +167,8 @@ class paypal {
 										let token = approvalUrl.split('token=')[1]
 										console.log(approvalUrl, JSON.stringify(agreement))
 										res.redirect(approvalUrl)
+									}else{
+										return 0
 									}
 								})
 							}
@@ -237,6 +242,40 @@ class paypal {
 			return 0
 		}
 		
+	}
+	static async getSubscriptionDetails(email){
+		const aggreement = await paypalAggreementServices.getLiveAggreement(email)
+		const raw = new Date()
+		const raw_start_date = date.removeDays(3)
+		const raw_end_date = raw.getTime()
+		console.log(aggreement.aggreementId)
+		if(!aggreement || aggreement.state == 'canceled') return 0
+		paypalHelper.billingAgreement.searchTransactions(aggreement.aggreementId,date.convertToISO(raw_start_date),date.convertToISO(raw_end_date),async(error,data)=>{
+			if(error){
+				console.log(error)
+			}else{
+				return 1
+			}
+		})
+	}
+	static async auth(){
+		const data = {
+			api_key : process.env.PAYPAL_CLIENT_ID,
+			api_secret : process.env.PAYPAL_SECRET
+		}
+		await fetch(`${process.env.PAYPAL_HOST}/v1/oauth2/token`,{
+			method: 'POST',
+			headers: {
+				'Authorization':`Basic ${base64.encode(data.api_key+':'+data.api_secret)}`,
+				'Content-Type':'application/x-www-form-url-encoded',
+
+			},
+			body: `key=${data.api_key}&value=${data.api_secret}`
+		})
+			.then(response => response.json)
+			.then(response =>{
+				console.log(JSON.stringify(response))
+			})
 	}
 }
 
