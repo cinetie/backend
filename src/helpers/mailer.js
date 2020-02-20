@@ -27,9 +27,17 @@ const mailer = async (emailToSend) => {
 					subject: emailToSend[1].subject,
 					html: data
 				}
-				transporter.sendMail(emailOptions)
-					// .then(() => console.log('sent email'))
-					.catch(() => error)
+				transporter.sendMail(emailOptions,(err,status)=>{
+					if(err){
+						console.log(2.9)
+						console.log(err)
+					}else{
+						console.log(3.1)
+						console.log(status)
+					}
+				})
+					// // .then(() => console.log('sent email'))
+					// .catch(() => error)
 			}
 		})
 	} catch (error) {
