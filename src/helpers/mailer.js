@@ -15,7 +15,7 @@ const mailer = async (emailToSend) => {
 				user: process.env.SENDGRID_USER,
 				pass: process.env.SENDGRID_PASS
 			}
-		})
+		})console.log(2.0)
 		const { path } = emailToSend[2]
 		ejs.renderFile(path, emailToSend[0], (error, data) => {
 			if (error) {
@@ -26,7 +26,7 @@ const mailer = async (emailToSend) => {
 					to: emailToSend[1].to,
 					subject: emailToSend[1].subject,
 					html: data
-				}
+				}console.log(2.1)
 				transporter.sendMail(emailOptions,(err,status)=>{
 					if(err){
 						console.log(2.9)
