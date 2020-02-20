@@ -8,13 +8,14 @@ import bcrypt from '../helpers/bcrypt'
 import response from '../helpers/response'
 import jwt from '../helpers/jwt'
 import cry from '../helpers/crypto'
-import mdw from '../helpers/mailer'
 import Util from '../helpers/utilities'
 import date from '../helpers/date'
+import mailer from  '../helpers/mailer'
 const util = new Util()
 class userController {
 	static async signupUser(req, res) {
 		try {
+			const { email } = req.body.email
 			const newUser = req.body
 			newUser.password = await bcrypt.encrypt(newUser.password)
 			newUser.isVerified = false
@@ -23,7 +24,10 @@ class userController {
 			if(search)util.setErrorResponse(res,"user already exists",403)
 			const createdUser = await userService.createNewUser(newUser)
 			const part1 = cry.crypto()
-			const token = jwt.jwtSign(`${part1}${newUser.email}`, process.env.SECRET, '1d')
+			const token = jwt.jwtSign({
+				key:part1,
+				email:newUser.email
+			}, process.env.SECRET)
 			const tokenToSave = {
 				email: newUser.email,
 				token: token,
@@ -31,14 +35,18 @@ class userController {
 
 			}
 			await tokenService.createNewToken(tokenToSave, token)
-			const emailTosend = {
-				to: req.body.email,
-				from: process.env.EMAIL_USER,
-				subject: 'CINETIE - Please verify your email!',
-				text: 'Dear ' + newUser.firstName + ' please follow this link to verify your email http://localhost:5000/auth/verify/?id=' + createdUser.id + '&&token=' + token,
-			}
-			await mdw.mailer(emailTosend)
-			const userToken = jwt.jwtSign(createdUser.email, process.env.SECRET, '1d')
+			const EmailStatus = await mailer([{
+				email,
+				username,
+				body: `${config.HOST}/api/v1/user/verify?token=${sign(email)}`
+			  }, {
+				from: 'auth.user@tuner.com',
+				to: email,
+				subject: 'Email verification',
+			  },
+			  { path: `${path.join(__dirname, '../public/templates/VerifyEmail.ejs')}` }]);
+			  if (EmailStatus) return out(res, 500, EmailStatus, null, 'SERVER_ERROR');
+			const userToken = jwt.jwtSign(createdUser.email, process.env.SECRET)
 			createdUser.token = userToken
 			delete createdUser.password
 			util.setSuccessResponse(res, 'Signed up successfully', 201, createdUser)
@@ -49,10 +57,10 @@ class userController {
 	}
 	static async verify(req, res) {
 		try {
-			const { id } = req.query
 			const { token } = req.query
 			const decoded = jwt.jwtVerify(token,process.env.SECRET)
-			const user = await userService.getUserById(id)
+			console.log(JSON.stringify(decoded))
+			const user = await userService.getUserByMail(decoded.email)
 			if (!user) response.errorResponse(res, 404, 'User not found')
 			jwt.jwtVerify(token, process.env.SECRET)
 			const newUser = {
@@ -63,7 +71,7 @@ class userController {
 			if(!updatedUser) util.setErrorResponse(res,`Can't verify user ${decoded}`,400)
 			const emailTosend = {
 				to: user.email,
-				from: process.env.EMAIL_USER,
+				from: 'auth.user@cinetie.com',
 				subject: 'Success email has been verified',
 				text: 'Dear ' + user.lastName + ' Your Email has been verified successfully '
 			}
@@ -105,7 +113,7 @@ class userController {
 		try {
 			const user = await userService.getUserByMail(req.body.email)
 			if (!user) response.errorResponse(res, 404, 'User not found!')
-			const token = jwt.jwtSign(`${cry.crypto()}${user.firstName}`, process.env.SECRET, '1d')
+			const token = jwt.jwtSign(`${cry.crypto()}${user.firstName}`, process.env.SECRET)
 			const emailTosend = {
 				to: req.body.email,
 				from: process.env.EMAIL_USER,
@@ -149,7 +157,7 @@ class userController {
 				message = 'Logged In';
 				code = 200;
 			}
-			const token = await jwt.jwtSign({
+			const token =  jwt.jwtSign({
 				key: cry.crypto(),
 				email: req.user.email
 			}, process.env.SECRET, '1d')
@@ -196,9 +204,8 @@ class userController {
 			
 			//check if there is a current subscription
 			const currentSubsctption = await billingServices.getCurrentSubscription(email)
-			if(Object.values(currentSubsctption).length === 0){
+			if(!currentSubsctption){
 				const paymentDetails = await payment.registerNewSubscription(subscriptionData)
-				console.log('here')
 				let frequency = 0
 				if (newInfo.isBilledAnnually === true) {
 					frequency = "YEAR"
@@ -216,6 +223,23 @@ class userController {
 						"price": paymentDetails.price,
 						"phoneNumber": newInfo.phoneNumber
 					},
+					creditCard: {
+						"card":{
+							"crNumber":newInfo.crNumber,
+							"crCVC":newInfo.crCVC,
+							"expMonth":newInfo.expMonth,
+							"expYear":newInfo.expYear
+						},
+						"user":{
+							"cardFirstName":newInfo.cardFirstName,
+							"cardLastName":newInfo.cardLastName,
+							"email":email,
+							"phoneNumber":newInfo.phoneNumber
+						},
+						"transaction":{
+							"amount":paymentDetails.price
+						}
+					},
 					paypal: {
 						"plan": newInfo.plan,
 						"price": paymentDetails.price,
@@ -224,18 +248,23 @@ class userController {
 						"total": paymentDetails.price,
 						"urls": {
 							"success": `${process.env.PAYPAL_SUCCESS}?user=${jwt.jwtSign(email,process.env.SECRET)}`,
-							"failOrCancel": process.env.PAYPAL_FAIL_CANCEL
+							"failOrCancel": `${process.env.PAYPAL_FAIL_CANCEL}`
 						}
 					}
 				}
 				const response = await userService.updateUser(email, newInfo)
 				if(newInfo.paymentMethod) {
-					await payment.commitPayment(req,res,paymentData)
+					for ( let i =0 ;i<=2; i++){
+						const status  = await payment.commitPayment(paymentData)
+						if(status){
+							break
+						}
+					}
 				}else{
 					util.setSuccessResponse(res, 'Payment done successfully', 200, response[1][0])
 				}
 			}else{
-				util.setErrorResponse(res,'user has already a current subscription',422)
+				await userService.updateUser(email,newInfo)
 			}
 			
 			// (paymentDetails && updates) ? util.setSuccessResponse(res, 'User updated easily', 201, { 'user': updates, 'paymentDetails': paymentDetails }) : util.setErrorResponse(res, 'user didn\'t update easily', 400)
