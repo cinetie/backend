@@ -8,18 +8,18 @@ dotenv.config()
 
 const mailer = async (emailToSend) => {
 	try {
-		const transporter = await nodemailer.createTransport({
+		const transporter = nodemailer.createTransport({
 			host: process.env.SMTP_HOST,
 			port: process.env.SMTP_PORT,
 			auth: {
-				user: process.env.MAIL_USER,
-				pass: process.env.MAIL_PASS
+				user: process.env.SENDGRID_USER,
+				pass: process.env.SENDGRID_PASS
 			}
 		})
 		const { path } = emailToSend[2]
 		ejs.renderFile(path, emailToSend[0], (error, data) => {
 			if (error) {
-				throw error
+				return error
 			} else {
 				const emailOptions = {
 					from: emailToSend[1].from,
@@ -28,8 +28,8 @@ const mailer = async (emailToSend) => {
 					html: data
 				}
 				transporter.sendMail(emailOptions)
-					.then(() => console.log)
-					.catch(() => console.error)
+					// .then(() => console.log('sent email'))
+					.catch(() => error)
 			}
 		})
 	} catch (error) {
