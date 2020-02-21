@@ -6,17 +6,17 @@ import bcrypt from '../helpers/bcrypt'
 import response from '../helpers/response'
 import jwt from '../helpers/jwt'
 import cry from '../helpers/crypto'
-import mdw from '../helpers/mailer'
+import mailer from '../helpers/mailer'
 import Util from '../helpers/utilities'
 import uuid from '../helpers/uuid'
 import cloudinary from '../helpers/cloudinary'
+import path from 'path'
 const util = new Util()
 //add an isVerified column to cp
 class cpController {
 	static async signupCp(req, res) {
-		try {
+		// try {
 			const newUser = req.body
-            
 			newUser.password = await bcrypt.encrypt(newUser.password)
 			newUser.isVerified = false
 			newUser.clientId = uuid.generator()
@@ -25,7 +25,7 @@ class cpController {
 			newUser.idLink = imageToUpload.url
 			const checkUser = await cp.getCpByMail(newUser.email)
 			if (checkUser != null) {
-				util.setErrorResponse(res,'User already exists',422)
+				util.setErrorResponse(res,'cp already exists',422)
 			} else {
 				const createdUser = await cp.createNewCp(newUser)
 				const part1 = cry.crypto()
@@ -37,13 +37,18 @@ class cpController {
 				}
                
 				await tokenService.createNewToken(tokenToSave, token)
-				const emailTosend = {
+				const EmailStatus = await mailer([{
+					link: `${process.env.HOST}/auth/verify?token=${jwt.jwtSign(req.body.email,process.env.SECRET)}`
+				}, {
+					from: 'auth.cp@cinetie.com',
 					to: req.body.email,
-					from: process.env.EMAIL_USER,
-					subject: 'Please verify your email!',
-					text: 'Dear ' + newUser.firstName + ' please follow this link to verify your email http://localhost:5000/cp/verify/?id=' + createdUser.id + '&&token=' + token,
+					subject: 'Email verification',
+				},
+				{
+					path: `${path.join(__dirname, '../public/templates/VerifyEmail.ejs')}`
 				}
-				await mdw.mailer(emailTosend)
+			]);
+			if (EmailStatus) util.setErrorResponse(res, error.message, 500)		
 				const userToken = jwt.jwtSign(createdUser.email, process.env.SECRET,'1d')
 				createdUser.token = userToken
 				delete createdUser.password
@@ -51,9 +56,9 @@ class cpController {
                 
 			}
         
-		} catch (error) {
-			util.setErrorResponse(res, 'Something went wrong '+error.message, 500)
-		}
+		// } catch (error) {
+		// 	util.setErrorResponse(res, 'Something went wrong '+error.message, 500)
+		// }
 	}
 	static async verify(req, res) {
 		try {

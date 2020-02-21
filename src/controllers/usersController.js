@@ -206,7 +206,7 @@ class userController {
 		}
 	}
 	static async updateAccountAndSubscription(req, res) {
-		try {
+		// try {
 			const {
 				email
 			} = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET)
@@ -271,23 +271,22 @@ class userController {
 				}
 				const response = await userService.updateUser(email, newInfo)
 				if (newInfo.paymentMethod) {
-					for (let i = 0; i <= 2; i++) {
-						const status = await payment.commitPayment(paymentData)
-						if (status) {
-							break
-						}
+					const status = await payment.commitPayment(paymentData)
+					console.log('arrived')
+					if(status){
+						util.setSuccessResponse(res, 'Payment done successfully', 200, response[1][0])
+					}else {
+						util.setErrorResponse(res,`Sorry payment failed`,500)
 					}
-				} else {
-					util.setSuccessResponse(res, 'Payment done successfully', 200, response[1][0])
-				}
+				} 
 			} else {
 				await userService.updateUser(email, newInfo)
 			}
 
 			// (paymentDetails && updates) ? util.setSuccessResponse(res, 'User updated easily', 201, { 'user': updates, 'paymentDetails': paymentDetails }) : util.setErrorResponse(res, 'user didn\'t update easily', 400)
-		} catch (error) {
-			util.setErrorResponse(res, error.message, 522)
-		}
+		// } catch (error) {
+		// 	util.setErrorResponse(res, error.message, 522)
+		// }
 	}
 	static async getAllAccounts(req, res) {
 
