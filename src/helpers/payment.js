@@ -3,10 +3,12 @@
 import billingService from '../services/billingServices'
 import planService from '../services/planServices'
 import date from '../helpers/date'
-import util from '../helpers/utilities'
+import Util from '../helpers/utilities'
 import paypalHelper from '../helpers/paypal'
 import opay from '../helpers/opay'
 import daxPay from '../helpers/dax-payment-handler' 
+
+const util = new Util()
 class payment {
 	static async registerNewSubscription(details) {
 		try {
@@ -38,12 +40,14 @@ class payment {
 	static async commitPayment(req, res, details) {
 		//check for what happens when payment fails to continue
 		try {
+			console.log('commits payment')
 			if (Number(details.user.paymentMethod) === 1) {
 				const status = await opay.payment(req,res,details.opay);
 				(status === 1) ? 1 : 0 
 			} else if (Number(details.user.paymentMethod) === 2) {
 				console.log('----------hanging-------- payment')
 				const status = await paypalHelper.subscription(req, res, details.paypal)
+				console.log(status)
 				if(status === 0 ) return 0
 			} else if(Number (details.user.paymentMethod) === 3){
 				const status = await daxPay.creditCards(details.creditCard)

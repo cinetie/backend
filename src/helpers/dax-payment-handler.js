@@ -26,7 +26,7 @@ class paymentHandler {
 				"txRef": uuid.generator()
 			}
 		}
-		const response = await fetch(`${process.env.DAX_PAY_URL}`, {
+		const response = await fetch(`${process.env.DAX_PAY_URL}/credit-card`, {
 			method: `POST`,
 			headers: {
 				"Content-Type": "application/json"
@@ -52,7 +52,7 @@ class paymentHandler {
 				"txRef": uuid.generator()
 			}
 		}
-		const response = await fetch(`${process.env.DAX_PAY_URL}`,{
+		const response = await fetch(`${process.env.DAX_PAY_URL}/mobile-money`,{
 			method: `POST`,
 			headers :{
 				"Content-Type":"application/json"
