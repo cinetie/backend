@@ -1,10 +1,4 @@
-const getCummulativeSum = async (total, num) =>  {
-    
-    return total + num;
-}
-const average = async (arrayLen, sum) => {
+const getCummulativeSum = async (total, num) => total + num;
+const average = async (arrayLen, sum) => sum / arrayLen;
 
-    return sum / arrayLen;
-}
-
-export default { getCummulativeSum,average };
+export default { getCummulativeSum, average };

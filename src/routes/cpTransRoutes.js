@@ -1,14 +1,15 @@
-//Routes  for Content providers transactions
+// Routes  for Content providers transactions
 import { Router } from 'express';
 import controller from '../controllers/cpTransController';
 import access from '../middlewares/access';
+
 const router = new Router();
 
-router.get('/all',access.isAdmin,controller.getAllTransactions);
-router.get('/',access.isProducer,controller.getAllTransById);
+router.get('/all', access.isAdmin, controller.getAllTransactions);
+router.get('/', access.isProducer, controller.getAllTransById);
 // router.get('/admin',access.isAdmin,controller.getAllTransById);
-router.get('/stats',controller.loadStats);
-router.put('/checkout',controller.checkout);
-router.put('/approve',access.isAdmin,controller.patchNonApprovedTrans);
+router.get('/stats', controller.loadStats);
+router.put('/checkout', controller.checkout);
+router.put('/approve', access.isAdmin, controller.patchNonApprovedTrans);
 
 export default router;

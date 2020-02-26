@@ -1,20 +1,20 @@
-const dotenv = require('dotenv')
+import { config } from 'dotenv';
 
-dotenv.config()
+config();
 module.exports = {
-	production: {
-		use_env_variable: 'PROD_DATABASE_URL',
-		dialect: 'postgres'
-	},
-	development: {
-		use_env_variable: 'DEV_DATABASE_URL',
-		dialect: 'DIALECT',
-		dialectOptions:{
-			typeCast:true
-		}
-	},
-	test: {
-		use_env_variable: 'DATABASE_URL_TEST',
-		dialect: 'postgres'
-	}
-}
+  development: {
+    use_env_variable: 'DEV_DATABASE_URL',
+    dialect: 'postgres',
+  },
+  production: {
+    use_env_variable: 'PROD_DATABASE_URL',
+    dialect: 'postgres',
+    dialectOptions: {
+      typeCast: true
+    }
+  },
+  test: {
+    use_env_variable: 'TEST_DATABASE_URL',
+    dialect: 'postgres'
+  },
+};

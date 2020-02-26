@@ -1,14 +1,14 @@
-import { Router } from 'express'
-import controller from '../controllers/earningControlller'
-import adminController from '../controllers/adminController'
-import access from '../middlewares/access'
+import { Router } from 'express';
+import controller from '../controllers/earningControlller';
+import adminController from '../controllers/adminController';
+import access from '../middlewares/access';
 
-const router = new Router()
+const router = new Router();
 
-router.get('/earnings',access.isAdmin,controller.getAllEarnings)
-router.get('/earnings/active',access.isAdmin,controller.getAllActiveEarnings)
-router.get('/earnings/cp',access.isAdmin,adminController.getEarningsPerClient)
-router.get('/earnings/video',access.isAdmin,adminController.getAllEarningsPerVideo)
-router.get('/videos/cp',access.isAdmin,adminController.getVideosPerCp)
-router.get('/videos',access.isAdmin,adminController.getAllVideos)
-export default router
+router.get('/earnings', access.isAdmin, controller.getAllEarnings);
+router.get('/earnings/active', access.isAdmin, controller.getAllActiveEarnings);
+router.get('/earnings/cp', access.isAdmin, adminController.getEarningsPerClient);
+router.get('/earnings/video', access.isAdmin, adminController.getAllEarningsPerVideo);
+router.get('/videos/cp', access.isAdmin, adminController.getVideosPerCp);
+router.get('/videos', access.isAdmin, adminController.getAllVideos);
+export default router;

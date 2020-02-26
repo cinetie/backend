@@ -9,7 +9,12 @@
     "dev": "nodemon --exec babel-node src/index.js",
     "migrate": "sequelize db:migrate --env production ",
     "migrate:undo": "sequelize db:migrate:undo:all --env production ",
-    "migrate:dev": "sequelize db:migrate --env development"
+    "migrate:dev": "sequelize db:migrate --env development",
+    "migrate:test": "sequelize db:migrate:undo:all --env test && sequelize db:migrate --env test",
+    "generate-lcov": "nyc report --reporter=text > lcov.info",
+    "lint": "eslint . --fix --ignore-path .gitignore",
+    "coverage": "nyc report --reporter=text | coveralls && nyc report --reporter=text | codeclimate-test-reporter",
+    "test": "set NODE_ENV=test && set TEST_DATABASE_URL=postgres://postgres:nAdia123@127.0.0.1:5432/test && npm run migrate:test && nyc mocha --require @babel/register ./src/test/user.js --timeout 60000 --exit"
   },
   "author": "Jonathan Shyaka",
   "dependencies": {
@@ -22,7 +27,7 @@
     "body-parser": "^1.18.3",
     "cloudinary": "^1.17.0",
     "cors": "^2.8.4",
-    "dotenv": "^6.2.0",
+    "dotenv": "^8.2.0",
     "ejs": "^3.0.1",
     "eslint": "^6.8.0",
     "eslint-cli": "^1.1.1",
@@ -70,7 +75,13 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "coveralls": "^3.0.9",
+    "eslint-plugin-import": "^2.20.1",
+    "mocha": "^7.0.1",
     "nodemon": "^1.19.2",
+    "nyc": "^15.0.0",
     "prettier-eslint": "^9.0.0",
     "prettier-eslint-cli": "^5.0.0"
   }

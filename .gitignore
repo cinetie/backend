@@ -7,3 +7,4 @@ test.json
 database/
 yarn-error.log
 yarn.lock
+yarn.ts

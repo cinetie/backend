@@ -2,26 +2,27 @@ import Joi from '@hapi/joi';
 import response from '../../helpers/response';
 
 class validator {
-  static profile(req,res,next){
+  static profile(req, res, next) {
     const schema = Joi.object().keys({
-     email: Joi.string().email({minDomainSegments: 2}).required(),
-     name: Joi.string().min(3).required()
+      email: Joi.string().email({ minDomainSegments: 2 }).required(),
+      name: Joi.string().min(3).required()
     });
-    schema.validate(req.body,(err)=>{
-      if(err){
-        return response.errorResponse(res, 422, 'Validation failed!', err.details[0].message)
+    schema.validate(req.body, (err) => {
+      if (err) {
+        return response.errorResponse(res, 422, 'Validation failed!', err.details[0].message);
       }
       next();
     });
   }
-  static updateProfile(req,res,next){
+
+  static updateProfile(req, res, next) {
     const schema = Joi.object().keys({
-     email: Joi.string().email({minDomainSegments: 2}),
-     name: Joi.string().min(3)
+      email: Joi.string().email({ minDomainSegments: 2 }),
+      name: Joi.string().min(3)
     });
-    schema.validate(req.body,(err)=>{
-      if(err){
-        return response.errorResponse(res, 422, 'Validation failed!', err.details[0].message)
+    schema.validate(req.body, (err) => {
+      if (err) {
+        return response.errorResponse(res, 422, 'Validation failed!', err.details[0].message);
       }
       next();
     });
