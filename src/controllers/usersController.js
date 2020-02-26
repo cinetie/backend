@@ -207,106 +207,106 @@ class userController {
 
   static async updateAccountAndSubscription(req, res) {
     console.log('hnaljaflka');
-    try {
-      const {
-        email
-      } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
-      console.log('Starts');
-      const newInfo = req.body;
-      const subscriptionData = {
-        paymentMethod: newInfo.paymentMethod,
-        email,
-        plan: newInfo.plan,
-        phoneNumber: newInfo.phoneNumber,
-        isBilledAnnually: newInfo.isBilledAnnually,
-      };
-      const user = await userService.getUserByMail(email);
-      // check if there is a current subscription
-      const currentSubsctption = await billingServices.getCurrentSubscription(email);
-      if (!currentSubsctption) {
-        const paymentDetails = await payment.registerNewSubscription(subscriptionData);
-        let frequency = 0;
-        if (newInfo.isBilledAnnually === true) {
-          frequency = "YEAR";
-        } else {
-          frequency = "MONTH";
-        }
-        const paymentData = {
-          user: {
-            email,
-            paymentMethod: newInfo.paymentMethod,
-            isBilledAnnually: newInfo.isBilledAnnually,
-            plan: newInfo.plan
-          },
-          momo: {
-            amount: Math.round(paymentDetails.price),
-            phonenumber: newInfo.phoneNumber,
-            firstname: user.firstName,
-            lastname: user.lastName
-          },
-          creditCard: {
-            card: {
-              crNumber: newInfo.crNumber,
-              crCVC: newInfo.crCVC,
-              expMonth: newInfo.expMonth,
-              expYear: newInfo.expYear
-            },
-            user: {
-              cardFirstName: newInfo.cardFirstName,
-              cardLastName: newInfo.cardLastName,
-              email,
-              phoneNumber: newInfo.phoneNumber
-            },
-            transaction: {
-              amount: Math.round(paymentDetails.price)
-            }
-          },
-          paypal: {
-            plan: newInfo.plan,
-            price: paymentDetails.price,
-            frequency,
-            currency: "USD",
-            total: paymentDetails.price,
-            urls: {
-              success: `${process.env.PAYPAL_SUCCESS}?user=${jwt.jwtSign(email, process.env.SECRET)}`,
-              failOrCancel: `${process.env.PAYPAL_FAIL_CANCEL}`
-            }
-          }
-        };
-        const momoData = await dax.momo(paymentData.momo);
-        const creditCard = await dax.creditCards(paymentData.creditCard);
-        console.log("1");
-        switch (Number(newInfo.paymentMethod)) {
-          case 1:
-            if (momoData !== 0) {
-              util.setSuccessResponse(res, 'Success', 204, {
-                data: momoData
-              });
-            } else {
-              util.setErrorResponse(res, `Sorry payment failed`, 500);
-            }
-            break;
-          case 2:
-            await paypal.subscription(req, res, paymentData.paypal);
-            break;
-          case 3:
-            if (creditCard !== 0) {
-              util.setSuccessResponse(res, 'Success', 204, {
-                data: creditCard
-              });
-            } else {
-              util.setErrorResponse(res, `Sorry payment failed`, 500);
-            }
-            break;
-          default:
-            util.setErrorResponse(res, `Sorry payment failed`, 500);
-        }
+    // try {
+    const {
+      email
+    } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
+    console.log('Starts');
+    const newInfo = req.body;
+    const subscriptionData = {
+      paymentMethod: newInfo.paymentMethod,
+      email,
+      plan: newInfo.plan,
+      phoneNumber: newInfo.phoneNumber,
+      isBilledAnnually: newInfo.isBilledAnnually,
+    };
+    const user = await userService.getUserByMail(email);
+    // check if there is a current subscription
+    const currentSubsctption = await billingServices.getCurrentSubscription(email);
+    if (!currentSubsctption) {
+      const paymentDetails = await payment.registerNewSubscription(subscriptionData);
+      let frequency = 0;
+      if (newInfo.isBilledAnnually === true) {
+        frequency = "YEAR";
       } else {
-        await userService.updateUser(email, newInfo);
+        frequency = "MONTH";
       }
-    } catch (error) {
-      return response.errorResponse(res, 500, `Something wrong happened ${error.message}`, error);
+      const paymentData = {
+        user: {
+          email,
+          paymentMethod: newInfo.paymentMethod,
+          isBilledAnnually: newInfo.isBilledAnnually,
+          plan: newInfo.plan
+        },
+        momo: {
+          amount: Math.round(paymentDetails.price),
+          phonenumber: newInfo.phoneNumber,
+          firstname: user.firstName,
+          lastname: user.lastName
+        },
+        creditCard: {
+          card: {
+            crNumber: newInfo.crNumber,
+            crCVC: newInfo.crCVC,
+            expMonth: newInfo.expMonth,
+            expYear: newInfo.expYear
+          },
+          user: {
+            cardFirstName: newInfo.cardFirstName,
+            cardLastName: newInfo.cardLastName,
+            email,
+            phoneNumber: newInfo.phoneNumber
+          },
+          transaction: {
+            amount: Math.round(paymentDetails.price)
+          }
+        },
+        paypal: {
+          plan: newInfo.plan,
+          price: paymentDetails.price,
+          frequency,
+          currency: "USD",
+          total: paymentDetails.price,
+          urls: {
+            success: `${process.env.PAYPAL_SUCCESS}?user=${jwt.jwtSign(email, process.env.SECRET)}`,
+            failOrCancel: `${process.env.PAYPAL_FAIL_CANCEL}`
+          }
+        }
+      };
+      const momoData = await dax.momo(paymentData.momo);
+      const creditCard = await dax.creditCards(paymentData.creditCard);
+      console.log("1");
+      switch (Number(newInfo.paymentMethod)) {
+        case 1:
+          if (momoData !== 0) {
+            util.setSuccessResponse(res, 'Success', 204, {
+              data: momoData
+            });
+          } else {
+            util.setErrorResponse(res, `Sorry payment failed`, 500);
+          }
+          break;
+        case 2:
+          await paypal.subscription(req, res, paymentData.paypal);
+          break;
+        case 3:
+          if (creditCard !== 0) {
+            util.setSuccessResponse(res, 'Success', 204, {
+              data: creditCard
+            });
+          } else {
+            util.setErrorResponse(res, `Sorry payment failed`, 500);
+          }
+          break;
+        default:
+          util.setErrorResponse(res, `Sorry payment failed`, 500);
+      }
+    } else {
+      await userService.updateUser(email, newInfo);
     }
+    // } catch (error) {
+    //   return response.errorResponse(res, 500, `Something wrong happened ${error.message}`, error);
+    // }
   }
 
   static async getAllAccounts(res) {
