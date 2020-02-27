@@ -1,3 +1,5 @@
+/* eslint-disable block-scoped-var */
+/* eslint-disable vars-on-top */
 import viewingSessions from '../services/viewingSessionsServices';
 import response from '../helpers/response';
 import Util from '../helpers/utilities';

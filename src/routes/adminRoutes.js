@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import controller from '../controllers/earningControlller';
 import adminController from '../controllers/adminController';
+import sales from '../controllers/salesController';
 import access from '../middlewares/access';
 
 const router = new Router();
@@ -11,4 +12,6 @@ router.get('/earnings/cp', access.isAdmin, adminController.getEarningsPerClient)
 router.get('/earnings/video', access.isAdmin, adminController.getAllEarningsPerVideo);
 router.get('/videos/cp', access.isAdmin, adminController.getVideosPerCp);
 router.get('/videos', access.isAdmin, adminController.getAllVideos);
+router.get('/sales/all', access.isAdmin, sales.getAllSales);
+router.get('/sales/range', access.isAdmin, sales.getSalesInTimeRange);
 export default router;

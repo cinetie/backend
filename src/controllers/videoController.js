@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable quotes */
 import fetch from 'node-fetch';
 import response from '../helpers/response';

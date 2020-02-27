@@ -59,5 +59,18 @@ class screenValidation {
       util.setErrorResponse(res, `an error occured  ${error}`, 500);
     }
   }
+
+  static async verifyPermissionLevel(req, res, next) {
+    try {
+      const data = await userService.getUserByMail(req.body.email);
+      if (data.permissionLevel !== 1) {
+        util.setErrorResponse(res, 'Please sent up your billing', 402);
+      } else {
+        next();
+      }
+    } catch (error) {
+      util.setErrorResponse(res, `an error occured  ${error}`, 500);
+    }
+  }
 }
 export default screenValidation;

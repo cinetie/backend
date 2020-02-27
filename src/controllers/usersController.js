@@ -16,6 +16,7 @@ import mailer from '../helpers/mailer';
 import dax from '../helpers/dax-payment-handler';
 import paypal from '../helpers/paypal';
 
+
 const util = new Util();
 class userController {
   static async signupUser(req, res) {
