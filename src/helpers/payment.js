@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable quotes */
@@ -40,16 +41,22 @@ class payment {
   static async commitPayment(req, res, details) {
     // check for what happens when payment fails to continue
     try {
-      if (Number(details.user.paymentMethod) === 1) {
-        const status = await daxPay.momo(details.momo)(status === 1) ? 1 : 0;
-      } else if (Number(details.user.paymentMethod) === 2) {
-        console.log('----------hanging-------- payment');
-        const status = await paypalHelper.subscription(req, res, details.paypal);
-        console.log(status);
-        if (status === 0) return 0;
-      } else if (Number(details.user.paymentMethod) === 3) {
-        const status = await daxPay.creditCards(details.creditCard);
-        return status;
+      switch (Number(details.user.paymentMethod)) {
+        case 1:
+          console.log('momo called ----');
+          const status = await daxPay.momo(details.momo)(status === 1) ? 1 : 0;
+          break;
+        case 2:
+          console.log('----------hanging-------- payment');
+          const statusPayPal = await paypalHelper.subscription(req, res, details.paypal);
+          console.log(statusPayPal);
+          break;
+        case 3:
+          console.log('credit cards called ----');
+          const statusCard = await daxPay.creditCards(details.creditCard);
+          return statusCard;
+        default:
+          util.setErrorResponse(res, 'Please select a method of payment', '400');
       }
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);

@@ -53,7 +53,7 @@ class paymentHandler {
       payload: {
         amount: details.amount.toString(),
         email: details.email,
-        phonenumber: details.phoneNumber,
+        phonenumber: details.phonenumber,
         firstname: details.firstName,
         lastname: details.lastName,
         txRef: uuid.generator()

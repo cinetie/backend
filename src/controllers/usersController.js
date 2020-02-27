@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 /* eslint-disable quotes */
 import path from 'path';
 import userService from '../services/userServices';
@@ -206,12 +207,11 @@ class userController {
   }
 
   static async updateAccountAndSubscription(req, res) {
-    console.log('hnaljaflka');
     // try {
     const {
       email
     } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
-    console.log('Starts');
+    console.log(email);
     const newInfo = req.body;
     const subscriptionData = {
       paymentMethod: newInfo.paymentMethod,
@@ -231,6 +231,7 @@ class userController {
       } else {
         frequency = "MONTH";
       }
+      console.log(JSON.stringify(newInfo));
       const paymentData = {
         user: {
           email,
@@ -240,9 +241,10 @@ class userController {
         },
         momo: {
           amount: Math.round(paymentDetails.price),
-          phonenumber: newInfo.phoneNumber,
+          phonenumber: "250780964422",
           firstname: user.firstName,
-          lastname: user.lastName
+          lastname: user.lastName,
+          email,
         },
         creditCard: {
           card: {
@@ -273,11 +275,12 @@ class userController {
           }
         }
       };
-      const momoData = await dax.momo(paymentData.momo);
-      const creditCard = await dax.creditCards(paymentData.creditCard);
+
+
       console.log("1");
       switch (Number(newInfo.paymentMethod)) {
         case 1:
+          const momoData = await dax.momo(paymentData.momo);
           if (momoData !== 0) {
             util.setSuccessResponse(res, 'Success', 204, {
               data: momoData
@@ -290,6 +293,7 @@ class userController {
           await paypal.subscription(req, res, paymentData.paypal);
           break;
         case 3:
+          const creditCard = await dax.creditCards(paymentData.creditCard);
           if (creditCard !== 0) {
             util.setSuccessResponse(res, 'Success', 204, {
               data: creditCard
