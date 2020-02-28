@@ -8,11 +8,23 @@ import planService from '../services/planServices';
 import date from "./date";
 import Util from "./utilities";
 import paypalHelper from "./paypal";
-import opay from "./opay";
 import daxPay from "./dax-payment-handler";
 
 const util = new Util();
 class payment {
+  static async getPlanPricing(details) {
+    try {
+      let price = 0;
+      const plan = await planService.getParticalPlan(details.plan);
+      (details.isBilledAnnually)
+        ? price = plan.yearlyPrice
+        : price = plan.monthlyPrice;
+      return price;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static async registerNewSubscription(details) {
     try {
       const data = {};

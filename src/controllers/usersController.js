@@ -223,19 +223,17 @@ class userController {
       phoneNumber: newInfo.phoneNumber,
       isBilledAnnually: newInfo.isBilledAnnually,
     };
+    const price = await payment.getPlanPricing(subscriptionData);
     const user = await userService.getUserByMail(email);
-    console.log(JSON.stringify(user));
     // check if there is a current subscription
     const currentSubsctption = await billingServices.getCurrentSubscription(email);
     if (!currentSubsctption) {
-     
       let frequency = 0;
       if (newInfo.isBilledAnnually === true) {
         frequency = "YEAR";
       } else {
         frequency = "MONTH";
       }
-      console.log(JSON.stringify(newInfo));
       const paymentData = {
         user: {
           email,
@@ -244,8 +242,8 @@ class userController {
           plan: newInfo.plan
         },
         momo: {
-          amount: Math.round(paymentDetails.price),
-          phonenumber: "250780964422",
+          amount: Math.round(price),
+          phonenumber: newInfo.phoneNumber,
           firstname: user.firstName,
           lastname: user.lastName,
           email,
@@ -264,15 +262,15 @@ class userController {
             phoneNumber: newInfo.phoneNumber
           },
           transaction: {
-            amount: Math.round(paymentDetails.price)
+            amount: Math.round(price)
           }
         },
         paypal: {
           plan: newInfo.plan,
-          price: paymentDetails.price,
+          price,
           frequency,
           currency: "USD",
-          total: paymentDetails.price,
+          total: price,
           urls: {
             success: `${process.env.PAYPAL_SUCCESS}?user=${jwt.jwtSign(email, process.env.SECRET)}`,
             failOrCancel: `${process.env.PAYPAL_FAIL_CANCEL}`
