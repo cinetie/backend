@@ -9,21 +9,21 @@ class planServices {
     }
   }
 
-  static async deletePlan(type) {
+  static async deletePlan(id) {
     try {
       return await database.plans.destroy({
-        where: { type }
+        where: { id }
       });
     } catch (error) {
       throw error;
     }
   }
 
-  static async updatePlans(type, plan) {
+  static async updatePlans(id, plan) {
     try {
       return await database.plans.update(plan, {
         returning: true,
-        where: { type }
+        where: { id }
       });
     } catch (error) {
       throw error;
