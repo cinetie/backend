@@ -30,7 +30,7 @@ class screenValidation {
       const details = await screenValidation.getEmail(req, res);
       const plan = await planService.getParticalPlan(details.plan);
       const screensAndEmail = {
-        screens: plan.numberOfScreens,
+        screens: Number(plan.numberOfScreens),
         email: details.email
       };
       return screensAndEmail;
@@ -42,15 +42,17 @@ class screenValidation {
   // this method uses the returned numberOfScreens property to validate the login session
   static async validateNumberOfScreens(req, res, next) {
     try {
-      if (req.body.email == process.env.ADMIN_USER) {
+      if (req.body.email !== process.env.ADMIN_USER) {
         console.log('----------hanging-------- screen validators');
         const details = await screenValidation.getPlan(req, res);
         const activeSessions = await loginSessionService.getParticularSession(details.email);
 
-        if (activeSessions.length != details.screens) {
+        if (activeSessions.length !== details.screens) {
+          console.log(activeSessions.length);
+          console.log(details.screens);
           next();
         } else {
-          util.setErrorResponse(res, 'Maximum screen number reached ', 403);
+          util.setErrorResponse(res, 'Maximum screens in your plan has reached ', 403);
         }
       } else {
         next();

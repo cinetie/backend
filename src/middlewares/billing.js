@@ -93,7 +93,11 @@ class billing {
   }
 
   static async renewPayment(req, res, next) {
-    try {
+    // try {
+    const user = await userService.getUserByMail(req.body.email);
+    if (user.plan === 'Setup') {
+      next();
+    } else {
       const today = new Date();
       const details = await billing.fetchCurrentSubscription(req, res);
       if (details.endDate === today.toDateString()) {
@@ -161,8 +165,23 @@ class billing {
       } else {
         next();
       }
+    }
+
+    // } catch (error) {
+    //   util.setErrorResponse(res, error.message, 500);
+    // }
+  }
+
+  static async verifyPermissionLevel(req, res, next) {
+    try {
+      const data = await userService.getUserByMail(req.body.email);
+      if (data.permissionLevel !== 1) {
+        util.setErrorResponse(res, 'Please sent up your billing', 402);
+      } else {
+        next();
+      }
     } catch (error) {
-      util.setErrorResponse(res, error.message, 500);
+      util.setErrorResponse(res, `an error occured  ${error}`, 500);
     }
   }
 }
