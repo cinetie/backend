@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 /* eslint-disable no-case-declarations */
 /* eslint-disable quotes */
 import path from 'path';
@@ -223,10 +224,11 @@ class userController {
       isBilledAnnually: newInfo.isBilledAnnually,
     };
     const user = await userService.getUserByMail(email);
+    console.log(JSON.stringify(user));
     // check if there is a current subscription
     const currentSubsctption = await billingServices.getCurrentSubscription(email);
     if (!currentSubsctption) {
-      const paymentDetails = await payment.registerNewSubscription(subscriptionData);
+     
       let frequency = 0;
       if (newInfo.isBilledAnnually === true) {
         frequency = "YEAR";
@@ -284,6 +286,7 @@ class userController {
         case 1:
           const momoData = await dax.momo(paymentData.momo);
           if (momoData !== 0) {
+            const paymentDetails = await payment.registerNewSubscription(subscriptionData);
             util.setSuccessResponse(res, 'Success', 204, {
               data: momoData
             });
@@ -292,11 +295,13 @@ class userController {
           }
           break;
         case 2:
+          const paymentDetails = await payment.registerNewSubscription(subscriptionData);
           await paypal.subscription(req, res, paymentData.paypal);
           break;
         case 3:
           const creditCard = await dax.creditCards(paymentData.creditCard);
           if (creditCard !== 0) {
+            const paymentDetails = await payment.registerNewSubscription(subscriptionData);
             util.setSuccessResponse(res, 'Success', 204, {
               data: creditCard
             });
@@ -308,7 +313,8 @@ class userController {
           util.setErrorResponse(res, `Sorry payment failed`, 500);
       }
     } else {
-      await userService.updateUser(email, newInfo);
+      const status = await userService.updateUser(email, newInfo);
+      util.setSuccessResponse(res, 'Updated successfully', 204, status);
     }
     // } catch (error) {
     //   return response.errorResponse(res, 500, `Something wrong happened ${error.message}`, error);
