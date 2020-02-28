@@ -59,7 +59,7 @@ class salesController {
       }
       return response.successResponse(res, 200, 'Data Not found', 0);
     } catch (error) {
-      util.setErrorResponse(res, 'something went wrong', 503);
+      util.setErrorResponse(res, `something went wrong ${error}`, 503);
     }
   }
 }
