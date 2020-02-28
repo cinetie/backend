@@ -25,6 +25,7 @@ class userController {
       newUser.password = await bcrypt.encrypt(newUser.password);
       newUser.isVerified = false;
       newUser.plan = "Setup";
+      newUser.permissionLevel = 1;
       const search = await userService.getUserByMail(newUser.email);
       if (search) {
         util.setErrorResponse(res, "user already exists", 403);
