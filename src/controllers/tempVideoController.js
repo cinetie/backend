@@ -13,6 +13,7 @@ const util = new helpers();
 class tempVideoController {
   static async createVideoController(req, res) {
     try {
+      console.log('started');
       // get token
       const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const data = req.body;
@@ -29,6 +30,7 @@ class tempVideoController {
       data.creationTime = new Date().getTime();
       data.videoId = uuid.generator();
       const file = req.files.video;
+      console.log('On upload');
       cloudinary.uploader.upload(file.tempFilePath, {
         resource_type: 'video',
         overwrite: true
@@ -43,6 +45,7 @@ class tempVideoController {
         // register to both temp server and real server
         data.videoUrl = data.videoUri;
         data.clientId = decoded.clientId;
+        console.log('On finish upload');
         const uploadedVideo = await services.createNewVideos(data);
         const newVideo = await videoService.createNewVideo(data);
         if (!uploadedVideo && newVideo) util.setErrorResponse(res, 'Video can\'t be saved', 401);
