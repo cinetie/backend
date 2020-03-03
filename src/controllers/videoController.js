@@ -23,11 +23,10 @@ class videoController {
       data.videoSuspensionState = false;
       data.size = decoded.size;
       const uri = await vimeoHelper.viemoUpload(data);
-      console.log(JSON.stringify(data));
       if (!uri) {
         util.setErrorResponse(res, 'something went wrong while uploading', 503);
       } else {
-        console.log(uri);
+        // console.log(uri);
         data.videoLink = uri;
         data.videoIdVimeo = uri.slice(8);
         const newVideo = await videoService.updateVideo(decoded.videoId, data);

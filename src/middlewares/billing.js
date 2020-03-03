@@ -94,6 +94,7 @@ class billing {
 
   static async renewPayment(req, res, next) {
     // try {
+    console.log('Renew payment');
     const user = await userService.getUserByMail(req.body.email);
     if (user.plan === 'Setup') {
       next();
