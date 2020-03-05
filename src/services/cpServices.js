@@ -65,6 +65,7 @@ class cpService {
   static async updateCp(email, oldCp) {
     try {
       return await database.contentProviders.update(oldCp, {
+        returning: true,
         where: { email }
       });
     } catch (error) {

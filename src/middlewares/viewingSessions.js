@@ -40,7 +40,7 @@ class viewingSession {
         (results && updates) ? next() : response.errorResponse(res, 400, 'something went wrong', 'Can\'t get location');
       }
     } catch (error) {
-      throw error;
+      return response.errorResponse(res, 400, 'Something went wrong', error);
     }
   }
 }
