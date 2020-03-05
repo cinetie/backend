@@ -43,13 +43,10 @@ class screenValidation {
   static async validateNumberOfScreens(req, res, next) {
     try {
       if (req.body.email !== process.env.ADMIN_USER) {
-        console.log('----------hanging-------- screen validators');
         const details = await screenValidation.getPlan(req, res);
         const activeSessions = await loginSessionService.getParticularSession(details.email);
 
         if (activeSessions.length !== details.screens) {
-          console.log(activeSessions.length);
-          console.log(details.screens);
           next();
         } else {
           util.setErrorResponse(res, 'Maximum screens in your plan has reached ', 403);

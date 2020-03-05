@@ -1,4 +1,7 @@
+import sequelize from 'sequelize';
 import database from '../database/models';
+
+const op = sequelize.Op;
 
 class loginSessionServices {
   static async addSession(newSession) {
@@ -17,7 +20,7 @@ class loginSessionServices {
     try {
       const session = await database.loginSessions.findAll({
         where: {
-          email
+          [op.and]: [{ email }, { state: 'in' }]
         }
       });
       if (session) {
@@ -41,7 +44,7 @@ class loginSessionServices {
       }
       return null;
     } catch (error) {
-
+      throw error;
     }
   }
 

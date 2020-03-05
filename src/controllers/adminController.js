@@ -34,14 +34,14 @@ class adminController {
         }
         // remove duplicates
         const uniqueValues = util.getUnique(formattedData, 'monthYear');
-        return response.successResponse(res, 200, 'Earnings found ', {
+        util.setSuccessResponse(res, 'Earnings found ', 200, {
           sum: Number(sum.toFixed(2)),
           data: uniqueValues
         });
       }
       util.setErrorResponse(res, 'Data not found', 404);
     } catch (error) {
-      return response.errorResponse(res, 500, 'Something happened', error.message);
+      util.setErrorResponse(res, `Something Went wrong logging in ${error}`, 500);
     }
   }
 
@@ -93,14 +93,14 @@ class adminController {
         }
         // remove duplicates
         const uniqueValues = util.getUnique(formattedData, 'monthYear');
-        return response.successResponse(res, 200, 'Earnings found ', {
+        util.setSuccessResponse(res, 'Earnings found ', 200, {
           sum: Number(sum.toFixed(2)),
           data: uniqueValues
         });
       }
       util.setErrorResponse(res, 'Data not found', 404);
     } catch (error) {
-      return response.errorResponse(res, 500, 'Something happened', error.message);
+      util.setErrorResponse(res, `Something Went wrong logging in ${error}`, 500);
     }
   }
 }

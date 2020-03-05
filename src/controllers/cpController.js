@@ -4,7 +4,6 @@ import sessionService from '../services/loginSessionServices';
 import videoService from '../services/videoServices';
 import cp from '../services/cpServices';
 import bcrypt from '../helpers/bcrypt';
-import response from '../helpers/response';
 import jwt from '../helpers/jwt';
 import cry from '../helpers/crypto';
 import mailer from '../helpers/mailer';
@@ -16,49 +15,48 @@ const util = new Util();
 // add an isVerified column to cp
 class cpController {
   static async signupCp(req, res) {
-    // try {
-    const newUser = req.body;
-    newUser.password = await bcrypt.encrypt(newUser.password);
-    newUser.isVerified = false;
-    newUser.clientId = uuid.generator();
-    const { image } = req.files;
-    const imageToUpload = await cloudinary.upload(image.tempFilePath, 'image');
-    newUser.idLink = imageToUpload.url;
-    const checkUser = await cp.getCpByMail(newUser.email);
-    if (checkUser != null) {
-      util.setErrorResponse(res, 'cp already exists', 422);
-    } else {
-      const createdUser = await cp.createNewCp(newUser);
-      const part1 = cry.crypto();
-      const token = jwt.jwtSign(`${part1}${newUser.email}`, process.env.SECRET, '1d');
-      const tokenToSave = {
-        email: newUser.email,
-        token
+    try {
+      const newUser = req.body;
+      newUser.password = await bcrypt.encrypt(newUser.password);
+      newUser.isVerified = false;
+      newUser.clientId = uuid.generator();
+      const { image } = req.files;
+      const imageToUpload = await cloudinary.upload(image.tempFilePath, 'image');
+      newUser.idLink = imageToUpload.url;
+      const checkUser = await cp.getCpByMail(newUser.email);
+      if (checkUser != null) {
+        util.setErrorResponse(res, 'cp already exists', 422);
+      } else {
+        const createdUser = await cp.createNewCp(newUser);
+        const part1 = cry.crypto();
+        const token = jwt.jwtSign(`${part1}${newUser.email}`, process.env.SECRET, '1d');
+        const tokenToSave = {
+          email: newUser.email,
+          token
 
-      };
+        };
 
-      await tokenService.createNewToken(tokenToSave, token);
-      const EmailStatus = await mailer([{
-        link: `${process.env.HOST}/auth/verify?token=${jwt.jwtSign(req.body.email, process.env.SECRET)}`
-      }, {
-        from: 'auth.cp@cinetie.com',
-        to: req.body.email,
-        subject: 'Email verification',
-      },
-      {
-        path: `${path.join(__dirname, '../public/templates/VerifyEmail.ejs')}`
+        await tokenService.createNewToken(tokenToSave, token);
+        const EmailStatus = await mailer([{
+          link: `${process.env.HOST}/auth/verify?token=${jwt.jwtSign(req.body.email, process.env.SECRET)}`
+        }, {
+          from: 'auth.cp@cinetie.com',
+          to: req.body.email,
+          subject: 'Email verification',
+        },
+        {
+          path: `${path.join(__dirname, '../public/templates/VerifyEmail.ejs')}`
+        }
+        ]);
+        if (EmailStatus) util.setErrorResponse(res, 'can\'t send email', 500);
+        const userToken = jwt.jwtSign(createdUser.email, process.env.SECRET, '1d');
+        createdUser.token = userToken;
+        delete createdUser.password;
+        util.setSuccessResponse(res, 'Signed up successfully', 201, createdUser);
       }
-      ]);
-      if (EmailStatus) util.setErrorResponse(res, error.message, 500);
-      const userToken = jwt.jwtSign(createdUser.email, process.env.SECRET, '1d');
-      createdUser.token = userToken;
-      delete createdUser.password;
-      util.setSuccessResponse(res, 'Signed up successfully', 201, createdUser);
+    } catch (error) {
+      util.setErrorResponse(res, `Something went wrong ${error.message}`, 500);
     }
-
-    // } catch (error) {
-    // 	util.setErrorResponse(res, 'Something went wrong '+error.message, 500)
-    // }
   }
 
   static async verify(req, res) {
@@ -66,7 +64,7 @@ class cpController {
       const { id } = req.query;
       const { token } = req.query;
       const user = await cp.getCpById(id);
-      if (!user) return response.errorResponse(res, 404, 'User not found ');
+      if (!user) util.setErrorResponse(res, 'can\'t find user', 404);
       jwt.jwtVerify(token, process.env.SECRET);
       const newUser = {
         isVerified: true
@@ -129,7 +127,7 @@ class cpController {
   static async forgotPassword(req, res) {
     try {
       const user = await cp.getCpByMail(req.body.email);
-      if (!user) return response.errorResponse(res, 404, `User not found! ${JSON.stringify(user)}`);
+      if (!user) util.setErrorResponse(res, 'can\'t find user', 404);
       const token = jwt.jwtSign(`${cry.crypto()}${user.firstName}`, process.env.SECRET, '1d');
       const emailTosend = {
         to: req.body.email,
@@ -139,9 +137,9 @@ class cpController {
         text: `Dear ${user.name} please follow this link to reset your password http://localhost:5000/auth/reset_password/?id=${user.id}&&token=${token}`,
       };
       await mdw.mailer(emailTosend);
-      response.successResponse(res, 200, 'Reset password link sent successfully!');
+      util.setSuccessResponse(res, 'Password reset link sent successfully', 200, user);
     } catch (error) {
-      response.errorResponse(res, 500, 'Something went wrong!', error);
+      util.setErrorResponse(res, 'Something went wrong', 500);
     }
   }
 
@@ -151,15 +149,15 @@ class cpController {
       const { id } = req.query;
       jwt.jwtVerify(token, process.env.SECRET);
       const user_ = cp.getCpById(id);
-      if (!user_) response.errorResponse(res, 404, 'User not found!', 'NotFoundError');
+      if (!user_) util.setErrorResponse(res, 'can\'t find user', 404);
       const hash = bcrypt.encrypt(req.body.password);
       const newPass = {
         password: hash
       };
       await cp.updateCp(id, newPass);
-      response.successResponse(res, 200, 'Password reset successfully!');
+      util.setSuccessResponse(res, 'Password reset  successfully', 200, null);
     } catch (error) {
-      response.errorResponse(res, 500, 'Something went wrong!', error);
+      util.setErrorResponse(res, 'Something went wrong', 500);
     }
   }
 
@@ -169,9 +167,9 @@ class cpController {
       if (!user) user = await cp.createNewCp(req.user, req.user.email);
       const token = jwt.jwtSign(user.email, process.env.SECRET, '1d');
       user.token = token;
-      response.successResponse(res, 200, 'Logged in successfully', user);
+      util.setErrorResponse(res, 'Logged in successfully', 500);
     } catch (error) {
-      response.errorResponse(res, 500, 'Something went wrong!', error.message);
+      util.setErrorResponse(res, 'Something went wrong', 500);
     }
   }
 
@@ -180,7 +178,11 @@ class cpController {
       const token = req.headers.authorization.slice(7);
       const { email } = jwt.jwtVerify(token, process.env.SECRET);
       const status = await cp.deleteCp(email);
-      status != 0 ? util.setSuccessResponse(res, 'deleted successfully', 200, status) : util.setErrorResponse(res, 'An error occured', 422);
+      if (status !== false) {
+        util.setSuccessResponse(res, 'deleted successfully', 200, status);
+      } else {
+        util.setErrorResponse(res, 'An error occured', 422);
+      }
     } catch (error) {
       util.setErrorResponse(res, `An error occured : ${error}`, 522);
     }
@@ -192,7 +194,11 @@ class cpController {
       const { email } = jwt.jwtVerify(token, process.env.SECRET);
       const newInfo = req.body;
       const updated = await cp.updateCp(email, newInfo);
-      updated != 0 ? util.setSuccessResponse(res, 'updated successfully', 200, updated) : util.setErrorResponse(res, 'An error occured', 422);
+      if (updated !== false) {
+        util.setSuccessResponse(res, 'updated successfully', 200, updated);
+      } else {
+        util.setErrorResponse(res, 'An error occured', 422);
+      }
     } catch (error) {
       util.setErrorResponse(res, error, 522);
     }
@@ -201,7 +207,7 @@ class cpController {
   static async getAllAccounts(req, res) {
     try {
       const users = await cp.getAllCps();
-      response.successResponse(res, 200, 'List of users', users);
+      util.setSuccessResponse(res, 'success', 200, users);
     } catch (error) {
       util.setErrorResponse(res, error, 503);
     }

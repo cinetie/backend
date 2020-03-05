@@ -4,7 +4,7 @@ config();
 module.exports = {
   development: {
     use_env_variable: 'DEV_DATABASE_URL',
-    dialect: 'postgres',
+    dialect: 'mysql'
   },
   production: {
     use_env_variable: 'PROD_DATABASE_URL',
