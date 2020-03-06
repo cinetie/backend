@@ -71,14 +71,19 @@ class cpController {
       };
       await tokenService.destroyToken(token);
       const updatedUser = await cp.updateCp(id, newUser);
-      const emailTosend = {
-        to: user.email,
-        from: process.env.EMAIL_USER,
-        subject: 'CINETIE email verification',
-        text: `Dear ${user.name} Your Email has been verified successfully `
-      };
-      await mdw.mailer(emailTosend);
-      delete updatedUser.password;
+      const EmailStatus = await mailer([{
+        link: `${process.env.HOST}/auth/verify?token=${jwt.jwtSign(req.body.email, process.env.SECRET)}`
+      }, {
+        from: 'auth.cp@cinetie.com',
+        to: req.body.email,
+        subject: 'Email verification',
+      },
+      {
+        path: `${path.join(__dirname, '../public/templates/VerifyEmail.ejs')}`
+      }
+      ]);
+      if (EmailStatus) util.setErrorResponse(res, 'can\'t send email', 500);
+      updatedUser.password = null;
       res.redirect('https://www.google.com');
     } catch (error) {
       util.setErrorResponse(res, `Something went wrong ${error.message}`, 500);
@@ -88,8 +93,9 @@ class cpController {
   static async loginUser(req, res) {
     try {
       const user = await cp.getCpByMail(req.body.email);
+      if (!user) util.setErrorResponse(res, 'Invalid email or password!', 400);
       const status = bcrypt.compare(req.body.password, user.password);
-      if (!status || !user) util.setErrorResponse(res, 'Invalid email or password!', 400);
+      if (!status) util.setErrorResponse(res, 'Passwords don\'t match', 400);
       if (!user.isVerified) util.setErrorResponse(res, 'Verify your account first!', 401);
       const token = jwt.jwtSign({ key: cry.crypto(), email: user.email, clientId: user.clientId }, process.env.SECRET, '1d');
       user.token = token;

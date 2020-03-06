@@ -37,7 +37,7 @@ class userController {
         const EmailStatus = await mailer([{
           link: `${process.env.HOST}/auth/verify?token=${jwt.jwtSign(req.body.email, process.env.SECRET)}`
         }, {
-          from: 'auth.user@cinetie.com',
+          from: 'CINETIE support',
           to: req.body.email,
           subject: 'Email verification',
         },
@@ -286,9 +286,7 @@ class userController {
             const momoData = await dax.momo(paymentData.momo);
             if (momoData !== 0) {
               const paymentDetails = await payment.registerNewSubscription(subscriptionData);
-              util.setSuccessResponse(res, 'Success', 204, {
-                data: momoData
-              });
+              util.setSuccessResponse(res, 'Success', 201, momoData);
             } else {
               util.setErrorResponse(res, `Sorry payment failed`, 500);
             }
@@ -301,9 +299,7 @@ class userController {
             const creditCard = await dax.creditCards(paymentData.creditCard);
             if (creditCard !== 0) {
               const paymentDetails = await payment.registerNewSubscription(subscriptionData);
-              util.setSuccessResponse(res, 'Success', 204, {
-                data: creditCard
-              });
+              util.setSuccessResponse(res, 'Success', 201, creditCard);
             } else {
               util.setErrorResponse(res, `Sorry payment failed`, 500);
             }
@@ -313,7 +309,7 @@ class userController {
         }
       } else {
         const status = await userService.updateUser(email, newInfo);
-        util.setSuccessResponse(res, 'Updated successfully', 204, status);
+        util.setSuccessResponse(res, 'Updated successfully', 201, null);
       }
     } catch (error) {
       return response.errorResponse(res, 500, `Something wrong happened ${error.message}`, error);

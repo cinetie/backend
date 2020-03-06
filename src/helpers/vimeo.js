@@ -22,7 +22,6 @@ class vimeo {
       });
       const videoDataJson = await videoData.json();
       if (videoDataJson) {
-        console.log(JSON.stringify(videoDataJson));
         return videoDataJson.uri;
       }
     } catch (error) {
