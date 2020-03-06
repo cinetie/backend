@@ -6,8 +6,6 @@ class validator {
   static plan(req, res, next) {
     const schema = joi.object().keys({
       type: joi.string().min(3).required(),
-      hasHd: joi.boolean().required(),
-      hasUltraHd: joi.boolean().required(),
       numberOfScreens: joi.number().min(1).required(),
       monthlyPrice: joi.number().required(),
       yearlyPrice: joi.number().required()
