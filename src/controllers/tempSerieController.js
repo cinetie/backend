@@ -25,7 +25,7 @@ class tempSerieController {
         if (!tempVideo || !newserie) {
           util.setErrorResponse(res, 'Can\'t upload tv serie', 422);
         } else {
-          util.setSuccessResponse(res, 'Successfully uploaded', 201, newserie);
+          util.setSuccessResponse(res, 'Successfully uploaded', 201, tempVideo);
         }
       });
     } catch (error) {
@@ -43,8 +43,9 @@ class tempSerieController {
 
           if (video) {
             episodes[i].videoId = video.videoName;
+            episodes[i].videoClientId = video.videoClientId;
           } else {
-            episodes[i].videoId = 'default';
+            episodes[i].videoName = 'default';
           }
           episodes[i].uri = decoded.uri;
         }
