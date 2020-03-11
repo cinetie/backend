@@ -344,7 +344,7 @@ class userController {
     }
   }
 
-  static async getLiveUsers(res) {
+  static async getLiveUsers(req, res) {
     try {
       const data = await sessionService.getLiveSessions();
       (data) ? util.setSuccessResponse(res, 'Found ', 200, {

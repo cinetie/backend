@@ -16,7 +16,7 @@ class paymentHandler {
         cvv: details.card.crCVC,
         expirymonth: details.card.expMonth,
         expiryyear: details.card.expYear,
-        currency: 'USD',
+        currency: 'RWF',
         country: 'RW',
         amount: details.transaction.amount.toString(),
         email: details.user.email,

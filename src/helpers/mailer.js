@@ -16,6 +16,7 @@ const mailer = async (emailToSend) => {
         pass: process.env.SENDGRID_PASS
       }
     });
+    console.log(process.env.SMTP_HOST, process.env.SMTP_PORT, process.env.SENDGRID_USER, process.env.SENDGRID_PASS);
     const { path } = emailToSend[2];
     ejs.renderFile(path, emailToSend[0], (error, data) => {
       if (error) {
