@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 /* eslint-disable no-useless-catch */
 import sequelize from 'sequelize';
 import database from '../database/models';
@@ -37,7 +38,8 @@ class videoService {
             creationTime: {
               [op.gte]: date.removeDays(60)
             },
-            type
+            type,
+            videoSuspensionState: "0"
           }]
 
         }
@@ -64,7 +66,8 @@ class videoService {
             creationTime: {
               [op.gte]: date.removeDays(180)
             },
-            type
+            type,
+            videoSuspensionState: "0"
           }]
         }
       });
@@ -124,7 +127,8 @@ class videoService {
             videoWatchCount: {
               [op.gte]: process.env.TRENDING_WATCH_COUNT
             },
-            type
+            type,
+            videoSuspensionState: "0"
           }]
         }
       });
@@ -235,6 +239,7 @@ class videoService {
               isFeatured: true,
               type,
               featureType: 1,
+              videoSuspensionState: "0"
             }
           ]
         }
@@ -264,6 +269,7 @@ class videoService {
               isFeatured: true,
               type,
               featureType: 2,
+              videoSuspensionState: "0"
             }
           ]
         }
