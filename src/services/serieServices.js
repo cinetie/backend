@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import sequelize from 'sequelize';
 import database from '../database/models';
 
@@ -26,7 +27,8 @@ class serieServices {
       where: {
         [op.and]: [
           { videoId },
-          { season }
+          { season },
+          { suspensionState: false }
         ]
       }
     });
