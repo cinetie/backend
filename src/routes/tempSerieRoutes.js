@@ -5,6 +5,6 @@ import access from '../middlewares/access';
 const router = new Router();
 
 router.post('/new', access.isProducer, controller.createSerie);
-router.get('/all', access.isProducer, controller.getAllSeries);
+router.get('/all', access.isAdmin, controller.getAllSeries);
 
 export default router;

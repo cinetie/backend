@@ -51,8 +51,11 @@ class serieController {
   static async getSingleSeason(req, res) {
     try {
       const season = await services.getSingleSeason(req.query.videoId, req.query.s);
-      if (!season) util.setErrorResponse(res, `Can't find what you requested`, 400);
-      util.setSuccessResponse(res, 'Retrieved successfully', 200, season);
+      if (!season) {
+        util.setErrorResponse(res, `Can't find what you requested`, 400);
+      } else {
+        util.setSuccessResponse(res, 'Retrieved successfully', 200, season);
+      }
     } catch (error) {
       util.setErrorResponse(res, `Something happened ${error.message}`, 500);
     }

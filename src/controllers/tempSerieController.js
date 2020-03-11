@@ -17,18 +17,15 @@ class tempSerieController {
         overwrite: true,
         resource_type: 'video'
       }, async (err, result) => {
-        console.log(result.url);
         data.size *= 1e+6;
-        console.log(JSON.stringify(thumb.url));
         data.thumbNailUrl = thumb.url;
-        console.log(JSON.stringify(data));
         const newserie = await series.createNewEpisode(data);
         data.uri = jwt.jwtSign({ uri: result.url, id: newserie.id }, process.env.SECRET);
         const tempVideo = await services.createNewSeries(data);
         if (!tempVideo || !newserie) {
           util.setErrorResponse(res, 'Can\'t upload tv serie', 422);
         } else {
-          util.setSuccessResponse(res, 'Successfully uploaded', 201, { temp: tempVideo, new: newserie });
+          util.setSuccessResponse(res, 'Successfully uploaded', 201, newserie);
         }
       });
     } catch (error) {
