@@ -11,21 +11,21 @@ const addMoreDays = (days) => {
 // 0 :false 1: true
 const isEndOfMonth = () => {
   const now = new Date();
-  if (now.getDate() === 3) {
+  if (now.getDate() === 11) {
     const tommorow = new Date(now.valueOf());
     tommorow.setDate(tommorow.getDate() + 1);
     if (tommorow.getDate() === 31) {
       return 0;
     }
     return 1;
-  } if (now.getDate() == 31) {
+  } if (now.getDate() === 31) {
     return 1;
   }
   return 0;
 };
 const isEndOfyear = () => {
   const now = new Date();
-  if (now.getMonth() == 12 && now.getDate() == 31) {
+  if (now.getMonth() === 12 && now.getDate() === 31) {
     return 1;
   }
   return 0;
