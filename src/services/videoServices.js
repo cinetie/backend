@@ -53,6 +53,25 @@ class videoService {
     }
   }
 
+  static async getVideosByType(clientId, type) {
+    try {
+      const videos = await database.videos.findAll({
+        where: {
+          [op.and]: [{
+            type,
+            videoClientId: clientId
+          }]
+        }
+      });
+      if (videos) {
+        return videos;
+      }
+      return null;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static async getTrendingVideos(offsetValue, limit, type) {
     try {
       const videos = await database.videos.findAll({
@@ -88,9 +107,16 @@ class videoService {
         ],
         limit: 20,
         where: {
-          [op.or]: [
-            { videoName: { [op.iLike]: `%${query}%` } },
-            { category: { [op.iLike]: `%${query}%` } }
+          [op.or]: [{
+            videoName: {
+              [op.iLike]: `%${query}%`
+            }
+          },
+          {
+            category: {
+              [op.iLike]: `%${query}%`
+            }
+          }
           ]
         }
       });
@@ -106,7 +132,9 @@ class videoService {
   static async incrementWatchCountService(videoId) {
     try {
       const data = await database.videos.increment('videoWatchCount', {
-        where: { videoId }
+        where: {
+          videoId
+        }
       });
       if (data) {
         return data;
@@ -196,7 +224,9 @@ class videoService {
         attributes: {
           exclude: ['videoLink', 'createdAt', 'updatedAt', 'videoCast', 'videoSynopsis', 'nameTagThumbNailLink', 'isFeatured', 'tallThumbNailLink', 'videoIdVimeo', 'videoClientId', 'featureType', 'category']
         },
-        where: { videoClientId },
+        where: {
+          videoClientId
+        },
         order: [
           ['id', 'DESC']
         ]
@@ -264,14 +294,12 @@ class videoService {
           exclude: ['videoLink', 'creationTime', 'videoWatchCount', 'videoSuspensionState', 'createdAt', 'updatedAt', 'isFeatured', 'tallThumbNailLink', 'videoIdVimeo', 'videoClientId', 'featureType', ]
         },
         where: {
-          [op.and]: [
-            {
-              isFeatured: true,
-              type,
-              featureType: 2,
-              videoSuspensionState: "0"
-            }
-          ]
+          [op.and]: [{
+            isFeatured: true,
+            type,
+            featureType: 2,
+            videoSuspensionState: "0"
+          }]
         }
       });
       if (videos) {

@@ -223,6 +223,22 @@ class videoController {
     }
   }
 
+  static async getAllVideosByType(req, res) {
+    try {
+      const token = req.headers.authorization.slice(7);
+      const { type } = req.query;
+      const { clientId } = jwt.jwtVerify(token, process.env.SECRET);
+      const videos = await videoService.getVideosByType(clientId, type);
+      if (Object.values(videos).length > 0) {
+        util.setSuccessResponse(res, 'Videos Found', 200, videos);
+      } else {
+        util.setErrorResponse(res, 'videos can\'t be found', 404);
+      }
+    } catch (error) {
+      util.setErrorResponse(res, `something went wrong ${error.message}`, 503);
+    }
+  }
+
   static async getVideoById(req, res) {
     try {
       const video = await videoService.getVideoById(req.query.id);
