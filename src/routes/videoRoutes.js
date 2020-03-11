@@ -15,6 +15,7 @@ router.get('/sort/category', access.isNormalUser, video.getVideosByCategory);
 router.get('/sort/trend', access.isNormalUser, video.getVideosByTrend);
 router.get('/search', access.isNormalUser, video.search);
 router.get('/unique', access.isNormalUser, session.createNewWatchCount, video.getVideoById);
+router.get('/cp/unique', access.isProducer, video.getVideoById);
 router.get('/arrivals', access.isNormalUser, video.getAllNewVideos);
 router.get('/earnings', earnings.getAllEarningsPerVideo);
 router.get('/main/ft', access.isNormalUser, video.getMainFeaturedFilm);
