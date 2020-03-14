@@ -23,6 +23,7 @@ class serieController {
       // get url after a successful upload to vimeo
       const url = await vimeo.viemoUpload(data);
       // patch serie object to fit suspensionSate and video url
+      console.log(url);
       const createdSerie = await services.update(decoded.id, {
         suspensionState: false,
         episode: url
