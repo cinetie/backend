@@ -6,7 +6,8 @@ module.exports = (sequelize, DataTypes) => {
     episodeName: DataTypes.STRING,
     videoId: DataTypes.STRING,
     thumbNailUrl: DataTypes.STRING,
-    suspensionState: DataTypes.BOOLEAN
+    suspensionState: DataTypes.BOOLEAN,
+    synopsis: DataTypes.TEXT
   }, {});
   series.associate = function (models) {
     // associations can be defined here

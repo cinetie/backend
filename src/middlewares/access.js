@@ -7,7 +7,8 @@ const util = new Util();
 class Access {
   // 0 normal user ( view own account and profiles,watch movies)
   // 1 producer user ( view views of each of their videos,upload videos in test area)
-  // 2 admin user ( manage all profiles,manage all accounts,metrics on each video,approve n reject videos,view sales metrics,manage plans )
+  // 2 admin user ( manage all profiles,manage all accounts,metrics on each video,
+  // approve n reject videos,view sales metrics,manage plans )
 
 
   // level 2 permission checkpoint

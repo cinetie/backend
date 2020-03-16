@@ -1,13 +1,9 @@
 'use strict';
 module.exports = {
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.addColumn('series', 'synopsis',{
-      type: Sequelize.TEXT,
-      allowNull: true
-    });
-  },
+  up: (queryInterface, Sequelize) => queryInterface.addColumn('series', 'synopsis', {
+    type: Sequelize.TEXT,
+    allowNull: true
+  }),
 
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.removeColumn('series', 'synopsis');
-  }
+  down: (queryInterface, Sequelize) => queryInterface.removeColumn('series', 'synopsis')
 };
