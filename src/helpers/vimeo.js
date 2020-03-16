@@ -22,7 +22,7 @@ class vimeo {
       });
       const videoDataJson = await videoData.json();
       if (videoDataJson) {
-        return videoDataJson.uri;
+        return videoDataJson.uri.slice(8);
       }
     } catch (error) {
       throw error;
