@@ -2,10 +2,7 @@
 import { v2 as cloudinary } from 'cloudinary';
 import Util from '../helpers/utilities';
 import trailerServices from '../services/trailerService';
-// import googleCloud from '../helpers/google.cloud.normal'
-// import aws from '../helpers/aws'
-// import multer from 'multer'
-// const upload = multer({dest: '../../uploads'})
+
 const util = new Util();
 
 class trailerController {
@@ -22,16 +19,6 @@ class trailerController {
         if (!uploadedTrailer) util.setErrorResponse(res, 'An error occured during file upload', 422);
         util.setSuccessResponse(res, 'successfully saved the trailer', 201, uploadedTrailer);
       });
-      // await googleCloud.uploadToGoogleCloud('cinetie', file)
-      // 	.then(async(uri) => {
-      // 		if(!uri) util.setErrorResponse(res,'An error occured updating the trailer trailer',422)
-      // 		data.trailerLink = uri
-      // 		const uploadedTrailer = await trailerServices.createNewTrailers(data)
-      // 		if(!uploadedTrailer) util.setErrorResponse(res,'An error occured saving the trailer',422)
-      // 		util.setSuccessResponse(res,'successfully saved the trailer',201,uploadedTrailer)
-      // 	})
-
-      // await aws.uploadSingleFile()
     } catch (error) {
       util.setErrorResponse(res, `Something wrong happened${error.message}`, 500);
     }
@@ -41,8 +28,11 @@ class trailerController {
     try {
       const { id } = req.query;
       const trailer = await trailerServices.getAllTrailers(id);
-      if (!trailer) util.setErrorResponse(res, 'An error occured getting desired trailer', 404);
-      util.setSuccessResponse(res, 'Found', 200, trailer);
+      if (Object.values(trailer).length > 0) {
+        util.setSuccessResponse(res, 'Found', 200, trailer);
+      } else {
+        util.setErrorResponse(res, 'No trailers found', 404);
+      }
     } catch (error) {
       util.setErrorResponse(res, `Something wrong happened${error.message}`, 500);
     }
