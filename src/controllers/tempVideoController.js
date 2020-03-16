@@ -3,7 +3,7 @@ import helpers from '../helpers/utilities';
 import services from '../services/tempVideoServices';
 import uuid from '../helpers/uuid';
 import jwt from '../helpers/jwt';
-import cloduinaryHelper from '../helpers/cloudinary';
+import cloudinaryHelper from '../helpers/cloudinary';
 // import google from '../helpers/google.cloud.normal'
 import videoService from '../services/videoServices';
 import cpService from '../services/cpServices';
@@ -18,9 +18,9 @@ class tempVideoController {
       const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const data = req.body;
       // register thumbnails
-      const smallThumbnail = await cloduinaryHelper.upload(req.files.small.tempFilePath, 'image');
-      const nameTagThumbNail = await cloduinaryHelper.upload(req.files.nameTag.tempFilePath, 'image');
-      const tallThumbNail = await cloduinaryHelper.upload(req.files.tall.tempFilePath, 'image');
+      const smallThumbnail = await cloudinaryHelper.upload(req.files.small.tempFilePath, 'image');
+      const nameTagThumbNail = await cloudinaryHelper.upload(req.files.nameTag.tempFilePath, 'image');
+      const tallThumbNail = await cloudinaryHelper.upload(req.files.tall.tempFilePath, 'image');
       data.tallThumbNailLink = tallThumbNail.url;
       data.nameTagThumbNailLink = nameTagThumbNail.url;
       data.videoThumbnailLink = smallThumbnail.url;
@@ -36,7 +36,7 @@ class tempVideoController {
         overwrite: true
       }, async (err, result) => {
         // upload video to temp server i.e cloudinary
-        console.log(result.url);
+        console.log(JSON.stringify(result));
         // hash video url
         const size = data.size * 1e+6;
         data.videoUri = jwt.jwtSign({

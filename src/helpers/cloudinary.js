@@ -20,20 +20,12 @@ const upload = async (file, type) => {
   });
   return uploadedFile;
 };
-const uploadCustom = async (file, width, height, cropType) => {
-  const modifiedFile = cloudinary.url(file, {
-    aspect_ratio: "4:3",
-    crop: 'scale'
+
+// eslint-disable-next-line camelcase
+const destroy = async (publicId, resource_type) => {
+  await cloudinary.uploader.destroy(publicId, { resource_type }, (err, result) => {
+    if (err) throw err;
   });
-  const originalFile = await upload(file, 'image');
-  return { modifiedFile, originalFile };
+  return true;
 };
-const videoUpload = (file) => {
-  let newFile = '';
-  cloudinary.uploader.upload(file,
-    { resource_type: "video" },
-    (error, result) => { newFile = result; });
-  console.log(JSON.stringify(newFile));
-  return newFile;
-};
-export default { upload, uploadCustom, videoUpload };
+export default { upload, destroy };
