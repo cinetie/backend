@@ -4,6 +4,7 @@ import Util from '../helpers/utilities';
 import temp from '../services/tempSerieService';
 import jwt from '../helpers/jwt';
 import vimeo from '../helpers/vimeo';
+import cloudinary from '../helpers/cloudinary';
 
 const util = new Util();
 
@@ -23,13 +24,15 @@ class serieController {
       // get url after a successful upload to vimeo
       const url = await vimeo.viemoUpload(data);
       // patch serie object to fit suspensionSate and video url
-      console.log(url);
       const createdSerie = await services.update(decoded.id, {
         suspensionState: false,
         episode: url
       });
       const deleted = await temp.deleteSeries(id);
-      if (createdSerie && deleted) {
+      const publicId = data.videoUrl.slice(59);
+      console.log(data.videoUrl);
+      const deletionStatusCloudinary = await cloudinary.destroy(publicId.split(".")[0], 'video');
+      if (createdSerie && deleted && deletionStatusCloudinary) {
         util.setErrorResponse(res, 'Created successfully', 201);
       } else {
         util.setErrorResponse(res, 'Can\'t upload', 400);

@@ -10,6 +10,7 @@ import jwt from '../helpers/jwt';
 import vimeoHelper from '../helpers/vimeo';
 import trailerServices from '../services/trailerService';
 import tempService from '../services/tempVideoServices';
+import cloudinary from '../helpers/cloudinary';
 
 const util = new Util();
 // const Vimeo = require('vimeo').Vimeo
@@ -27,12 +28,14 @@ class videoController {
       if (!uri) {
         util.setErrorResponse(res, 'something went wrong while uploading', 503);
       } else {
-        // console.log(uri);
+        console.log(data.videoUrl);
         data.videoLink = uri;
         data.videoIdVimeo = uri.slice(8);
         const newVideo = await videoService.updateVideo(decoded.videoId, data);
         const deleted = await tempService.deleteVideos(req.query.id);
-        if (!newVideo || !deleted) {
+        const publicId = data.videoUrl.slice(59);
+        const cloudinaryDeletionStatus = await cloudinary.destroy(publicId.split(".")[0], 'video');
+        if (!newVideo || !deleted || !cloudinaryDeletionStatus) {
           util.setErrorResponse(res, 'something went wrong while uploading', 503);
         } else {
           util.setSuccessResponse(res, 'Video uploaded', 201, newVideo);
