@@ -16,7 +16,8 @@ module.exports = (sequelize, DataTypes) => {
     featureType: DataTypes.INTEGER,
     isFeatured: DataTypes.BOOLEAN,
     tallThumbNailLink: DataTypes.STRING,
-    nameTagThumbNailLink: DataTypes.STRING
+    nameTagThumbNailLink: DataTypes.STRING,
+    type: DataTypes.STRING
   }, {});
   // eslint-disable-next-line no-unused-vars
   videos.associate = function (models) {
