@@ -17,28 +17,37 @@ const util = new Util();
 class videoController {
   static async addVideo(req, res) {
     try {
-      const tempVideo = await tempService.getParticularVideo(req.query.id);
+      const tempVideo = await tempService.getParticularVideo(Number(req.query.id));
       const decoded = jwt.jwtVerify(tempVideo.videoUri, process.env.SECRET);
       const data = decoded;
-      data.videoUrl = decoded.videoUri;
-      data.videoClientId = decoded.clientId;
-      data.videoSuspensionState = false;
-      data.size = decoded.size;
-      const uri = await vimeoHelper.viemoUpload(data);
-      if (!uri) {
-        util.setErrorResponse(res, 'something went wrong while uploading', 503);
-      } else {
-        console.log(data.videoUrl);
-        data.videoLink = uri;
-        data.videoIdVimeo = uri.slice(8);
-        const newVideo = await videoService.updateVideo(decoded.videoId, data);
-        const deleted = await tempService.deleteVideos(req.query.id);
-        const publicId = data.videoUrl.slice(59);
-        const cloudinaryDeletionStatus = await cloudinary.destroy(publicId.split(".")[0], 'video');
-        if (!newVideo || !deleted || !cloudinaryDeletionStatus) {
+      if (data.type === 'movie') {
+        data.videoUrl = decoded.videoUri;
+        data.videoClientId = decoded.clientId;
+        data.videoSuspensionState = false;
+        data.size = decoded.size;
+        const uri = await vimeoHelper.viemoUpload(data);
+        if (!uri) {
           util.setErrorResponse(res, 'something went wrong while uploading', 503);
         } else {
-          util.setSuccessResponse(res, 'Video uploaded', 201, newVideo);
+          data.videoLink = uri;
+          data.videoIdVimeo = uri.slice(8);
+          const updatedVideo = await videoService.updateVideo(decoded.videoId, data);
+          const deleted = await tempService.deleteVideos(req.query.id);
+          const publicId = data.videoUrl.slice(59);
+          const cloudinaryDeletionStatus = await cloudinary.destroy(publicId.split(".")[0], 'video');
+          if (!updatedVideo || !deleted || !cloudinaryDeletionStatus) {
+            util.setErrorResponse(res, 'something went wrong while uploading', 503);
+          } else {
+            util.setSuccessResponse(res, 'Video uploaded', 201, updatedVideo);
+          }
+        }
+      } else {
+        const deleted = await tempService.deleteVideos(req.query.id);
+        const updatedVideo = await videoService.updateVideo(decoded.videoId, { videoSuspensionState: false, videoClientId: decoded.clientId });
+        if (!updatedVideo || !deleted) {
+          util.setErrorResponse(res, 'Something went wrong approving video', 503);
+        } else {
+          util.setSuccessResponse(res, 'Video approved', 201, updatedVideo);
         }
       }
     } catch (error) {

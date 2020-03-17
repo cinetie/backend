@@ -31,25 +31,37 @@ class tempVideoController {
       // generate video parameters
       data.creationTime = new Date().getTime();
       data.videoId = uuid.generator();
-      const file = req.files.video;
-      cloudinary.uploader.upload(file.tempFilePath, {
-        resource_type: 'video',
-        overwrite: true
-      }, async (err, result) => {
-        // upload video to temp server i.e cloudinary
-        // hash video url
-        const size = data.size * 1e+6;
+      data.clientId = decoded.clientId;
+      data.type = req.body.type;
+      if (data.type === 'movie') {
+        const file = req.files.video;
+        cloudinary.uploader.upload(file.tempFilePath, {
+          resource_type: 'video',
+          overwrite: true
+        }, async (err, result) => {
+          // upload video to temp server i.e cloudinary
+          // hash video url
+          const size = data.size * 1e+6;
+          data.videoUri = jwt.jwtSign({
+            videoUri: result.url, size, clientId: decoded.clientId, videoId: data.videoId, type: 'movie'
+          }, process.env.SECRET);
+          // register to both temp server and real server
+          data.videoUrl = data.videoUri;
+          const uploadedVideo = await services.createNewVideos(data);
+          const newVideo = await videoService.createNewVideo(data);
+          if (!uploadedVideo && newVideo) util.setErrorResponse(res, 'Video can\'t be saved', 401);
+          util.setSuccessResponse(res, 'video uploaded successfully', 201, { status: 'upload success' });
+        });
+      } else {
+        // set to serie since this video represents an entire serie
         data.videoUri = jwt.jwtSign({
-          videoUri: result.url, size, clientId: decoded.clientId, videoId: data.videoId
+          videoUri: null, type: 'serie', videoId: data.videoId, clientId: decoded.clientId
         }, process.env.SECRET);
-        // register to both temp server and real server
-        data.videoUrl = data.videoUri;
-        data.clientId = decoded.clientId;
         const uploadedVideo = await services.createNewVideos(data);
         const newVideo = await videoService.createNewVideo(data);
-        if (!uploadedVideo && newVideo) util.setErrorResponse(res, 'Video can\'t be saved', 401);
+        if ((newVideo && uploadedVideo) === (null || undefined)) util.setErrorResponse(res, 'Video can\'t be saved', 401);
         util.setSuccessResponse(res, 'video uploaded successfully', 201, { status: 'upload success' });
-      });
+      }
     } catch (error) {
       util.setErrorResponse(res, `something happened ${error.message}`, 503);
     }
