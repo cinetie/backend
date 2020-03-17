@@ -220,8 +220,9 @@ class cpController {
   }
 
   static async getAllVideosLocal(req, res) {
+    const { type } = req.query;
     const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
-    const videos = await videoService.getAllVideos(decoded.clientId);
+    const videos = await videoService.getAllVideos(decoded.clientId, type);
     if (videos) {
       util.setSuccessResponse(res, 'Data found', 200, videos);
     } else {

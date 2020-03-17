@@ -7,7 +7,7 @@ const router = new Router();
 router.post('/create', access.isAdmin, controller.create);
 router.get('/ep', access.isNormalUser, controller.getSingleEpisode);
 router.get('/single/season', access.isNormalUser, controller.getSingleSeason);
-router.get('/all/seasons', access.isNormalUser, controller.getAllSeasons);
+router.get('/all/seasons', access.isLoggedIn, controller.getAllSeasons);
 router.put('/update', access.isProducer, controller.updateSerie);
 router.delete('/delete', access.isAdmin, controller.delete);
 

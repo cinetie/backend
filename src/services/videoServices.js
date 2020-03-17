@@ -236,6 +236,27 @@ class videoService {
     }
   }
 
+  static async getAllVideosByType(videoClientId, type) {
+    try {
+      return await database.videos.findAll({
+        attributes: {
+          exclude: ['videoLink', 'createdAt', 'updatedAt', 'videoCast', 'videoSynopsis', 'nameTagThumbNailLink', 'isFeatured', 'tallThumbNailLink', 'videoIdVimeo', 'videoClientId', 'featureType', 'category']
+        },
+        where: {
+          [op.and]: [
+            { videoClientId },
+            { type }
+          ]
+        },
+        order: [
+          ['id', 'DESC']
+        ]
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static async getAllVideosForAdmin() {
     try {
       return await database.videos.findAll({
