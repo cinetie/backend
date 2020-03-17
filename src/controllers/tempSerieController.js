@@ -14,6 +14,8 @@ class tempSerieController {
   static async createSerie(req, res) {
     try {
       const data = req.body;
+      const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
+      data.clientId = decoded.clientId;
       const thumb = await cloudinaryHelper.upload(req.files.thumb.tempFilePath, 'image');
       cloudinary.uploader.upload(req.files.video.tempFilePath, {
         overwrite: true,
@@ -21,6 +23,7 @@ class tempSerieController {
       }, async (err, result) => {
         data.size *= 1e+6;
         data.thumbNailUrl = thumb.url;
+        console.log(JSON.stringify(data));
         const newserie = await series.createNewEpisode(data);
         data.uri = jwt.jwtSign({ uri: result.url, id: newserie.id }, process.env.SECRET);
         const tempVideo = await services.createNewSeries(data);

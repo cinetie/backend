@@ -30,7 +30,6 @@ class serieController {
       });
       const deleted = await temp.deleteSeries(id);
       const publicId = data.videoUrl.slice(59);
-      console.log(data.videoUrl);
       const deletionStatusCloudinary = await cloudinary.destroy(publicId.split(".")[0], 'video');
       if (createdSerie && deleted && deletionStatusCloudinary) {
         util.setErrorResponse(res, 'Created successfully', 201);
@@ -44,7 +43,7 @@ class serieController {
 
   static async getSingleEpisode(req, res) {
     try {
-      const episode = await services.getSingleEpisode(req.query.id);
+      const episode = await services.getSingleEpisode(req.query.ep);
       if (!episode) util.setErrorResponse(res, `Can't find what you requested`, 400);
       util.setSuccessResponse(res, 'Retrieved successfully', 200, episode);
     } catch (error) {
