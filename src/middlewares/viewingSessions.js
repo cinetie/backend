@@ -13,7 +13,8 @@ class viewingSession {
       const videoId = id;
       const videoData = await videoService.getVideoById(videoId);
       const token = req.headers.authorization.slice(7);
-      if (!ip || !videoId || videoData === null) return response.errorResponse(res, 400, 'Something went wrong', 'missingParameterError');
+      if (!ip || !videoId === null) return response.errorResponse(res, 400, 'Something went wrong', 'missingParameterError');
+      if (!videoData) return response.errorResponse(res, 404, 'Can\'t find the video you\'re looking for', 'NotFoundError');
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
       const data = req.body;
       data.sessionState = 'Active';
@@ -21,7 +22,6 @@ class viewingSession {
       data.time = new Date().getTime();
       const locationServiceData = await fetch(`http://api.ipstack.com/${ip}?access_key=${process.env.IP_STACK_ACCESS_TOKEN}`);
       const JsonlocationData = await locationServiceData.json();
-      console.log(JSON.stringify(JsonlocationData));
       // check if there is an exact session before same like the provided one
       const sessions = await viewingSessions.getSesssionPerVideoUser(decoded.email, videoId);
       if (Object.values(sessions).length >= 1) {
