@@ -1,3 +1,5 @@
+/* eslint-disable no-plusplus */
+/* eslint-disable no-await-in-loop */
 import { v2 as cloudinary } from 'cloudinary';
 import helpers from '../helpers/utilities';
 import services from '../services/tempVideoServices';
@@ -30,13 +32,11 @@ class tempVideoController {
       data.creationTime = new Date().getTime();
       data.videoId = uuid.generator();
       const file = req.files.video;
-      console.log('On upload');
       cloudinary.uploader.upload(file.tempFilePath, {
         resource_type: 'video',
         overwrite: true
       }, async (err, result) => {
         // upload video to temp server i.e cloudinary
-        console.log(JSON.stringify(result));
         // hash video url
         const size = data.size * 1e+6;
         data.videoUri = jwt.jwtSign({
@@ -45,7 +45,6 @@ class tempVideoController {
         // register to both temp server and real server
         data.videoUrl = data.videoUri;
         data.clientId = decoded.clientId;
-        console.log('On finish upload');
         const uploadedVideo = await services.createNewVideos(data);
         const newVideo = await videoService.createNewVideo(data);
         if (!uploadedVideo && newVideo) util.setErrorResponse(res, 'Video can\'t be saved', 401);
@@ -60,7 +59,6 @@ class tempVideoController {
     try {
       const videos = await services.getAllVideos();
       for (let i = 0; i < Object.values(videos).length; i++) {
-        console.log(videos[i].clientId);
         const cp = await cpService.getCpByClientId(videos[i].clientId);
         if (cp) {
           videos[i].clientId = cp.name;
@@ -70,7 +68,7 @@ class tempVideoController {
         const decoded = jwt.jwtVerify(videos[i].videoUri, process.env.SECRET);
         videos[i].videoUri = decoded.videoUri;
       }
-      if (videos) {
+      if (Object.values(videos).length > 0) {
         util.setSuccessResponse(res, 'Videos found', 200, videos);
       } else {
         util.setErrorResponse(res, 'No videos available', 401);

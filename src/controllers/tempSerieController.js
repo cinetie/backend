@@ -1,3 +1,5 @@
+/* eslint-disable no-plusplus */
+/* eslint-disable no-await-in-loop */
 import { v2 as cloudinary } from 'cloudinary';
 import helpers from '../helpers/utilities';
 import services from '../services/tempSerieService';
@@ -36,12 +38,12 @@ class tempSerieController {
   static async getAllSeries(req, res) {
     try {
       const episodes = await services.getAllSeries();
-      if (episodes) {
+      if (Object.values(episodes).length > 0) {
         for (let i = 0; i < Object.values(episodes).length; i++) {
           const video = await videoServices.getVideoById(episodes[i].videoId);
           const decoded = jwt.jwtVerify(episodes[i].uri, process.env.SECRET);
 
-          if (video) {
+          if (video !== (null || undefined)) {
             episodes[i].videoId = video.videoName;
             episodes[i].videoClientId = video.videoClientId;
           } else {
