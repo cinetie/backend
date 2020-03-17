@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import controller from '../controllers/seriesController';
 import access from '../middlewares/access';
+import viewingSession from '../middlewares/viewingSessions';
 
 const router = new Router();
 
 router.post('/create', access.isAdmin, controller.create);
-router.get('/ep', access.isNormalUser, controller.getSingleEpisode);
+router.get('/ep', access.isNormalUser, viewingSession.createNewWatchCount, controller.getSingleEpisode);
 router.get('/single/season', access.isNormalUser, controller.getSingleSeason);
 router.get('/all/seasons', access.isLoggedIn, controller.getAllSeasons);
 router.put('/update', access.isProducer, controller.updateSerie);
