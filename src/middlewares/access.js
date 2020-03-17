@@ -18,7 +18,11 @@ class Access {
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
       const { user } = decoded;
       if (!user) util.setErrorResponse(res, 'Invalid access token', 400);
-      (user != process.env.ADMIN_USER) ? util.setErrorResponse(res, 'Access denied  ', 403) : next();
+      if (user !== process.env.ADMIN_USER) {
+        util.setErrorResponse(res, 'Access denied  ', 403);
+      } else {
+        next();
+      }
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
     }
@@ -31,7 +35,11 @@ class Access {
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
       const { email } = decoded;
       const user = await cpService.getCpByMail(email);
-      (!user) ? util.setErrorResponse(res, 'Access denied', 403) : next();
+      if (!user) {
+        util.setErrorResponse(res, 'Access denied', 403)
+      } else {
+        next();
+      }
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
     }
@@ -44,7 +52,26 @@ class Access {
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
       const { email } = decoded;
       const user = await userService.getUserByMail(email);
-      (user.permissionLevel == 0) ? util.setErrorResponse(res, 'Access denied ', 403) : next();
+      if (user.permissionLevel === 0) {
+        util.setErrorResponse(res, 'Access denied ', 403);
+      } else {
+        next();
+      }
+    } catch (error) {
+      util.setErrorResponse(res, error.message, 500);
+    }
+  }
+
+  static async isLoggedIn(req, res, next) {
+    try {
+      const token = req.headers.authorization.slice(7);
+      const decoded = jwt.jwtVerify(token, process.env.SECRET);
+      const { email } = decoded;
+      if (email) {
+        next();
+      } else {
+        util.setErrorResponse(res, 'Access denied', 403);
+      }
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
     }
