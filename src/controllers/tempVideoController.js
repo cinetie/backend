@@ -83,7 +83,7 @@ class tempVideoController {
       if (Object.values(videos).length > 0) {
         util.setSuccessResponse(res, 'Videos found', 200, videos);
       } else {
-        util.setErrorResponse(res, 'No videos available', 401);
+        util.setErrorResponse(res, 'No videos available', 404);
       }
     } catch (error) {
       util.setErrorResponse(res, `something happened ${error.message}`, 503);
