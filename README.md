@@ -1,7 +1,7 @@
 # cinetie-backend
 
 ### Usage
-
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/24e459cbb0c71cc6aae5#?env%5Bcinetie%5D=W3sia2V5IjoibG9jYWwiLCJ2YWx1ZSI6IjEyNy4wLjAuMTo1MDAwIiwiZW5hYmxlZCI6dHJ1ZX0seyJrZXkiOiJzdGFnaW5nIiwidmFsdWUiOiJodHRwczovL2NpbmV0aWUuaGVyb2t1YXBwLmNvbSIsImVuYWJsZWQiOnRydWV9XQ==)
 #### Dependencies
 
 First pull the code and navigate to the root `DIR` and run `npm install`
