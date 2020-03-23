@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import controller from '../controllers/earningControlller';
-import adminController from '../controllers/adminController';
-import sales from '../controllers/salesController';
+import controller from '../controllers/earning';
+import adminController from '../controllers/admin';
+import sales from '../controllers/sales';
 import access from '../middlewares/access';
 
 const router = new Router();

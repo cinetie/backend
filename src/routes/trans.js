@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import controller from '../controllers/transationsController';
+import controller from '../controllers/transations';
 
 const route = new Router();
 route.post('/new', controller.createNewTrans);

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import controller from '../controllers/seriesController';
+import controller from '../controllers/series';
 import access from '../middlewares/access';
 import viewingSession from '../middlewares/viewingSessions';
 

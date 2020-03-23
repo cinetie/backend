@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import controller from '../controllers/viewingSessionsController';
+import controller from '../controllers/viewingSessions';
 
 const router = new Router();
 

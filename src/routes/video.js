@@ -1,9 +1,8 @@
 import { Router } from 'express';
-import video from '../controllers/videoController';
+import video from '../controllers/video';
 import access from '../middlewares/access';
 import session from '../middlewares/viewingSessions';
-import validation from '../middlewares/validators/videoValidation';
-import earnings from '../controllers/earningControlller';
+import earnings from '../controllers/earning';
 
 // import imageValidation from '../middlewares/validators/imageValidator'
 const router = new Router();

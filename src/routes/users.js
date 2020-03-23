@@ -1,7 +1,7 @@
 import passport from 'passport';
 import { Router } from 'express';
-import auth from '../controllers/usersController';
-import validation from '../middlewares/validators/userValidation';
+import auth from '../controllers/users';
+import * as validation from '../middlewares/validation/user';
 import '../config/passport';
 import access from '../middlewares/access';
 import screenValidator from '../middlewares/screenValidation';
@@ -14,9 +14,9 @@ const router = new Router();
 router.use(passport.initialize());
 router.use(passport.session());
 
-router.post('/signup', validation.user, auth.signupUser);
+router.post('/signup', validation.signup, auth.signupUser);
 router.get('/particular', auth.getUserByEmail);
-router.post('/login', isAdmin.verifyAdmin, billing.renewPayment, earnings.registerEarnings, billing.verifyPermissionLevel, screenValidator.validateNumberOfScreens, auth.loginUser);
+router.post('/login', isAdmin.verifyAdmin, validation.login, billing.renewPayment, earnings.registerEarnings, billing.verifyPermissionLevel, screenValidator.validateNumberOfScreens, auth.loginUser);
 router.put('/logout', auth.logout);
 router.delete('/delete_acc', access.isNormalUser, auth.deleteAccount);
 router.get('/all', access.isAdmin, auth.getAllAccounts);
@@ -25,7 +25,7 @@ router.post('/forgot_password', auth.forgotPassword);
 router.get('/verify', auth.verify);
 router.get('/my-account', auth.getUserProfile);
 router.put('/signup/cont', auth.updateAccountAndSubscription);
-router.put('/update', validation.updateUser, auth.updateAccount);
+router.put('/update', auth.updateAccount);
 router.get('/users', access.isAdmin, auth.getSubscribersInRange);
 router.get('/users/live', access.isAdmin, auth.getLiveUsers);
 router.get(
