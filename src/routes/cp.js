@@ -1,19 +1,20 @@
-import auth from '../controllers/cpController';
-import passport from 'passport';
-import '../config/passport';
 import { Router } from 'express';
+import passport from 'passport';
+import auth from '../controllers/cp';
+import '../config/passport';
 import access from '../middlewares/access';
 import isAdmin from '../middlewares/isAdmin';
-import earnings from '../controllers/earningControlller';
+import * as validation from '../middlewares/validation/cp';
+import earnings from '../controllers/earning';
 
 const router = new Router();
 
 router.use(passport.initialize());
 router.use(passport.session());
 
-router.post('/signup', auth.signupCp);
+router.post('/signup', validation.signup, auth.signupCp);
 router.get('/details', access.isProducer, auth.getCpDetails);
-router.post('/login', isAdmin.verifyAdmin, auth.loginUser);
+router.post('/login', isAdmin.verifyAdmin, validation.login, auth.loginUser);
 router.delete('/delete_acc', access.isProducer, auth.deleteAccount);
 router.get('/all', access.isAdmin, auth.getAllAccounts);
 router.get('/reset_password/', auth.resetPassword);

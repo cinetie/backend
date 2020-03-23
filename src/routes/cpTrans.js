@@ -1,6 +1,6 @@
 // Routes  for Content providers transactions
 import { Router } from 'express';
-import controller from '../controllers/cpTransController';
+import controller from '../controllers/cpTrans';
 import access from '../middlewares/access';
 
 const router = new Router();

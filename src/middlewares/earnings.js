@@ -1,4 +1,4 @@
-import earningController from '../controllers/earningControlller';
+import earningController from '../controllers/earning';
 import subscriptions from '../services/billingServices';
 import userServices from '../services/userServices';
 import date from '../helpers/date';
