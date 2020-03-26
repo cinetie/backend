@@ -41,7 +41,7 @@ class tempVideoController {
         }, async (err, result) => {
           // upload video to temp server i.e cloudinary
           // hash video url
-          const size = data.size * 1e+6;
+          const { size } = req.files.video;
           data.videoUri = jwt.jwtSign({
             videoUri: result.url, size, clientId: decoded.clientId, videoId: data.videoId, type: 'movie'
           }, process.env.SECRET);
