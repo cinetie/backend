@@ -93,5 +93,20 @@ class serieController {
       util.setErrorResponse(res, `Something happened ${error.message}`, 500);
     }
   }
+
+  static async getVideosByClientId(req, res) {
+    try {
+      const token = req.headers.authorization.slice(7);
+      const { clientId } = jwt.jwtVerify(token, process.env.SECRET);
+      const videos = await services.getEpisodesByClientId(clientId);
+      if (Object.values(videos).length > 0) {
+        util.setSuccessResponse(res, 'Sucess', 200, videos);
+      } else {
+        util.setErrorResponse(res, 'can\'t find matching episodes', 400);
+      }
+    } catch (error) {
+      util.setErrorResponse(res, `Something happened ${error.message}`, 500);
+    }
+  }
 }
 export default serieController;

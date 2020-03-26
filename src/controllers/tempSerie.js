@@ -13,6 +13,9 @@ const util = new Helpers();
 class tempSerieController {
   static async createSerie(req, res) {
     try {
+      const token = req.headers.authorization.slice(7);
+      const { clientId } = jwt.jwtVerify(token, process.env.SECRET);
+      console.log(clientId);
       const data = req.body;
       const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       data.clientId = decoded.clientId;
