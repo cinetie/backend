@@ -11,7 +11,5 @@ export default joi.object().keys({
   category: joi.string().required()
     .error(() => 'You have to provide a valid category'),
   type: joi.string().valid('serie', 'movie').required()
-    .error(() => 'You have to provide a type Ex: serie or movie'),
-  size: joi.number().required()
-    .error(() => 'You have to provide a size in megabytes')
+    .error(() => 'You have to provide a type Ex: serie or movie')
 }).options({ allowUnknown: false });

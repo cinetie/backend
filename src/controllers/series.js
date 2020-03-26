@@ -32,7 +32,7 @@ class serieController {
       const publicId = data.videoUrl.slice(59);
       const deletionStatusCloudinary = await cloudinary.destroy(publicId.split(".")[0], 'video');
       if (createdSerie && deleted && deletionStatusCloudinary) {
-        util.setErrorResponse(res, 'Created successfully', 201);
+        util.setSuccessResponse(res, 'Created successfully', 201);
       } else {
         util.setErrorResponse(res, 'Can\'t upload', 400);
       }
