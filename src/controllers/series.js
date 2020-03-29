@@ -3,8 +3,8 @@ import services from '../services/serieServices';
 import Util from '../helpers/utilities';
 import temp from '../services/tempSerieService';
 import jwt from '../helpers/jwt';
-import vimeo from '../helpers/vimeo';
 import cloudinary from '../helpers/cloudinary';
+import { upload,getObject } from '../helpers/aws';
 
 const util = new Util();
 
@@ -16,20 +16,15 @@ class serieController {
       const tempVideo = await temp.getParticularVideo(id);
       const decoded = jwt.jwtVerify(tempVideo.uri, process.env.SECRET);
       // set details for vimeo upload
-      const data = {
-        size: tempVideo.size,
-        videoUrl: decoded.uri
-
-      };
       // get url after a successful upload to vimeo
-      const url = await vimeo.viemoUpload(data);
+      const url = await upload('series-cinetie', req.files.episode);
       // patch serie object to fit suspensionSate and video url
       const createdSerie = await services.update(decoded.id, {
         suspensionState: false,
-        episode: url
+        episode: url.data.Key
       });
       const deleted = await temp.deleteSeries(id);
-      const publicId = data.videoUrl.slice(59);
+      const publicId = decoded.uri.slice(59);
       const deletionStatusCloudinary = await cloudinary.destroy(publicId.split(".")[0], 'video');
       if (createdSerie && deleted && deletionStatusCloudinary) {
         util.setSuccessResponse(res, 'Created successfully', 201);
@@ -44,6 +39,8 @@ class serieController {
   static async getSingleEpisode(req, res) {
     try {
       const episode = await services.getSingleEpisode(req.query.ep);
+      const uri = await getObject('series-cinetie', episode.episode, 20000);
+      episode.episode = uri;
       if (!episode) util.setErrorResponse(res, `Can't find what you requested`, 400);
       util.setSuccessResponse(res, 'Retrieved successfully', 200, episode);
     } catch (error) {

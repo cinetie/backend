@@ -7,8 +7,6 @@ import earnings from '../controllers/earning';
 // import imageValidation from '../middlewares/validators/imageValidator'
 const router = new Router();
 router.post('/new', access.isAdmin, video.addVideo);
-router.get('/', access.isNormalUser, video.getParticularVideo);
-router.get('/all', access.isNormalUser, video.getAllVideo);
 router.get('/all/local', access.isAdmin, video.getAllVideosLocal);
 router.get('/sort/pop', access.isNormalUser, video.getVideosByPopularity);
 router.get('/sort/category', access.isNormalUser, video.getVideosByCategory);
@@ -23,4 +21,5 @@ router.get('/second/ft', access.isNormalUser, video.getSecondFeaturedFilm);
 router.get('/sort/type', access.isProducer, video.getAllVideosByType);
 router.put('/', access.isProducer, video.updateVideos);
 router.delete('/', access.isProducer, video.deleteAvideo);
+
 export default router;

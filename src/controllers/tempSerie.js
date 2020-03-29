@@ -48,7 +48,7 @@ class tempSerieController {
           const video = await videoServices.getVideoById(episodes[i].videoId);
           const decoded = jwt.jwtVerify(episodes[i].uri, process.env.SECRET);
 
-          if (video !== (null || undefined)) {
+          if (video) {
             episodes[i].videoId = video.videoName;
             episodes[i].videoClientId = video.videoClientId;
           } else {

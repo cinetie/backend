@@ -1,21 +1,21 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable no-await-in-loop */
 import { v2 as cloudinary } from 'cloudinary';
-import helpers from '../helpers/utilities';
+import Helpers from '../helpers/utilities';
 import services from '../services/tempVideoServices';
 import uuid from '../helpers/uuid';
 import jwt from '../helpers/jwt';
 import cloudinaryHelper from '../helpers/cloudinary';
 // import google from '../helpers/google.cloud.normal'
+import { upload,getObject } from '../helpers/aws';
 import videoService from '../services/videoServices';
 import cpService from '../services/cpServices';
 
-const util = new helpers();
+const util = new Helpers();
 
 class tempVideoController {
   static async createVideoController(req, res) {
     try {
-      console.log('started');
       // get token
       const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const data = req.body;

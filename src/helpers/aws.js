@@ -1,31 +1,38 @@
 import AWS from 'aws-sdk';
 import fs from 'fs';
+import { promisify } from 'util';
+import { v4 as V4 } from 'uuid';
 
-const AWS_ID = process.env.AWS_ACCESS_KEY_ID;
-const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRECT_ACCESS_KEY;
-const { AWS_BUCKET_NAME } = process.env;
 
-class awsSdk {
-  static async generateAwsInstance() {
-    const aws = AWS.S3({
-      accessKeyId: AWS_ID,
-      secretAccessKey: AWS_SECRET_ACCESS_KEY
-    });
-    return aws;
+const { AWS_REGION, AWS_ID, AWS_SECRET } = process.env;
+
+AWS.config.update({
+  region: AWS_REGION,
+  signatureVersion: 'v4',
+  credentials: {
+    accessKeyId: AWS_ID,
+    secretAccessKey: AWS_SECRET
   }
+});
+const S3 = new AWS.S3({ apiVersion: '2006-03-01' });
+const readFileAsync = promisify(fs.readFile);
+const upload = async (bucket, file) => {
+  const extension = file.name.split('.').pop();
+  const fileToUpload = await readFileAsync(file.tempFilePath);
+  const params = {
+    Bucket: bucket,
+    Key: `${V4()}.${extension}`,
+    Body: fileToUpload
+  };
+  const data = await S3.upload(params).promise();
+  return {
+    file: fileToUpload,
+    data
+  };
+};
 
-  static async uploadSingleFile(file) {
-    const params = {
-      Bucket: AWS_BUCKET_NAME,
-      Key: file.originalname,
-      Body: file.buffer
-    };
-    const aws = this.generateAwsInstance();
-    aws.upload(params, (err, data) => {
-      if (err) console.log(err);
-      console.log(`uploaded to ${data.location}`);
-    });
-  }
-}
-
-export default awsSdk;
+const getObject = async (Bucket, Key, Expires) => {
+  const uri = S3.getSignedUrl('getObject', { Bucket, Key, Expires });
+  return uri;
+};
+export { upload, getObject };
