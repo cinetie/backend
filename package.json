@@ -4,7 +4,7 @@
   "description": "A Social platform for the creative at heart",
   "main": "index.js",
   "scripts": {
-    "build": "rm -rf ./src/dist && babel ./src/. --out-dir ./src/dist",
+    "build": "rm -rf ./src/dist && babel ./src/. --out-dir ./src/dist --copy-files",
     "start": "npm run migrate && npm run build && node ./src/dist/index.js",
     "dev": "nodemon --exec babel-node src/index.js",
     "migrate": "sequelize db:migrate --env production ",
