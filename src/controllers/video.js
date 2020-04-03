@@ -195,12 +195,16 @@ class videoController {
   static async getVideoById(req, res) {
     try {
       const video = await videoService.getVideoById(req.query.id);
-      const uri = await getObject('movies-cinetie', video.videoLink, 20000);
-      video.videoLink = uri;
-      if (uri) {
+      if (video.type === 'serie') {
         util.setSuccessResponse(res, 'videos Found', 200, video);
       } else {
-        util.setErrorResponse(res, 'Video can\'t be found', 404);
+        const uri = await getObject('movies-cinetie', video.videoLink, 20000);
+        video.videoLink = uri;
+        if (uri) {
+          util.setSuccessResponse(res, 'videos Found', 200, video);
+        } else {
+          util.setErrorResponse(res, 'Video can\'t be found', 404);
+        }
       }
     } catch (error) {
       util.setErrorResponse(res, `something went wrong ${error.message}`, 503);
