@@ -8,7 +8,7 @@ dotenv.config();
 
 const mailer = async (emailToSend) => {
   try {
-    const transporter = nodemailer.createTransport({
+    const transporter = await nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: process.env.SMTP_PORT,
       auth: {
@@ -16,29 +16,21 @@ const mailer = async (emailToSend) => {
         pass: process.env.SENDGRID_PASS
       }
     });
-    console.log(process.env.SMTP_HOST, process.env.SMTP_PORT, process.env.SENDGRID_USER, process.env.SENDGRID_PASS);
     const { path } = emailToSend[2];
-    ejs.renderFile(path, emailToSend[0], (error, data) => {
+    return ejs.renderFile(path, emailToSend[0], (error, data) => {
       if (error) {
-        return error;
+        console.log(error);
+      } else {
+        const emailOptions = {
+          from: '"Cinetie Support" <support@cinetie.com>',
+          to: emailToSend[1].to,
+          subject: emailToSend[1].subject,
+          html: data
+        };
+        transporter.sendMail(emailOptions)
+          .then((success) => success)
+          .catch((err) => console.log(err));
       }
-      const emailOptions = {
-        from: emailToSend[1].from,
-        to: emailToSend[1].to,
-        subject: emailToSend[1].subject,
-        html: data
-      };
-      transporter.sendMail(emailOptions, (err, status) => {
-        if (err) {
-          console.log(2.9);
-          console.log(err);
-        } else {
-          console.log(3.1);
-          console.log(status);
-        }
-      });
-      // // .then(() => console.log('sent email'))
-      // .catch(() => error)
     });
   } catch (error) {
     throw error;

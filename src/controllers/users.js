@@ -42,7 +42,7 @@ class userController {
           subject: 'Email verification',
         },
         {
-          path: `${path.join(__dirname, '../public/templates/VerifyEmail.ejs')}`
+          path: `${path.resolve('src/public/templates/VerifyEmail.ejs')}`
         }
         ]);
         const createdUser = await userService.createNewUser(newUser);
@@ -57,7 +57,7 @@ class userController {
           desc: 'Login-Active'
 
         };
-        if (EmailStatus) util.setErrorResponse(res, error.message, 500);
+        if (EmailStatus) util.setErrorResponse(res, EmailStatus, 500);
         const userToken = jwt.jwtSign(createdUser.email, process.env.SECRET);
         createdUser.token = userToken;
         delete createdUser.password;
@@ -95,7 +95,7 @@ class userController {
         path: `${path.join(__dirname, '../public/templates/EmailVerificationSuccess.ejs')}`
       }
       ]);
-      res.redirect('https://www.google.com');
+      res.redirect('https://staging.cinetie.com');
     } catch (error) {
       util.setErrorResponse(res, `Something went wrong ${error.message}`, 500);
     }
