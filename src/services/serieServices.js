@@ -40,13 +40,15 @@ class serieServices {
     return null;
   }
 
-  static async getSingleSeason(videoId, season) {
+  static async getSingleSeason(videoId, season, limit, offset) {
     try {
       const data = await database.series.findAll({
+        limit: Number(limit),
+        offset: Number(offset),
         where: {
           [op.and]: [
             { videoId },
-            { season },
+            { season: Number(season) },
             { suspensionState: false }
           ]
         }
@@ -63,7 +65,7 @@ class serieServices {
   static async getAllSeasons(videoId) {
     try {
       const data = await database.series.findAll({
-        where: { videoId },
+        where: { [op.and]: [{ videoId }, { suspensionState: false }] },
         order: [
           ['id', 'DESC']
         ],

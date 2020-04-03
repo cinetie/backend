@@ -284,8 +284,6 @@ class videoService {
         },
         where: {
           [op.and]: [
-            // { isFeatured: true },
-            // { featureType: 1 }
             {
               isFeatured: true,
               type,
