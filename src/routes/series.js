@@ -11,6 +11,6 @@ router.get('/ep', access.isNormalUser, viewingSession.createNewWatchCount, contr
 router.get('/single/season', access.isNormalUser, controller.getSingleSeason);
 router.get('/all/seasons', access.isLoggedIn, controller.getAllSeasons);
 router.put('/update', access.isProducer, controller.updateSerie);
-router.delete('/delete', access.isAdmin, controller.delete);
+router.delete('/delete/:id', access.isAdmin, controller.delete);
 
 export default router;

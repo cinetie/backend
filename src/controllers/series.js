@@ -81,7 +81,7 @@ class serieController {
 
   static async delete(req, res) {
     try {
-      const deleted = await services.deleteEpisode(req.body.id);
+      const deleted = await services.deleteEpisode(req.params.id);
       if (!deleted) util.setErrorResponse(res, 'Can\'t find what you requested', 400);
       util.setSuccessResponse(res, 'deleted easily', 200, deleted);
     } catch (error) {
