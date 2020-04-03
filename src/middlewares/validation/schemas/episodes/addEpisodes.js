@@ -9,5 +9,7 @@ export default joi.object().keys({
   season: joi.number().required()
     .error(() => 'You have to provide season number Ex: 1'),
   synopsis: joi.string().required()
-    .error(() => 'You have to provide a synopsis Ex: "It all starts at night" ')
-});
+    .error(() => 'You have to provide a synopsis Ex: "It all starts at night" '),
+  episodeNumber: joi.number().required()
+    .error(() => 'You have to provide a number')
+}).options({ allowUnknown: false });
