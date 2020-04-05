@@ -1,8 +1,3 @@
-/* eslint-disable no-shadow */
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-case-declarations */
-/* eslint-disable quotes */
 import path from 'path';
 import userService from '../services/userServices';
 import tokenService from '../services/tokenService';
@@ -27,12 +22,14 @@ class userController {
       const newUser = req.body;
       newUser.password = await bcrypt.encrypt(newUser.password);
       newUser.isVerified = false;
-      newUser.plan = "Setup";
+      newUser.plan = 'Setup';
       newUser.permissionLevel = 1;
       const search = await userService.getUserByMail(newUser.email);
       if (search) {
-        util.setErrorResponse(res, "user already exists", 403);
+        util.setErrorResponse(res, 'user already exists', 403);
       } else {
+        // console.log(tokenToSave);
+        // eslint-disable-next-line no-use-before-define
         await tokenService.createNewToken(tokenToSave, token);
         const EmailStatus = await mailer([{
           link: `${process.env.HOST}/auth/verify?token=${jwt.jwtSign(req.body.email, process.env.SECRET)}`
@@ -95,7 +92,7 @@ class userController {
         path: `${path.join(__dirname, '../public/templates/EmailVerificationSuccess.ejs')}`
       }
       ]);
-      res.redirect('https://staging.cinetie.com');
+      res.redirect('https://www.cinetie.com');
     } catch (error) {
       util.setErrorResponse(res, `Something went wrong ${error.message}`, 500);
     }
@@ -134,6 +131,18 @@ class userController {
       const user = await userService.getUserByMail(req.body.email);
       if (!user) response.errorResponse(res, 404, 'User not found!');
       const token = jwt.jwtSign(`${cry.crypto()}${user.firstName}`, process.env.SECRET);
+      await mailer([{
+        name: user.firstName
+      },
+      {
+        to: req.body.email,
+        from: 'auth.user@cinetie.com',
+        subject: 'Password help  has arrived',
+      },
+      {
+        path: `${path.join(__dirname, '../public/templates/EmailVerificationSuccess.ejs')}`
+      }
+      ]);
       const emailTosend = {
         to: req.body.email,
         from: process.env.EMAIL_USER,
@@ -232,9 +241,9 @@ class userController {
       if (!currentSubsctption) {
         let frequency = 0;
         if (newInfo.isBilledAnnually === true) {
-          frequency = "YEAR";
+          frequency = 'YEAR';
         } else {
-          frequency = "MONTH";
+          frequency = 'MONTH';
         }
         const paymentData = {
           user: {
@@ -271,7 +280,7 @@ class userController {
             plan: newInfo.plan,
             price,
             frequency,
-            currency: "USD",
+            currency: 'USD',
             total: price,
             urls: {
               success: `${process.env.PAYPAL_SUCCESS}?user=${jwt.jwtSign(email, process.env.SECRET)}`,
@@ -288,7 +297,7 @@ class userController {
               const paymentDetails = await payment.registerNewSubscription(subscriptionData);
               util.setSuccessResponse(res, 'Success', 201, momoData);
             } else {
-              util.setErrorResponse(res, `Sorry payment failed`, 500);
+              util.setErrorResponse(res, 'Sorry payment failed', 500);
             }
             break;
           case 2:
@@ -301,11 +310,11 @@ class userController {
               const paymentDetails = await payment.registerNewSubscription(subscriptionData);
               util.setSuccessResponse(res, 'Success', 201, creditCard);
             } else {
-              util.setErrorResponse(res, `Sorry payment failed`, 500);
+              util.setErrorResponse(res, 'Sorry payment failed', 500);
             }
             break;
           default:
-            util.setErrorResponse(res, `Sorry payment failed`, 500);
+            util.setErrorResponse(res, 'Sorry payment failed', 500);
         }
       } else {
         const status = await userService.updateUser(email, newInfo);
