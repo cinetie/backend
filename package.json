@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "rm -rf ./src/dist && babel ./src/. --out-dir ./src/dist --copy-files",
-    "start": "npm run migrate:staging && npm run build && node  ./src/dist/index.js",
+    "start": "npm run migrate:staging && npm run build && node --tls-min-v1.0 ./src/dist/index.js",
     "dev": "nodemon --exec babel-node src/index.js",
     "migrate": "sequelize db:migrate --env production ",
     "migrate:undo": "sequelize db:migrate:undo:all --env production ",
