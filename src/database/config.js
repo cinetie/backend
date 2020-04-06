@@ -28,4 +28,12 @@ module.exports = {
     use_env_variable: 'TEST_DATABASE_URL',
     dialect: 'postgres'
   },
+
+  staging: {
+    use_env_variable: 'STAGING_DATABASE_URL',
+    dialect: 'mysql',
+    dialectOptions: {
+      typeCast: true
+    }
+  }
 };
