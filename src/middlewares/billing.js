@@ -35,9 +35,10 @@ class billing {
       } else {
         today = date.addMoreDays(31).toDateString();
       }
-      const updates = await billingService.updateSubscription(req.body.email, { dueState: true, endDate: today });
+      const updates = await billingService.updateSubscription(req.body.email,
+        { dueState: true, endDate: today });
       // release account to active
-      const activationStatus = await userService.updateUser(req.body.email, { permissionLevel: 1 });
+      await userService.updateUser(req.body.email, { permissionLevel: 1 });
       if (!updates) {
         util.setErrorResponse(res, 'can\'t grant access to user', 503);
       }
@@ -93,84 +94,85 @@ class billing {
   }
 
   static async renewPayment(req, res, next) {
-    // try {
-    console.log('Renew payment');
-    const user = await userService.getUserByMail(req.body.email);
-    if (user.plan === 'Setup') {
-      next();
-    } else {
-      const today = new Date();
-      const details = await billing.fetchCurrentSubscription(req, res);
-      if (details.endDate === today.toDateString()) {
-        const salesStipend = details.price * 0.3;
-        const user = await userService.getUserByMail(details.email);
-        if (Number(details.paymentMethod) === 1) {
-          const salesData = {
-            method: 'Mobile Money',
-            plan: details.plan,
-            amount: salesStipend,
-            user: details.email
-          };
-          console.log(JSON.stringify(salesData));
-          const sales = billing.registerSales(salesData);
-          if (!sales) util.setErrorResponse(res, 'sales can\'t run ', 500);
-          const momoStatus = await dax.momo({
-            amount: Math.round(details.price),
-            email: user.email,
-            phonenumber: details.phoneNumber,
-            firstName: user.firstName,
-            lastName: user.lastName
-
-          });
-          billing.verifyStatus(req, res, momoStatus, next);
-          // service.get
-        } else if (Number(details.paymentMethod) === 2) {
-          const salesData = {
-            method: 'Paypal',
-            plan: details.plan,
-            amount: salesStipend,
-            user: details.email
-          };
-          const sales = billing.registerSales(salesData);
-          if (!sales) util.setErrorResponse(res, 'sales can\'t run ', 500);
-          const status = await paypalHelper.getSubscriptionDetails(req.body.email);
-          billing.verifyStatus(req, res, status, next);
-        } else if (Number(details.paymentMethod) === 3) {
-          const salesData = {
-            method: 'Credit card',
-            plan: details.plan,
-            amount: salesStipend,
-            user: details.email
-          };
-          const sales = billing.registerSales(salesData);
-          if (!sales) util.setErrorResponse(res, 'sales can\'t run ', 500);
-          const status = await dax.creditCards({
-            card: {
-              crNumber: user.crNumber,
-              crCVC: user.crCVC,
-              expMonth: user.expMonth,
-              expYear: user.expYear
-            },
-            transaction: {
-              amount: Math.round(details.price)
-            },
-            user: {
-              email: user.email,
-              phoneNumber: details.phoneNumber,
-              cardFirstName: user.cardFirstName,
-              cardLastName: user.cardLastName
-            }
-          });
-          billing.verifyStatus(req, res, status, next);
-        }
-      } else {
+    try {
+      console.log('Renew payment');
+      const user = await userService.getUserByMail(req.body.email);
+      if (!user) {
+        util.setErrorResponse(res, "user doesn't exist", 400);
+      } else if (user.plan === 'Setup') {
         next();
-      }
-    }
+      } else {
+        const today = new Date();
+        const details = await billing.fetchCurrentSubscription(req, res);
+        if (details.endDate === today.toDateString()) {
+          const salesStipend = details.price * 0.3;
+          const user = await userService.getUserByMail(details.email);
+          if (Number(details.paymentMethod) === 1) {
+            const salesData = {
+              method: 'Mobile Money',
+              plan: details.plan,
+              amount: salesStipend,
+              user: details.email
+            };
+            console.log(JSON.stringify(salesData));
+            const sales = billing.registerSales(salesData);
+            if (!sales) util.setErrorResponse(res, 'sales can\'t run ', 500);
+            const momoStatus = await dax.momo({
+              amount: Math.round(details.price),
+              email: user.email,
+              phonenumber: details.phoneNumber,
+              firstName: user.firstName,
+              lastName: user.lastName
 
-    // } catch (error) {
-    //   util.setErrorResponse(res, error.message, 500);
-    // }
+            });
+            billing.verifyStatus(req, res, momoStatus, next);
+            // service.get
+          } else if (Number(details.paymentMethod) === 2) {
+            const salesData = {
+              method: 'Paypal',
+              plan: details.plan,
+              amount: salesStipend,
+              user: details.email
+            };
+            const sales = billing.registerSales(salesData);
+            if (!sales) util.setErrorResponse(res, 'sales can\'t run ', 500);
+            const status = await paypalHelper.getSubscriptionDetails(req.body.email);
+            billing.verifyStatus(req, res, status, next);
+          } else if (Number(details.paymentMethod) === 3) {
+            const salesData = {
+              method: 'Credit card',
+              plan: details.plan,
+              amount: salesStipend,
+              user: details.email
+            };
+            const sales = billing.registerSales(salesData);
+            if (!sales) util.setErrorResponse(res, 'sales can\'t run ', 500);
+            const status = await dax.creditCards({
+              card: {
+                crNumber: user.crNumber,
+                crCVC: user.crCVC,
+                expMonth: user.expMonth,
+                expYear: user.expYear
+              },
+              transaction: {
+                amount: Math.round(details.price)
+              },
+              user: {
+                email: user.email,
+                phoneNumber: details.phoneNumber,
+                cardFirstName: user.cardFirstName,
+                cardLastName: user.cardLastName
+              }
+            });
+            billing.verifyStatus(req, res, status, next);
+          }
+        } else {
+          next();
+        }
+      }
+    } catch (error) {
+      util.setErrorResponse(res, error.message, 500);
+    }
   }
 
   static async verifyPermissionLevel(req, res, next) {
