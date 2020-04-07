@@ -94,7 +94,7 @@ class billing {
   }
 
   static async renewPayment(req, res, next) {
-    try {
+    // try {
       console.log('Renew payment');
       const user = await userService.getUserByMail(req.body.email);
       if (!user) {
@@ -170,9 +170,9 @@ class billing {
           next();
         }
       }
-    } catch (error) {
-      util.setErrorResponse(res, error.message, 500);
-    }
+    // } catch (error) {
+    //   util.setErrorResponse(res, error.message, 500);
+    // }
   }
 
   static async verifyPermissionLevel(req, res, next) {
