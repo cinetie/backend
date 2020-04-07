@@ -72,9 +72,9 @@ class cpController {
       await tokenService.destroyToken(token);
       const updatedUser = await cp.updateCp(id, newUser);
       const EmailStatus = await mailer([{
-        link: `${process.env.HOST}/auth/verify?token=${jwt.jwtSign(req.body.email, process.env.SECRET)}`
+        link: `${process.env.HOST}/cp/verify?token=${jwt.jwtSign(req.body.email, process.env.SECRET)}`
       }, {
-        from: 'auth.cp@cinetie.com',
+        from: 'CINETIE Support',
         to: req.body.email,
         subject: 'Email verification',
       },
