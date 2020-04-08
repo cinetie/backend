@@ -37,8 +37,9 @@ class cpController {
         };
 
         await tokenService.createNewToken(tokenToSave, token);
+        const { id } = createdUser;
         const EmailStatus = await mailer([{
-          link: `${process.env.HOST}/auth/verify?token=${jwt.jwtSign(req.body.email, process.env.SECRET)}`
+          link: `${process.env.HOST}/cp/verify?id=${id}&&token=${jwt.jwtSign(req.body.email, process.env.SECRET)}`
         }, {
           from: 'auth.cp@cinetie.com',
           to: req.body.email,
@@ -48,11 +49,14 @@ class cpController {
           path: `${path.join(__dirname, '../public/templates/VerifyEmail.ejs')}`
         }
         ]);
-        if (EmailStatus) util.setErrorResponse(res, 'can\'t send email', 500);
-        const userToken = jwt.jwtSign(createdUser.email, process.env.SECRET, '1d');
-        createdUser.token = userToken;
-        delete createdUser.password;
-        util.setSuccessResponse(res, 'Signed up successfully', 201, createdUser);
+        if (EmailStatus) {
+          util.setErrorResponse(res, 'can\'t send email', 500);
+        } else {
+          const userToken = jwt.jwtSign(createdUser.email, process.env.SECRET, '1d');
+          createdUser.token = userToken;
+          createdUser.password = undefined;
+          util.setSuccessResponse(res, 'Signed up successfully', 201, createdUser);
+        }
       }
     } catch (error) {
       util.setErrorResponse(res, `Something went wrong ${error.message}`, 500);
@@ -70,21 +74,25 @@ class cpController {
         isVerified: true
       };
       await tokenService.destroyToken(token);
-      const updatedUser = await cp.updateCp(id, newUser);
+      const updatedUser = await cp.updateCp(user.email, newUser);
       const EmailStatus = await mailer([{
-        link: `${process.env.HOST}/cp/verify?token=${jwt.jwtSign(req.body.email, process.env.SECRET)}`
-      }, {
-        from: 'CINETIE Support',
-        to: req.body.email,
-        subject: 'Email verification',
+        name: user.firstName
       },
       {
-        path: `${path.join(__dirname, '../public/templates/VerifyEmail.ejs')}`
+        to: user.email,
+        from: 'auth.cp@cinetie.com',
+        subject: 'Success email has been verified',
+      },
+      {
+        path: `${path.join(__dirname, '../public/templates/EmailVerificationSuccess.ejs')}`
       }
       ]);
-      if (EmailStatus) util.setErrorResponse(res, 'can\'t send email', 500);
-      updatedUser.password = null;
-      res.redirect('https://www.google.com');
+      if (EmailStatus) {
+        util.setErrorResponse(res, 'can\'t send email', 500);
+      } else {
+        updatedUser.password = undefined;
+        res.redirect('https://www.cinetie.com');
+      }
     } catch (error) {
       util.setErrorResponse(res, `Something went wrong ${error.message}`, 500);
     }

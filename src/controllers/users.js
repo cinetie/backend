@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 import path from 'path';
 import userService from '../services/userServices';
 import tokenService from '../services/tokenService';
@@ -184,7 +185,7 @@ class userController {
       let user = await userService.getUserByMail(req.user.email);
       if (!user) {
         user = await userService.createNewUser(req.user, req.user.email);
-      } else {}
+      }
       const token = jwt.jwtSign({
         key: cry.crypto(),
         email: req.user.email
@@ -213,8 +214,12 @@ class userController {
       const user = await userService.getUserByMail(decoded.email);
       if (!user) util.setErrorResponse(res, 'Can\'t find that user', 422);
       const newInfo = req.body;
-      const updated = await userService.updateUser(user.id, newInfo);
-      updated != 0 ? util.setSuccessResponse(res, 'updated successfully', 200, updated) : util.setErrorResponse(res, 'An error occured', 422);
+      const updated = await userService.updateUser(decoded.email, newInfo);
+      if (updated[0] !== 0) {
+        util.setSuccessResponse(res, 'updated successfully', 200, updated);
+      } else {
+        util.setErrorResponse(res, 'An error occured', 400);
+      }
     } catch (error) {
       util.setErrorResponse(res, error, 522);
     }
@@ -222,25 +227,22 @@ class userController {
 
   static async updateAccountAndSubscription(req, res) {
     try {
-      const {
-        email
-      } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
-      console.log(email);
-      const newInfo = req.body;
+      const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
+      const user = await userService.getUserByMail(email);
+      const { paymentMethod } = req.body;
       const subscriptionData = {
-        paymentMethod: newInfo.paymentMethod,
+        paymentMethod,
         email,
-        plan: newInfo.plan,
-        phoneNumber: newInfo.phoneNumber,
-        isBilledAnnually: newInfo.isBilledAnnually,
+        plan: user.plan,
+        phoneNumber: user.phoneNumber,
+        isBilledAnnually: user.isBilledAnnually,
       };
       const price = await payment.getPlanPricing(subscriptionData);
-      const user = await userService.getUserByMail(email);
       // check if there is a current subscription
       const currentSubsctption = await billingServices.getCurrentSubscription(email);
       if (!currentSubsctption) {
         let frequency = 0;
-        if (newInfo.isBilledAnnually === true) {
+        if (user.isBilledAnnually === true) {
           frequency = 'YEAR';
         } else {
           frequency = 'MONTH';
@@ -248,36 +250,36 @@ class userController {
         const paymentData = {
           user: {
             email,
-            paymentMethod: newInfo.paymentMethod,
-            isBilledAnnually: newInfo.isBilledAnnually,
-            plan: newInfo.plan
+            paymentMethod,
+            isBilledAnnually: user.isBilledAnnually,
+            plan: user.plan
           },
           momo: {
             amount: Math.round(price),
-            phonenumber: newInfo.phoneNumber,
+            phonenumber: user.phoneNumber,
             firstname: user.firstName,
             lastname: user.lastName,
             email,
           },
-          creditCard: {
-            card: {
-              crNumber: newInfo.crNumber,
-              crCVC: newInfo.crCVC,
-              expMonth: newInfo.expMonth,
-              expYear: newInfo.expYear
-            },
-            user: {
-              cardFirstName: newInfo.cardFirstName,
-              cardLastName: newInfo.cardLastName,
-              email,
-              phoneNumber: newInfo.phoneNumber
-            },
-            transaction: {
-              amount: Math.round(price)
-            }
-          },
+          // creditCard: {
+          //   card: {
+          //     crNumber: newInfo.crNumber,
+          //     crCVC: newInfo.crCVC,
+          //     expMonth: newInfo.expMonth,
+          //     expYear: newInfo.expYear
+          //   },
+          //   user: {
+          //     cardFirstName: newInfo.cardFirstName,
+          //     cardLastName: newInfo.cardLastName,
+          //     email,
+          //     phoneNumber: newInfo.phoneNumber
+          //   },
+          //   transaction: {
+          //     amount: Math.round(price)
+          //   }
+          // },
           paypal: {
-            plan: newInfo.plan,
+            plan: user.plan,
             price,
             frequency,
             currency: 'USD',
@@ -290,36 +292,42 @@ class userController {
         };
 
 
-        switch (Number(newInfo.paymentMethod)) {
-          case 1:
+        switch (Number(paymentMethod)) {
+          case 1: {
             const momoData = await dax.momo(paymentData.momo);
-            if (momoData !== 0) {
-              const paymentDetails = await payment.registerNewSubscription(subscriptionData);
+            const paymentDetails = await payment.registerNewSubscription(subscriptionData);
+            if (momoData !== 0 && paymentDetails) {
               util.setSuccessResponse(res, 'Success', 201, momoData);
             } else {
+              console.log(momoData, paymentDetails);
               util.setErrorResponse(res, 'Sorry payment failed', 500);
             }
             break;
-          case 2:
-            const paymentDetails = await payment.registerNewSubscription(subscriptionData);
+          }
+          case 2: {
+            await payment.registerNewSubscription(subscriptionData);
             await paypal.subscription(req, res, paymentData.paypal);
             break;
-          case 3:
+          }
+
+          case 3: {
             const creditCard = await dax.creditCards(paymentData.creditCard);
-            if (creditCard !== 0) {
-              const paymentDetails = await payment.registerNewSubscription(subscriptionData);
+            const paymentDetails = await payment.registerNewSubscription(subscriptionData);
+            if (creditCard !== 0 && paymentDetails) {
               util.setSuccessResponse(res, 'Success', 201, creditCard);
             } else {
               util.setErrorResponse(res, 'Sorry payment failed', 500);
             }
             break;
+          }
+
           default:
             util.setErrorResponse(res, 'Sorry payment failed', 500);
         }
       } else {
-        const status = await userService.updateUser(email, newInfo);
-        util.setSuccessResponse(res, 'Updated successfully', 201, null);
+        util.setErrorResponse(res, 'subscription already exists', 400);
       }
+      // const status = await userService.updateUser(email, user);
     } catch (error) {
       return response.errorResponse(res, 500, `Something wrong happened ${error.message}`, error);
     }
