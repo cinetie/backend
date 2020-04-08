@@ -1,5 +1,3 @@
-/* eslint-disable quotes */
-/* eslint-disable no-useless-catch */
 import sequelize from 'sequelize';
 import database from '../database/models';
 import date from '../helpers/date';
@@ -39,7 +37,7 @@ class videoService {
               [op.gte]: date.removeDays(60)
             },
             type,
-            videoSuspensionState: "0"
+            videoSuspensionState: '0'
           }]
 
         }
@@ -86,7 +84,7 @@ class videoService {
               [op.gte]: date.removeDays(180)
             },
             type,
-            videoSuspensionState: "0"
+            videoSuspensionState: '0'
           }]
         }
       });
@@ -156,7 +154,7 @@ class videoService {
               [op.gte]: process.env.TRENDING_WATCH_COUNT
             },
             type,
-            videoSuspensionState: "0"
+            videoSuspensionState: '0'
           }]
         }
       });
@@ -198,6 +196,23 @@ class videoService {
       return await database.videos.update(newVideo, {
         where: {
           videoId
+        }
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async resetFeaturedVideo(featureType, isFeatured, type) {
+    try {
+      return await database.videos.update({ isFeatured: false }, {
+        returning: true,
+        where: {
+          [op.and]: [
+            { featureType },
+            { isFeatured },
+            { type }
+          ]
         }
       });
     } catch (error) {
@@ -288,7 +303,7 @@ class videoService {
               isFeatured: true,
               type,
               featureType: 1,
-              videoSuspensionState: "0"
+              videoSuspensionState: '0'
             }
           ]
         }
@@ -317,7 +332,7 @@ class videoService {
             isFeatured: true,
             type,
             featureType: 2,
-            videoSuspensionState: "0"
+            videoSuspensionState: '0'
           }]
         }
       });
