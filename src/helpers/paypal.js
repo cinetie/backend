@@ -102,11 +102,11 @@ class paypal {
         auto_bill_amount: 'yes',
         cancel_url: details.urls.failOrCancel,
         initial_fail_amount_action: 'continue',
-        max_fail_attempts: '1',
+        max_fail_attempts: '3',
         return_url: details.urls.success,
         setup_fee: {
           currency: 'USD',
-          value: '1'
+          value: '0'
         }
       },
       name: 'Paypal Agreement',
@@ -166,7 +166,7 @@ class paypal {
                     const approvalUrl = agreement.href;
                     const token = approvalUrl.split('token=')[1];
                     console.log(approvalUrl, JSON.stringify(agreement));
-                    res.redirect(approvalUrl);
+                    util.setSuccessResponse(res, 'Success ', 200, approvalUrl);
                   } else {
                     return 0;
                   }
@@ -204,9 +204,7 @@ class paypal {
         await paypapTransServices.createTransaction(data);
         console.log(billingAgreement);
         // Billing agreement will have all the information about the agreement.
-        util.setSuccessResponse(res, 'User can now watch movies', 202, {
-          status: 'Info updated'
-        });
+        res.redirect('https://www.cinetie.com', 200);
       }
     });
   }
@@ -249,7 +247,7 @@ class paypal {
     const raw_start_date = date.removeDays(3);
     const raw_end_date = raw.getTime();
     console.log(aggreement.aggreementId);
-    if (!aggreement || aggreement.state == 'canceled') return 0;
+    if (!aggreement || aggreement.state === 'canceled') return 0;
     paypalHelper.billingAgreement.searchTransactions(aggreement.aggreementId, date.convertToISO(raw_start_date), date.convertToISO(raw_end_date), async (error, data) => {
       if (error) {
         console.log(error);
