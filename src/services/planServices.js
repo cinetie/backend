@@ -1,5 +1,7 @@
+import Sequelize from 'sequelize';
 import database from '../database/models';
 
+const op = Sequelize.Op;
 class planServices {
   static async addPlan(newPlan) {
     try {
@@ -42,7 +44,13 @@ class planServices {
 
   static async getAllPlan() {
     try {
-      return await database.plans.findAll();
+      return await database.plans.findAll({
+        where: {
+          type: {
+            [op.not]: 'Setup'
+          }
+        }
+      });
     } catch (error) {
       throw error;
     }

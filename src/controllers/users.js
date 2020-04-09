@@ -144,15 +144,7 @@ class userController {
         path: `${path.join(__dirname, '../public/templates/EmailVerificationSuccess.ejs')}`
       }
       ]);
-      const emailTosend = {
-        to: req.body.email,
-        from: process.env.EMAIL_USER,
-        template: 'forgot-password',
-        subject: 'Password help has arrived!',
-        text: `Dear ${user.firstName} please follow this link to reset your password http://localhost:5000/auth/reset_password/?id=${user.id}&&token=${token}`,
-      };
-      await mdw.mailer(emailTosend);
-      response.successResponse(res, 200, 'Reset password link sent successfully!');
+      return response.successResponse(res, 200, 'Reset password link sent successfully!');
     } catch (error) {
       util.setErrorResponse(res, `Something Went wrong logging in ${error}`, 500);
     }
