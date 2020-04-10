@@ -13,11 +13,9 @@ module.exports = (sequelize, DataTypes) => {
     cityOfResidence: DataTypes.STRING,
     phoneNumber: DataTypes.STRING,
     crNumber: DataTypes.STRING,
-    crCVC: DataTypes.STRING,
-    cardFirstName: DataTypes.STRING,
-    cardLastName: DataTypes.STRING,
-    expMonth: DataTypes.STRING,
-    expYear: DataTypes.STRING
+    card_nonce: DataTypes.STRING,
+    card_brand: DataTypes.STRING,
+    customerId: DataTypes.STRING
 
   }, {});
   User.associate = function (models) {

@@ -11,7 +11,7 @@
     "migrate:undo": "sequelize db:migrate:undo:all --env production ",
     "migrate:dev": "sequelize db:migrate --env development",
     "migrate:staging": "sequelize db:migrate --env staging",
-    "migrate:test": "sequelize db:migrate:undo:all --env test && sequelize db:migrate --env test",
+    "migrate:test": "sequelize db:migrate --env test && sequelize db:migrate:undo:all --env test",
     "generate-lcov": "nyc report --reporter=text > lcov.info",
     "lint": "eslint . --fix --ignore-path .gitignore",
     "coverage": "nyc report --reporter=text | coveralls && nyc report --reporter=text | codeclimate-test-reporter",
