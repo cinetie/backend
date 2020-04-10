@@ -221,7 +221,7 @@ class userController {
     try {
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const user = await userService.getUserByMail(email);
-      const { paymentMethod, nonce, customerId } = req.body;
+      const { paymentMethod, nonce } = req.body;
       const subscriptionData = {
         paymentMethod,
         email,
@@ -274,7 +274,6 @@ class userController {
             if (momoData !== 0 && paymentDetails) {
               util.setSuccessResponse(res, 'Success', 201, momoData);
             } else {
-              console.log(momoData, paymentDetails);
               util.setErrorResponse(res, 'Sorry payment failed', 500);
             }
             break;
@@ -286,7 +285,8 @@ class userController {
           }
 
           case 3: {
-            const cardId = await square.attachCard({ customerId, nonce });
+            const { customer } = await square.createCustomer({ email: user.email });
+            const cardId = await square.attachCard({ customerId: customer.id, nonce });
             if (cardId) {
               const reciept = await square.billCard({
                 source_id: cardId,
@@ -294,11 +294,11 @@ class userController {
                   amount: Number(price) * 100,
                   currency: 'USD'
                 },
-                customerId
+                customerId: customer.id
               });
               const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
               const updates = await userService.updateUser(user.email,
-                { card_nonce: cardId, customerId, card_brand: reciept.cardBrand });
+                { card_nonce: cardId, customerId: customer.id, card_brand: reciept.cardBrand });
               if (reciept.status === 'COMPLETED'
               && updates[0] > 0
               && subscriptionDetails) {
