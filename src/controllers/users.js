@@ -14,6 +14,7 @@ import date from '../helpers/date';
 import mailer from '../helpers/mailer';
 import dax from '../helpers/dax-payment-handler';
 import paypal from '../helpers/paypal';
+import square from '../helpers/square';
 
 
 const util = new Util();
@@ -21,7 +22,7 @@ class userController {
   static async signupUser(req, res) {
     try {
       const newUser = req.body;
-      newUser.password = await bcrypt.encrypt(newUser.password);
+      newUser.password = bcrypt.encrypt(newUser.password);
       newUser.isVerified = false;
       newUser.plan = 'Setup';
       newUser.permissionLevel = 1;
@@ -29,9 +30,7 @@ class userController {
       if (search) {
         util.setErrorResponse(res, 'user already exists', 403);
       } else {
-        // console.log(tokenToSave);
         // eslint-disable-next-line no-use-before-define
-        await tokenService.createNewToken(tokenToSave, token);
         const EmailStatus = await mailer([{
           link: `${process.env.HOST}/auth/verify?token=${jwt.jwtSign(req.body.email, process.env.SECRET)}`
         }, {
@@ -55,6 +54,7 @@ class userController {
           desc: 'Login-Active'
 
         };
+        await tokenService.createNewToken(tokenToSave, token);
         if (EmailStatus) util.setErrorResponse(res, EmailStatus, 500);
         const userToken = jwt.jwtSign(createdUser.email, process.env.SECRET);
         createdUser.token = userToken;
@@ -221,7 +221,7 @@ class userController {
     try {
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const user = await userService.getUserByMail(email);
-      const { paymentMethod } = req.body;
+      const { paymentMethod, nonce, customerId } = req.body;
       const subscriptionData = {
         paymentMethod,
         email,
@@ -253,23 +253,6 @@ class userController {
             lastname: user.lastName,
             email,
           },
-          // creditCard: {
-          //   card: {
-          //     crNumber: newInfo.crNumber,
-          //     crCVC: newInfo.crCVC,
-          //     expMonth: newInfo.expMonth,
-          //     expYear: newInfo.expYear
-          //   },
-          //   user: {
-          //     cardFirstName: newInfo.cardFirstName,
-          //     cardLastName: newInfo.cardLastName,
-          //     email,
-          //     phoneNumber: newInfo.phoneNumber
-          //   },
-          //   transaction: {
-          //     amount: Math.round(price)
-          //   }
-          // },
           paypal: {
             plan: user.plan,
             price,
@@ -303,13 +286,30 @@ class userController {
           }
 
           case 3: {
-            const creditCard = await dax.creditCards(paymentData.creditCard);
-            const paymentDetails = await payment.registerNewSubscription(subscriptionData);
-            if (creditCard !== 0 && paymentDetails) {
-              util.setSuccessResponse(res, 'Success', 201, creditCard);
+            const cardId = await square.attachCard({ customerId, nonce });
+            if (cardId) {
+              const reciept = await square.billCard({
+                source_id: cardId,
+                amount_money: {
+                  amount: Number(price) * 100,
+                  currency: 'USD'
+                },
+                customerId
+              });
+              const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
+              const updates = await userService.updateUser(user.email,
+                { card_nonce: cardId, customerId, card_brand: reciept.cardBrand });
+              if (reciept.status === 'COMPLETED'
+              && updates[0] > 0
+              && subscriptionDetails) {
+                util.setSuccessResponse(res, 'Success', 201, subscriptionDetails);
+              } else {
+                util.setErrorResponse(res, `Sorry payment failed  ${updates}`, 500);
+              }
             } else {
-              util.setErrorResponse(res, 'Sorry payment failed', 500);
+              util.setErrorResponse(res, `Sorry payment failed ${cardId}`, 500);
             }
+
             break;
           }
 

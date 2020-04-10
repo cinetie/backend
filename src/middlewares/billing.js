@@ -10,6 +10,7 @@ import uuid from '../helpers/uuid';
 import userService from '../services/userServices';
 import dax from '../helpers/dax-payment-handler';
 import date from '../helpers/date';
+import Square from '../helpers/square';
 
 
 // opay@123
@@ -50,9 +51,9 @@ class billing {
         await mailer([{
           body: `putting onhold an account failed : line 45, /src/middlewares/billing`
         }, {
-          from: 'monitor@cinetie.com',
+          from: 'Cinetie monitor',
           to: `mugishaalainc@gmail.com`,
-          subject: 'Bug',
+          subject: 'Payment failed to process',
         },
         {
           path: `${path.join(__dirname, '../public/templates/notification.ejs')}`
@@ -62,7 +63,7 @@ class billing {
         await mailer([{
           body: `We would like you to know that your account has been put onhold. \n since your  payment didn't work out`
         }, {
-          from: 'billing@cinetie.com',
+          from: 'Cinetie support',
           to: req.body.email,
           subject: 'Update payment details',
         },
@@ -94,7 +95,7 @@ class billing {
   }
 
   static async renewPayment(req, res, next) {
-    // try {
+    try {
       console.log('Renew payment');
       const user = await userService.getUserByMail(req.body.email);
       if (!user) {
@@ -106,7 +107,6 @@ class billing {
         const details = await billing.fetchCurrentSubscription(req, res);
         if (details.endDate === today.toDateString()) {
           const salesStipend = details.price * 0.3;
-          const user = await userService.getUserByMail(details.email);
           if (Number(details.paymentMethod) === 1) {
             const salesData = {
               method: 'Mobile Money',
@@ -126,7 +126,7 @@ class billing {
 
             });
             billing.verifyStatus(req, res, momoStatus, next);
-            // service.get
+          // service.get
           } else if (Number(details.paymentMethod) === 2) {
             const salesData = {
               method: 'Paypal',
@@ -140,39 +140,31 @@ class billing {
             billing.verifyStatus(req, res, status, next);
           } else if (Number(details.paymentMethod) === 3) {
             const salesData = {
-              method: 'Credit card',
+              method: user.card_brand,
               plan: details.plan,
               amount: salesStipend,
               user: details.email
             };
             const sales = billing.registerSales(salesData);
             if (!sales) util.setErrorResponse(res, 'sales can\'t run ', 500);
-            const status = await dax.creditCards({
-              card: {
-                crNumber: user.crNumber,
-                crCVC: user.crCVC,
-                expMonth: user.expMonth,
-                expYear: user.expYear
+            const reciept = await Square.billCard({
+              source_id: user.card_nonce,
+              amount_money: {
+                amount: Number(details.price) * 100,
+                currency: 'USD'
               },
-              transaction: {
-                amount: Math.round(details.price)
-              },
-              user: {
-                email: user.email,
-                phoneNumber: details.phoneNumber,
-                cardFirstName: user.cardFirstName,
-                cardLastName: user.cardLastName
-              }
+              customerId: user.customerId
             });
+            const status = Number((reciept.status === 'COMPLETED'));
             billing.verifyStatus(req, res, status, next);
           }
         } else {
           next();
         }
       }
-    // } catch (error) {
-    //   util.setErrorResponse(res, error.message, 500);
-    // }
+    } catch (error) {
+      util.setErrorResponse(res, error.message, 500);
+    }
   }
 
   static async verifyPermissionLevel(req, res, next) {
