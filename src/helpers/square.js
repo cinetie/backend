@@ -11,10 +11,10 @@ export default class Square {
         Authorization: `Bearer ${process.env.SQUARE_ACCESS_TOKEN}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email: data.email }),
+      body: JSON.stringify({ email_address: data.email }),
     });
-    const { customer } = response.json();
-    return customer;
+    const responseToJson = await response.json();
+    return responseToJson;
   }
 
   static async attachCard(data) {
