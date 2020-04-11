@@ -97,22 +97,23 @@ class videoService {
     }
   }
 
-  static async search(query) {
+  static async search(query, offset) {
     try {
       const data = await database.videos.findAll({
         order: [
           ['id', 'DESC']
         ],
+        offset: Number(offset),
         limit: 20,
         where: {
           [op.or]: [{
             videoName: {
-              [op.iLike]: `%${query}%`
+              [op.like]: `%${query}%`
             }
           },
           {
             category: {
-              [op.iLike]: `%${query}%`
+              [op.like]: `%${query}%`
             }
           }
           ]

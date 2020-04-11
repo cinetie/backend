@@ -104,8 +104,8 @@ class videoController {
 
   static async search(req, res) {
     try {
-      const { q } = req.query;
-      const videos = await videoService.search(q);
+      const { q, offset } = req.query;
+      const videos = await videoService.search(q, offset);
       if (Object.values(videos).length > 0) {
         util.setSuccessResponse(res, 'Videos found', 200, videos);
       } else {
