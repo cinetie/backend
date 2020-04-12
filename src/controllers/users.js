@@ -273,7 +273,8 @@ class userController {
         const cardId = await square.attachCard({ customerId: customer.id, nonce });
         const updates = await userService.updateUser(email,
           { card_nonce: cardId, customerId: customer.id });
-        if (updates[0] > 0) {
+          console.log(updates);
+        if (updates[1] > 0) {
           const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
           if (subscriptionDetails) {
             util.setSuccessResponse(res, 'Completed signup process', 201, subscriptionDetails);
@@ -281,7 +282,7 @@ class userController {
             util.setErrorResponse(res, 'Something went sideways completing the signup', 400);
           }
         } else {
-          util.setErrorResponse(res, `Completed signup process ${updates[0]}`, 201);
+          util.setErrorResponse(res, 'something went side ways updating credit card details', 400);
         }
       } else {
         const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
@@ -350,7 +351,8 @@ class userController {
             if (momoData !== 0) {
               const updates = await userService.updateUser(user.email,
                 { isOnTrial: false, permissionLevel: 1 });
-              if (updates[0] > 0) {
+              console.log(updates);
+              if (updates[1] > 0) {
                 util.setSuccessResponse(res, 'Success', 201, updates);
               } else {
                 util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
@@ -363,7 +365,7 @@ class userController {
           case 2: {
             const status = await userService.updateUser(user.email,
               { isOnTrial: false });
-            if (status[0] > 0) {
+            if (status[1] > 0) {
               await paypal.subscription(req, res, paymentData.paypal);
             } else {
               util.setErrorResponse(res, 'Sorry payment failed', 500);
@@ -384,7 +386,8 @@ class userController {
               if (reciept.status === 'COMPLETED') {
                 const updates = await userService.updateUser(user.email,
                   { isOnTrial: false, card_brand: reciept.cardBrand, permissionLevel: 1 });
-                if (updates[0] > 0) {
+                console.log(updates);
+                if (updates[1] > 0) {
                   util.setSuccessResponse(res, 'Success', 201, undefined);
                 } else {
                   util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);

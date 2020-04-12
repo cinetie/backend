@@ -48,8 +48,8 @@ class userService {
   static async updateUser(email, updates) {
     try {
       return await database.User.update(updates, {
+        returning: true,
         where: { email },
-        returning: true
       });
     } catch (error) {
       throw error;

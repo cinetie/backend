@@ -107,7 +107,7 @@ class earningController {
           data: uniqueValues
         });
       }
-      return response.successResponse(res, 200, 'Data Not found', 0);
+      return response.successResponse(res, 404, 'Data Not found', 0);
     } catch (error) {
       return response.errorResponse(res, 500, 'Something happened', error.message);
     }
@@ -145,7 +145,7 @@ class earningController {
           data: uniqueValues
         });
       }
-      return response.successResponse(res, 200, 'Data Not found', 0);
+      return response.successResponse(res, 404, 'Data Not found', 0);
     } catch (error) {
       return response.errorResponse(res, 500, 'Something happened', error.message);
     }
@@ -184,7 +184,7 @@ class earningController {
           data: uniqueValues
         });
       }
-      return response.successResponse(res, 200, 'Data Not found', 0);
+      return response.successResponse(res, 404, 'Data Not found', 0);
     } catch (error) {
       return response.errorResponse(res, 500, 'Something happened', error.message);
     }
@@ -200,7 +200,7 @@ class earningController {
         }
         return response.successResponse(res, 200, 'Earnings found ', sum);
       }
-      return response.successResponse(res, 200, 'Data Not found', 0);
+      return response.successResponse(res, 404, 'Data Not found', 0);
     } catch (error) {
       return response.errorResponse(res, 500, 'Something happened', error.message);
     }
@@ -219,7 +219,7 @@ class earningController {
         }
         return response.successResponse(res, 200, 'Earnings found ', sum);
       }
-      return response.successResponse(res, 200, 'Data Not found', 0);
+      return response.successResponse(res, 404, 'Data Not found', 0);
     } catch (error) {
       return response.errorResponse(res, 500, 'Something happened', error.message);
     }
@@ -260,7 +260,7 @@ class earningController {
           data: uniqueValues
         });
       }
-      return response.successResponse(res, 200, 'Data Not found', 0);
+      return response.successResponse(res, 404, 'Data Not found', 0);
     } catch (error) {
       return response.errorResponse(res, 500, 'Something happened', error.message);
     }

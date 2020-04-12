@@ -168,7 +168,8 @@ class billing {
 
   static async verifyPermissionLevel(req, res, next) {
     try {
-      const data = await userService.getUserByMail(req.body.email);
+      const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
+      const data = await userService.getUserByMail(email);
       if (data.permissionLevel !== 1) {
         util.setErrorResponse(res, 'Please sent up your billing', 402);
       } else {
@@ -194,7 +195,7 @@ class billing {
           next();
         } else {
           const updates = await userService.updateUser(email, { permissionLevel: -1 });
-          if (updates[0] > 0) {
+          if (updates[1] > 0) {
             await mailer([{
               body: 'We would like you to know that your account has been put onhold. \n since your  trial just ended'
             }, {

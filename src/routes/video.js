@@ -13,7 +13,7 @@ router.get('/sort/pop', access.isNormalUser, video.getVideosByPopularity);
 router.get('/sort/category', access.isNormalUser, video.getVideosByCategory);
 router.get('/sort/trend', access.isNormalUser, video.getVideosByTrend);
 router.get('/search', access.isNormalUser, video.search);
-router.get('/unique', access.isNormalUser, billing.trial, session.createNewWatchCount, video.getVideoById);
+router.get('/unique', access.isNormalUser, billing.trial, billing.verifyPermissionLevel, session.createNewWatchCount, video.getVideoById);
 router.get('/cp/unique', access.isProducer, video.getVideoById);
 router.get('/arrivals', access.isNormalUser, video.getAllNewVideos);
 router.get('/earnings', earnings.getAllEarningsPerVideo);
