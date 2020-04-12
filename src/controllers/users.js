@@ -104,25 +104,29 @@ class userController {
     try {
       const user = await userService.getUserByMail(req.body.email);
       const status = bcrypt.compare(req.body.password, user.password);
-      if (!status || !user) util.setErrorResponse(res, 'Invalid email or password!', 400);
-      if (!user.isVerified) util.setErrorResponse(res, 'Verify your account first!', 401);
-      const token = jwt.jwtSign({
-        key: cry.crypto(),
-        email: req.body.email
-      }, process.env.SECRET, '1d');
-      user.token = token;
-      delete user.password;
-      const date = new Date();
-      const session = {
-        email: user.email,
-        date: date.toDateString(),
-        timeIn: date.toTimeString(),
-        timeOut: null,
-        state: 'in'
-      };
-      const addedSession = await sessionService.addSession(session);
-      if (!addedSession) util.setErrorResponse(res, 'Can\'t register session', 500);
-      util.setSuccessResponse(res, 'Logged in successfully!', 200, token);
+      if (!status || !user) {
+        util.setErrorResponse(res, 'Invalid email or password!', 400);
+      } else if (!user.isVerified) {
+        util.setErrorResponse(res, 'Verify your account first!', 401);
+      } else {
+        const token = jwt.jwtSign({
+          key: cry.crypto(),
+          email: req.body.email
+        }, process.env.SECRET, '1d');
+        user.token = token;
+        delete user.password;
+        const dateSession = new Date();
+        const session = {
+          email: user.email,
+          date: dateSession.toDateString(),
+          timeIn: dateSession.toTimeString(),
+          timeOut: null,
+          state: 'in'
+        };
+        const addedSession = await sessionService.addSession(session);
+        if (!addedSession) util.setErrorResponse(res, 'Can\'t register session', 500);
+        util.setSuccessResponse(res, 'Logged in successfully!', 200, token);
+      }
     } catch (error) {
       util.setErrorResponse(res, `Something Went wrong logging in ${error}`, 500);
     }
@@ -131,18 +135,19 @@ class userController {
   static async forgotPassword(req, res) {
     try {
       const user = await userService.getUserByMail(req.body.email);
-      if (!user) response.errorResponse(res, 404, 'User not found!');
-      const token = jwt.jwtSign(`${cry.crypto()}${user.firstName}`, process.env.SECRET);
+      if (!user) return response.errorResponse(res, 404, 'User not found!');
+      // const date = new Date();
+      const newDate = date.addMoreDays(1);
+      const token = jwt.jwtSign(newDate.getTime(), process.env.SECRET);
       await mailer([{
-        name: user.firstName
-      },
-      {
+        link: `${process.env.HOST}/auth/serve-verify?id=${user.id}&&token=${token}`
+      }, {
+        from: 'CINETIE support',
         to: req.body.email,
-        from: 'auth.user@cinetie.com',
-        subject: 'Password help  has arrived',
+        subject: 'Password help',
       },
       {
-        path: `${path.join(__dirname, '../public/templates/EmailVerificationSuccess.ejs')}`
+        path: `${path.resolve('src/public/templates/ForgotPassword.ejs')}`
       }
       ]);
       return response.successResponse(res, 200, 'Reset password link sent successfully!');
@@ -160,14 +165,30 @@ class userController {
         id
       } = req.query;
       jwt.jwtVerify(token, process.env.SECRET);
-      const user_ = userService.getUserById(id);
+      const user_ = await userService.getUserById(id);
       if (!user_) response.errorResponse(res, 404, 'User not found!', 'user undefined');
       const hash = bcrypt.encrypt(req.body.password);
       const newPass = {
         password: hash
       };
-      await userService.updateUser(id, newPass);
-      response.successResponse(res, 200, 'Password reset successfully!');
+      const result = await userService.updateUser(user_.email, newPass);
+      if (result[0] === 0) {
+        console.log('something went wrong');
+      } else {
+        await mailer([{
+          name: user_.firstName,
+          body: 'Your password has been reset successfully'
+        }, {
+          from: 'CINETIE support',
+          to: user_.email,
+          subject: 'Password help',
+        },
+        {
+          path: `${path.resolve('src/public/templates/notification.ejs')}`
+        }
+        ]);
+        res.redirect('http://www.cinetie.com/signin');
+      }
     } catch (error) {
       util.setErrorResponse(res, `Something Went wrong logging in ${error}`, 500);
     }
@@ -458,6 +479,14 @@ class userController {
       } else {
         util.setErrorResponse(res, 'Something went wrong', 500);
       }
+    } catch (error) {
+      util.setErrorResponse(res, error.message, 500);
+    }
+  }
+
+  static async serveVerifyPassword(req, res) {
+    try {
+      return res.render('ResetPassword', { host: process.env.HOST });
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
     }

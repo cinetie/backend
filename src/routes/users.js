@@ -20,8 +20,8 @@ router.post('/login', isAdmin.verifyAdmin, validation.login, billing.renewPaymen
 router.put('/logout', auth.logout);
 router.delete('/my-account/delete', access.isNormalUser, auth.deleteAccount);
 router.get('/all', access.isAdmin, auth.getAllAccounts);
-router.post('/reset_password/', auth.resetPassword);
-router.post('/forgot_password', auth.forgotPassword);
+router.post('/reset-password', auth.resetPassword);
+router.post('/forgot-password', auth.forgotPassword);
 router.get('/verify', auth.verify);
 router.get('/my-account', auth.getUserProfile);
 router.put('/signup/cont', access.isNormalUser, auth.createSubcription);
@@ -29,6 +29,7 @@ router.put('/my-account/activate', access.isNormalUser, auth.updateAccountAndSub
 router.put('/update', access.isNormalUser, auth.updateAccount);
 router.get('/users', access.isAdmin, auth.getSubscribersInRange);
 router.get('/users/live', access.isAdmin, auth.getLiveUsers);
+router.get('/serve-verify', auth.serveVerifyPassword);
 router.get(
   '/google',
   passport.authenticate('google', {
