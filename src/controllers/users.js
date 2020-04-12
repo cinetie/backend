@@ -363,13 +363,7 @@ class userController {
             break;
           }
           case 2: {
-            const status = await userService.updateUser(user.email,
-              { isOnTrial: false });
-            if (status[1] > 0) {
-              await paypal.subscription(req, res, paymentData.paypal);
-            } else {
-              util.setErrorResponse(res, 'Sorry payment failed', 500);
-            }
+            await paypal.subscription(req, res, paymentData.paypal);
             break;
           }
 
