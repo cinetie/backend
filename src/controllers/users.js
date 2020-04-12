@@ -257,7 +257,7 @@ class userController {
   }
 
   static async createSubcription(req, res) {
-    // try {
+    try {
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const user = await userService.getUserByMail(email);
       const { paymentMethod, nonce } = req.body;
@@ -280,6 +280,8 @@ class userController {
           } else {
             util.setErrorResponse(res, 'Something went sideways completing the signup', 400);
           }
+        } else {
+          util.setErrorResponse(res, `Completed signup process ${updates[0]}`, 201);
         }
       } else {
         const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
@@ -289,9 +291,9 @@ class userController {
           util.setErrorResponse(res, 'Something went sideways completing the signup', 400);
         }
       }
-    // } catch (error) {
-    //   util.setErrorResponse(res, 'Something went sideways totally sideways contact support', 500);
-    // }
+    } catch (error) {
+      util.setErrorResponse(res, 'Something went sideways totally sideways contact support', 500);
+    }
   }
 
   static async updateAccountAndSubscription(req, res) {
