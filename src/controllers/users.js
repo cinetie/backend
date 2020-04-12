@@ -26,6 +26,7 @@ class userController {
       newUser.isVerified = false;
       newUser.plan = 'Setup';
       newUser.permissionLevel = 1;
+      newUser.isOnTrial = true;
       const search = await userService.getUserByMail(newUser.email);
       if (search) {
         util.setErrorResponse(res, 'user already exists', 403);
@@ -190,13 +191,30 @@ class userController {
 
   static async deleteAccount(req, res) {
     try {
-      const {
-        id
-      } = req.query;
-      const status = await userService.deleteUser(id);
-      status !== 0 ? util.setSuccessResponse(res, 'deleted successfully', 200, status) : util.setErrorResponse(res, 'An error occured', 422);
+      const token = req.headers.authorization.slice(7);
+      const decoded = jwt.jwtVerify(token, process.env.SECRET);
+      const user = await userService.getUserByMail(decoded.email);
+      const status = await userService.deleteUser(user.id);
+      const subscription = await billingServices.getCurrentSubscription(decoded.email);
+      const cancelSubscription = await billingServices.updateSubscription(decoded.email, { state: 'canceled' });
+      if (subscription.paymentMethod === 2 && cancelSubscription[0] > 0) {
+        const cancelation = await paypal.cancelAggreement({ token });
+        // if (cancelation === 1) {
+        if (status !== 0) {
+          util.setSuccessResponse(res, 'deleted successfully', 200, status);
+        } else {
+          util.setErrorResponse(res, 'An error occured deleting your account', 400);
+        }
+        // } else {
+        //   util.setErrorResponse(res, 'An error occured can\'t cancel paypal subscription', 400);
+        // }
+      } else if (status !== 0) {
+        util.setSuccessResponse(res, 'deleted successfully', 200, status);
+      } else {
+        util.setErrorResponse(res, 'An error occured', 400);
+      }
     } catch (error) {
-      util.setErrorResponse(res, `An error occured : ${error}`, 522);
+      util.setErrorResponse(res, `An error occured : ${error}`, 500);
     }
   }
 
@@ -217,7 +235,7 @@ class userController {
     }
   }
 
-  static async updateAccountAndSubscription(req, res) {
+  static async createSubcription(req, res) {
     try {
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const user = await userService.getUserByMail(email);
@@ -229,10 +247,46 @@ class userController {
         phoneNumber: user.phoneNumber,
         isBilledAnnually: user.isBilledAnnually,
       };
+      if (Number(paymentMethod) === 3) {
+        const { customer } = await square.createCustomer({ email });
+        const cardId = await square.attachCard({ customerId: customer.id, nonce });
+        const updates = await userService.updateUser(email,
+          { card_nonce: cardId, customerId: customer.id });
+        if (updates[0] > 0) {
+          const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
+          if (subscriptionDetails) {
+            util.setSuccessResponse(res, 'Completed signup process', 201, subscriptionDetails);
+          } else {
+            util.setErrorResponse(res, 'Something went sideways completing the signup', 400);
+          }
+        }
+      } else {
+        const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
+        if (subscriptionDetails) {
+          util.setSuccessResponse(res, 'Completed signup process', 201, subscriptionDetails);
+        } else {
+          util.setErrorResponse(res, 'Something went sideways completing the signup', 400);
+        }
+      }
+    } catch (error) {
+      util.setErrorResponse(res, 'Something went sideways totally sideways contact support', 500);
+    }
+  }
+
+  static async updateAccountAndSubscription(req, res) {
+    try {
+      const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
+      const user = await userService.getUserByMail(email);
+      const subscriptionData = {
+        email,
+        plan: user.plan,
+        isBilledAnnually: user.isBilledAnnually,
+      };
       const price = await payment.getPlanPricing(subscriptionData);
-      // check if there is a current subscription
       const currentSubsctption = await billingServices.getCurrentSubscription(email);
-      if (!currentSubsctption) {
+      if (user.isOnTrial === false) {
+        util.setErrorResponse(res, 'account is already activated', 400);
+      } else {
         let frequency = 0;
         if (user.isBilledAnnually === true) {
           frequency = 'YEAR';
@@ -242,7 +296,7 @@ class userController {
         const paymentData = {
           user: {
             email,
-            paymentMethod,
+            paymentMethod: user.paymentMethod,
             isBilledAnnually: user.isBilledAnnually,
             plan: user.plan
           },
@@ -267,47 +321,56 @@ class userController {
         };
 
 
-        switch (Number(paymentMethod)) {
+        switch (Number(currentSubsctption.paymentMethod)) {
           case 1: {
             const momoData = await dax.momo(paymentData.momo);
-            const paymentDetails = await payment.registerNewSubscription(subscriptionData);
-            if (momoData !== 0 && paymentDetails) {
-              util.setSuccessResponse(res, 'Success', 201, momoData);
+            if (momoData !== 0) {
+              const updates = await userService.updateUser(user.email,
+                { isOnTrial: false, permissionLevel: 1 });
+              if (updates[0] > 0) {
+                util.setSuccessResponse(res, 'Success', 201, updates);
+              } else {
+                util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
+              }
             } else {
               util.setErrorResponse(res, 'Sorry payment failed', 500);
             }
             break;
           }
           case 2: {
-            await payment.registerNewSubscription(subscriptionData);
-            await paypal.subscription(req, res, paymentData.paypal);
+            const status = await userService.updateUser(user.email,
+              { isOnTrial: false });
+            if (status[0] > 0) {
+              await paypal.subscription(req, res, paymentData.paypal);
+            } else {
+              util.setErrorResponse(res, 'Sorry payment failed', 500);
+            }
             break;
           }
 
           case 3: {
-            const { customer } = await square.createCustomer({ email: user.email });
-            const cardId = await square.attachCard({ customerId: customer.id, nonce });
-            if (cardId) {
+            if (user.card_nonce) {
               const reciept = await square.billCard({
-                source_id: cardId,
+                source_id: user.card_nonce,
                 amount_money: {
                   amount: Number(price) * 100,
                   currency: 'USD'
                 },
-                customerId: customer.id
+                customerId: user.customerId
               });
-              const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
-              const updates = await userService.updateUser(user.email,
-                { card_nonce: cardId, customerId: customer.id, card_brand: reciept.cardBrand });
-              if (reciept.status === 'COMPLETED'
-              && updates[0] > 0
-              && subscriptionDetails) {
-                util.setSuccessResponse(res, 'Success', 201, subscriptionDetails);
+              if (reciept.status === 'COMPLETED') {
+                const updates = await userService.updateUser(user.email,
+                  { isOnTrial: false, card_brand: reciept.cardBrand, permissionLevel: 1 });
+                if (updates[0] > 0) {
+                  util.setSuccessResponse(res, 'Success', 201, undefined);
+                } else {
+                  util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
+                }
               } else {
-                util.setErrorResponse(res, `Sorry payment failed  ${updates}`, 500);
+                util.setErrorResponse(res, 'Sorry payment failed', 500);
               }
             } else {
-              util.setErrorResponse(res, `Sorry payment failed ${cardId}`, 500);
+              util.setErrorResponse(res, 'Can not save card', 500);
             }
 
             break;
@@ -316,8 +379,6 @@ class userController {
           default:
             util.setErrorResponse(res, 'Sorry payment failed', 500);
         }
-      } else {
-        util.setErrorResponse(res, 'subscription already exists', 400);
       }
       // const status = await userService.updateUser(email, user);
     } catch (error) {
@@ -378,8 +439,8 @@ class userController {
   static async getUserProfile(req, res) {
     try {
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
-      const response = await userService.getUser(email);
-      util.setSuccessResponse(res, 'Found', 200, response);
+      const _response = await userService.getUser(email);
+      util.setSuccessResponse(res, 'Found', 200, _response);
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
     }

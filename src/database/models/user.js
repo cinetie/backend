@@ -12,10 +12,10 @@ module.exports = (sequelize, DataTypes) => {
     nationality: DataTypes.STRING,
     cityOfResidence: DataTypes.STRING,
     phoneNumber: DataTypes.STRING,
-    crNumber: DataTypes.STRING,
     card_nonce: DataTypes.STRING,
     card_brand: DataTypes.STRING,
-    customerId: DataTypes.STRING
+    customerId: DataTypes.STRING,
+    isOnTrial: DataTypes.BOOLEAN
 
   }, {});
   User.associate = function (models) {

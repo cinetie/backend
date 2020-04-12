@@ -3,6 +3,7 @@ import service from '../services/transactionService';
 import paypal from '../helpers/paypal';
 import Util from '../helpers/utilities';
 import tokenService from '../services/tokenService';
+import userService from '../services/userServices';
 import billingService from '../services/billingServices';
 import jwt from '../helpers/jwt';
 
@@ -24,6 +25,7 @@ class transactionsController {
     try {
       const token = await tokenService.getToken(req.query.paymentId);
       const billInfo = await billingService.getCurrentSubscription(token.email);
+      await userService.updateUser(token.email, { permissionLevel: 1 });
       const details = {
         paymentId: req.query.paymentId,
         data: {
