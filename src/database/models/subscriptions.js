@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
     paymentMethod: DataTypes.INTEGER,
     state: DataTypes.STRING,
     phoneNumber: DataTypes.STRING,
+    trialEnds: DataTypes.BIGINT
 
   }, {});
   subscriptions.associate = function (models) {

@@ -1,5 +1,3 @@
-/* eslint-disable no-useless-catch */
-/* eslint-disable quotes */
 import path from 'path';
 import billingService from '../services/billingServices';
 import Util from '../helpers/utilities';
@@ -11,6 +9,7 @@ import userService from '../services/userServices';
 import dax from '../helpers/dax-payment-handler';
 import date from '../helpers/date';
 import Square from '../helpers/square';
+import jwt from '../helpers/jwt';
 
 
 // opay@123
@@ -49,10 +48,10 @@ class billing {
       const updates = await userService.updateUser(req.body.email, { permissionLevel: -1 });
       if (!updates) {
         await mailer([{
-          body: `putting onhold an account failed : line 45, /src/middlewares/billing`
+          body: 'putting onhold an account failed : line 45, /src/middlewares/billing'
         }, {
           from: 'Cinetie monitor',
-          to: `mugishaalainc@gmail.com`,
+          to: 'mugishaalainc@gmail.com',
           subject: 'Payment failed to process',
         },
         {
@@ -61,7 +60,7 @@ class billing {
         ]);
       } else {
         await mailer([{
-          body: `We would like you to know that your account has been put onhold. \n since your  payment didn't work out`
+          body: 'We would like you to know that your account has been put onhold. \n since your  payment didn\'t work out'
         }, {
           from: 'Cinetie support',
           to: req.body.email,
@@ -177,6 +176,44 @@ class billing {
       }
     } catch (error) {
       util.setErrorResponse(res, `an error occured  ${error}`, 500);
+    }
+  }
+
+  static async trial(req, res, next) {
+    try {
+      const { email } = jwt.jwtVerify(
+        req.headers.authorization.slice(7), process.env.SECRET
+      );
+      const data = await userService.getUserByMail(email);
+      if (data.isOnTrial === false) {
+        next();
+      } else {
+        const today = new Date();
+        const subscription = await billingService.getCurrentSubscription(email);
+        if (subscription.trialEnds > today.getTime()) {
+          next();
+        } else {
+          const updates = await userService.updateUser(email, { permissionLevel: -1 });
+          if (updates[0] > 0) {
+            await mailer([{
+              body: 'We would like you to know that your account has been put onhold. \n since your  trial just ended'
+            }, {
+              from: 'Cinetie support',
+              to: email,
+              subject: 'Update payment details',
+            },
+            {
+              path: `${path.join(__dirname, '../public/templates/notification.ejs')}`
+            }
+            ]);
+            util.setErrorResponse(res, 'Please activate your account as your trial just ended', 402);
+          } else {
+            util.setErrorResponse(res, 'Something went wrong ', 402);
+          }
+        }
+      }
+    } catch (error) {
+      util.setErrorResponse(res, 'Something went wrong', 500);
     }
   }
 }

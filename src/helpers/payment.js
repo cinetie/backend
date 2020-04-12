@@ -1,14 +1,10 @@
-/* eslint-disable no-case-declarations */
-/* eslint-disable no-use-before-define */
 /* eslint-disable no-unused-expressions */
-/* eslint-disable quotes */
-/* eslint-disable no-useless-catch */
 import billingService from '../services/billingServices';
 import planService from '../services/planServices';
-import date from "./date";
-import Util from "./utilities";
-import paypalHelper from "./paypal";
-import daxPay from "./dax-payment-handler";
+import date from './date';
+import Util from './utilities';
+import paypalHelper from './paypal';
+import daxPay from './dax-payment-handler';
 
 const util = new Util();
 class payment {
@@ -40,6 +36,7 @@ class payment {
         data.endDate = date.addMoreDays(31).toDateString();
       }
       data.paymentMethod = details.paymentMethod;
+      data.trialEnds = date.addMoreDays(5).getTime();
       const bill = await billingService.registerSubscription(data);
       if (bill) {
         return bill;
@@ -54,21 +51,22 @@ class payment {
     // check for what happens when payment fails to continue
     try {
       switch (Number(details.user.paymentMethod)) {
-        case 1:
-          console.log('momo called ----');
+        case 1: {
           const status = await daxPay.momo(details.momo)(status === 1) ? 1 : 0;
           break;
-        case 2:
-          console.log('----------hanging-------- payment');
-          const statusPayPal = await paypalHelper.subscription(req, res, details.paypal);
-          console.log(statusPayPal);
+        }
+        case 2: {
+          await paypalHelper.subscription(req, res, details.paypal);
           break;
-        case 3:
-          console.log('credit cards called ----');
+        }
+        case 3: {
           const statusCard = await daxPay.creditCards(details.creditCard);
           return statusCard;
-        default:
+        }
+
+        default: {
           util.setErrorResponse(res, 'Please select a method of payment', '400');
+        }
       }
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
