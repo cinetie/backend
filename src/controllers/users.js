@@ -380,7 +380,6 @@ class userController {
               if (reciept.status === 'COMPLETED') {
                 const updates = await userService.updateUser(user.email,
                   { isOnTrial: false, card_brand: reciept.cardBrand, permissionLevel: 1 });
-                console.log(updates);
                 if (updates[1] > 0) {
                   util.setSuccessResponse(res, 'Success', 201, undefined);
                 } else {
