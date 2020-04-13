@@ -195,7 +195,7 @@ class billing {
           next();
         } else {
           const updates = await userService.updateUser(email, { permissionLevel: -1 });
-          if (updates[1] > 0) {
+          if (updates[0] > 0) {
             await mailer([{
               body: 'We would like you to know that your account has been put onhold. \n since your  trial just ended'
             }, {

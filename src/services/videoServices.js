@@ -1,4 +1,4 @@
-import sequelize from 'sequelize';
+import sequelize, { Sequelize } from 'sequelize';
 import database from '../database/models';
 import date from '../helpers/date';
 
@@ -106,17 +106,9 @@ class videoService {
         offset: Number(offset),
         limit: 20,
         where: {
-          [op.or]: [{
-            videoName: {
-              [op.like]: `%${query}%`
-            }
-          },
-          {
-            category: {
-              [op.like]: `%${query}%`
-            }
-          }
-          ]
+          [op.col]: Sequelize.where(Sequelize.fn('lower', Sequelize.col('videoName')), {
+            [op.like]: `%${query}%`
+          })
         }
       });
       if (data) {

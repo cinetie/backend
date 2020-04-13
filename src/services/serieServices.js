@@ -65,6 +65,9 @@ class serieServices {
   static async getAllSeasons(videoId) {
     try {
       const data = await database.series.findAll({
+        attributes: {
+          exclude: ['episode', 'episodeName', 'videoId', 'thumbNailUrl', ' suspensionState', 'episodeNumber', 'synopsis', 'clientId']
+        },
         where: { [op.and]: [{ videoId }, { suspensionState: false }] },
         order: [
           ['id', 'DESC']

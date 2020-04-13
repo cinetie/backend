@@ -42,4 +42,4 @@ app.use((req, res, next) => {
 app.set('views', path.join(__dirname, '/public/templates'));
 app.set('view engine', 'ejs');
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log('Up and running'));
+app.listen(PORT, () => console.log(`Up and running on port ${PORT}`));

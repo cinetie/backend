@@ -317,7 +317,7 @@ class userController {
         const paymentData = {
           user: {
             email,
-            paymentMethod: user.paymentMethod,
+            paymentMethod: currentSubsctption.paymentMethod,
             isBilledAnnually: user.isBilledAnnually,
             plan: user.plan
           },
@@ -433,10 +433,14 @@ class userController {
   static async getLiveUsers(req, res) {
     try {
       const data = await sessionService.getLiveSessions();
-      (data) ? util.setSuccessResponse(res, 'Found ', 200, {
-        size: Object.values(data).length,
-        data
-      }) : util.setErrorResponse(res, `Can't find Live users ${JSON.stringify(data)}`, 404);
+      if (data) {
+        util.setSuccessResponse(res, 'Found ', 200, {
+          size: Object.values(data).length,
+          data
+        });
+      } else {
+        util.setErrorResponse(res, `Can't find Live users ${JSON.stringify(data)}`, 404);
+      }
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
     }
@@ -444,9 +448,16 @@ class userController {
 
   static async getUserByEmail(req, res) {
     try {
-      const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
-      const user = await userService.getUserByMail(decoded.email);
-      (user) ? util.setSuccessResponse(res, 'Found', 200, user) : util.setErrorResponse(res, 'Data not found', 404);
+      const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
+      const user = await userService.getUserByMail(email);
+      const currentSubscription = await billingServices.getCurrentSubscription(email);
+      console.log(currentSubscription.paymentMethod);
+      user.paymentMethod = currentSubscription.paymentMethod;
+      if (user) {
+        util.setSuccessResponse(res, 'Found', 200, { user, paymentMethod: currentSubscription.paymentMethod });
+      } else {
+        util.setErrorResponse(res, 'Data not found', 404);
+      }
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
     }
@@ -455,7 +466,11 @@ class userController {
   static async getUserProfile(req, res) {
     try {
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
+      const currentSubscription = await billingServices.getCurrentSubscription(email);
+
+      console.log(JSON.stringify(currentSubscription));
       const _response = await userService.getUser(email);
+      _response.paymentMethod = currentSubscription.paymentMethod;
       util.setSuccessResponse(res, 'Found', 200, _response);
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
