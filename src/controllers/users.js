@@ -256,6 +256,7 @@ class userController {
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const user = await userService.getUserByMail(email);
       const { paymentMethod, nonce } = req.body;
+      console.log(paymentMethod, nonce);
       const subscriptionData = {
         paymentMethod,
         email,
@@ -266,6 +267,7 @@ class userController {
       if (Number(paymentMethod) === 3) {
         const { customer } = await square.createCustomer({ email });
         const cardId = await square.attachCard({ customerId: customer.id, nonce });
+        console.log(customer, cardId);
         const updates = await userService.updateUser(email,
           { card_nonce: cardId, customerId: customer.id });
         console.log(updates);
@@ -288,7 +290,7 @@ class userController {
         }
       }
     } catch (error) {
-      util.setErrorResponse(res, 'Something went sideways totally sideways contact support', 500);
+      util.setErrorResponse(res, `Something went sideways totally sideways contact support ${ error}`, 500);
     }
   }
 
