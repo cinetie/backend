@@ -5,7 +5,6 @@ import * as validation from '../middlewares/validation/user';
 import '../config/passport';
 import access from '../middlewares/access';
 import screenValidator from '../middlewares/screenValidation';
-import earnings from '../middlewares/earnings';
 import isAdmin from '../middlewares/isAdmin';
 import billing from '../middlewares/billing';
 

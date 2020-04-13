@@ -87,14 +87,14 @@ class userController {
       },
       {
         to: user.email,
-        from: 'auth.user@cinetie.com',
+        from: 'CINETIE support',
         subject: 'Success email has been verified',
       },
       {
         path: `${path.join(__dirname, '../public/templates/EmailVerificationSuccess.ejs')}`
       }
       ]);
-      res.redirect('https://www.cinetie.com');
+      res.redirect(200, 'https://www.cinetie.com');
     } catch (error) {
       util.setErrorResponse(res, `Something went wrong ${error.message}`, 500);
     }
@@ -158,12 +158,7 @@ class userController {
 
   static async resetPassword(req, res) {
     try {
-      const {
-        token
-      } = req.query;
-      const {
-        id
-      } = req.query;
+      const { token, id } = req.query;
       jwt.jwtVerify(token, process.env.SECRET);
       const user_ = await userService.getUserById(id);
       if (!user_) response.errorResponse(res, 404, 'User not found!', 'user undefined');
@@ -172,8 +167,8 @@ class userController {
         password: hash
       };
       const result = await userService.updateUser(user_.email, newPass);
-      if (result[0] === 0) {
-        console.log('something went wrong');
+      if (result[1] === 0) {
+        util.setErrorResponse(res, 'Something Went wrong updating user password', 400);
       } else {
         await mailer([{
           name: user_.firstName,
@@ -187,10 +182,10 @@ class userController {
           path: `${path.resolve('src/public/templates/notification.ejs')}`
         }
         ]);
-        res.redirect('http://www.cinetie.com/signin');
+        res.redirect(200, 'http://www.cinetie.com/signin');
       }
     } catch (error) {
-      util.setErrorResponse(res, `Something Went wrong logging in ${error}`, 500);
+      util.setErrorResponse(res, `Something Went wrong resetting password ${error}`, 500);
     }
   }
 
@@ -204,7 +199,7 @@ class userController {
         key: cry.crypto(),
         email: req.user.email
       }, process.env.SECRET, '1d');
-      res.redirect(`https://cinetie-frontend.herokuapp.com/social_auth?token=${token}`);
+      res.redirect(200, `https://cinetie-frontend.herokuapp.com/social_auth?token=${token}`);
     } catch (error) {
       response.errorResponse(res, 500, 'Something went wrong!', error.message);
     }
@@ -273,7 +268,7 @@ class userController {
         const cardId = await square.attachCard({ customerId: customer.id, nonce });
         const updates = await userService.updateUser(email,
           { card_nonce: cardId, customerId: customer.id });
-          console.log(updates);
+        console.log(updates);
         if (updates[1] > 0) {
           const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
           if (subscriptionDetails) {
@@ -484,7 +479,7 @@ class userController {
 
   static async serveVerifyPassword(req, res) {
     try {
-      return res.render('ResetPassword', { host: process.env.HOST });
+      return res.render('ResetPassword', { host: process.env.HOST, role: 'auth' });
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
     }

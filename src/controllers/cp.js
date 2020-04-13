@@ -10,6 +10,7 @@ import mailer from '../helpers/mailer';
 import Util from '../helpers/utilities';
 import uuid from '../helpers/uuid';
 import cloudinary from '../helpers/cloudinary';
+import date from '../helpers/date';
 
 const util = new Util();
 // add an isVerified column to cp
@@ -41,7 +42,7 @@ class cpController {
         const EmailStatus = await mailer([{
           link: `${process.env.HOST}/cp/verify?id=${id}&&token=${jwt.jwtSign(req.body.email, process.env.SECRET)}`
         }, {
-          from: 'auth.cp@cinetie.com',
+          from: 'CINETIE support',
           to: req.body.email,
           subject: 'Email verification',
         },
@@ -80,7 +81,7 @@ class cpController {
       },
       {
         to: user.email,
-        from: 'auth.cp@cinetie.com',
+        from: 'CINETIE support',
         subject: 'Success email has been verified',
       },
       {
@@ -91,7 +92,7 @@ class cpController {
         util.setErrorResponse(res, 'can\'t send email', 500);
       } else {
         updatedUser.password = undefined;
-        res.redirect('https://www.cinetie.com');
+        res.redirect(200, 'https://www.cinetie.com');
       }
     } catch (error) {
       util.setErrorResponse(res, `Something went wrong ${error.message}`, 500);
@@ -142,15 +143,19 @@ class cpController {
     try {
       const user = await cp.getCpByMail(req.body.email);
       if (!user) util.setErrorResponse(res, 'can\'t find user', 404);
-      const token = jwt.jwtSign(`${cry.crypto()}${user.firstName}`, process.env.SECRET, '1d');
-      const emailTosend = {
+      const exp = date.addMoreDays(2);
+      const token = jwt.jwtSign({ exp: exp.getTime() }, process.env.SECRET, '1d');
+      await mailer([{
+        link: `${process.env.HOST}/cp/serve-verify?id=${user.id}&&token=${token}`
+      }, {
+        from: 'CINETIE support',
         to: req.body.email,
-        from: process.env.EMAIL_USER,
-        template: 'forgot-password',
-        subject: 'Password help has arrived!',
-        text: `Dear ${user.name} please follow this link to reset your password http://localhost:5000/auth/reset_password/?id=${user.id}&&token=${token}`,
-      };
-      await mdw.mailer(emailTosend);
+        subject: 'Password help',
+      },
+      {
+        path: `${path.resolve('src/public/templates/ForgotPassword.ejs')}`
+      }
+      ]);
       util.setSuccessResponse(res, 'Password reset link sent successfully', 200, user);
     } catch (error) {
       util.setErrorResponse(res, 'Something went wrong', 500);
@@ -159,17 +164,34 @@ class cpController {
 
   static async resetPassword(req, res) {
     try {
-      const { token } = req.query;
-      const { id } = req.query;
-      jwt.jwtVerify(token, process.env.SECRET);
-      const user_ = cp.getCpById(id);
-      if (!user_) util.setErrorResponse(res, 'can\'t find user', 404);
-      const hash = bcrypt.encrypt(req.body.password);
-      const newPass = {
-        password: hash
-      };
-      await cp.updateCp(id, newPass);
-      util.setSuccessResponse(res, 'Password reset  successfully', 200, null);
+      const { token, id } = req.query;
+      const { exp } = jwt.jwtVerify(token, process.env.SECRET);
+      const user_ = await cp.getCpById(id);
+      const _todayDate = new Date();
+      if (!user_ || exp <= _todayDate.getTime()) {
+        util.setErrorResponse(res, 'Link has expired', 400);
+      } else {
+        const hash = bcrypt.encrypt(req.body.password);
+        const newPass = { password: hash };
+        const status = await cp.updateCp(user_.email, newPass);
+        if (status[1] !== 1) {
+          util.setErrorResponse(res, 'Something Went wrong updating  your password', 400);
+        } else {
+          await mailer([{
+            name: user_.name,
+            body: 'Your password has been reset successfully'
+          }, {
+            from: 'CINETIE support',
+            to: user_.email,
+            subject: 'Password help',
+          },
+          {
+            path: `${path.resolve('src/public/templates/notification.ejs')}`
+          }
+          ]);
+          res.redirect(200, 'https://www.cinetie.com/cp/signin');
+        }
+      }
     } catch (error) {
       util.setErrorResponse(res, 'Something went wrong', 500);
     }
@@ -235,6 +257,15 @@ class cpController {
       util.setSuccessResponse(res, 'Data found', 200, videos);
     } else {
       util.setErrorResponse(res, 'Data not found', 400);
+    }
+  }
+
+  // eslint-disable-next-line consistent-return
+  static async serveVerifyPassword(req, res) {
+    try {
+      return res.render('ResetPassword', { host: process.env.HOST, role: 'cp' });
+    } catch (error) {
+      util.setErrorResponse(res, error.message, 500);
     }
   }
 }
