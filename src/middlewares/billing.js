@@ -104,6 +104,7 @@ class billing {
       } else {
         const today = new Date();
         const details = await billing.fetchCurrentSubscription(req, res);
+        console.log(today.toDateString());
         if (details.endDate === today.toDateString()) {
           const salesStipend = details.price * 0.3;
           if (Number(details.paymentMethod) === 1) {
