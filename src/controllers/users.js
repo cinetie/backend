@@ -451,10 +451,12 @@ class userController {
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const user = await userService.getUserByMail(email);
       const currentSubscription = await billingServices.getCurrentSubscription(email);
-      console.log(currentSubscription.paymentMethod);
-      user.paymentMethod = currentSubscription.paymentMethod;
       if (user) {
-        util.setSuccessResponse(res, 'Found', 200, { user, paymentMethod: currentSubscription.paymentMethod });
+        if (currentSubscription) {
+          util.setSuccessResponse(res, 'Found', 200, { user, paymentMethod: currentSubscription.paymentMethod });
+        } else {
+          util.setSuccessResponse(res, 'Found', 200, user);
+        }
       } else {
         util.setErrorResponse(res, 'Data not found', 404);
       }
