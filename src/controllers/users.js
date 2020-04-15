@@ -254,40 +254,45 @@ class userController {
   static async createSubcription(req, res) {
     try {
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
-      const user = await userService.getUserByMail(email);
-      const { paymentMethod, nonce } = req.body;
-      console.log(paymentMethod, nonce);
-      const subscriptionData = {
-        paymentMethod,
-        email,
-        plan: user.plan,
-        phoneNumber: user.phoneNumber,
-        isBilledAnnually: user.isBilledAnnually,
-      };
-      if (Number(paymentMethod) === 3) {
-        const { customer } = await square.createCustomer({ email });
-        const cardId = await square.attachCard({ customerId: customer.id, nonce });
-        console.log(customer, cardId);
-        const updates = await userService.updateUser(email,
-          { card_nonce: cardId, customerId: customer.id });
-        console.log(updates);
-        if (updates[1] > 0) {
+      const currentSubscription = await billingServices.getCurrentSubscription(email);
+      if (!currentSubscription) {
+        const user = await userService.getUserByMail(email);
+        const { paymentMethod, nonce } = req.body;
+        console.log(paymentMethod, nonce);
+        const subscriptionData = {
+          paymentMethod,
+          email,
+          plan: user.plan,
+          phoneNumber: user.phoneNumber,
+          isBilledAnnually: user.isBilledAnnually,
+        };
+        if (Number(paymentMethod) === 3) {
+          const { customer } = await square.createCustomer({ email });
+          const cardId = await square.attachCard({ customerId: customer.id, nonce });
+          console.log(customer, cardId);
+          const updates = await userService.updateUser(email,
+            { card_nonce: cardId, customerId: customer.id });
+          console.log(updates);
+          if (updates[1] > 0) {
+            const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
+            if (subscriptionDetails) {
+              util.setSuccessResponse(res, 'Completed signup process', 201, subscriptionDetails);
+            } else {
+              util.setErrorResponse(res, 'Something went sideways completing the signup', 400);
+            }
+          } else {
+            util.setErrorResponse(res, 'something went side ways updating credit card details', 400);
+          }
+        } else {
           const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
           if (subscriptionDetails) {
             util.setSuccessResponse(res, 'Completed signup process', 201, subscriptionDetails);
           } else {
             util.setErrorResponse(res, 'Something went sideways completing the signup', 400);
           }
-        } else {
-          util.setErrorResponse(res, 'something went side ways updating credit card details', 400);
         }
       } else {
-        const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
-        if (subscriptionDetails) {
-          util.setSuccessResponse(res, 'Completed signup process', 201, subscriptionDetails);
-        } else {
-          util.setErrorResponse(res, 'Something went sideways completing the signup', 400);
-        }
+        util.setErrorResponse(res, 'user has an active subscription', 400);
       }
     } catch (error) {
       util.setErrorResponse(res, `Something went sideways totally sideways contact support ${ error}`, 500);
@@ -348,7 +353,6 @@ class userController {
             if (momoData !== 0) {
               const updates = await userService.updateUser(user.email,
                 { isOnTrial: false, permissionLevel: 1 });
-              console.log(updates);
               if (updates[1] > 0) {
                 util.setSuccessResponse(res, 'Success', 201, updates);
               } else {

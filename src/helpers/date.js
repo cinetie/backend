@@ -11,7 +11,7 @@ const addMoreDays = (days) => {
 // 0 :false 1: true
 const isEndOfMonth = () => {
   const now = new Date();
-  if (now.getDate() === 14) {
+  if (now.getDate() === 15) {
     const tommorow = new Date(now.valueOf());
     tommorow.setDate(tommorow.getDate() + 1);
     if (tommorow.getDate() === 31) {
@@ -27,7 +27,7 @@ const isEndOfyear = () => {
   const now = new Date();
   // now.getMonth() === 12 && now.getDate() === 31
   console.log(now.getMonth(), now.getDate());
-  if (now.getMonth() === 3 && now.getDate() === 14) {
+  if (now.getMonth() === 3 && now.getDate() === 15) {
     return 1;
   }
   return 0;
