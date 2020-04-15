@@ -414,8 +414,8 @@ class userController {
   static async getSubscribersInRange(req, res) {
     try {
       // in Milliseconds since epoch.
-      const start = date.convertToTimestamp(req.body.start);
-      const end = date.convertToTimestamp(req.body.end);
+      const start = date.convertToTimestamp(req.query.start);
+      const end = date.convertToTimestamp(req.query.end);
       const data = await billingServices.getMonthlySubscribers(start, end);
       if (Object.values(data).length > 0) {
         util.setSuccessResponse(res, 'Data was found', 200, {
