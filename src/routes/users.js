@@ -5,9 +5,9 @@ import * as validation from '../middlewares/validation/user';
 import '../config/passport';
 import access from '../middlewares/access';
 import screenValidator from '../middlewares/screenValidation';
-import earnings from '../middlewares/earnings';
 import isAdmin from '../middlewares/isAdmin';
 import billing from '../middlewares/billing';
+import earnings from '../middlewares/earnings';
 
 const router = new Router();
 
@@ -16,18 +16,20 @@ router.use(passport.session());
 
 router.post('/signup', validation.signup, auth.signupUser);
 router.get('/particular', auth.getUserByEmail);
-router.post('/login', isAdmin.verifyAdmin, validation.login, billing.renewPayment, earnings.registerEarnings, billing.verifyPermissionLevel, screenValidator.validateNumberOfScreens, auth.loginUser);
+router.post('/login', isAdmin.verifyAdmin, validation.login, billing.renewPayment, earnings.registerEarnings, screenValidator.validateNumberOfScreens, auth.loginUser);
 router.put('/logout', auth.logout);
-router.delete('/delete_acc', access.isNormalUser, auth.deleteAccount);
+router.delete('/my-account/delete', access.isNormalUser, auth.deleteAccount);
 router.get('/all', access.isAdmin, auth.getAllAccounts);
-router.post('/reset_password/', auth.resetPassword);
-router.post('/forgot_password', auth.forgotPassword);
+router.post('/reset-password', auth.resetPassword);
+router.post('/forgot-password', auth.forgotPassword);
 router.get('/verify', auth.verify);
 router.get('/my-account', auth.getUserProfile);
-router.put('/signup/cont', auth.updateAccountAndSubscription);
-router.put('/update', auth.updateAccount);
+router.put('/signup/cont', access.isNormalUser, auth.createSubcription);
+router.put('/my-account/activate', access.isNormalUser, auth.updateAccountAndSubscription);
+router.put('/update', access.isNormalUser, auth.updateAccount);
 router.get('/users', access.isAdmin, auth.getSubscribersInRange);
 router.get('/users/live', access.isAdmin, auth.getLiveUsers);
+router.get('/serve-verify', auth.serveVerifyPassword);
 router.get(
   '/google',
   passport.authenticate('google', {

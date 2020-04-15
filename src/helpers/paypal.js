@@ -1,5 +1,4 @@
 /* eslint-disable no-useless-catch */
-/* eslint-disable quotes */
 import paypalHelper from 'paypal-rest-sdk';
 import moment from 'moment';
 import _ from 'lodash';
@@ -10,8 +9,9 @@ import paypapTransServices from '../services/paypalTransServices';
 import billingServices from '../services/billingServices';
 import paypalAggreementServices from '../services/paypalAggreementService';
 import Util from './utilities';
-import jwt from "./jwt";
-import date from "./date";
+import jwt from './jwt';
+import date from './date';
+import userService from '../services/userServices';
 
 const util = new Util();
 paypalHelper.configure({
@@ -22,9 +22,9 @@ paypalHelper.configure({
 class paypal {
   static async setPaymentJson(details) {
     const paymentJSON = {
-      intent: "sale",
+      intent: 'sale',
       payer: {
-        payment_method: "paypal"
+        payment_method: 'paypal'
       },
       redirect_urls: {
         return_url: details.urls.success,
@@ -41,7 +41,7 @@ class paypal {
           }]
         },
         amount: {
-          currency: "USD",
+          currency: 'USD',
           total: details.total
         },
         description: details.paymentDesc
@@ -61,7 +61,7 @@ class paypal {
           const tokenData = {
             token: payment.id,
             email: details.name,
-            desc: "PayPal-Active"
+            desc: 'PayPal-Active'
           };
           console.log(payment.links[1]);
           await tokenService.createNewToken(tokenData, '');
@@ -100,48 +100,48 @@ class paypal {
     const billingPlanAttributes = {
       description: ` Cinetie ${details.plan}`,
       merchant_preferences: {
-        auto_bill_amount: "yes",
+        auto_bill_amount: 'yes',
         cancel_url: details.urls.failOrCancel,
-        initial_fail_amount_action: "continue",
-        max_fail_attempts: "1",
+        initial_fail_amount_action: 'continue',
+        max_fail_attempts: '3',
         return_url: details.urls.success,
         setup_fee: {
-          currency: "USD",
-          value: "1"
+          currency: 'USD',
+          value: '0'
         }
       },
-      name: "Paypal Agreement",
+      name: 'Paypal Agreement',
       payment_definitions: [{
         amount: {
           currency: details.currency,
           value: String(details.price)
         },
         charge_models: [],
-        cycles: "0",
+        cycles: '0',
         frequency: details.frequency,
         frequency_interval: 1,
-        name: "Regular Payments",
-        type: "REGULAR"
+        name: 'Regular Payments',
+        type: 'REGULAR'
       }],
-      type: "INFINITE"
+      type: 'INFINITE'
     };
     const billingPlanUpdateAttributes = [{
-      op: "replace",
-      path: "/",
+      op: 'replace',
+      path: '/',
       value: {
-        state: "ACTIVE"
+        state: 'ACTIVE'
       }
     }];
     const startDate = `${moment(new Date()).add(10, 'minute').format('gggg-MM-DDTHH:mm:ss')}Z`;
     const billingAgreementAttributes = {
-      name: "Name of Payment Agreement",
-      description: "Description of  your payment  agreement",
+      name: 'Name of Payment Agreement',
+      description: 'Description of  your payment  agreement',
       start_date: startDate,
       plan: {
-        id: ""
+        id: ''
       },
       payer: {
-        payment_method: "paypal"
+        payment_method: 'paypal'
       }
     };
     paypalHelper.billingPlan.create(billingPlanAttributes, (error, billingPlan) => {
@@ -167,7 +167,7 @@ class paypal {
                     const approvalUrl = agreement.href;
                     const token = approvalUrl.split('token=')[1];
                     console.log(approvalUrl, JSON.stringify(agreement));
-                    res.redirect(approvalUrl);
+                    util.setSuccessResponse(res, 'Success ', 200, approvalUrl);
                   } else {
                     return 0;
                   }
@@ -203,11 +203,15 @@ class paypal {
           state: 'alive'
         });
         await paypapTransServices.createTransaction(data);
-        console.log(billingAgreement);
-        // Billing agreement will have all the information about the agreement.
-        util.setSuccessResponse(res, 'User can now watch movies', 202, {
-          status: "Info updated"
-        });
+        const updateStatus = await userService.updateUser(decoded,
+          { isOnTrial: false, permissionLevel: 1 });
+        if (updateStatus[1] > 0) {
+          console.log(billingAgreement);
+          // Billing agreement will have all the information about the agreement.
+          res.redirect('https://www.cinetie.com', 200);
+        } else {
+          util.setErrorResponse(res, 'Something went sideways ', 400);
+        }
       }
     });
   }
@@ -218,7 +222,7 @@ class paypal {
     console.log(JSON.stringify(aggreement));
     if (aggreement) {
       const cancelNote = {
-        note: "Cancel subscription to cinetie"
+        note: 'Cancel subscription to cinetie'
       };
       console.log('start 1');
       paypalHelper.billingAgreement.cancel(aggreement.aggreementId, cancelNote, (error, response) => {
@@ -233,7 +237,7 @@ class paypal {
           } else if (billingAgreement.state) {
             // cancel subscription in the database
             const paypalUpdates = await paypalAggreementServices.updateAggreement(aggreement.aggreementId, { state: 'canceled' });
-            const updates = await billingServices.updateSubscription(user.email, { state: "canceled" });
+            const updates = await billingServices.updateSubscription(user.email, { state: 'canceled' });
             if (updates && paypalUpdates) return 1;
             return 0;
           }
@@ -250,7 +254,7 @@ class paypal {
     const raw_start_date = date.removeDays(3);
     const raw_end_date = raw.getTime();
     console.log(aggreement.aggreementId);
-    if (!aggreement || aggreement.state == 'canceled') return 0;
+    if (!aggreement || aggreement.state === 'canceled') return 0;
     paypalHelper.billingAgreement.searchTransactions(aggreement.aggreementId, date.convertToISO(raw_start_date), date.convertToISO(raw_end_date), async (error, data) => {
       if (error) {
         console.log(error);

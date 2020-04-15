@@ -7,7 +7,8 @@ import opay from '../helpers/opay';
 
 const util = new Util();
 
-// middleware for registering earnings/shares based on the amount of videos watched and subscription plan
+// middleware for registering earnings/shares based 
+// on the amount of videos watched and subscription plan
 class earningsMiddleware {
   static async registerEarnings(req, res, next) {
     console.log('Earnings');
@@ -17,8 +18,10 @@ class earningsMiddleware {
       console.log('Earnings -> data accurate');
       if (user) {
         console.log('Earnings -> user');
-        console.log(date.isEndOfMonth(), user.isBilledAnnually);
-        if ((date.isEndOfMonth() == 1 && user.isBilledAnnually == false) || (date.isEndOfyear() == 1 && user.isBilledAnnually == true)) {
+        console.log(date.isEndOfMonth(), date.isEndOfyear(), user.isBilledAnnually);
+        if (
+          (date.isEndOfMonth() === 1 && user.isBilledAnnually === false)
+          || (date.isEndOfyear() === 1 && user.isBilledAnnually === true)) {
           console.log('Earnings -> details');
           const updates = await subscriptions.updateSubscription(req.body.email, {
             dueState: true

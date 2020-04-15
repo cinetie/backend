@@ -3,6 +3,7 @@ import service from '../services/transactionService';
 import paypal from '../helpers/paypal';
 import Util from '../helpers/utilities';
 import tokenService from '../services/tokenService';
+import userService from '../services/userServices';
 import billingService from '../services/billingServices';
 import jwt from '../helpers/jwt';
 
@@ -24,19 +25,26 @@ class transactionsController {
     try {
       const token = await tokenService.getToken(req.query.paymentId);
       const billInfo = await billingService.getCurrentSubscription(token.email);
-      const details = {
-        paymentId: req.query.paymentId,
-        data: {
-          payer_id: req.query.PayerID,
-          transactions: [{
-            amount: {
-              currency: "USD",
-              total: billInfo.price
-            }
-          }]
-        }
-      };
-      await paypal.executePayment(details);
+      const status = await userService.updateUser(token.email,
+        { isOnTrial: false, permissionLevel: 1 });
+
+      if (status[1] > 0) {
+        const details = {
+          paymentId: req.query.paymentId,
+          data: {
+            payer_id: req.query.PayerID,
+            transactions: [{
+              amount: {
+                currency: "USD",
+                total: billInfo.price
+              }
+            }]
+          }
+        };
+        await paypal.executePayment(details);
+      } else {
+        util.setErrorResponse(res, "something went sideways while creating updating user details", 500);
+      }
     } catch (error) {
       util.setErrorResponse(res, error.message, 503);
     }

@@ -4,8 +4,8 @@ import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
 import app from '../index';
 
-const signupUrl = `${process.env.host}/auth/signup`;
-const signinUrl = `${process.env.host}/auth/login`;
+const signupUrl = `${process.env.HOST}/auth/signup`;
+const signinUrl = `${process.env.HOST}/auth/login`;
 
 chai.use(chaiHttp);
 const normalRegData = {

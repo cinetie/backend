@@ -100,6 +100,7 @@ class billingServices {
   static async updateSubscription(email, updated) {
     try {
       const status = await database.subscriptions.update(updated, {
+        returning: true,
         where: { email }
       });
       if (status) {

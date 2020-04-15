@@ -104,8 +104,8 @@ class videoController {
 
   static async search(req, res) {
     try {
-      const { q } = req.query;
-      const videos = await videoService.search(q);
+      const { q, offset } = req.query;
+      const videos = await videoService.search(q, offset);
       if (Object.values(videos).length > 0) {
         util.setSuccessResponse(res, 'Videos found', 200, videos);
       } else {
@@ -118,10 +118,10 @@ class videoController {
 
   static async getAllVideosLocal(req, res) {
     const videos = await videoService.getAllVideosForAdmin();
-    if (videos) {
+    if (Object.values(videos).length > 0) {
       util.setSuccessResponse(res, 'Data found', 200, videos);
     } else {
-      util.setErrorResponse(res, 'Data not found', 400);
+      util.setErrorResponse(res, 'Data not found', 404);
     }
   }
 
@@ -214,10 +214,30 @@ class videoController {
   static async updateVideos(req, res) {
     try {
       const returned = await videoService.getVideoById(req.query.id);
-      if (!returned) response.errorResponse(res, 404, 'Video not updated');
+      if (!returned) {
+        return response.errorResponse(res, 404, 'Video not updated');
+      }
       const toUpdate = req.body;
       const updated = await videoService.updateVideo(req.query.id, toUpdate);
-      response.successResponse(res, 200, 'Video successfully updated!', updated);
+      return response.successResponse(res, 200, 'Video successfully updated!', updated);
+    } catch (error) {
+      response.errorResponse(res, 500, 'Something went wrong', error.message);
+    }
+  }
+
+  static async featureVideo(req, res) {
+    try {
+      const { featureType, isFeatured, type } = req.body;
+      const returned = await videoService.getVideoById(req.query.id);
+      if (!returned) {
+        return response.errorResponse(res, 404, 'Video not updated');
+      }
+      const resetFeatured = await videoService.resetFeaturedVideo(featureType, isFeatured, type);
+      // if (resetFeatured[0] === 0) {
+      //   return response.errorResponse(res, 500, 'Something went wrong resetting featured ', undefined);
+      // }
+      const updated = await videoService.updateVideo(req.query.id, req.body);
+      return response.successResponse(res, 200, 'Video successfully updated!', updated);
     } catch (error) {
       response.errorResponse(res, 500, 'Something went wrong', error.message);
     }

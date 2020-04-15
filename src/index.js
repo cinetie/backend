@@ -2,6 +2,7 @@ import '@babel/polyfill';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import path from 'path';
 import fileUpload from 'express-fileupload';
 import response from './helpers/response';
 import routes from './routes';
@@ -38,7 +39,7 @@ app.use('/', routes);
 app.use((req, res, next) => {
   response.errorResponse(res, 404, 'Not found', 'Undefined URL');
 });
-
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log('Up and running'));
+app.set('views', path.join(__dirname, '/public/templates'));
+app.set('view engine', 'ejs');
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`Up and running on port ${PORT}`));
