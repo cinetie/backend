@@ -104,6 +104,7 @@ class billing {
       } else {
         const today = new Date();
         const details = await billing.fetchCurrentSubscription(req, res);
+        console.log(today.toDateString());
         if (details.endDate === today.toDateString()) {
           const salesStipend = details.price * 0.3;
           if (Number(details.paymentMethod) === 1) {
@@ -168,7 +169,8 @@ class billing {
 
   static async verifyPermissionLevel(req, res, next) {
     try {
-      const data = await userService.getUserByMail(req.body.email);
+      const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
+      const data = await userService.getUserByMail(email);
       if (data.permissionLevel !== 1) {
         util.setErrorResponse(res, 'Please sent up your billing', 402);
       } else {

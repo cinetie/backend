@@ -14,6 +14,7 @@ export default class Square {
       body: JSON.stringify({ email_address: data.email }),
     });
     const responseToJson = await response.json();
+    console.log(responseToJson);
     return responseToJson;
   }
 
@@ -28,6 +29,8 @@ export default class Square {
       body: JSON.stringify({ card_nonce: data.nonce }),
     });
     const responseToJson = await response.json();
+
+    console.log(responseToJson);
     return responseToJson.card.id;
   }
 
@@ -49,6 +52,8 @@ export default class Square {
     const jsonResponse = await response.json();
     const { status } = jsonResponse.payment;
     const { card_brand } = jsonResponse.payment.card_details.card;
+
+    console.log(jsonResponse);
     return {
       status, cardBrand: card_brand
     };

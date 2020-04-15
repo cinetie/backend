@@ -11,6 +11,7 @@ import paypalAggreementServices from '../services/paypalAggreementService';
 import Util from './utilities';
 import jwt from './jwt';
 import date from './date';
+import userService from '../services/userServices';
 
 const util = new Util();
 paypalHelper.configure({
@@ -202,9 +203,15 @@ class paypal {
           state: 'alive'
         });
         await paypapTransServices.createTransaction(data);
-        console.log(billingAgreement);
-        // Billing agreement will have all the information about the agreement.
-        res.redirect('https://www.cinetie.com', 200);
+        const updateStatus = await userService.updateUser(decoded,
+          { isOnTrial: false, permissionLevel: 1 });
+        if (updateStatus[1] > 0) {
+          console.log(billingAgreement);
+          // Billing agreement will have all the information about the agreement.
+          res.redirect('https://www.cinetie.com', 200);
+        } else {
+          util.setErrorResponse(res, 'Something went sideways ', 400);
+        }
       }
     });
   }

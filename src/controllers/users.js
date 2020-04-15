@@ -87,14 +87,14 @@ class userController {
       },
       {
         to: user.email,
-        from: 'auth.user@cinetie.com',
+        from: 'CINETIE support',
         subject: 'Success email has been verified',
       },
       {
         path: `${path.join(__dirname, '../public/templates/EmailVerificationSuccess.ejs')}`
       }
       ]);
-      res.redirect('https://www.cinetie.com');
+      res.redirect(200, 'https://www.cinetie.com');
     } catch (error) {
       util.setErrorResponse(res, `Something went wrong ${error.message}`, 500);
     }
@@ -158,12 +158,7 @@ class userController {
 
   static async resetPassword(req, res) {
     try {
-      const {
-        token
-      } = req.query;
-      const {
-        id
-      } = req.query;
+      const { token, id } = req.query;
       jwt.jwtVerify(token, process.env.SECRET);
       const user_ = await userService.getUserById(id);
       if (!user_) response.errorResponse(res, 404, 'User not found!', 'user undefined');
@@ -172,8 +167,8 @@ class userController {
         password: hash
       };
       const result = await userService.updateUser(user_.email, newPass);
-      if (result[0] === 0) {
-        console.log('something went wrong');
+      if (result[1] === 0) {
+        util.setErrorResponse(res, 'Something Went wrong updating user password', 400);
       } else {
         await mailer([{
           name: user_.firstName,
@@ -187,10 +182,10 @@ class userController {
           path: `${path.resolve('src/public/templates/notification.ejs')}`
         }
         ]);
-        res.redirect('http://www.cinetie.com/signin');
+        res.redirect(200, 'http://www.cinetie.com/signin');
       }
     } catch (error) {
-      util.setErrorResponse(res, `Something Went wrong logging in ${error}`, 500);
+      util.setErrorResponse(res, `Something Went wrong resetting password ${error}`, 500);
     }
   }
 
@@ -204,7 +199,7 @@ class userController {
         key: cry.crypto(),
         email: req.user.email
       }, process.env.SECRET, '1d');
-      res.redirect(`https://cinetie-frontend.herokuapp.com/social_auth?token=${token}`);
+      res.redirect(200, `https://cinetie-frontend.herokuapp.com/social_auth?token=${token}`);
     } catch (error) {
       response.errorResponse(res, 500, 'Something went wrong!', error.message);
     }
@@ -257,10 +252,11 @@ class userController {
   }
 
   static async createSubcription(req, res) {
-    // try {
+    try {
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const user = await userService.getUserByMail(email);
       const { paymentMethod, nonce } = req.body;
+      console.log(paymentMethod, nonce);
       const subscriptionData = {
         paymentMethod,
         email,
@@ -271,15 +267,19 @@ class userController {
       if (Number(paymentMethod) === 3) {
         const { customer } = await square.createCustomer({ email });
         const cardId = await square.attachCard({ customerId: customer.id, nonce });
+        console.log(customer, cardId);
         const updates = await userService.updateUser(email,
           { card_nonce: cardId, customerId: customer.id });
-        if (updates[0] > 0) {
+        console.log(updates);
+        if (updates[1] > 0) {
           const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
           if (subscriptionDetails) {
             util.setSuccessResponse(res, 'Completed signup process', 201, subscriptionDetails);
           } else {
             util.setErrorResponse(res, 'Something went sideways completing the signup', 400);
           }
+        } else {
+          util.setErrorResponse(res, 'something went side ways updating credit card details', 400);
         }
       } else {
         const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
@@ -289,9 +289,9 @@ class userController {
           util.setErrorResponse(res, 'Something went sideways completing the signup', 400);
         }
       }
-    // } catch (error) {
-    //   util.setErrorResponse(res, 'Something went sideways totally sideways contact support', 500);
-    // }
+    } catch (error) {
+      util.setErrorResponse(res, `Something went sideways totally sideways contact support ${ error}`, 500);
+    }
   }
 
   static async updateAccountAndSubscription(req, res) {
@@ -317,7 +317,7 @@ class userController {
         const paymentData = {
           user: {
             email,
-            paymentMethod: user.paymentMethod,
+            paymentMethod: currentSubsctption.paymentMethod,
             isBilledAnnually: user.isBilledAnnually,
             plan: user.plan
           },
@@ -348,7 +348,8 @@ class userController {
             if (momoData !== 0) {
               const updates = await userService.updateUser(user.email,
                 { isOnTrial: false, permissionLevel: 1 });
-              if (updates[0] > 0) {
+              console.log(updates);
+              if (updates[1] > 0) {
                 util.setSuccessResponse(res, 'Success', 201, updates);
               } else {
                 util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
@@ -359,13 +360,7 @@ class userController {
             break;
           }
           case 2: {
-            const status = await userService.updateUser(user.email,
-              { isOnTrial: false });
-            if (status[0] > 0) {
-              await paypal.subscription(req, res, paymentData.paypal);
-            } else {
-              util.setErrorResponse(res, 'Sorry payment failed', 500);
-            }
+            await paypal.subscription(req, res, paymentData.paypal);
             break;
           }
 
@@ -382,7 +377,7 @@ class userController {
               if (reciept.status === 'COMPLETED') {
                 const updates = await userService.updateUser(user.email,
                   { isOnTrial: false, card_brand: reciept.cardBrand, permissionLevel: 1 });
-                if (updates[0] > 0) {
+                if (updates[1] > 0) {
                   util.setSuccessResponse(res, 'Success', 201, undefined);
                 } else {
                   util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
@@ -419,8 +414,8 @@ class userController {
   static async getSubscribersInRange(req, res) {
     try {
       // in Milliseconds since epoch.
-      const start = date.convertToTimestamp(req.body.start);
-      const end = date.convertToTimestamp(req.body.end);
+      const start = date.convertToTimestamp(req.query.start);
+      const end = date.convertToTimestamp(req.query.end);
       const data = await billingServices.getMonthlySubscribers(start, end);
       if (Object.values(data).length > 0) {
         util.setSuccessResponse(res, 'Data was found', 200, {
@@ -438,10 +433,14 @@ class userController {
   static async getLiveUsers(req, res) {
     try {
       const data = await sessionService.getLiveSessions();
-      (data) ? util.setSuccessResponse(res, 'Found ', 200, {
-        size: Object.values(data).length,
-        data
-      }) : util.setErrorResponse(res, `Can't find Live users ${JSON.stringify(data)}`, 404);
+      if (data) {
+        util.setSuccessResponse(res, 'Found ', 200, {
+          size: Object.values(data).length,
+          data
+        });
+      } else {
+        util.setErrorResponse(res, `Can't find Live users ${JSON.stringify(data)}`, 404);
+      }
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
     }
@@ -449,9 +448,18 @@ class userController {
 
   static async getUserByEmail(req, res) {
     try {
-      const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
-      const user = await userService.getUserByMail(decoded.email);
-      (user) ? util.setSuccessResponse(res, 'Found', 200, user) : util.setErrorResponse(res, 'Data not found', 404);
+      const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
+      const user = await userService.getUserByMail(email);
+      const currentSubscription = await billingServices.getCurrentSubscription(email);
+      if (user) {
+        if (currentSubscription) {
+          util.setSuccessResponse(res, 'Found', 200, { user, paymentMethod: currentSubscription.paymentMethod });
+        } else {
+          util.setSuccessResponse(res, 'Found', 200, user);
+        }
+      } else {
+        util.setErrorResponse(res, 'Data not found', 404);
+      }
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
     }
@@ -460,7 +468,11 @@ class userController {
   static async getUserProfile(req, res) {
     try {
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
+      const currentSubscription = await billingServices.getCurrentSubscription(email);
+
+      console.log(JSON.stringify(currentSubscription));
       const _response = await userService.getUser(email);
+      _response.paymentMethod = currentSubscription.paymentMethod;
       util.setSuccessResponse(res, 'Found', 200, _response);
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
@@ -486,7 +498,7 @@ class userController {
 
   static async serveVerifyPassword(req, res) {
     try {
-      return res.render('ResetPassword', { host: process.env.HOST });
+      return res.render('ResetPassword', { host: process.env.HOST, role: 'auth' });
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
     }

@@ -5,9 +5,9 @@ import * as validation from '../middlewares/validation/user';
 import '../config/passport';
 import access from '../middlewares/access';
 import screenValidator from '../middlewares/screenValidation';
-import earnings from '../middlewares/earnings';
 import isAdmin from '../middlewares/isAdmin';
 import billing from '../middlewares/billing';
+import earnings from '../middlewares/earnings';
 
 const router = new Router();
 
@@ -16,7 +16,7 @@ router.use(passport.session());
 
 router.post('/signup', validation.signup, auth.signupUser);
 router.get('/particular', auth.getUserByEmail);
-router.post('/login', isAdmin.verifyAdmin, validation.login, billing.renewPayment, earnings.registerEarnings, billing.verifyPermissionLevel, screenValidator.validateNumberOfScreens, auth.loginUser);
+router.post('/login', isAdmin.verifyAdmin, validation.login, billing.renewPayment, earnings.registerEarnings, screenValidator.validateNumberOfScreens, auth.loginUser);
 router.put('/logout', auth.logout);
 router.delete('/my-account/delete', access.isNormalUser, auth.deleteAccount);
 router.get('/all', access.isAdmin, auth.getAllAccounts);
