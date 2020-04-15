@@ -37,10 +37,14 @@ class viewingSession {
           videoId
         });
         const updates = await videoService.incrementWatchCountService(videoId);
-        (results && updates) ? next() : response.errorResponse(res, 400, 'something went wrong', 'Can\'t get location');
+        if (results && updates) {
+          next();
+        } else {
+          return response.errorResponse(res, 400, 'something went wrong', 'Can\'t get location');
+        }
       }
     } catch (error) {
-      return response.errorResponse(res, 400, 'Something went wrong', error);
+      return response.errorResponse(res, 500, 'Something went wrong', error.message);
     }
   }
 }

@@ -72,7 +72,9 @@ class cpTransController {
     try {
       const token = req.headers.authorization.slice(7);
       const raw = jwt.jwtVerify(token, process.env.SECRET);
-      const data = await earningService.getAllFromThreeshold(raw.clientId, process.env.MIN_CASHOUT);
+      const data = await earningService.getAllFromThreeshold(
+        raw.clientId, Number(process.env.MIN_CASHOUT)
+      );
       let sum = 0;
       for (let i = 0; i < Object.values(data).length; i++) {
         sum += Number(data[i].amount);

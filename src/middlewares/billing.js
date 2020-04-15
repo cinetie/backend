@@ -215,7 +215,7 @@ class billing {
         }
       }
     } catch (error) {
-      util.setErrorResponse(res, 'Something went wrong', 500);
+      util.setErrorResponse(res, `Something went wrong${error.message}`, 500);
     }
   }
 }
