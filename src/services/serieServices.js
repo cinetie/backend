@@ -65,9 +65,7 @@ class serieServices {
   static async getAllSeasons(videoId) {
     try {
       const data = await database.series.findAll({
-        attributes: {
-          exclude: ['episode', 'episodeName', 'videoId', 'thumbNailUrl', ' suspensionState', 'episodeNumber', 'synopsis', 'clientId']
-        },
+        attributes: [[sequelize.fn('max', sequelize.col('season')), 'seasons']],
         where: { [op.and]: [{ videoId }, { suspensionState: false }] },
         order: [
           ['id', 'DESC']

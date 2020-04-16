@@ -63,7 +63,7 @@ class serieController {
     try {
       const seasons = await services.getAllSeasons(req.query.videoId);
       if (!seasons) util.setErrorResponse(res, 'Can\'t find what you requested', 400);
-      util.setSuccessResponse(res, 'Retrieved successfully', 200, seasons);
+      util.setSuccessResponse(res, 'Retrieved successfully', 200, seasons[0]);
     } catch (error) {
       util.setErrorResponse(res, `Something happened ${error.message}`, 500);
     }
