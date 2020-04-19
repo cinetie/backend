@@ -11,6 +11,6 @@ export default joi.object().keys({
     .error(() => 'Enter a valid nationality Ex: Rwandan '),
   cityOfResidence: joi.string().min(3).required()
     .error(() => 'Enter a valid city of residence Ex: Kigali'),
-  phoneLine: joi.string().required()
+  phoneLine: joi.string().trim().regex(/^[0-9]{10}$/)
     .error(() => 'Enter a valid phone number')
 }).options({ allowUnknown: false });
