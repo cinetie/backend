@@ -25,7 +25,7 @@ class tempSerieController {
         resource_type: 'video'
       }, async (err, result) => {
         data.size = req.files.video.size;
-        data.thumbNailUrl = thumb.url;
+        data.thumbNailUrl = thumb.secure_url;
         const newserie = await series.createNewEpisode(data);
         data.uri = jwt.jwtSign({ uri: result.url, id: newserie.id }, process.env.SECRET);
         const tempVideo = await services.createNewSeries(data);

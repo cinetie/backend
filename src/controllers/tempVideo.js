@@ -23,9 +23,10 @@ class tempVideoController {
       const smallThumbnail = await cloudinaryHelper.upload(req.files.small.tempFilePath, 'image');
       const nameTagThumbNail = await cloudinaryHelper.upload(req.files.nameTag.tempFilePath, 'image');
       const tallThumbNail = await cloudinaryHelper.upload(req.files.tall.tempFilePath, 'image');
-      data.tallThumbNailLink = tallThumbNail.url;
-      data.nameTagThumbNailLink = nameTagThumbNail.url;
-      data.videoThumbnailLink = smallThumbnail.url;
+      console.log(JSON.stringify(smallThumbnail));
+      data.tallThumbNailLink = tallThumbNail.secure_url;
+      data.nameTagThumbNailLink = nameTagThumbNail.secure_url;
+      data.videoThumbnailLink = smallThumbnail.secure_url;
       // suspend video for verification
       data.videoSuspensionState = true;
       // generate video parameters
@@ -43,7 +44,7 @@ class tempVideoController {
           // hash video url
           const { size } = req.files.video;
           data.videoUri = jwt.jwtSign({
-            videoUri: result.url, size, clientId: decoded.clientId, videoId: data.videoId, type: 'movie'
+            videoUri: result.secure_url, size, clientId: decoded.clientId, videoId: data.videoId, type: 'movie'
           }, process.env.SECRET);
           // register to both temp server and real server
           data.videoUrl = data.videoUri;
