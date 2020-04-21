@@ -14,7 +14,7 @@ class trailerController {
         resource_type: "video",
         overwrite: true
       }, async (err, result) => {
-        data.trailerLink = result.url;
+        data.trailerLink = result.secure_url;
         const uploadedTrailer = await trailerServices.createNewTrailers(data);
         if (!uploadedTrailer) util.setErrorResponse(res, 'An error occured during file upload', 422);
         util.setSuccessResponse(res, 'successfully saved the trailer', 201, uploadedTrailer);

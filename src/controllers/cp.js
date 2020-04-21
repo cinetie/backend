@@ -23,7 +23,7 @@ class cpController {
       newUser.clientId = uuid.generator();
       const { image } = req.files;
       const imageToUpload = await cloudinary.upload(image.tempFilePath, 'image');
-      newUser.idLink = imageToUpload.url;
+      newUser.idLink = imageToUpload.secure_url;
       const checkUser = await cp.getCpByMail(newUser.email);
       if (checkUser != null) {
         util.setErrorResponse(res, 'cp already exists', 422);
