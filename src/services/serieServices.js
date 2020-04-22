@@ -97,8 +97,9 @@ class serieServices {
 
   static async deleteEpisode(id) {
     try {
-      const deleted = await database.series.destroy(id, {
-        returning: true
+      const deleted = await database.series.destroy({
+        returning: true,
+        where: { id }
       });
       if (deleted) {
         return deleted;

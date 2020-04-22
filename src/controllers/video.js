@@ -6,7 +6,7 @@ import jwt from '../helpers/jwt';
 import trailerServices from '../services/trailerService';
 import tempService from '../services/tempVideoServices';
 import cloudinary from '../helpers/cloudinary';
-import { upload, getObject } from '../helpers/aws';
+import { upload, getObject, deleteObject } from '../helpers/aws';
 
 const util = new Util();
 class videoController {
@@ -27,7 +27,7 @@ class videoController {
           data.videoIdVimeo = '0000';
           const updatedVideo = await videoService.updateVideo(decoded.videoId, data);
           const deleted = await tempService.deleteVideos(req.query.id);
-          const publicId = decoded.videoUri.slice(59);
+          const publicId = decoded.videoUri.slice(60);
           const cloudinaryDeletionStatus = await cloudinary.destroy(publicId.split('.')[0], 'video');
           if (!updatedVideo || !deleted || !cloudinaryDeletionStatus) {
             util.setErrorResponse(res, 'something went wrong while approving video', 503);
@@ -52,9 +52,21 @@ class videoController {
   static async deleteAvideo(req, res) {
     try {
       const returned = await videoService.getVideoById(req.query.id);
-      if (!returned) response.errorResponse(res, 404, 'Video not found');
-      const deletedVideo = await videoService.deleteVideo(req.query.id);
-      return response.successResponse(res, 200, 'Video successfully deleted!', deletedVideo);
+      if (returned && returned.videoClientId === req.user) {
+        const deletedVideo = await videoService.deleteVideo(req.query.id);
+        if (returned.videoLink) {
+          const results = await deleteObject('movies-cinetie', returned.videoLink);
+          if (deletedVideo || Object.values(results).length === 0) {
+            return response.successResponse(res, 200, 'Video successfully deleted!', deletedVideo);
+          }
+          return response.errorResponse(res, 500, 'Video could not be deleted', 'SERVER_ERROR');
+        }
+        if (deletedVideo) {
+          return response.successResponse(res, 200, 'Video successfully deleted!', deletedVideo);
+        }
+        return response.errorResponse(res, 500, 'Video could not be deleted', 'SERVER_ERROR');
+      }
+      return response.errorResponse(res, 400, 'Video was not found or access to it was denied', 'BAD_REQUEST');
     } catch (error) {
       return response.errorResponse(res, 500, 'Something went wrong', error.message);
     }

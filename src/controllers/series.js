@@ -3,7 +3,7 @@ import Util from '../helpers/utilities';
 import temp from '../services/tempSerieService';
 import jwt from '../helpers/jwt';
 import cloudinary from '../helpers/cloudinary';
-import { upload, getObject } from '../helpers/aws';
+import { upload, getObject, deleteObject } from '../helpers/aws';
 
 const util = new Util();
 
@@ -81,9 +81,14 @@ class serieController {
 
   static async delete(req, res) {
     try {
+      const videoFile = await services.getSingleEpisode(req.params.id);
+      const results = await deleteObject('series-cinetie', videoFile.episode);
       const deleted = await services.deleteEpisode(req.params.id);
-      if (!deleted) util.setErrorResponse(res, 'Can\'t find what you requested', 400);
-      util.setSuccessResponse(res, 'deleted easily', 200, deleted);
+      if (deleted && Object.values(results).length === 0) {
+        util.setSuccessResponse(res, 'deleted easily', 200, deleted);
+      } else {
+        util.setErrorResponse(res, 'Can\'t find what you requested', 400);
+      }
     } catch (error) {
       util.setErrorResponse(res, `Something happened ${error.message}`, 500);
     }

@@ -35,4 +35,9 @@ const getObject = async (Bucket, Key, Expires) => {
   const uri = S3.getSignedUrl('getObject', { Bucket, Key, Expires });
   return uri;
 };
-export { upload, getObject };
+
+const deleteObject = async (Bucket, Key) => {
+  const result = await S3.deleteObject({ Bucket, Key }).promise();
+  return result;
+};
+export { upload, getObject, deleteObject };

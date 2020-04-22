@@ -33,11 +33,12 @@ class Access {
     try {
       const token = req.headers.authorization.slice(7);
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
-      const { email } = decoded;
+      const { email, clientId } = decoded;
       const user = await cpService.getCpByMail(email);
       if (!user) {
-        util.setErrorResponse(res, 'Access denied', 403)
+        util.setErrorResponse(res, 'Access denied', 403);
       } else {
+        req.user = clientId;
         next();
       }
     } catch (error) {
