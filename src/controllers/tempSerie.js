@@ -13,9 +13,6 @@ const util = new Helpers();
 class tempSerieController {
   static async createSerie(req, res) {
     try {
-      const token = req.headers.authorization.slice(7);
-      const { clientId } = jwt.jwtVerify(token, process.env.SECRET);
-      console.log(clientId);
       const data = req.body;
       const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       data.clientId = decoded.clientId;
@@ -47,9 +44,9 @@ class tempSerieController {
         for (let i = 0; i < Object.values(episodes).length; i++) {
           const video = await videoServices.getVideoById(episodes[i].videoId);
           const decoded = jwt.jwtVerify(episodes[i].uri, process.env.SECRET);
-
+          const episode = await series.getSingleEpisode(decoded.id);
           if (video) {
-            episodes[i].videoId = video.videoName;
+            episodes[i].videoId = `${video.videoName} S${episode.season}E${episode.episodeNumber}`;
             episodes[i].videoClientId = video.videoClientId;
           } else {
             episodes[i].videoName = 'default';
