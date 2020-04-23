@@ -2,6 +2,7 @@
 import { v2 as cloudinary } from 'cloudinary';
 import Util from '../helpers/utilities';
 import trailerServices from '../services/trailerService';
+import cloudinaryHelper from '../helpers/cloudinary';
 
 const util = new Util();
 
@@ -43,7 +44,7 @@ class trailerController {
       const trailers = await trailerServices.getAllTrailers();
       if (trailers) {
         util.setSuccessResponse(res, 'Found', 200, trailers);
-      } else {
+      } else {  
         util.setErrorResponse(res, 'No trailers available', 404);
       }
     } catch (error) {
@@ -66,8 +67,11 @@ class trailerController {
 
   static async deleteParticularTrailerController(req, res) {
     try {
+      const trailer = await trailerServices.getParticularTrailer(req.query.id);
+      const publicId = trailer.trailerLink.slice(60);
+      const cloudinaryStatus = await cloudinaryHelper.destroy(publicId.split('.')[0], 'video');
       const trailers = await trailerServices.deleteTrailers(req.query.id);
-      if (trailers) {
+      if (trailers && cloudinaryStatus) {
         util.setSuccessResponse(res, 'Trailer deleted', 200, trailers);
       } else {
         util.setErrorResponse(res, 'No trailer found', 401);

@@ -7,7 +7,6 @@ import uuid from '../helpers/uuid';
 import jwt from '../helpers/jwt';
 import cloudinaryHelper from '../helpers/cloudinary';
 // import google from '../helpers/google.cloud.normal'
-import { upload,getObject } from '../helpers/aws';
 import videoService from '../services/videoServices';
 import cpService from '../services/cpServices';
 
