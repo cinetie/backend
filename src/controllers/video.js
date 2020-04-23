@@ -28,6 +28,10 @@ class videoController {
           const updatedVideo = await videoService.updateVideo(decoded.videoId, data);
           const deleted = await tempService.deleteVideos(req.query.id);
           const publicId = decoded.videoUri.slice(60);
+<<<<<<< HEAD
+=======
+          console.log(publicId);
+>>>>>>> f549780a9365691fc03ad3c0e417ffe75511d9f6
           const cloudinaryDeletionStatus = await cloudinary.destroy(publicId.split('.')[0], 'video');
           if (!updatedVideo || !deleted || !cloudinaryDeletionStatus) {
             util.setErrorResponse(res, 'something went wrong while approving video', 503);
