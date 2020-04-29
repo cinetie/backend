@@ -1,3 +1,5 @@
+/* eslint-disable vars-on-top */
+/* eslint-disable no-var */
 /* eslint-disable no-useless-catch */
 import earningService from '../services/earningServices';
 import subscriptionService from '../services/billingServices';
@@ -40,11 +42,13 @@ class earningController {
   }
 
   // assign the obtained rate to each video.
-  // upon failure of this method maping the numerous elements of session's array and then doing a bulk create
+  // upon failure of this method maping the numerous elements of session's array and 
+  // then doing a bulk create
   // would solve the issue.
   static async assignRateToEachVideo(email) {
     try {
       let results = [];
+      // eslint-disable-next-line no-unused-vars
       let updatedSessions = [];
       const sessions = await this.getCurrentViewingSessions(email);
       const rate = await this.calculateRatePerVideo(email);

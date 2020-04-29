@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 import path from 'path';
 import billingService from '../services/billingServices';
 import Util from '../helpers/utilities';
@@ -9,10 +10,10 @@ import userService from '../services/userServices';
 import dax from '../helpers/dax-payment-handler';
 import date from '../helpers/date';
 import Square from '../helpers/square';
+import Earnings from '../helpers/earnings';
 import jwt from '../helpers/jwt';
 
 
-// opay@123
 const util = new Util();
 // middlware to perfom actual payment and registering transactions
 class billing {
@@ -37,14 +38,29 @@ class billing {
       }
       const updates = await billingService.updateSubscription(req.body.email,
         { dueState: true, endDate: today });
+      const earningsStatus = await Earnings(req.body.email);
       // release account to active
       await userService.updateUser(req.body.email, { permissionLevel: 1 });
-      if (!updates) {
+      if (updates[0]) {
+        const salesStipend = details.price * 0.3;
+        const salesData = {
+          method: details.paymentMethod,
+          plan: details.plan,
+          amount: salesStipend,
+          user: details.email
+        };
+        const sales = billing.registerSales(salesData);
+        if (!sales) util.setErrorResponse(res, 'sales can\'t run ', 500);
+        if (earningsStatus === 0) {
+          util.setErrorResponse(res, 'can\'t grant register earnings', 503);
+        }
+      } else {
         util.setErrorResponse(res, 'can\'t grant access to user', 503);
       }
       next();
     } else {
       // put user account onhold
+      const user = await userService.getUserByMail(req.body.email);
       const updates = await userService.updateUser(req.body.email, { permissionLevel: -1 });
       if (!updates) {
         await mailer([{
@@ -60,7 +76,8 @@ class billing {
         ]);
       } else {
         await mailer([{
-          body: 'We would like you to know that your account has been put onhold. \n since your  payment didn\'t work out'
+          body: 'We would like you to know that your account has been put onhold. \n since your  payment didn\'t work out',
+          name: `${user.firstName}`
         }, {
           from: 'Cinetie support',
           to: req.body.email,
@@ -95,7 +112,6 @@ class billing {
 
   static async renewPayment(req, res, next) {
     try {
-      console.log('Renew payment');
       const user = await userService.getUserByMail(req.body.email);
       if (!user) {
         util.setErrorResponse(res, "user doesn't exist", 400);
@@ -104,23 +120,13 @@ class billing {
       } else {
         const today = new Date();
         const details = await billing.fetchCurrentSubscription(req, res);
-        console.log(today.toDateString());
-        if (details.endDate === today.toDateString()) {
-          const salesStipend = details.price * 0.3;
+        const endDate = new Date(details.endDate);
+        if (endDate.getTime() <= today.getTime()) {
           if (Number(details.paymentMethod) === 1) {
-            const salesData = {
-              method: 'Mobile Money',
-              plan: details.plan,
-              amount: salesStipend,
-              user: details.email
-            };
-            console.log(JSON.stringify(salesData));
-            const sales = billing.registerSales(salesData);
-            if (!sales) util.setErrorResponse(res, 'sales can\'t run ', 500);
             const momoStatus = await dax.momo({
               amount: Math.round(details.price),
               email: user.email,
-              phonenumber: details.phoneNumber,
+              phonenumber: user.phoneNumber,
               firstName: user.firstName,
               lastName: user.lastName
 
@@ -128,25 +134,9 @@ class billing {
             billing.verifyStatus(req, res, momoStatus, next);
           // service.get
           } else if (Number(details.paymentMethod) === 2) {
-            const salesData = {
-              method: 'Paypal',
-              plan: details.plan,
-              amount: salesStipend,
-              user: details.email
-            };
-            const sales = billing.registerSales(salesData);
-            if (!sales) util.setErrorResponse(res, 'sales can\'t run ', 500);
             const status = await paypalHelper.getSubscriptionDetails(req.body.email);
             billing.verifyStatus(req, res, status, next);
           } else if (Number(details.paymentMethod) === 3) {
-            const salesData = {
-              method: user.card_brand,
-              plan: details.plan,
-              amount: salesStipend,
-              user: details.email
-            };
-            const sales = billing.registerSales(salesData);
-            if (!sales) util.setErrorResponse(res, 'sales can\'t run ', 500);
             const reciept = await Square.billCard({
               source_id: user.card_nonce,
               amount_money: {
