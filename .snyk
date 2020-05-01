@@ -3,6 +3,60 @@ version: v1.14.1
 ignore: {}
 # patches apply the minimum changes required to fix a vulnerability
 patch:
-  'npm:lodash:20180130':
-    - nodemailer-sendgrid-transport > sendgrid > lodash:
-        patched: '2020-04-29T16:32:01.162Z'
+  SNYK-JS-LODASH-567746:
+    - heroku-cli > @oclif/plugin-update > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - cloudinary > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - eslint > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - sequelize > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - sequelize-cli > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - eslint > inquirer > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - eslint > table > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - heroku-cli > ts-lodash > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - heroku-cli > cli-ux > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - heroku-cli > @oclif/plugin-plugins > cli-ux > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - heroku-cli > @heroku-cli/plugin-webhooks > heroku-cli-util > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - heroku-cli > @heroku-cli/plugin-pg > @heroku-cli/plugin-addons > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - heroku-cli > @heroku-cli/plugin-orgs > inquirer > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - heroku-cli > @heroku-cli/plugin-config > edit-string > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - heroku-cli > cli-flags > ts-lodash > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - heroku-cli > @oclif/plugin-legacy > @heroku-cli/command > cli-ux > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - heroku-cli > @heroku-cli/plugin-ci > @heroku-cli/plugin-run > heroku-cli-util > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - heroku-cli > @heroku-cli/plugin-ps-exec > heroku-exec-util > heroku-cli-util > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - heroku-cli > @heroku-cli/plugin-ci > @heroku-cli/plugin-pipelines > inquirer > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - heroku-cli > @heroku-cli/plugin-ci > @heroku-cli/plugin-run > @heroku-cli/command > cli-ux > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - heroku-cli > @heroku-cli/plugin-ps-exec > heroku-exec-util > @heroku/socksv5 > ip-address > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - nodemailer-sendgrid-transport > sendgrid > smtpapi > esdoc > babel-generator > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - nodemailer-sendgrid-transport > sendgrid > smtpapi > esdoc > babel-traverse > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - nodemailer-sendgrid-transport > sendgrid > smtpapi > esdoc > cheerio > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - nodemailer-sendgrid-transport > sendgrid > smtpapi > esdoc > babel-generator > babel-types > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - nodemailer-sendgrid-transport > sendgrid > smtpapi > esdoc > babel-traverse > babel-types > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
+    - nodemailer-sendgrid-transport > sendgrid > smtpapi > esdoc > ice-cap > cheerio > lodash:
+        patched: '2020-05-01T04:49:42.636Z'
