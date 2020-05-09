@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 /* eslint-disable consistent-return */
 import path from 'path';
 import userService from '../services/userServices';
@@ -474,7 +475,6 @@ class userController {
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const currentSubscription = await billingServices.getCurrentSubscription(email);
 
-      console.log(JSON.stringify(currentSubscription));
       const _response = await userService.getUser(email);
       _response.paymentMethod = currentSubscription.paymentMethod;
       util.setSuccessResponse(res, 'Found', 200, _response);
