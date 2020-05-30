@@ -1,5 +1,6 @@
 pipeline {
-    agent { docker { image 'node:12.16' } }
+    agent any
+    tools { nodejs "latest" }
     stages {
         stage('install') {
             steps {
