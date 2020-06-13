@@ -44,7 +44,7 @@ class trailerController {
       const trailers = await trailerServices.getAllTrailers();
       if (trailers) {
         util.setSuccessResponse(res, 'Found', 200, trailers);
-      } else {  
+      } else {
         util.setErrorResponse(res, 'No trailers available', 404);
       }
     } catch (error) {

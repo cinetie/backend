@@ -3,7 +3,6 @@
 import fetch from 'node-fetch';
 import uuid from './uuid';
 
-
 class paymentHandler {
   static async creditCards(details) {
     const data = {

@@ -24,7 +24,6 @@ export default class Rave {
     return (Forge.util.encode64(encrypted.getBytes()));
   }
 
-
   static async chargeCard(cardDetails) {
     const hash = Rave.encrypt(cardDetails, Rave.getKey());
     const transaction = await Fetch(

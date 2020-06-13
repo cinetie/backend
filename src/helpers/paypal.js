@@ -315,5 +315,4 @@ class paypal {
   }
 }
 
-
 export default paypal;

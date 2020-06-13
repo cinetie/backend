@@ -1,4 +1,3 @@
-'use strict';
 module.exports = (sequelize, DataTypes) => {
   const sales = sequelize.define('sales', {
     method: DataTypes.STRING,
@@ -9,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     user: DataTypes.STRING,
     monthYear: DataTypes.STRING
   }, {});
-  sales.associate = function(models) {
+  sales.associate = function (models) {
     // associations can be defined here
   };
   return sales;

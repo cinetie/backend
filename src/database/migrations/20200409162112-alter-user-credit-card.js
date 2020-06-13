@@ -1,4 +1,3 @@
-
 module.exports = {
   up: (queryInterface, Sequelize) => queryInterface.removeColumn('Users', 'crCVC')
     .then(() => queryInterface.removeColumn('Users', 'cardFirstName'))
@@ -11,4 +10,10 @@ module.exports = {
   down: (queryInterface, Sequelize) => queryInterface.removeColumn('Users', 'customerId')
     .then(() => queryInterface.removeColumn('Users', 'card_nonce'))
     .then(() => queryInterface.removeColumn('Users', 'card_brand'))
+    .then(() => queryInterface.addColumn('Users', 'cardFirstName', Sequelize.STRING))
+    .then(() => queryInterface.addColumn('Users', 'cardLastName', Sequelize.STRING))
+    .then(() => queryInterface.addColumn('Users', 'expMonth', Sequelize.STRING))
+    .then(() => queryInterface.addColumn('Users', 'expYear', Sequelize.STRING))
+    .then(() => queryInterface.addColumn('Users', 'crCVC', Sequelize.STRING))
+    .then(() => queryInterface.addColumn('Users', 'crNUmber', Sequelize.STRING))
 };

@@ -1,6 +1,5 @@
 import joi from '@hapi/joi';
 
-
 export default joi.object().keys({
   episodeName: joi.string().min(3).required()
     .error(() => 'You have to enter a valid episode name Ex: pilot'),

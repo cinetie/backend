@@ -1,6 +1,5 @@
 import joi from '@hapi/joi';
 
-
 export default joi.object().keys({
   videoName: joi.string().required()
     .error(() => 'You have to enter a valid name like \'Faster\''),

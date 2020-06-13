@@ -1,4 +1,3 @@
-
 module.exports = {
   up: (queryInterface, Sequelize) => queryInterface.removeColumn('earnings', 'monthYear')
     .then(() => queryInterface.addColumn('earnings', 'monthYear', { type: Sequelize.BIGINT }))
@@ -8,6 +7,5 @@ module.exports = {
   down: (queryInterface, Sequelize) => queryInterface.removeColumn('earnings', 'monthYear')
     .then(() => queryInterface.addColumn('earnings', 'monthYear', { type: Sequelize.STRING }))
     .then(() => queryInterface.removeColumn('earnings', 'amount'))
-    .then(() => queryInterface.addColumn('earnings', 'monthYear', { type: Sequelize.STRING }))
 
 };

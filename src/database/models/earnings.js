@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   const earnings = sequelize.define('earnings', {
     videoId: DataTypes.STRING,

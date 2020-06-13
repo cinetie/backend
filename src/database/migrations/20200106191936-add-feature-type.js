@@ -1,14 +1,8 @@
-'use strict';
-
 module.exports = {
-	up: (queryInterface, Sequelize) => {
-		return queryInterface.addColumn('videos','featureType',{
-			type:Sequelize.INTEGER,
-			defaultValue:0
-		})
-	},
+  up: (queryInterface, Sequelize) => queryInterface.addColumn('videos', 'featureType', {
+    type: Sequelize.INTEGER,
+    defaultValue: 0
+  }),
 
-	down: (queryInterface, Sequelize) => {
-		return queryInterface.removeColumn('videos','featureType')
-	}
+  down: (queryInterface, Sequelize) => queryInterface.removeColumn('videos', 'featureType')
 };

@@ -1,16 +1,8 @@
-'use strict';
-
 module.exports = {
-  up: (queryInterface, Sequelize) => {
+  up: (queryInterface, Sequelize) => queryInterface.addColumn('subscriptions', 'start', {
+    type: Sequelize.BIGINT,
+    defaultValue: Date.now()
+  }),
 
-    return queryInterface.addColumn('subscriptions', 'start', {
-      type: Sequelize.BIGINT,
-      defaultValue: Date.now()
-    })
-  },
-
-  down: (queryInterface, Sequelize) => {
-
-    return queryInterface.removeColumn('subscriptions', 'start')
-  }
+  down: (queryInterface, Sequelize) => queryInterface.removeColumn('subscriptions', 'start')
 };

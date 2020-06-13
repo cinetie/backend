@@ -17,45 +17,21 @@ import dax from '../helpers/dax-payment-handler';
 import paypal from '../helpers/paypal';
 import square from '../helpers/square';
 
-
 const util = new Util();
 class userController {
   static async signupUser(req, res) {
     try {
-      const newUser = req.body;
-      newUser.password = bcrypt.encrypt(newUser.password);
-      newUser.isVerified = false;
-      newUser.plan = 'Setup';
-      newUser.permissionLevel = 1;
-      newUser.isOnTrial = true;
+      const newUser = userController.initializeVarsForSignup(req);
       const search = await userService.getUserByMail(newUser.email);
       if (search) {
         util.setErrorResponse(res, 'user already exists', 403);
       } else {
         // eslint-disable-next-line no-use-before-define
-        const EmailStatus = await mailer([{
-          link: `${process.env.HOST}/auth/verify?token=${jwt.jwtSign(req.body.email, process.env.SECRET)}`
-        }, {
-          from: 'CINETIE support',
-          to: req.body.email,
-          subject: 'Email verification',
-        },
-        {
-          path: `${path.resolve('src/public/templates/VerifyEmail.ejs')}`
-        }
-        ]);
+        const EmailStatus = await userController.sendEmail(req);
         const createdUser = await userService.createNewUser(newUser);
         const part1 = cry.crypto();
-        const token = jwt.jwtSign({
-          key: part1,
-          email: newUser.email
-        }, process.env.SECRET);
-        const tokenToSave = {
-          email: newUser.email,
-          token,
-          desc: 'Login-Active'
-
-        };
+        const token = userController.signToken(part1, newUser);
+        const tokenToSave = userController.generateTokenToSave(newUser, token);
         await tokenService.createNewToken(tokenToSave, token);
         if (EmailStatus) util.setErrorResponse(res, EmailStatus, 500);
         const userToken = jwt.jwtSign(createdUser.email, process.env.SECRET);
@@ -66,6 +42,46 @@ class userController {
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
     }
+  }
+
+  static generateTokenToSave(newUser, token) {
+    return {
+      email: newUser.email,
+      token,
+      desc: 'Login-Active'
+    };
+  }
+
+  static signToken(part1, newUser) {
+    return jwt.jwtSign({
+      key: part1,
+      email: newUser.email
+    }, process.env.SECRET);
+  }
+
+  static async sendEmail(req) {
+    // eslint-disable-next-line no-return-await
+    return await mailer([{
+      link: `${process.env.HOST}/auth/verify?token=${jwt.jwtSign(req.body.email, process.env.SECRET)}`
+    }, {
+      from: 'CINETIE support',
+      to: req.body.email,
+      subject: 'Email verification',
+    },
+    {
+      path: `${path.resolve('src/public/templates/VerifyEmail.ejs')}`
+    }
+    ]);
+  }
+
+  static initializeVarsForSignup(req) {
+    const newUser = req.body;
+    newUser.password = bcrypt.encrypt(newUser.password);
+    newUser.isVerified = false;
+    newUser.plan = 'Setup';
+    newUser.permissionLevel = 1;
+    newUser.isOnTrial = true;
+    return newUser;
   }
 
   static async verify(req, res) {
@@ -296,7 +312,7 @@ class userController {
         util.setErrorResponse(res, 'user has an active subscription', 400);
       }
     } catch (error) {
-      util.setErrorResponse(res, `Something went sideways totally sideways contact support ${ error}`, 500);
+      util.setErrorResponse(res, `Something went sideways totally sideways contact support ${error}`, 500);
     }
   }
 
@@ -346,7 +362,6 @@ class userController {
             }
           }
         };
-
 
         switch (Number(currentSubsctption.paymentMethod)) {
           case 1: {

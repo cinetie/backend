@@ -1,7 +1,6 @@
-'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    const now =  Date.now();
+    const now = Date.now();
     return queryInterface.createTable('subscriptions', {
       id: {
         allowNull: false,
@@ -24,9 +23,9 @@ module.exports = {
       state: {
         type: Sequelize.STRING
       },
-      phoneNumber:{
+      phoneNumber: {
         type: Sequelize.STRING
-    },
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
@@ -37,7 +36,5 @@ module.exports = {
       }
     });
   },
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('subscriptions');
-  }
+  down: (queryInterface, Sequelize) => queryInterface.dropTable('subscriptions')
 };

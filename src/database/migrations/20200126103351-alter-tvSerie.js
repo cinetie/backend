@@ -1,13 +1,7 @@
-'use strict'
-
 module.exports = {
-	up: (queryInterface, Sequelize) => {
-		return queryInterface.addColumn('series','thumbNailUrl',{
-			type: Sequelize.STRING
-		})
-	},
+  up: (queryInterface, Sequelize) => queryInterface.addColumn('series', 'thumbNailUrl', {
+    type: Sequelize.STRING
+  }),
 
-	down: (queryInterface, Sequelize) => {
-		return queryInterface.removeColumn('series','thumbNailUrl')
-	}
-}
+  down: (queryInterface, Sequelize) => queryInterface.removeColumn('series', 'thumbNailUrl')
+};

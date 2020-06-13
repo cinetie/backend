@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   const contentProviders = sequelize.define('contentProviders', {
     name: DataTypes.STRING,

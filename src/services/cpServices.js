@@ -1,7 +1,6 @@
 /* eslint-disable no-useless-catch */
 import database from '../database/models';
 
-
 class cpService {
   static async getCpByMail(email) {
     try {

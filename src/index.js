@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import '@babel/polyfill';
 import express from 'express';
 import bodyParser from 'body-parser';
@@ -37,10 +38,12 @@ app.use((req, res, next) => {
 });
 app.use('/', routes);
 
-app.use((req, res, next) => {
+app.use((req, res) => {
   response.errorResponse(res, 404, 'Not found', 'Undefined URL');
 });
 app.set('views', path.join(__dirname, '/public/templates'));
 app.set('view engine', 'ejs');
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Up and running on port ${PORT}`));
+
+module.exports = app;

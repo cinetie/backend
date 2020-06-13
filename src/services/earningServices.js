@@ -3,7 +3,6 @@ import sequelize from 'sequelize';
 import database from '../database/models';
 import date from '../helpers/date';
 
-
 const op = sequelize.Op;
 class earningsService {
   static async getEarningsByVideo(videoId) {

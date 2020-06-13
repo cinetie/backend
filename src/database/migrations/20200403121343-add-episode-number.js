@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = {
   up: (queryInterface, Sequelize) => queryInterface.addColumn('series', 'episodeNumber', { defaultValue: 0, type: Sequelize.INTEGER }),
 

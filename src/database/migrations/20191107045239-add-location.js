@@ -1,23 +1,11 @@
-'use strict';
-
 module.exports = {
-  up: (queryInterface, Sequelize) => {
+  up: (queryInterface, Sequelize) => queryInterface.addColumn(
+    'viewingSessions',
+    'location',
+    Sequelize.STRING
+  )
+    .then(() => queryInterface.addColumn('viewingSessions', 'ip', Sequelize.STRING)),
 
-    return queryInterface.addColumn(
-        'viewingSessions',
-        'location',
-        Sequelize.STRING
-      )
-      .then(() => {
-        return queryInterface.addColumn('viewingSessions', 'ip', Sequelize.STRING)
-      })
-  },
-
-  down: (queryInterface, Sequelize) => {
-
-    return queryInterface.removeColumn('viewingSessions', 'location')
-      .then(() => {
-        return queryInterface.removeColumn('viewingSessions', 'ip')
-      })
-  }
+  down: (queryInterface, Sequelize) => queryInterface.removeColumn('viewingSessions', 'location')
+    .then(() => queryInterface.removeColumn('viewingSessions', 'ip'))
 };

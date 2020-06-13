@@ -72,7 +72,6 @@ class videoController {
     }
   }
 
-
   static async getVideosByPopularity(req, res) {
     try {
       const { type } = req.query;

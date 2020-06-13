@@ -1,4 +1,3 @@
-'use strict'
 module.exports = (sequelize, DataTypes) => {
   const series = sequelize.define('series', {
     episode: DataTypes.STRING,

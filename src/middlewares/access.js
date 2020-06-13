@@ -10,7 +10,6 @@ class Access {
   // 2 admin user ( manage all profiles,manage all accounts,metrics on each video,
   // approve n reject videos,view sales metrics,manage plans )
 
-
   // level 2 permission checkpoint
   static async isAdmin(req, res, next) {
     try {

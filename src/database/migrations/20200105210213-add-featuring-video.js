@@ -1,14 +1,8 @@
-'use strict';
-
 module.exports = {
-	up: (queryInterface, Sequelize) => {
-		return queryInterface.addColumn('videos','isFeatured',{
-			type:Sequelize.BOOLEAN,
-			defaultValue: false
-		})
-	},
+  up: (queryInterface, Sequelize) => queryInterface.addColumn('videos', 'isFeatured', {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false
+  }),
 
-	down: (queryInterface, Sequelize) => {
-		return queryInterface.removeColumn('videos','isFeatured')
-	}
+  down: (queryInterface, Sequelize) => queryInterface.removeColumn('videos', 'isFeatured')
 };

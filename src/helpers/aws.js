@@ -3,7 +3,6 @@ import fs from 'fs';
 import { promisify } from 'util';
 import { v4 as V4 } from 'uuid';
 
-
 const { AWS_REGION, AWS_ID, AWS_SECRET } = process.env;
 
 AWS.config.update({

@@ -13,7 +13,6 @@ import Square from '../helpers/square';
 import Earnings from '../helpers/earnings';
 import jwt from '../helpers/jwt';
 
-
 const util = new Util();
 // middlware to perfom actual payment and registering transactions
 class billing {

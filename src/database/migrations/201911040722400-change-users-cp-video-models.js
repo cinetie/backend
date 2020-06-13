@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-vars */
 
-
 module.exports = {
   up: (queryInterface, Sequelize) => queryInterface.addColumn('Users', 'nationality', Sequelize.STRING)
     .then(() => queryInterface.addColumn('Users', 'cityOfResidence', Sequelize.STRING))
