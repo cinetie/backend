@@ -33,14 +33,14 @@ class videoService {
         limit: Number(limitValue),
         where: {
           [op.and]: [{
-            creationTime: {
-              [op.gte]: date.removeDays(60)
-            },
             type,
             videoSuspensionState: '0'
           }]
 
-        }
+        },
+        order: [
+          ['creationTime', 'DESC']
+        ]
       });
       if (videos) {
         return videos;

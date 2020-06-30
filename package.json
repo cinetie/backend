@@ -16,7 +16,7 @@
     "generate-lcov": "nyc report --reporter=text > lcov.info",
     "lint": "eslint . --fix --ignore-path .gitignore",
     "coverage": "nyc report --reporter=text | coveralls && nyc report --reporter=text | codeclimate-test-reporter",
-    "test": "set NODE_ENV=test && npm run migrate:test && nyc mocha --require @babel/register ./src/test/user.js --timeout 60000 --exit",
+    "test": "export NODE_ENV=test && npm run migrate:test && nyc mocha --require @babel/register ./src/test/user.js --timeout 60000 --exit",
     "snyk-protect": "snyk protect",
     "prepare": "yarn run snyk-protect"
   },
