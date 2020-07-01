@@ -22,7 +22,6 @@ class tempVideoController {
       const smallThumbnail = await cloudinaryHelper.upload(req.files.small.tempFilePath, 'image');
       const nameTagThumbNail = await cloudinaryHelper.upload(req.files.nameTag.tempFilePath, 'image');
       const tallThumbNail = await cloudinaryHelper.upload(req.files.tall.tempFilePath, 'image');
-      console.log(JSON.stringify(smallThumbnail));
       data.tallThumbNailLink = tallThumbNail.secure_url;
       data.nameTagThumbNailLink = nameTagThumbNail.secure_url;
       data.videoThumbnailLink = smallThumbnail.secure_url;
