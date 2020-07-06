@@ -327,47 +327,16 @@ class userController {
       if (user.isOnTrial === false) {
         util.setErrorResponse(res, 'account is on trial', 400);
       } else {
-        let frequency = 0;
-        if (user.isBilledAnnually === true) {
-          frequency = 'YEAR';
-        } else {
-          frequency = 'MONTH';
-        }
-        const paymentData = {
-          user: {
-            email,
-            paymentMethod: currentSubsctption.paymentMethod,
-            isBilledAnnually: user.isBilledAnnually,
-            plan: user.plan
-          },
-          momo: {
-            amount: Math.round(price),
-            phonenumber: user.phoneNumber,
-            firstname: user.firstName,
-            lastname: user.lastName,
-            email,
-          },
-          paypal: {
-            plan: user.plan,
-            price,
-            frequency,
-            currency: 'USD',
-            total: price,
-            urls: {
-              success: `${process.env.PAYPAL_SUCCESS}?user=${jwt.jwtSign(email, process.env.SECRET)}`,
-              failOrCancel: `${process.env.PAYPAL_FAIL_CANCEL}`
-            }
-          }
-        };
+        const paymentData = userController.getAndSetPaymentData(req, price, user, email);
 
         switch (Number(currentSubsctption.paymentMethod)) {
           case 1: {
-            const momoData = await dax.momo(paymentData.momo);
+            const momoData = await Rave.chargeMomo(paymentData.momo);
             if (momoData !== 0) {
-              const updates = await userService.updateUser(user.email,
-                { isOnTrial: false, permissionLevel: 1 });
+              const updates = await userService.updateUser(email,
+                { isOnTrial: false });
               if (updates[1] > 0) {
-                util.setSuccessResponse(res, 'Success', 201, updates);
+                util.setSuccessResponse(res, 'Successful Subscription with MoMo', 201, momoData);
               } else {
                 util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
               }
@@ -376,36 +345,21 @@ class userController {
             }
             break;
           }
-          case 2: {
-            await paypal.subscription(req, res, paymentData.paypal);
-            break;
-          }
 
-          case 3: {
-            if (user.card_nonce) {
-              const reciept = await square.billCard({
-                source_id: user.card_nonce,
-                amount_money: {
-                  amount: Number(price) * 100,
-                  currency: 'USD'
-                },
-                customerId: user.customerId
-              });
-              if (reciept.status === 'COMPLETED') {
-                const updates = await userService.updateUser(user.email,
-                  { isOnTrial: false, card_brand: reciept.cardBrand, permissionLevel: 1 });
-                if (updates[1] > 0) {
-                  util.setSuccessResponse(res, 'Success', 201, undefined);
-                } else {
-                  util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
-                }
+
+          case 2: {
+            const momoData = await Rave.chargeCard(paymentData.card);
+            if (momoData !== 0) {
+              const updates = await userService.updateUser(email,
+                { isOnTrial: false });
+              if (updates[1] > 0) {
+                util.setSuccessResponse(res, 'Success', 201, momoData);
               } else {
-                util.setErrorResponse(res, 'Sorry payment failed', 500);
+                util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
               }
             } else {
-              util.setErrorResponse(res, 'Can not save card', 500);
+              util.setErrorResponse(res, 'Sorry payment failed', 500);
             }
-
             break;
           }
 
@@ -417,6 +371,22 @@ class userController {
     } catch (error) {
       return response.errorResponse(res, 500, `Something wrong happened ${error.message}`, error);
     }
+  }
+
+  static getAndSetPaymentData(req, price, user, email) {
+    return {
+      card: {
+        ...req.body.card
+      },
+      momo: {
+        amount: Math.round(price),
+        phone_number: user.phoneNumber,
+        fullname: `${user.firstName} ${user.lastName}`,
+        isNew: true,
+        currency: 'RWF',
+        email,
+      },
+    };
   }
 
   static async getAllAccounts(res) {

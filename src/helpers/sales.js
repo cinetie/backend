@@ -1,8 +1,19 @@
-import controller from '../services/salesService';
+import SalesService from '../services/salesService';
+import uuid from './uuid';
 
 const addRecord = async (details) => {
-  const recorded = await controller.createNewSales(details);
-  if (!recorded) return null;
-  return recorded;
+  try {
+    const dates = new Date();
+    const data = {
+      ...details,
+      transactionId: uuid.generator(),
+      creationTime: dates.getTime()
+    };
+    const status = await SalesService.createNewSales(data);
+    if (status) return 1;
+    return 0;
+  } catch (error) {
+    throw error;
+  }
 };
 export default { addRecord };

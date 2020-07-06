@@ -4,14 +4,19 @@ import uuid from './uuid';
 const rave = new Flutterwave(
   process.env.RAVE_PUBLIC,
   process.env.RAVE_SECRET,
-  process.env.RAVE_PRODUCTION
+  Boolean(process.env.RAVE_PRODUCTION)
 );
 export default class Rave {
   static async chargeCard(cardDetails) {
     try {
-      const payload = { ...cardDetails, enckey: process.env.RAVE_ENC_KEY_TEST };
-      const initCharge = await rave.Charge.card(payload);
-      return initCharge;
+      const payload = {
+        ...cardDetails,
+        enckey: process.env.RAVE_ENC_KEY_TEST,
+        redirect_url: 'https://cinetie.com/signin'
+      };
+      const response = await rave.Charge.card(payload);
+      const status = (response.status === 'success') ? { redirect: response.meta.authorization.redirect } : 0;
+      return status;
     } catch (error) {
       throw error;
     }
@@ -22,12 +27,12 @@ export default class Rave {
       const payload = {
         ...momoDetails,
         tx_ref: uuid.generator(),
-        order_id: `USS-URG-${uuid.generator()}`
+        order_id: `USS-URG-${uuid.generator()}`,
+        redirect_url: 'https://cinetie.com/signin'
       };
       const response = await rave.MobileMoney.rwanda(payload);
-      // eslint-disable-next-line no-console
-      console.log(response);
-      return response;
+      const status = (response.status === 'success') ? { redirect: response.meta.authorization.redirect } : 0;
+      return status;
     } catch (error) {
       throw error;
     }
