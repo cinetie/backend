@@ -29,7 +29,7 @@ class billing {
     if (status === 1) {
       // change user state from onhold to active
       let today = '';
-      const details = billing.fetchCurrentSubscription(req, res);
+      const details = await billing.fetchCurrentSubscription(req, res);
       if (details.isBilledAnnually === true) {
         today = date.addMoreDays(365).toDateString();
       } else {

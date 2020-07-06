@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable no-shadow */
 /* eslint-disable consistent-return */
 import path from 'path';
@@ -16,6 +17,7 @@ import mailer from '../helpers/mailer';
 import dax from '../helpers/dax-payment-handler';
 import paypal from '../helpers/paypal';
 import square from '../helpers/square';
+import Rave from '../helpers/rave';
 
 const util = new Util();
 class userController {
@@ -274,8 +276,7 @@ class userController {
       const currentSubscription = await billingServices.getCurrentSubscription(email);
       if (!currentSubscription) {
         const user = await userService.getUserByMail(email);
-        const { paymentMethod, nonce } = req.body;
-        console.log(paymentMethod, nonce);
+        const { paymentMethod } = req.body;
         const subscriptionData = {
           paymentMethod,
           email,
@@ -283,13 +284,9 @@ class userController {
           phoneNumber: user.phoneNumber,
           isBilledAnnually: user.isBilledAnnually,
         };
-        if (Number(paymentMethod) === 3) {
-          const { customer } = await square.createCustomer({ email });
-          const cardId = await square.attachCard({ customerId: customer.id, nonce });
-          console.log(customer, cardId);
-          const updates = await userService.updateUser(email,
-            { card_nonce: cardId, customerId: customer.id });
-          console.log(updates);
+        if (Number(paymentMethod) === 2) {
+          await Rave.chargeMomo(req.body.momo);
+          const updates = 1;
           if (updates[1] > 0) {
             const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
             if (subscriptionDetails) {
@@ -328,7 +325,7 @@ class userController {
       const price = await payment.getPlanPricing(subscriptionData);
       const currentSubsctption = await billingServices.getCurrentSubscription(email);
       if (user.isOnTrial === false) {
-        util.setErrorResponse(res, 'account is already activated', 400);
+        util.setErrorResponse(res, 'account is on trial', 400);
       } else {
         let frequency = 0;
         if (user.isBilledAnnually === true) {
