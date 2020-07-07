@@ -29,6 +29,7 @@ router.put('/update', access.isNormalUser, auth.updateAccount);
 router.get('/users', access.isAdmin, auth.getSubscribersInRange);
 router.get('/users/live', access.isAdmin, auth.getLiveUsers);
 router.get('/serve-verify', auth.serveVerifyPassword);
+router.post('/otp-verify', access.isNormalUser, auth.verifyOTP);
 router.get(
   '/google',
   passport.authenticate('google', {

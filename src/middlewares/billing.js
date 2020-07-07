@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable consistent-return */
 import path from 'path';
 import billingService from '../services/billingServices';
@@ -24,14 +25,9 @@ class billing {
     if (status.redirect !== null || undefined) {
       // change user state from onhold to active
       let today = '';
-      const details = await billing.fetchCurrentSubscription(req, res);
-      if (details.isBilledAnnually === true) {
-        today = date.addMoreDays(365).toDateString();
-      } else {
-        today = date.addMoreDays(31).toDateString();
-      }
-      const updates = await billingService.updateSubscription(req.body.email,
-        { dueState: true, endDate: today });
+      let updates;
+      // eslint-disable-next-line prefer-const
+      ({ updates, today } = await billing.updateSubscription(req, res, today));
       if (updates[0]) {
         next();
       } else {
@@ -57,6 +53,18 @@ class billing {
     }
   }
 
+  static async updateSubscription(req, res, today) {
+    const details = await billing.fetchCurrentSubscription(req, res);
+    if (details.isBilledAnnually === true) {
+      today = date.addMoreDays(365).toDateString();
+    } else {
+      today = date.addMoreDays(31).toDateString();
+    }
+    const updates = await billingService.updateSubscription(req.body.email,
+      { dueState: true, endDate: today });
+    return { updates, today };
+  }
+
   static async renewPayment(req, res, next) {
     try {
       const user = await userService.getUserByMail(req.body.email);
@@ -71,15 +79,23 @@ class billing {
         if (endDate.getTime() <= today.getTime()) {
           if (Number(details.paymentMethod) === 1) {
             const momoStatus = await Rave.chargeMomo({
-              amount: Math.round(details.price),
+              currency: 'RWF',
+              amount: details.price,
               email: user.email,
               phone_number: user.phoneNumber,
-              isNew: false,
               fullname: `${user.firstName} ${user.lastName}`,
 
             });
             if (momoStatus.redirect) {
-              util.setSuccessResponse(res, 'Please follow this link to renew your subscription with Mobile money', 200, momoStatus);
+              let todayDate = '';
+              let updates;
+              // eslint-disable-next-line prefer-const
+              ({ updates, todayDate } = await billing.updateSubscription(req, res, todayDate));
+              if (updates[1] === 1) {
+                util.setSuccessResponse(res, 'Please follow this link to renew your subscription with Mobile money', 200, momoStatus);
+              } else {
+                util.setErrorResponse(res, 'Can\'t renew subscription', 500);
+              }
             } else {
               billing.verifyStatus(req, res, momoStatus, next);
             }
