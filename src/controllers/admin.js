@@ -1,7 +1,12 @@
+/* eslint-disable eqeqeq */
+/* eslint-disable vars-on-top */
+/* eslint-disable no-plusplus */
+/* eslint-disable no-var */
 import earningService from '../services/earningServices';
 import videoService from '../services/videoServices';
-import response from '../helpers/response';
 import Util from '../helpers/utilities';
+import JWT from '../helpers/jwt';
+import cry from '../helpers/crypto';
 
 const util = new Util();
 
@@ -99,6 +104,17 @@ class adminController {
         });
       }
       util.setErrorResponse(res, 'Data not found', 404);
+    } catch (error) {
+      util.setErrorResponse(res, `Something Went wrong logging in ${error}`, 500);
+    }
+  }
+
+  static async gainAccess(req, res) {
+    try {
+      const { email, clientId } = req.body;
+      const token = JWT.jwtSign({ key: cry.crypto(), email, clientId }, process.env.SECRET, '1d');
+      if (!token) util.setErrorResponse(res, 'something went wrong', 400);
+      util.setSuccessResponse(res, 'Token generated', 200, token);
     } catch (error) {
       util.setErrorResponse(res, `Something Went wrong logging in ${error}`, 500);
     }
