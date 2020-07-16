@@ -113,7 +113,7 @@ class adminController {
     try {
       const { email, clientId } = req.body;
       const token = JWT.jwtSign({ key: cry.crypto(), email, clientId }, process.env.SECRET, '1d');
-      if (!token) util.setErrorResponse(res, 'something went wrong', 400);
+      if (!token) util.setErrorResponse(res, 'something  went wrong', 400);
       util.setSuccessResponse(res, 'Token generated', 200, token);
     } catch (error) {
       util.setErrorResponse(res, `Something Went wrong logging in ${error}`, 500);
