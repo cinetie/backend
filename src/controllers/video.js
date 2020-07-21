@@ -12,6 +12,7 @@ const util = new Util();
 class videoController {
   static async addVideo(req, res) {
     try {
+      req.socket.setTimeout(120 * 60 * 1000);
       const tempVideo = await tempService.getParticularVideo(Number(req.query.id));
       const decoded = jwt.jwtVerify(tempVideo.videoUri, process.env.SECRET);
       const data = decoded;
