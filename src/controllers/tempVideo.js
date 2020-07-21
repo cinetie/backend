@@ -16,6 +16,7 @@ class tempVideoController {
   static async createVideoController(req, res) {
     try {
       // get token
+      req.socket.setTimeout(240 * 60 * 1000);
       const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const data = req.body;
       // register thumbnails
