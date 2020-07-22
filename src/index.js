@@ -24,7 +24,8 @@ app.use((req, res, next) => {
 });
 app.use(fileUpload({
   useTempFiles: true,
-  tempFileDir: '/tmp/'
+  tempFileDir: '/tmp/',
+  limits: { fileSize: 5000 * 1024 * 1024 }
 }));
 
 app.get('/', (req, res) => {
