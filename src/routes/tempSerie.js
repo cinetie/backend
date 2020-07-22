@@ -7,5 +7,6 @@ const router = new Router();
 
 router.post('/new', access.isProducer, addEpisode, controller.createSerie);
 router.get('/all', access.isAdmin, controller.getAllSeries);
+router.get('/signed-url', access.isProducer, controller.getSignedUrlTempSeries);
 
 export default router;

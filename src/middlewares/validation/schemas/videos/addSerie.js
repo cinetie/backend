@@ -10,5 +10,13 @@ export default joi.object().keys({
   category: joi.string().required()
     .error(() => 'You have to provide a valid category'),
   type: joi.string().valid('serie', 'movie').required()
-    .error(() => 'You have to provide a type Ex: serie or movie')
+    .error(() => 'You have to provide a type Ex: serie or movie'),
+  portrait: joi.string().required()
+    .error(() => 'You did not upload a portrait cover'),
+  nameTag: joi.string().required()
+    .error(() => 'You did not upload a name tag cover'),
+  landscape: joi.string().required()
+    .error(() => 'You did not provide landscape cover')
 }).options({ allowUnknown: false });
+
+// 03d44171-95d9-4954-9af0-e72975f51e1d.avi

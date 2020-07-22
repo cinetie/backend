@@ -1,10 +1,9 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable no-await-in-loop */
-import { v2 as cloudinary } from 'cloudinary';
 import Helpers from '../helpers/utilities';
 import services from '../services/tempSerieService';
 import jwt from '../helpers/jwt';
-import cloudinaryHelper from '../helpers/cloudinary';
+import { getSignedUrl } from '../helpers/aws';
 import series from '../services/serieServices';
 import videoServices from '../services/videoServices';
 
@@ -16,22 +15,16 @@ class tempSerieController {
       const data = req.body;
       const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       data.clientId = decoded.clientId;
-      const thumb = await cloudinaryHelper.upload(req.files.thumb.tempFilePath, 'image');
-      cloudinary.uploader.upload(req.files.video.tempFilePath, {
-        overwrite: true,
-        resource_type: 'video'
-      }, async (err, result) => {
-        data.size = req.files.video.size;
-        data.thumbNailUrl = thumb.secure_url;
-        const newserie = await series.createNewEpisode(data);
-        data.uri = jwt.jwtSign({ uri: result.url, id: newserie.id }, process.env.SECRET);
-        const tempVideo = await services.createNewSeries(data);
-        if (!tempVideo || !newserie) {
-          util.setErrorResponse(res, 'Can\'t upload tv serie', 422);
-        } else {
-          util.setSuccessResponse(res, 'Successfully uploaded', 201, tempVideo);
-        }
-      });
+      // data.size = req.files.video.size;
+      data.thumbNailUrl = req.body.thumb;
+      const newserie = await series.createNewEpisode(data);
+      data.uri = jwt.jwtSign({ uri: data.video, id: newserie.id }, process.env.SECRET);
+      const tempVideo = await services.createNewSeries(data);
+      if (!tempVideo || !newserie) {
+        util.setErrorResponse(res, 'Can\'t upload tv serie', 422);
+      } else {
+        util.setSuccessResponse(res, 'Successfully uploaded', 201, tempVideo);
+      }
     } catch (error) {
       util.setErrorResponse(res, `Something wrong happened ${error.message}`, 500);
     }
@@ -59,6 +52,20 @@ class tempSerieController {
       }
     } catch (error) {
       util.setErrorResponse(res, `Someting went wrong ${error.message}`, 500);
+    }
+  }
+
+  static async getSignedUrlTempSeries(req, res) {
+    try {
+      const { extension } = req.query;
+      const thumb = await getSignedUrl('cinetie-thumbnails', 'image/*', 'jpg');
+      const video = await getSignedUrl('cinetie-temp-series', 'video/*', extension);
+      util.setSuccessResponse(res, 'Temporary urls', 200, {
+        thumb,
+        video
+      });
+    } catch (error) {
+      util.setErrorResponse(res, `something happened ${error.message}`, 500);
     }
   }
 }

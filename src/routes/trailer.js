@@ -9,6 +9,7 @@ router.post('/new', access.isProducer, validation.addTrailer, controller.createN
 router.get('/sort/video', controller.getAllTrailersPerVideo);
 router.get('/particular', controller.getParticularTrailerController);
 router.get('/all', access.isAdmin, controller.getAllTrailerController);
+router.get('/upload-link', access.isProducer, controller.getTrailerUploadLink);
 router.put('/update', access.isProducer, controller.updateParticularTrailerController);
 router.delete('/delete', access.isProducer, controller.deleteParticularTrailerController);
 
