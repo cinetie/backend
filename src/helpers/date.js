@@ -26,7 +26,6 @@ const isEndOfMonth = () => {
 const isEndOfyear = () => {
   const now = new Date();
   // now.getMonth() === 12 && now.getDate() === 31
-  console.log(now.getMonth(), now.getDate());
   if (now.getMonth() === 3 && now.getDate() === 15) {
     return 1;
   }
@@ -47,6 +46,20 @@ const convertToISO = (date) => {
   return isoDate.toISOString();
 };
 
+const compareDates = (date1, date2) => {
+  const sysDate = `${date1.getFullYear()}-${date1.getMonth() + 1}-${date1.getDate()}`;
+  const raveDate = `${date2.getFullYear()}-${date2.getMonth() + 1}-${date2.getDate()}`;
+  const result = (sysDate === raveDate) ? 1 : 0;
+  return result;
+};
+
 export default {
-  getCurrentDate, addMoreDays, isEndOfMonth, isEndOfyear, convertToTimestamp, removeDays, convertToISO
+  getCurrentDate,
+  addMoreDays,
+  isEndOfMonth,
+  isEndOfyear,
+  convertToTimestamp,
+  removeDays,
+  convertToISO,
+  compareDates
 };

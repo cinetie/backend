@@ -1,17 +1,8 @@
-import MD5 from 'md5';
 import Forge from 'node-forge';
 import Fetch from './fetch';
+import uuid from './uuid';
 
 export default class Rave {
-  static getKey() {
-    const secret = process.env.RAVE_SECRET;
-    const md5Secret = MD5(secret);
-    const md5SecretLast12 = md5Secret.substr(-12);
-    const secretAdjusted = secret.replace('FLWSECK-', '');
-    const secretAdjustedFirst12 = secretAdjusted.substr(0, 12);
-    return secretAdjustedFirst12 + md5SecretLast12;
-  }
-
   static encrypt(card, key) {
     const cardDetails = JSON.stringify(card);
 
@@ -24,23 +15,78 @@ export default class Rave {
     return (Forge.util.encode64(encrypted.getBytes()));
   }
 
-  static async chargeCard(cardDetails) {
-    const hash = Rave.encrypt(cardDetails, Rave.getKey());
-    const transaction = await Fetch(
-      { client: hash, PBFPubKey: process.env.RAVE_PUBLIC, alg: '3DES-24' },
-      { 'Content-Type': 'application/json' },
-      process.env.RAVE_CHARGE_URL, 'POST'
-    );
-    return transaction;
+  static async chargeMomo(raw) {
+    try {
+      const responseMomo = await Fetch({
+        ...raw,
+        tx_ref: uuid.generator(),
+      }, {
+        'Content-Type': 'application/json',
+        Authorization: process.env.RAVE_SECRET_TEST
+      }, `${process.env.RAVE_CHARGE_URL}/v3/charges?type=mobile_money_rwanda`, 'POST');
+      return responseMomo;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  static async chargeMomo(payload) {
-    const hash = Rave.encrypt(payload, Rave.getKey());
-    const transaction = await Fetch(
-      { client: hash, PBFPubKey: process.env.RAVE_PUBLIC, alg: '3DES-24' },
-      { 'Content-Type': 'application/json' },
-      process.env.RAVE_CHARGE_URL, 'POST'
-    );
-    return transaction;
+  static async chargeCard(raw) {
+    try {
+      const payload = {
+        ...raw,
+        redirect_url: 'https://cinetie.com/home',
+        tx_ref: uuid.generator(),
+        flw_ref: uuid.generator(),
+      };
+      const client = Rave.encrypt(payload, process.env.RAVE_ENC_KEY_TEST);
+      const responseCard = await Fetch({ client }, {
+        'Content-Type': 'application/json',
+        Authorization: process.env.RAVE_SECRET_TEST
+      }, `${process.env.RAVE_CHARGE_URL}/v3/charges?type=card`, 'POST');
+      return responseCard;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async verifyTransaction(id) {
+    try {
+      const responseVerification = await Fetch('', {
+        'Content-Type': 'application/json',
+        Authorization: process.env.RAVE_SECRET_TEST
+      }, `${process.env.RAVE_CHARGE_URL}/v3/transactions/${id}/verify`, 'GET');
+      return responseVerification;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async validateACharge(raw) {
+    try {
+      const responseChargeValidation = await Fetch(raw, {
+        'Content-Type': 'application/json',
+        Authorization: process.env.RAVE_SECRET_TEST
+      }, `${process.env.RAVE_CHARGE_URL}/v3/validate-charge`, 'POST');
+      return responseChargeValidation;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async chargeTokenised(raw) {
+    try {
+      const responseTokenised = await Fetch({
+        ...raw,
+        tx_ref: uuid.generator(),
+        currency: 'RWF',
+        country: 'RW'
+      }, {
+        'Content-Type': 'application/json',
+        Authorization: process.env.RAVE_SECRET
+      }, `${process.env.RAVE_CHARGE_URL}/v3/tokenized-charges`, 'POST');
+      return responseTokenised;
+    } catch (error) {
+      throw error;
+    }
   }
 }

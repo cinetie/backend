@@ -76,5 +76,19 @@ class Access {
       util.setErrorResponse(res, error.message, 500);
     }
   }
+
+  static async isRave(req, res, next) {
+    try {
+      const hash = req.headers['verify-hash'];
+      console.log(req.headers);
+      if (1 !== 0) {
+        util.setErrorResponse(res, 'Access denied', 403);
+      } else {
+        next();
+      }
+    } catch (error) {
+      util.setErrorResponse(res, error.message || error, 500);
+    }
+  }
 }
 export default Access;
