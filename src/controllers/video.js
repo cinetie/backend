@@ -1,13 +1,15 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-plusplus */
 /* eslint-disable max-len */
+import fetch from 'node-fetch';
 import response from '../helpers/response';
-import videoService from '../services/videoServices';
 import Util from '../helpers/utilities';
 import jwt from '../helpers/jwt';
 import trailerServices from '../services/trailerService';
 import tempService from '../services/tempVideoServices';
 import { getObject, deleteObject, copyObjects } from '../helpers/aws';
+import videoService from '../services/videoServices';
+import viewingSessions from '../services/viewingSessionsServices';
 
 const util = new Util();
 class Video {
@@ -250,6 +252,7 @@ class Video {
     }
   }
 
+  // eslint-disable-next-line consistent-return
   static async updateVideos(req, res) {
     try {
       const returned = await videoService.getVideoById(req.query.id);
@@ -273,9 +276,9 @@ class Video {
         return response.errorResponse(res, 404, 'Video not updated');
       }
       const resetFeatured = await videoService.resetFeaturedVideo(featureType, isFeatured, type);
-      // if (resetFeatured[0] === 0) {
-      //   return response.errorResponse(res, 500, 'Something went wrong resetting featured ', undefined);
-      // }
+      if (resetFeatured[0] === 0) {
+        return response.errorResponse(res, 500, 'Something went wrong resetting featured ', undefined);
+      }
       const updated = await videoService.updateVideo(req.query.id, req.body);
       return response.successResponse(res, 200, 'Video successfully updated!', updated);
     } catch (error) {
@@ -288,6 +291,49 @@ class Video {
       return `https://${bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
     } catch (error) {
       throw error;
+    }
+  }
+
+  // eslint-disable-next-line consistent-return
+  static async createNewWatchCount(req, res) {
+    try {
+      const { ip } = req.headers;
+      const { id } = req.query;
+      const videoId = id;
+      const videoData = await videoService.getVideoById(videoId);
+      const token = req.headers.authorization.slice(7);
+      if (!ip || !videoId === null) return response.errorResponse(res, 400, 'Something went wrong', 'missingParameterError');
+      if (!videoData) return response.errorResponse(res, 404, 'Can\'t find the video you\'re looking for', 'NotFoundError');
+      const decoded = jwt.jwtVerify(token, process.env.SECRET);
+      const data = req.body;
+      data.sessionState = 'Active';
+      data.userId = decoded.email;
+      data.time = new Date().getTime();
+      const locationServiceData = await fetch(`http://api.ipstack.com/${ip}?access_key=${process.env.IP_STACK_ACCESS_TOKEN}`);
+      const JsonlocationData = await locationServiceData.json();
+      // check if there is an exact session before same like the provided one
+      const sessions = await viewingSessions.getSesssionPerVideoUser(decoded.email, videoId);
+      if (Object.values(sessions).length >= 1) {
+        util.setErrorResponse(res, 'user already watched video', 400);
+      } else {
+        const results = await viewingSessions.registerViewingSessions({
+          sessionState: 'Active',
+          userId: decoded.email,
+          time: new Date().getTime(),
+          location: JsonlocationData.country_name,
+          ip,
+          clientId: videoData.videoClientId,
+          videoId
+        });
+        const updates = await videoService.incrementWatchCountService(videoId);
+        if (results && updates) {
+          util.setSuccessResponse(res, 'Registered the watch session', 201, { status: 'done' });
+        } else {
+          return response.errorResponse(res, 400, 'something went wrong', 'Can\'t get location');
+        }
+      }
+    } catch (error) {
+      return response.errorResponse(res, 500, 'Something went wrong', error.message);
     }
   }
 }
