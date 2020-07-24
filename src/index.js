@@ -5,7 +5,9 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import path from 'path';
 import fileUpload from 'express-fileupload';
+import cron from 'node-cron';
 import response from './helpers/response';
+import RegisterEarnings from './helpers/earnings';
 import routes from './routes';
 
 const app = express();
