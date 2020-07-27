@@ -6,7 +6,7 @@ import cpService from '../services/cpServices';
 import Helpers from '../helpers/utilities';
 import uuid from '../helpers/uuid';
 import jwt from '../helpers/jwt';
-import { getSignedUrl } from '../helpers/aws';
+import { getSignedUrl, getObject } from '../helpers/aws';
 
 const util = new Helpers();
 
@@ -78,12 +78,17 @@ class tempVideoController {
   static async getParticularVideoController(req, res) {
     try {
       const videos = await services.getParticularVideo(req.query.id);
-      const decoded = jwt.jwtVerify(videos.videoUri, process.env.SECRET);
-      videos.videoUri = decoded.videoUri;
-      if (videos) {
-        util.setSuccessResponse(res, 'Video found', 200, videos);
+      if (!videos) {
+        util.setErrorResponse(res, 'No video available', 404);
       } else {
-        util.setErrorResponse(res, 'No video available', 401);
+        const decoded = jwt.jwtVerify(videos.videoUri, process.env.SECRET);
+        const uri = await getObject('cinetie-temp-movies', decoded.videoUri, 60000);
+        videos.videoUri = uri;
+        if (uri) {
+          util.setSuccessResponse(res, 'Video found', 200, videos);
+        } else {
+          util.setErrorResponse(res, 'No video available', 401);
+        }
       }
     } catch (error) {
       util.setErrorResponse(res, `something happened ${error.message}`, 503);

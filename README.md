@@ -459,13 +459,13 @@ Method: POST
 ### Description: 
 Method: POST
 >```
->{{staging}}/video/new?id=181
+>{{staging}}/video/new?id=25
 >```
 ### Query Params
 
 |Param|value|
 |---|---|
-|id|181|
+|id|25|
 
 
 ### 🔑 Authentication bearer
@@ -1149,7 +1149,7 @@ Method: PUT
 ### Description: 
 Method: POST
 >```
->{{staging}}/temp/new
+>{{local}}/temp/new
 >```
 ### Body formdata
 
@@ -1162,8 +1162,8 @@ Method: POST
 |portrait|186a887d-44da-4aad-8322-d01357c98fd5.jpg|text|
 |nameTag|be932ec8-8de2-4c94-9566-c2fc17570cc5.png|text|
 |landscape|98716207-df16-40ae-b822-ed50e3700a46.jpg|text|
-|video|cameliian.mp4|text|
-|type|serie|text|
+|video|45447b5a-0768-4849-94fa-c373ed1d6ad9.mp4|text|
+|type|movie|text|
 
 
 ### 🔑 Authentication bearer
@@ -1181,7 +1181,7 @@ Method: POST
 ### Description: 
 Method: GET
 >```
->{{staging}}/temp/all
+>{{local}}/temp/all
 >```
 ### 🔑 Authentication bearer
 
@@ -1680,7 +1680,7 @@ Method: GET
 
 
 
-⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ 
 
 
 ## End-point: register stream session
@@ -1716,6 +1716,30 @@ Method: POST
 |Param|value|Type|
 |---|---|---|
 |token|eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6InRpeW92YTQ2NTBAZW50cmFzdGQuY29tIiwiaWF0IjoxNTk1NTEwODE0fQ.dojxLud4802HZKYhbD1Qlp6YDkILUdRCE_qW3gFQ8mc|string|
+
+
+
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+
+
+## End-point: get single temp movie
+### Description: 
+Method: GET
+>```
+>{{local}}/temp?id=22
+>```
+### Query Params
+
+|Param|value|
+|---|---|
+|id|22|
+
+
+### 🔑 Authentication bearer
+
+|Param|value|Type|
+|---|---|---|
+|token|eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiIiwidXNlciI6InNkZmxzZGpmbGpAY2luZXRpZS5jb20iLCJpYXQiOjE1ODAxNjE5MDd9.qR5N1uUG_F9E0spZRfvbLZd84CslBApI9tETQYZFWY8|string|
 
 
 
@@ -1878,7 +1902,7 @@ Method: GET
 ### Description: 
 Method: POST
 >```
->{{staging}}/temp/series/new
+>{{local}}/temp/series/new
 >```
 ### Body formdata
 
@@ -2114,6 +2138,30 @@ Method: GET
 |Param|value|Type|
 |---|---|---|
 |token|eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImFsYWluY2hyaXN0aWFuODdAZ21haWwuY29tIiwiY2xpZW50SWQiOiIwYzNiZTkyZi0zNzgyLTQ0YzMtYjc0Zi1lY2RiZWY5ZTQ0OTIiLCJpYXQiOjE1ODYzNDU1MTF9.Bdr0oy4UdOoxWpFYUyAF5pHsS-JAHAjakUfaz0yKFYM|string|
+
+
+
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+
+
+## End-point: get single temp serie
+### Description: 
+Method: GET
+>```
+>{{local}}/temp/series?id=2
+>```
+### Query Params
+
+|Param|value|
+|---|---|
+|id|2|
+
+
+### 🔑 Authentication bearer
+
+|Param|value|Type|
+|---|---|---|
+|token|eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiIiwidXNlciI6InNkZmxzZGpmbGpAY2luZXRpZS5jb20iLCJpYXQiOjE1ODAxNjE5MDd9.qR5N1uUG_F9E0spZRfvbLZd84CslBApI9tETQYZFWY8|string|
 
 
 
