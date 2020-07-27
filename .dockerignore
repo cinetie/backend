@@ -1,3 +1,9 @@
 node_modules
 npm-debug.log
 yarn-error.log
+.gitingore
+dev.DockerFile
+docker-compose*
+README
+.dockeringore
+.nyc_output

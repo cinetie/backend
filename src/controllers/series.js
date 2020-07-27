@@ -1,27 +1,26 @@
+/* eslint-disable no-plusplus */
 import services from '../services/serieServices';
 import Util from '../helpers/utilities';
 import temp from '../services/tempSerieService';
 import jwt from '../helpers/jwt';
-import cloudinary from '../helpers/cloudinary';
-import { upload, getObject, deleteObject } from '../helpers/aws';
+import { getObject, deleteObject, copyObjects } from '../helpers/aws';
 
 const util = new Util();
 
-class serieController {
+class Episodes {
   static async create(req, res) {
     try {
       const { id } = req.query;
       const tempVideo = await temp.getParticularVideo(id);
       const decoded = jwt.jwtVerify(tempVideo.uri, process.env.SECRET);
-      const url = await upload('series-cinetie', req.files.episode);
+      await copyObjects('cinetie-temp-series', 'series-cinetie', decoded.uri);
       const createdSerie = await services.update(decoded.id, {
         suspensionState: false,
-        episode: url.data.Key
+        episode: decoded.uri
       });
       const deleted = await temp.deleteSeries(id);
-      const publicId = decoded.uri.slice(59);
-      const deletionStatusCloudinary = await cloudinary.destroy(publicId.split('.')[0], 'video');
-      if (createdSerie && deleted && deletionStatusCloudinary) {
+      const deletionStatus = await deleteObject('cinetie-temp-series', decoded.uri);
+      if (createdSerie && deleted && deletionStatus) {
         util.setSuccessResponse(res, 'Created successfully', 201);
       } else {
         util.setErrorResponse(res, 'Can\'t upload', 400);
@@ -36,8 +35,11 @@ class serieController {
       const episode = await services.getSingleEpisode(req.query.ep);
       const uri = await getObject('series-cinetie', episode.episode, 20000);
       episode.episode = uri;
-      if (!episode) util.setErrorResponse(res, 'Can\'t find what you requested', 400);
-      util.setSuccessResponse(res, 'Retrieved successfully', 200, episode);
+      if (!episode) {
+        util.setErrorResponse(res, 'Can\'t find what you requested', 400);
+      } else {
+        util.setSuccessResponse(res, 'Retrieved successfully', 200, episode);
+      }
     } catch (error) {
       util.setErrorResponse(res, `Something happened ${error.message}`, 500);
     }
@@ -48,11 +50,14 @@ class serieController {
       const {
         id, s, limit, offset
       } = req.query;
-      const season = await services.getSingleSeason(id, s, limit, offset);
-      if (!season) {
+      const episodes = await services.getSingleSeason(id, s, limit, offset);
+      for (let i = 0; i < episodes.length; i++) {
+        episodes[i].thumbNailUrl = Episodes.attachThumbnails(episodes[i].thumbNailUrl, 'cinetie-thumbnails');
+      }
+      if (!episodes) {
         util.setErrorResponse(res, 'Can\'t find what you requested', 400);
       } else {
-        util.setSuccessResponse(res, 'Retrieved successfully', 200, season);
+        util.setSuccessResponse(res, 'Retrieved successfully', 200, episodes);
       }
     } catch (error) {
       util.setErrorResponse(res, `Something happened ${error.message}`, 500);
@@ -62,8 +67,11 @@ class serieController {
   static async getAllSeasons(req, res) {
     try {
       const seasons = await services.getAllSeasons(req.query.videoId);
-      if (!seasons) util.setErrorResponse(res, 'Can\'t find what you requested', 400);
-      util.setSuccessResponse(res, 'Retrieved successfully', 200, seasons[0]);
+      if (!seasons) {
+        util.setErrorResponse(res, 'Can\'t find what you requested', 400);
+      } else {
+        util.setSuccessResponse(res, 'Retrieved successfully', 200, seasons[0]);
+      }
     } catch (error) {
       util.setErrorResponse(res, `Something happened ${error.message}`, 500);
     }
@@ -98,9 +106,12 @@ class serieController {
     try {
       const token = req.headers.authorization.slice(7);
       const { clientId } = jwt.jwtVerify(token, process.env.SECRET);
-      const videos = await services.getEpisodesByClientId(clientId);
-      if (Object.values(videos).length > 0) {
-        util.setSuccessResponse(res, 'Sucess', 200, videos);
+      const episodes = await services.getEpisodesByClientId(clientId);
+      for (let i = 0; i < episodes.length; i++) {
+        episodes[i].thumbNailUrl = Episodes.attachThumbnails(episodes[i].thumbNailUrl, 'cinetie-thumbnails');
+      }
+      if (Object.values(episodes).length > 0) {
+        util.setSuccessResponse(res, 'Sucess', 200, episodes);
       } else {
         util.setErrorResponse(res, 'can\'t find matching episodes', 400);
       }
@@ -108,5 +119,13 @@ class serieController {
       util.setErrorResponse(res, `Something happened ${error.message}`, 500);
     }
   }
+
+  static attachThumbnails(key, bucket) {
+    try {
+      return `https://${bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
-export default serieController;
+export default Episodes;

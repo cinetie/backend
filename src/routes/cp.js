@@ -26,6 +26,7 @@ router.get('/earnings', access.isProducer, earnings.getEarningsPerClient);
 router.get('/videos', access.isProducer, auth.getAllVideosLocal);
 router.put('/update', access.isProducer, auth.updateAccount);
 router.get('/serve-verify', auth.serveVerifyPassword);
+router.get('/upload-tokens', access.isProducer, auth.getS3Tokens);
 router.get(
   '/google',
   passport.authenticate('google', {

@@ -16,7 +16,9 @@ class Access {
       const token = req.headers.authorization.slice(7);
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
       const { user } = decoded;
-      if (!user) util.setErrorResponse(res, 'Invalid access token', 400);
+      if (!user) {
+        util.setErrorResponse(res, 'Invalid access token', 400);
+      }
       if (user !== process.env.ADMIN_USER) {
         util.setErrorResponse(res, 'Access denied  ', 403);
       } else {
@@ -52,6 +54,9 @@ class Access {
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
       const { email } = decoded;
       const user = await userService.getUserByMail(email);
+      if (!user) {
+        util.setErrorResponse(res, 'Invalid Token', 400);
+      }
       if (user.permissionLevel === 0) {
         util.setErrorResponse(res, 'Access denied ', 403);
       } else {
@@ -80,8 +85,7 @@ class Access {
   static async isRave(req, res, next) {
     try {
       const hash = req.headers['verify-hash'];
-      console.log(req.headers);
-      if (1 !== 0) {
+      if (hash !== process.env.RAVE_SECRET) {
         util.setErrorResponse(res, 'Access denied', 403);
       } else {
         next();

@@ -11,6 +11,7 @@ import Util from '../helpers/utilities';
 import uuid from '../helpers/uuid';
 import cloudinary from '../helpers/cloudinary';
 import date from '../helpers/date';
+import { upload } from '../helpers/aws';
 
 const util = new Util();
 // add an isVerified column to cp
@@ -22,8 +23,8 @@ class cpController {
       newUser.isVerified = false;
       newUser.clientId = uuid.generator();
       const { image } = req.files;
-      const imageToUpload = await cloudinary.upload(image.tempFilePath, 'image');
-      newUser.idLink = imageToUpload.secure_url;
+      const uploadedThumb = await upload('contentproviderids', image);
+      newUser.idLink = uploadedThumb.data.Key;
       const checkUser = await cp.getCpByMail(newUser.email);
       if (checkUser != null) {
         util.setErrorResponse(res, 'cp already exists', 422);
@@ -266,6 +267,19 @@ class cpController {
       return res.render('ResetPassword', { host: process.env.HOST, role: 'cp' });
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
+    }
+  }
+
+  static async getS3Tokens(req, res) {
+    try {
+      const params = {
+        AWS_REGION: process.env.AWS_REGION,
+        AWS_ID: process.env.AWS_UPLOAD_ID,
+        AWS_SECRET: process.env.AWS_UPLOAD_ACCESS_KEY
+      };
+      util.setSuccessResponse(res, 'results', 200, params);
+    } catch (error) {
+      util.setErrorResponse(res, `something went wrong ${error} || ${error.message}`, 500);
     }
   }
 }
