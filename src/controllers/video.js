@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-plusplus */
 /* eslint-disable max-len */
 import response from '../helpers/response';
 import videoService from '../services/videoServices';
@@ -5,14 +7,12 @@ import Util from '../helpers/utilities';
 import jwt from '../helpers/jwt';
 import trailerServices from '../services/trailerService';
 import tempService from '../services/tempVideoServices';
-import cloudinary from '../helpers/cloudinary';
-import { upload, getObject, deleteObject } from '../helpers/aws';
+import { getObject, deleteObject, copyObjects } from '../helpers/aws';
 
 const util = new Util();
-class videoController {
+class Video {
   static async addVideo(req, res) {
     try {
-      req.socket.setTimeout(240 * 60 * 1000);
       const tempVideo = await tempService.getParticularVideo(Number(req.query.id));
       const decoded = jwt.jwtVerify(tempVideo.videoUri, process.env.SECRET);
       const data = decoded;
@@ -20,17 +20,18 @@ class videoController {
         data.videoClientId = decoded.clientId;
         data.videoSuspensionState = false;
         data.size = decoded.size;
-        const uri = await upload('movies-cinetie', req.files.video);
-        if (!uri) {
+        const copyFile = await copyObjects('cinetie-temp-movies', 'movies-cinetie', decoded.videoUri);
+        if (!copyFile) {
           util.setErrorResponse(res, 'something went wrong while uploading', 503);
         } else {
-          data.videoLink = uri.data.Key;
+          // copy back the same key from the temp bucket
+          // delete the object in temp
+          data.videoLink = decoded.videoUri;
           data.videoIdVimeo = '0000';
           const updatedVideo = await videoService.updateVideo(decoded.videoId, data);
           const deleted = await tempService.deleteVideos(req.query.id);
-          const publicId = decoded.videoUri.slice(60);
-          const cloudinaryDeletionStatus = await cloudinary.destroy(publicId.split('.')[0], 'video');
-          if (!updatedVideo || !deleted || !cloudinaryDeletionStatus) {
+          const deleteAWS = await deleteObject('cinetie-temp-movies', decoded.videoUri);
+          if (!updatedVideo || !deleted || !deleteAWS) {
             util.setErrorResponse(res, 'something went wrong while approving video', 503);
           } else {
             util.setSuccessResponse(res, 'Video uploaded', 201, updatedVideo);
@@ -77,6 +78,8 @@ class videoController {
     try {
       const { type } = req.query;
       const videos = await videoService.getPopularVideos(req.query.offset, req.query.limit, type);
+      Video.getAttachedThumbsMultiple(videos);
+
       if (Object.values(videos).length > 0) {
         util.setSuccessResponse(res, 'videos found', 200, videos);
       } else {
@@ -91,6 +94,8 @@ class videoController {
     try {
       const { type } = req.query;
       const videos = await videoService.getTrendingVideos(req.query.offset, req.query.limit, type);
+      Video.getAttachedThumbsMultiple(videos);
+
       if (Object.values(videos).length > 0) {
         util.setSuccessResponse(res, 'videos found', 200, videos);
       } else {
@@ -104,6 +109,7 @@ class videoController {
   static async getVideosByCategory(req, res) {
     try {
       const videos = await videoService.getVideosByCategory(req.query.q);
+      Video.getAttachedThumbsMultiple(videos);
       if (Object.values(videos).length > 0) {
         util.setSuccessResponse(res, `${req.query.q} videos found`, 200, videos);
       } else {
@@ -118,6 +124,8 @@ class videoController {
     try {
       const { q, offset } = req.query;
       const videos = await videoService.search(q, offset);
+      Video.getAttachedThumbsMultiple(videos);
+
       if (Object.values(videos).length > 0) {
         util.setSuccessResponse(res, 'Videos found', 200, videos);
       } else {
@@ -130,6 +138,7 @@ class videoController {
 
   static async getAllVideosLocal(req, res) {
     const videos = await videoService.getAllVideosForAdmin();
+    Video.getAttachedThumbsMultiple(videos);
     if (Object.values(videos).length > 0) {
       util.setSuccessResponse(res, 'Data found', 200, videos);
     } else {
@@ -137,11 +146,20 @@ class videoController {
     }
   }
 
+  static getAttachedThumbsMultiple(videos) {
+    for (let i = 0; i < videos.length; i++) {
+      videos[i].videoThumbnailLink = Video.attachThumbnails(videos[i].videoThumbnailLink, 'cinetie-thumbnails');
+      videos[i].tallThumbNailLink = Video.attachThumbnails(videos[i].tallThumbNailLink, 'cinetie-thumbnails');
+      videos[i].nameTagThumbNailLink = Video.attachThumbnails(videos[i].nameTagThumbNailLink, 'cinetie-thumbnails');
+    }
+  }
+
   static async getMainFeaturedFilm(req, res) {
     try {
       const { type } = req.query;
       const video = await videoService.getMainFeaturedVideo(type);
-      const trailer = await trailerServices.getAllTrailers(video[0].videoId);
+      Video.getAttachedThumbs(video);
+      const trailer = await trailerServices.getAllTrailers(video.videoId);
       const data = {
         video,
         trailer: trailer[0].trailerLink
@@ -160,6 +178,7 @@ class videoController {
     try {
       const { type } = req.query;
       const video = await videoService.getSecondFeaturedVideo(type);
+      Video.getAttachedThumbs(video);
       const trailer = await trailerServices.getAllTrailers(video[0].videoId);
       const data = {
         video,
@@ -175,11 +194,18 @@ class videoController {
     }
   }
 
+  static getAttachedThumbs(video) {
+    video.videoThumbnailLink = Video.attachThumbnails(video.videoThumbnailLink, 'cinetie-thumbnails');
+    video.tallThumbNailLink = Video.attachThumbnails(video.tallThumbNailLink, 'cinetie-thumbnails');
+    video.nameTagThumbNailLink = Video.attachThumbnails(video.nameTagThumbNailLink, 'cinetie-thumbnails');
+  }
+
   static async getAllNewVideos(req, res) {
     try {
-      const video = await videoService.getNewVideos(req.query.limit, req.query.offset, req.query.type);
-      if (video) {
-        util.setSuccessResponse(res, 'videos Found', 200, video);
+      const videos = await videoService.getNewVideos(req.query.limit, req.query.offset, req.query.type);
+      Video.getAttachedThumbsMultiple(videos);
+      if (Object.values(videos).length >= 1) {
+        util.setSuccessResponse(res, 'videos Found', 200, videos);
       } else {
         util.setErrorResponse(res, 'Video can\'t be found', 404);
       }
@@ -194,6 +220,7 @@ class videoController {
       const { type } = req.query;
       const { clientId } = jwt.jwtVerify(token, process.env.SECRET);
       const videos = await videoService.getVideosByType(clientId, type);
+      Video.getAttachedThumbsMultiple(videos);
       if (Object.values(videos).length > 0) {
         util.setSuccessResponse(res, 'Videos Found', 200, videos);
       } else {
@@ -237,6 +264,7 @@ class videoController {
     }
   }
 
+  // eslint-disable-next-line consistent-return
   static async featureVideo(req, res) {
     try {
       const { featureType, isFeatured, type } = req.body;
@@ -254,6 +282,14 @@ class videoController {
       response.errorResponse(res, 500, 'Something went wrong', error.message);
     }
   }
+
+  static attachThumbnails(key, bucket) {
+    try {
+      return `https://${bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
-export default videoController;
+export default Video;

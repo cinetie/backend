@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable no-shadow */
 /* eslint-disable consistent-return */
 import path from 'path';
@@ -16,6 +17,7 @@ import mailer from '../helpers/mailer';
 import dax from '../helpers/dax-payment-handler';
 import paypal from '../helpers/paypal';
 import square from '../helpers/square';
+import Rave from '../helpers/rave';
 
 const util = new Util();
 class userController {
@@ -228,20 +230,8 @@ class userController {
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
       const user = await userService.getUserByMail(decoded.email);
       const status = await userService.deleteUser(user.id);
-      const subscription = await billingServices.getCurrentSubscription(decoded.email);
       const cancelSubscription = await billingServices.updateSubscription(decoded.email, { state: 'canceled' });
-      if (subscription.paymentMethod === 2 && cancelSubscription[0] > 0) {
-        const cancelation = await paypal.cancelAggreement({ token });
-        // if (cancelation === 1) {
-        if (status !== 0) {
-          util.setSuccessResponse(res, 'deleted successfully', 200, status);
-        } else {
-          util.setErrorResponse(res, 'An error occured deleting your account', 400);
-        }
-        // } else {
-        //   util.setErrorResponse(res, 'An error occured can\'t cancel paypal subscription', 400);
-        // }
-      } else if (status !== 0) {
+      if (status !== 0 && cancelSubscription[1] === 1) {
         util.setSuccessResponse(res, 'deleted successfully', 200, status);
       } else {
         util.setErrorResponse(res, 'An error occured', 400);
@@ -274,8 +264,7 @@ class userController {
       const currentSubscription = await billingServices.getCurrentSubscription(email);
       if (!currentSubscription) {
         const user = await userService.getUserByMail(email);
-        const { paymentMethod, nonce } = req.body;
-        console.log(paymentMethod, nonce);
+        const { paymentMethod } = req.body;
         const subscriptionData = {
           paymentMethod,
           email,
@@ -283,30 +272,11 @@ class userController {
           phoneNumber: user.phoneNumber,
           isBilledAnnually: user.isBilledAnnually,
         };
-        if (Number(paymentMethod) === 3) {
-          const { customer } = await square.createCustomer({ email });
-          const cardId = await square.attachCard({ customerId: customer.id, nonce });
-          console.log(customer, cardId);
-          const updates = await userService.updateUser(email,
-            { card_nonce: cardId, customerId: customer.id });
-          console.log(updates);
-          if (updates[1] > 0) {
-            const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
-            if (subscriptionDetails) {
-              util.setSuccessResponse(res, 'Completed signup process', 201, subscriptionDetails);
-            } else {
-              util.setErrorResponse(res, 'Something went sideways completing the signup', 400);
-            }
-          } else {
-            util.setErrorResponse(res, 'something went side ways updating credit card details', 400);
-          }
+        const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
+        if (subscriptionDetails) {
+          util.setSuccessResponse(res, 'Completed signup process', 201, subscriptionDetails);
         } else {
-          const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
-          if (subscriptionDetails) {
-            util.setSuccessResponse(res, 'Completed signup process', 201, subscriptionDetails);
-          } else {
-            util.setErrorResponse(res, 'Something went sideways completing the signup', 400);
-          }
+          util.setErrorResponse(res, 'Something went sideways completing the signup', 400);
         }
       } else {
         util.setErrorResponse(res, 'user has an active subscription', 400);
@@ -330,47 +300,16 @@ class userController {
       if (user.isOnTrial === false) {
         util.setErrorResponse(res, 'account is already activated', 400);
       } else {
-        let frequency = 0;
-        if (user.isBilledAnnually === true) {
-          frequency = 'YEAR';
-        } else {
-          frequency = 'MONTH';
-        }
-        const paymentData = {
-          user: {
-            email,
-            paymentMethod: currentSubsctption.paymentMethod,
-            isBilledAnnually: user.isBilledAnnually,
-            plan: user.plan
-          },
-          momo: {
-            amount: Math.round(price),
-            phonenumber: user.phoneNumber,
-            firstname: user.firstName,
-            lastname: user.lastName,
-            email,
-          },
-          paypal: {
-            plan: user.plan,
-            price,
-            frequency,
-            currency: 'USD',
-            total: price,
-            urls: {
-              success: `${process.env.PAYPAL_SUCCESS}?user=${jwt.jwtSign(email, process.env.SECRET)}`,
-              failOrCancel: `${process.env.PAYPAL_FAIL_CANCEL}`
-            }
-          }
-        };
-
+        const paymentData = userController.getAndSetPaymentData(req, price, user, email);
         switch (Number(currentSubsctption.paymentMethod)) {
           case 1: {
-            const momoData = await dax.momo(paymentData.momo);
-            if (momoData !== 0) {
-              const updates = await userService.updateUser(user.email,
-                { isOnTrial: false, permissionLevel: 1 });
+            const momoData = await Rave.chargeMomo(paymentData);
+            console.log(momoData);
+            if (momoData.status !== 'error') {
+              const updates = await userService.updateUser(email,
+                { isOnTrial: false });
               if (updates[1] > 0) {
-                util.setSuccessResponse(res, 'Success', 201, updates);
+                util.setSuccessResponse(res, 'Pending subscription  activation with MoMo', 201, momoData);
               } else {
                 util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
               }
@@ -379,36 +318,23 @@ class userController {
             }
             break;
           }
+
           case 2: {
-            await paypal.subscription(req, res, paymentData.paypal);
-            break;
-          }
-
-          case 3: {
-            if (user.card_nonce) {
-              const reciept = await square.billCard({
-                source_id: user.card_nonce,
-                amount_money: {
-                  amount: Number(price) * 100,
-                  currency: 'USD'
-                },
-                customerId: user.customerId
-              });
-              if (reciept.status === 'COMPLETED') {
-                const updates = await userService.updateUser(user.email,
-                  { isOnTrial: false, card_brand: reciept.cardBrand, permissionLevel: 1 });
-                if (updates[1] > 0) {
-                  util.setSuccessResponse(res, 'Success', 201, undefined);
-                } else {
-                  util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
-                }
-              } else {
-                util.setErrorResponse(res, 'Sorry payment failed', 500);
+            const pay = await Rave.chargeCard(paymentData);
+            if (pay.status !== 'error') {
+              if (pay.meta.authorization.mode === 'avs_noauth') {
+                return util.setSuccessResponse(res, 'Please provide these details', 200, ['city', 'address', 'state', 'country', 'zipcode']);
+              } if (pay.meta.authorization.mode === 'pin') {
+                return util.setSuccessResponse(res, 'Please provide your pin', 200, undefined);
+              } if (pay.meta.authorization.mode === 'otp') {
+                return util.setSuccessResponse(
+                  res, pay.data.processor_response, 200, { flw_ref: pay.data.flw_ref }
+                );
               }
+              await userController.removeTrial(email, res, pay);
             } else {
-              util.setErrorResponse(res, 'Can not save card', 500);
+              util.setErrorResponse(res, pay.message, 500);
             }
-
             break;
           }
 
@@ -420,6 +346,51 @@ class userController {
     } catch (error) {
       return response.errorResponse(res, 500, `Something wrong happened ${error.message}`, error);
     }
+  }
+
+  static async removeTrial(email, res, pay) {
+    const updates = await userService.updateUser(email,
+      { isOnTrial: false });
+    if (updates[1] > 0) {
+      util.setSuccessResponse(res, 'Success', 201, { user: updates, payment: { ...pay.meta, flw_ref: pay.data.flw_ref } });
+    } else {
+      util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
+    }
+  }
+
+  static async verifyOTP(req, res) {
+    try {
+      const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
+      if (req.body.authorization.mode === 'otp-verify') {
+        const otpStatus = await Rave.validateACharge(
+          {
+            otp: req.body.authorization.otp,
+            flw_ref: req.body.flw_ref
+          }
+        );
+        console.log(otpStatus);
+        if (otpStatus.data.processor_response !== 'successful') {
+          return util.setErrorResponse(res, otpStatus.message, 400, 'BAD_REQUEST');
+        // eslint-disable-next-line no-else-return
+        } else {
+          await userController.removeTrial(email, res, otpStatus);
+          return util.setSuccessResponse(res, 'OTP verified', 200, otpStatus, null);
+        }
+      }
+    } catch (error) {
+      return util.setErrorResponse(res, error.message || error, 500, 'SERVER_ERROR');
+    }
+  }
+
+  static getAndSetPaymentData(req, price, user, email) {
+    return {
+      ...req.body,
+      amount: price,
+      currency: 'RWF',
+      phone_number: user.phoneNumber,
+      fullname: `${user.firstName} ${user.lastName}`,
+      email
+    };
   }
 
   static async getAllAccounts(res) {

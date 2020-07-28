@@ -13,6 +13,7 @@ import trailers from './trailer';
 import admin from './admin';
 import series from './series';
 import tempSeries from './tempSerie';
+import webhooks from './webhooks';
 
 const router = Router();
 
@@ -29,4 +30,5 @@ router.use('/trailer', trailers);
 router.use('/admin', admin);
 router.use('/series', series);
 router.use('/temp/series', tempSeries);
+router.use('/webhooks', webhooks);
 export default router;

@@ -1,14 +1,12 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable no-await-in-loop */
-import { v2 as cloudinary } from 'cloudinary';
-import Helpers from '../helpers/utilities';
 import services from '../services/tempVideoServices';
-import uuid from '../helpers/uuid';
-import jwt from '../helpers/jwt';
-import cloudinaryHelper from '../helpers/cloudinary';
-// import google from '../helpers/google.cloud.normal'
 import videoService from '../services/videoServices';
 import cpService from '../services/cpServices';
+import Helpers from '../helpers/utilities';
+import uuid from '../helpers/uuid';
+import jwt from '../helpers/jwt';
+import { getSignedUrl, getObject } from '../helpers/aws';
 
 const util = new Helpers();
 
@@ -19,13 +17,9 @@ class tempVideoController {
       req.socket.setTimeout(240 * 60 * 1000);
       const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const data = req.body;
-      // register thumbnails
-      const smallThumbnail = await cloudinaryHelper.upload(req.files.small.tempFilePath, 'image');
-      const nameTagThumbNail = await cloudinaryHelper.upload(req.files.nameTag.tempFilePath, 'image');
-      const tallThumbNail = await cloudinaryHelper.upload(req.files.tall.tempFilePath, 'image');
-      data.tallThumbNailLink = tallThumbNail.secure_url;
-      data.nameTagThumbNailLink = nameTagThumbNail.secure_url;
-      data.videoThumbnailLink = smallThumbnail.secure_url;
+      data.tallThumbNailLink = data.portrait;
+      data.nameTagThumbNailLink = data.nameTag;
+      data.videoThumbnailLink = data.landscape;
       // suspend video for verification
       data.videoSuspensionState = true;
       // generate video parameters
@@ -34,24 +28,15 @@ class tempVideoController {
       data.clientId = decoded.clientId;
       data.type = req.body.type;
       if (data.type === 'movie') {
-        const file = req.files.video;
-        cloudinary.uploader.upload(file.tempFilePath, {
-          resource_type: 'video',
-          overwrite: true
-        }, async (err, result) => {
-          // upload video to temp server i.e cloudinary
-          // hash video url
-          const { size } = req.files.video;
-          data.videoUri = jwt.jwtSign({
-            videoUri: result.secure_url, size, clientId: decoded.clientId, videoId: data.videoId, type: 'movie'
-          }, process.env.SECRET);
-          // register to both temp server and real server
-          data.videoUrl = data.videoUri;
-          const uploadedVideo = await services.createNewVideos(data);
-          const newVideo = await videoService.createNewVideo(data);
-          if (!uploadedVideo && newVideo) util.setErrorResponse(res, 'Video can\'t be saved', 401);
-          util.setSuccessResponse(res, 'video uploaded successfully', 201, { status: 'upload success' });
-        });
+        data.videoUri = jwt.jwtSign({
+          videoUri: data.video, size: data.size, clientId: decoded.clientId, videoId: data.videoId, type: 'movie'
+        }, process.env.SECRET);
+        // register to both temp server and real server
+        data.videoUrl = data.videoUri;
+        const uploadedVideo = await services.createNewVideos(data);
+        const newVideo = await videoService.createNewVideo(data);
+        if (!uploadedVideo && newVideo) util.setErrorResponse(res, 'Video can\'t be saved', 401);
+        util.setSuccessResponse(res, 'video uploaded successfully', 201, { status: 'upload success' });
       } else {
         // set to serie since this video represents an entire serie
         data.videoUri = jwt.jwtSign({
@@ -93,12 +78,17 @@ class tempVideoController {
   static async getParticularVideoController(req, res) {
     try {
       const videos = await services.getParticularVideo(req.query.id);
-      const decoded = jwt.jwtVerify(videos.videoUri, process.env.SECRET);
-      videos.videoUri = decoded.videoUri;
-      if (videos) {
-        util.setSuccessResponse(res, 'Video found', 200, videos);
+      if (!videos) {
+        util.setErrorResponse(res, 'No video available', 404);
       } else {
-        util.setErrorResponse(res, 'No video available', 401);
+        const decoded = jwt.jwtVerify(videos.videoUri, process.env.SECRET);
+        const uri = await getObject('cinetie-temp-movies', decoded.videoUri, 60000);
+        videos.videoUri = uri;
+        if (uri) {
+          util.setSuccessResponse(res, 'Video found', 200, videos);
+        } else {
+          util.setErrorResponse(res, 'No video available', 401);
+        }
       }
     } catch (error) {
       util.setErrorResponse(res, `something happened ${error.message}`, 503);
@@ -128,6 +118,24 @@ class tempVideoController {
       }
     } catch (error) {
       util.setErrorResponse(res, `something happened ${error.message}`, 503);
+    }
+  }
+
+  static async getSignedUrlTempVideos(req, res) {
+    try {
+      const { type, extension } = req.query;
+      const portrait = await getSignedUrl('cinetie-thumbnails', 'image/*', 'jpg');
+      const landscape = await getSignedUrl('cinetie-thumbnails', 'image/*', 'jpg');
+      const nameTag = await getSignedUrl('cinetie-thumbnails', 'image/*', 'png');
+      const video = (type === 'movie') ? await getSignedUrl('cinetie-temp-movies', 'video/*', extension) : null;
+      util.setSuccessResponse(res, 'Temporary urls', 200, {
+        portrait,
+        landscape,
+        nameTag,
+        video
+      });
+    } catch (error) {
+      util.setErrorResponse(res, `something happened ${error.message}`, 500);
     }
   }
 }

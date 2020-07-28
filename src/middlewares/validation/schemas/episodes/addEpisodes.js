@@ -10,5 +10,9 @@ export default joi.object().keys({
   synopsis: joi.string().required()
     .error(() => 'You have to provide a synopsis Ex: "It all starts at night" '),
   episodeNumber: joi.number().required()
-    .error(() => 'You have to provide a number')
+    .error(() => 'You have to provide a number'),
+  thumb: joi.string().required()
+    .error(() => 'You have to provide a thumbnail'),
+  video: joi.string().required()
+    .error(() => 'You have to provide a video')
 }).options({ allowUnknown: false });

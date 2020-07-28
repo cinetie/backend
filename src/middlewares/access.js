@@ -13,14 +13,20 @@ class Access {
   // level 2 permission checkpoint
   static async isAdmin(req, res, next) {
     try {
-      const token = req.headers.authorization.slice(7);
-      const decoded = jwt.jwtVerify(token, process.env.SECRET);
-      const { user } = decoded;
-      if (!user) util.setErrorResponse(res, 'Invalid access token', 400);
-      if (user !== process.env.ADMIN_USER) {
-        util.setErrorResponse(res, 'Access denied  ', 403);
+      if (!req.headers.authorization) {
+        util.setErrorResponse(res, 'Invalid access token', 400);
       } else {
-        next();
+        const token = req.headers.authorization.slice(7);
+        const decoded = jwt.jwtVerify(token, process.env.SECRET);
+        const { user } = decoded;
+        if (!user) {
+          util.setErrorResponse(res, 'Invalid access token', 400);
+        }
+        if (user !== process.env.ADMIN_USER) {
+          util.setErrorResponse(res, 'Access denied  ', 403);
+        } else {
+          next();
+        }
       }
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
@@ -52,6 +58,9 @@ class Access {
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
       const { email } = decoded;
       const user = await userService.getUserByMail(email);
+      if (!user) {
+        util.setErrorResponse(res, 'Invalid Token', 400);
+      }
       if (user.permissionLevel === 0) {
         util.setErrorResponse(res, 'Access denied ', 403);
       } else {
@@ -74,6 +83,19 @@ class Access {
       }
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
+    }
+  }
+
+  static async isRave(req, res, next) {
+    try {
+      const hash = req.headers['verify-hash'];
+      if (hash !== process.env.RAVE_SECRET) {
+        util.setErrorResponse(res, 'Access denied', 403);
+      } else {
+        next();
+      }
+    } catch (error) {
+      util.setErrorResponse(res, error.message || error, 500);
     }
   }
 }
