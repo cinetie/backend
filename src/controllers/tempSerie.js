@@ -3,7 +3,7 @@
 import Helpers from '../helpers/utilities';
 import services from '../services/tempSerieService';
 import jwt from '../helpers/jwt';
-import { getSignedUrl } from '../helpers/aws';
+import { getSignedUrl, getObject } from '../helpers/aws';
 import series from '../services/serieServices';
 import videoServices from '../services/videoServices';
 
@@ -64,6 +64,21 @@ class tempSerieController {
         thumb,
         video
       });
+    } catch (error) {
+      util.setErrorResponse(res, `something happened ${error.message}`, 500);
+    }
+  }
+
+  static async generateSignedUrl(req, res) {
+    try {
+      const episode = await services.getParticularVideo(req.query.id);
+      if (episode) {
+        const decoded = jwt.jwtVerify(episode.uri, process.env.SECRET);
+        episode.uri = await getObject('cinetie-temp-serie', decoded.uri, 6000);
+        util.setSuccessResponse(res, 'Episode found', 200, episode);
+      } else {
+        util.setErrorResponse(res, 'Can not find that episode', 404);
+      }
     } catch (error) {
       util.setErrorResponse(res, `something happened ${error.message}`, 500);
     }

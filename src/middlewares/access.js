@@ -13,16 +13,20 @@ class Access {
   // level 2 permission checkpoint
   static async isAdmin(req, res, next) {
     try {
-      const token = req.headers.authorization.slice(7);
-      const decoded = jwt.jwtVerify(token, process.env.SECRET);
-      const { user } = decoded;
-      if (!user) {
+      if (!req.headers.authorization) {
         util.setErrorResponse(res, 'Invalid access token', 400);
-      }
-      if (user !== process.env.ADMIN_USER) {
-        util.setErrorResponse(res, 'Access denied  ', 403);
       } else {
-        next();
+        const token = req.headers.authorization.slice(7);
+        const decoded = jwt.jwtVerify(token, process.env.SECRET);
+        const { user } = decoded;
+        if (!user) {
+          util.setErrorResponse(res, 'Invalid access token', 400);
+        }
+        if (user !== process.env.ADMIN_USER) {
+          util.setErrorResponse(res, 'Access denied  ', 403);
+        } else {
+          next();
+        }
       }
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
