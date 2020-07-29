@@ -230,7 +230,7 @@ class videoService {
     try {
       return await database.videos.findAll({
         attributes: {
-          exclude: ['videoLink', 'createdAt', 'updatedAt', 'videoCast', 'videoSynopsis', 'nameTagThumbNailLink', 'isFeatured', 'tallThumbNailLink', 'videoIdVimeo', 'videoClientId', 'featureType', 'category']
+          exclude: ['videoLink', 'createdAt', 'updatedAt', 'videoCast', 'videoSynopsis', 'nameTagThumbNailLink', 'isFeatured', 'tallThumbNailLink', 'videoIdVimeo', 'videoClientId', 'featureType', 'category', 'rate']
         },
         where: {
           videoClientId

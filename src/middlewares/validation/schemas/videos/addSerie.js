@@ -16,7 +16,9 @@ export default joi.object().keys({
   nameTag: joi.string().required()
     .error(() => 'You did not upload a name tag cover'),
   landscape: joi.string().required()
-    .error(() => 'You did not provide landscape cover')
+    .error(() => 'You did not provide landscape cover'),
+  rate: joi.string().required()
+    .error(() => 'You have to enter age rating')
 }).options({ allowUnknown: false });
 
 // 03d44171-95d9-4954-9af0-e72975f51e1d.avi

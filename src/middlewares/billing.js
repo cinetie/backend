@@ -8,6 +8,7 @@ import userService from '../services/userServices';
 import date from '../helpers/date';
 import jwt from '../helpers/jwt';
 import Rave from '../helpers/rave';
+import earnings from '../helpers/earnings';
 
 const util = new Util();
 // middlware to perfom actual payment and registering transactions
@@ -77,6 +78,8 @@ class billing {
         const details = await billing.fetchCurrentSubscription(req, res);
         const endDate = new Date(details.endDate);
         if (endDate.getTime() <= today.getTime()) {
+          // if(earningsStatus)
+          await earnings(req.body.email);
           if (Number(details.paymentMethod) === 1) {
             const momoStatus = await Rave.chargeMomo({
               currency: 'RWF',
@@ -91,7 +94,7 @@ class billing {
               let updates;
               // eslint-disable-next-line prefer-const
               ({ updates, todayDate } = await billing.updateSubscription(req, res, todayDate));
-              if (updates[1] === 1) {
+              if (updates[1] === 1 ) {
                 util.setSuccessResponse(res, 'Please follow this link to renew your subscription with Mobile money', 200, momoStatus);
               } else {
                 util.setErrorResponse(res, 'Can\'t renew subscription', 500);

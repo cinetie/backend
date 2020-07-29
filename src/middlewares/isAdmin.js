@@ -12,7 +12,7 @@ class authenticator {
 
       const payload = cry.crypto();
       const token = jwt.jwtSign({ payload, user: process.env.ADMIN_USER }, process.env.SECRET);
-      if (req.body.password == process.env.ADMIN_PASS && req.body.email == process.env.ADMIN_USER) {
+      if (req.body.password === process.env.ADMIN_PASS && req.body.email === process.env.ADMIN_USER) {
         util.setSuccessResponse(res, 'Access granted', 200, token);
       } else {
         // console.log(process.env.ADMIN_PASS)

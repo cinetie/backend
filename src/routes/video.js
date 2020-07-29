@@ -1,19 +1,19 @@
 import { Router } from 'express';
 import video from '../controllers/video';
 import access from '../middlewares/access';
-import session from '../middlewares/viewingSessions';
 import earnings from '../controllers/earning';
 import billing from '../middlewares/billing';
 
 // import imageValidation from '../middlewares/validators/imageValidator'
 const router = new Router();
 router.post('/new', access.isAdmin, video.addVideo);
+router.post('/watch-session', access.isNormalUser, video.createNewWatchCount);
 router.get('/all/local', access.isAdmin, video.getAllVideosLocal);
 router.get('/sort/pop', access.isNormalUser, video.getVideosByPopularity);
 router.get('/sort/category', access.isNormalUser, video.getVideosByCategory);
 router.get('/sort/trend', access.isNormalUser, video.getVideosByTrend);
 router.get('/search', access.isNormalUser, video.search);
-router.get('/unique', access.isNormalUser, billing.trial, billing.verifyPermissionLevel, session.createNewWatchCount, video.getVideoById);
+router.get('/unique', access.isNormalUser, billing.trial, billing.verifyPermissionLevel, video.getVideoById);
 router.get('/cp/unique', access.isProducer, video.getVideoById);
 router.get('/arrivals', access.isNormalUser, video.getAllNewVideos);
 router.get('/earnings', earnings.getAllEarningsPerVideo);

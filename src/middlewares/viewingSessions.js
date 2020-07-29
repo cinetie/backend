@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable no-useless-catch */
 import fetch from 'node-fetch';
 import viewingSessions from '../services/viewingSessionsServices';
