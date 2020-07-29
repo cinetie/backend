@@ -1,5 +1,5 @@
-module.exports = {
-  up: (queryInterface, Sequelize) => queryInterface.addColumn('Users', 'crNumber', {
+export function up(queryInterface, Sequelize) {
+  return queryInterface.addColumn('Users', 'crNumber', {
     type: Sequelize.STRING,
     allowNull: true
   }).then(() => queryInterface.addColumn('Users', 'crCVC', {
@@ -19,11 +19,12 @@ module.exports = {
     .then(() => queryInterface.addColumn('Users', 'cardLastName', {
       type: Sequelize.STRING,
       allowNull: true
-    })),
-
-  down: (queryInterface, Sequelize) => queryInterface.removeColumn('Users', 'crNumber')
+    }));
+}
+export function down(queryInterface, Sequelize) {
+  return queryInterface.removeColumn('Users', 'crNumber')
     .then(() => queryInterface.removeColumn('Users', 'crCVC'))
     .then(() => queryInterface.removeColumn('Users', 'cardFirstName'))
     .then(() => queryInterface.removeColumn('Users', 'expMonth'))
-    .then(() => queryInterface.removeColumn('Users', 'expYear'))
-};
+    .then(() => queryInterface.removeColumn('Users', 'expYear'));
+}
