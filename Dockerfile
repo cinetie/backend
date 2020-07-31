@@ -1,28 +1,24 @@
-FROM node:12-alpine as builder
+FROM ubuntu:latest
+LABEL Author="Alain Christian(gal1l0)"
 
-ARG NODE_ENV=staging
-ENV NODE_ENV=${NODE_ENV}
+# install our dependencies and install nodejs
+RUN apt-get update && apt-get install -y curl
+RUN curl -sL https://deb.nodesource.com/setup_12.x -o nodesource_setup.sh
+RUN bash nodesource_setup.sh
+RUN apt-get install nodejs
 
-RUN apk --no-cache add python make g++
+# use changes to package.json to force Docker not to use the cache
+# when we change our application's nodejs dependencies:
+ADD package*.json /tmp/
+RUN cd /tmp && npm install
+RUN mkdir -p /opt/app && cp -a /tmp/node_modules /opt/app/
 
-COPY package*.json ./
+# From here we load our application's code in, therefore the previous docker
+# "layer" thats been cached will be used if possible
+WORKDIR /opt/app
+ADD . /opt/app
 
-RUN npm install
 
-# Building the actual app after building dependecies
+EXPOSE 3001
 
-FROM node:12-alpine
-
-WORKDIR /usr/src/app
-
-COPY --from=builder node_modules node_modules
-
-COPY . .
-
-RUN npm run build
-
-COPY . .
-
-EXPOSE 3001:3001
-
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start-staging"]
