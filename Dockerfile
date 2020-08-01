@@ -1,21 +1,23 @@
-FROM node:12 as builder
-ARG NODE_ENV=staging
-ENV NODE_ENV=${NODE_ENV}}
-RUN apk --no-cache add python make g++
+FROM ubuntu:latest
 LABEL Author="Alain Christian(gal1l0)"
 
 # install our dependencies and install nodejs
-
+RUN apt-get update && apt-get install -y curl
+RUN curl -sL https://deb.nodesource.com/setup_12.x -o nodesource_setup.sh
+RUN bash nodesource_setup.sh
+RUN apt-get install nodejs
 
 # use changes to package.json to force Docker not to use the cache
 # when we change our application's nodejs dependencies:
-ADD package*.json ./
-RUN npm install
+ADD package*.json /tmp/
+RUN cd /tmp && npm install
+RUN mkdir -p /opt/app && cp -a /tmp/node_modules /opt/app/
 
-FROM node:12
-WORKDIR /usr/src/app
-COPY --from=builder node_modules node_modules
-COPY . .
+# From here we load our application's code in, therefore the previous docker
+# "layer" thats been cached will be used if possible
+WORKDIR /opt/app
+ADD . /opt/app
+
 
 EXPOSE 3001
 
