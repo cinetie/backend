@@ -9,6 +9,7 @@ import date from '../helpers/date';
 import jwt from '../helpers/jwt';
 import Rave from '../helpers/rave';
 import earnings from '../helpers/earnings';
+import Fetch from '../helpers/fetch';
 
 const util = new Util();
 // middlware to perfom actual payment and registering transactions
@@ -77,35 +78,40 @@ class billing {
         const today = new Date();
         const details = await billing.fetchCurrentSubscription(req, res);
         const endDate = new Date(details.endDate);
+        const token = jwt.jwtSign({ role: 'main-api', user: user.email }, process.env.SECRET, 1000);
         if (endDate.getTime() <= today.getTime()) {
           // if(earningsStatus)
           await earnings(req.body.email);
           if (Number(details.paymentMethod) === 1) {
-            const momoStatus = await Rave.chargeMomo({
+            const momoStatus = await Fetch({
               currency: 'RWF',
               amount: details.price,
               email: user.email,
               phone_number: user.phoneNumber,
               fullname: `${user.firstName} ${user.lastName}`,
 
-            });
-            if (momoStatus.redirect) {
+            }, { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+            `${process.env.PAY_HOST}/charge/momo`, 'POST');
+            if (momoStatus.data.redirect) {
               let todayDate = '';
               let updates;
               // eslint-disable-next-line prefer-const
               ({ updates, todayDate } = await billing.updateSubscription(req, res, todayDate));
-              if (updates[1] === 1 ) {
+              if (updates[1] === 1) {
                 util.setSuccessResponse(res, 'Please follow this link to renew your subscription with Mobile money', 200, momoStatus);
               } else {
                 util.setErrorResponse(res, 'Can\'t renew subscription', 500);
               }
             } else {
-              billing.verifyStatus(req, res, momoStatus, next);
+              billing.verifyStatus(req, res, momoStatus.data, next);
             }
           // service.get
-          } else if (Number(details.paymentMethod) === 3) {
+          } else if (Number(details.paymentMethod) === 2) {
             // charge tokenised
-            const status = 1;
+            const status = await Fetch({ email: user.email }, {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }, `${process.env.PAY_HOST}/charge/card-token`, 'POST');
             billing.verifyStatus(req, res, status, next);
           }
         } else {

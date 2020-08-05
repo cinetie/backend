@@ -14,10 +14,8 @@ import cry from '../helpers/crypto';
 import Util from '../helpers/utilities';
 import date from '../helpers/date';
 import mailer from '../helpers/mailer';
-import dax from '../helpers/dax-payment-handler';
-import paypal from '../helpers/paypal';
-import square from '../helpers/square';
 import Rave from '../helpers/rave';
+import Fetch from '../helpers/fetch';
 
 const util = new Util();
 class userController {
@@ -287,65 +285,71 @@ class userController {
   }
 
   static async updateAccountAndSubscription(req, res) {
-    try {
-      const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
-      const user = await userService.getUserByMail(email);
-      const subscriptionData = {
-        email,
-        plan: user.plan,
-        isBilledAnnually: user.isBilledAnnually,
-      };
-      const price = await payment.getPlanPricing(subscriptionData);
-      const currentSubsctption = await billingServices.getCurrentSubscription(email);
-      if (user.isOnTrial === false) {
-        util.setErrorResponse(res, 'account is already activated', 400);
-      } else {
-        const paymentData = userController.getAndSetPaymentData(req, price, user, email);
-        switch (Number(currentSubsctption.paymentMethod)) {
-          case 1: {
-            const momoData = await Rave.chargeMomo(paymentData);
-            console.log(momoData);
-            if (momoData.status !== 'error') {
-              const updates = await userService.updateUser(email,
-                { isOnTrial: false });
-              if (updates[1] > 0) {
-                util.setSuccessResponse(res, 'Pending subscription  activation with MoMo', 201, momoData);
-              } else {
-                util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
-              }
+    // try {
+    const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
+    const user = await userService.getUserByMail(email);
+    const subscriptionData = {
+      email,
+      plan: user.plan,
+      isBilledAnnually: user.isBilledAnnually,
+    };
+    const price = await payment.getPlanPricing(subscriptionData);
+    const currentSubsctption = await billingServices.getCurrentSubscription(email);
+    if (user.isOnTrial === false) {
+      util.setErrorResponse(res, 'account is already activated', 400);
+    } else {
+      const paymentData = userController.getAndSetPaymentData(req, price, user, email);
+      const token = jwt.jwtSign({ role: 'main-api', user: email }, process.env.SECRET, 1000);
+      switch (Number(currentSubsctption.paymentMethod)) {
+        case 1: {
+          const momoData = await Fetch(paymentData,
+            { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+            `${process.env.PAY_HOST}/charge/momo`, 'POST');
+          console.log(momoData, 'happening');
+          if (momoData.status === 200) {
+            const updates = await userService.updateUser(email,
+              { isOnTrial: false });
+            if (updates[1] > 0) {
+              util.setSuccessResponse(res, 'Pending subscription  activation with MoMo', 201, momoData);
             } else {
-              util.setErrorResponse(res, 'Sorry payment failed', 500);
+              util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
             }
-            break;
-          }
-
-          case 2: {
-            const pay = await Rave.chargeCard(paymentData);
-            if (pay.status !== 'error') {
-              if (pay.meta.authorization.mode === 'avs_noauth') {
-                return util.setSuccessResponse(res, 'Please provide these details', 200, ['city', 'address', 'state', 'country', 'zipcode']);
-              } if (pay.meta.authorization.mode === 'pin') {
-                return util.setSuccessResponse(res, 'Please provide your pin', 200, undefined);
-              } if (pay.meta.authorization.mode === 'otp') {
-                return util.setSuccessResponse(
-                  res, pay.data.processor_response, 200, { flw_ref: pay.data.flw_ref }
-                );
-              }
-              await userController.removeTrial(email, res, pay);
-            } else {
-              util.setErrorResponse(res, pay.message, 500);
-            }
-            break;
-          }
-
-          default:
+          } else {
             util.setErrorResponse(res, 'Sorry payment failed', 500);
+          }
+          break;
         }
+
+        case 2: {
+          const pay = await Fetch(paymentData,
+            { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+            `${process.env.PAY_HOST}/charge/card`, 'POST');
+          console.log(pay, 'card');
+          if (pay.status !== 400) {
+            if (pay.meta.authorization.mode === 'avs_noauth') {
+              return util.setSuccessResponse(res, 'Please provide these details', 200, ['city', 'address', 'state', 'country', 'zipcode']);
+            } if (pay.meta.authorization.mode === 'pin') {
+              return util.setSuccessResponse(res, 'Please provide your pin', 200, undefined);
+            } if (pay.meta.authorization.mode === 'otp') {
+              return util.setSuccessResponse(
+                res, pay.data.processor_response, 200, { flw_ref: pay.data.flw_ref }
+              );
+            }
+            await userController.removeTrial(email, res, pay);
+          } else {
+            util.setErrorResponse(res, pay.message, 500);
+          }
+          break;
+        }
+
+        default:
+          util.setErrorResponse(res, 'Sorry payment failed', 500);
       }
-      // const status = await userService.updateUser(email, user);
-    } catch (error) {
-      return response.errorResponse(res, 500, `Something wrong happened ${error.message}`, error);
     }
+    // const status = await userService.updateUser(email, user);
+    // } catch (error) {
+    //   return response.errorResponse(res, 500, `Something wrong happened ${error.message}`, error);
+    // }
   }
 
   static async removeTrial(email, res, pay) {
