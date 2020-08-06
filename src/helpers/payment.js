@@ -2,11 +2,7 @@
 import billingService from '../services/billingServices';
 import planService from '../services/planServices';
 import date from './date';
-import Util from './utilities';
-import paypalHelper from './paypal';
-import daxPay from './dax-payment-handler';
 
-const util = new Util();
 class payment {
   static async getPlanPricing(details) {
     try {
@@ -44,32 +40,6 @@ class payment {
       return null;
     } catch (error) {
       throw error;
-    }
-  }
-
-  static async commitPayment(req, res, details) {
-    // check for what happens when payment fails to continue
-    try {
-      switch (Number(details.user.paymentMethod)) {
-        case 1: {
-          const status = await daxPay.momo(details.momo)(status === 1) ? 1 : 0;
-          break;
-        }
-        case 2: {
-          await paypalHelper.subscription(req, res, details.paypal);
-          break;
-        }
-        case 3: {
-          const statusCard = await daxPay.creditCards(details.creditCard);
-          return statusCard;
-        }
-
-        default: {
-          util.setErrorResponse(res, 'Please select a method of payment', '400');
-        }
-      }
-    } catch (error) {
-      util.setErrorResponse(res, error.message, 500);
     }
   }
 }

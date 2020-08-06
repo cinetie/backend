@@ -3,8 +3,4 @@ import controller from '../controllers/transations';
 
 const route = new Router();
 route.post('/new', controller.createNewTrans);
-route.get('/paypal/success', controller.paypalSubscriptionSuccess);
-route.get('/paypal/failOrCancel', controller.paypalCancelOrFail);
-route.get('/paypal/cancel/agreement', controller.paypalCancelSubscription);
-route.get('/paypal/list', controller.paypalGetTransDetails);
 export default route;

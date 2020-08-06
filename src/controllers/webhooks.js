@@ -7,7 +7,6 @@ import Earnings from '../helpers/earnings';
 import mailer from '../helpers/mailer';
 import date from '../helpers/date';
 
-
 const util = new Util();
 const rave = new Flutterwave(
   process.env.RAVE_PUBLIC,
@@ -22,7 +21,9 @@ export default class WebHooks {
       const user = await UserService.getUserByMail(response.customer.email);
       const transVerification = await rave.Transaction.verify({ id: response.id });
       if (transVerification.status === 'success') {
-        const updates = await UserService.updateUser(user.email, { permissionLevel: 1 });
+        const updates = await UserService.updateUser(
+          user.email, { permissionLevel: 1, card_nonce: transVerification.data.card.token }
+        );
         // eslint-disable-next-line no-console
         console.log(updates);
         // creating sales
