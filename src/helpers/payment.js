@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-expressions */
 import billingService from '../services/billingServices';
+import userService from '../services/userServices';
 import planService from '../services/planServices';
 import date from './date';
 
@@ -29,10 +30,13 @@ class payment {
       if (details.isBilledAnnually === true) {
         data.endDate = date.addMoreDays(365).toDateString();
       } else {
-        data.endDate = date.addMoreDays(31).toDateString();
+        data.endDate = date.addMoreDays(30).toDateString();
       }
       data.paymentMethod = details.paymentMethod;
-      data.trialEnds = date.addMoreDays(5).getTime();
+      const user = await userService.getUserByMail(details.email);
+      if (user.isOnTrial === true) {
+        data.trialEnds = date.addMoreDays(5).getTime();
+      }
       const bill = await billingService.registerSubscription(data);
       if (bill) {
         return bill;

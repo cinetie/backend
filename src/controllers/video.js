@@ -10,6 +10,7 @@ import tempService from '../services/tempVideoServices';
 import { getObject, deleteObject, copyObjects } from '../helpers/aws';
 import videoService from '../services/videoServices';
 import viewingSessions from '../services/viewingSessionsServices';
+import userService from '../services/userServices';
 
 const util = new Util();
 class Video {
@@ -313,8 +314,9 @@ class Video {
       const JsonlocationData = await locationServiceData.json();
       // check if there is an exact session before same like the provided one
       const sessions = await viewingSessions.getSesssionPerVideoUser(decoded.email, videoId);
-      if (Object.values(sessions).length >= 1) {
-        util.setErrorResponse(res, 'user already watched video', 400);
+      const user = await userService.getUserByMail(decoded.email);
+      if (Object.values(sessions).length >= 1 || user.isOnTrial === true) {
+        util.setErrorResponse(res, 'user already watched video or trial is still active', 400);
       } else {
         const results = await viewingSessions.registerViewingSessions({
           sessionState: 'Active',
