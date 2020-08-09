@@ -7,9 +7,8 @@ import mailer from '../helpers/mailer';
 import userService from '../services/userServices';
 import date from '../helpers/date';
 import jwt from '../helpers/jwt';
-import Rave from '../helpers/rave';
-import earnings from '../helpers/earnings';
 import Fetch from '../helpers/fetch';
+import ViewingSessions from '../services/viewingSessionsServices';
 
 const util = new Util();
 // middlware to perfom actual payment and registering transactions
@@ -24,7 +23,8 @@ class billing {
   }
 
   static async verifyStatus(req, res, status, next) {
-    if (status.redirect !== null || undefined) {
+    // if (status.redirect !== null || undefined) {
+    if (1>10) {
       // change user state from onhold to active
       let today = '';
       let updates;
@@ -39,20 +39,41 @@ class billing {
     } else {
       // put user account onhold
       const user = await userService.getUserByMail(req.body.email);
-      await userService.updateUser(req.body.email, { permissionLevel: -1 });
-      await mailer([{
-        body: 'We would like you to know that your account has been put onhold . \n since your  payment didn\'t work out',
-        name: `${user.firstName}`
-      }, {
-        from: 'Cinetie support',
-        to: req.body.email,
-        subject: 'Update payment details',
-      },
-      {
-        path: `${path.join(__dirname, '../public/templates/notification.ejs')}`
+      if (user.isOnExtension === true) {
+        await userService.updateUser(req.body.email, { permissionLevel: -1 });
+        await billing.sendBillingNotification(user, req, 'We would like you to know that your account has been put onhold . \n since your  payment didn\'t work out');
+        next();
+      } else {
+        const viewingSessions = await ViewingSessions.getActiveSessionsPerUser(req.body.email);
+        viewingSessions.forEach(async (data) => {
+          const updates = {
+            sessionState: 'suspended'
+          };
+          await ViewingSessions.updateViewingSessions(data.id, updates);
+        });
+        await billingService.updateSubscription(req.body.email, {
+          endDate: date.addMoreDays(5).toDateString(),
+        });
+        await userService.updateUser(req.body.email, { isOnExtension: true });
+        await billing.sendBillingNotification(user, req, 'Hello, Your cinetie subscription has ended and automatic billing has failed, we extended your subscription for five days ');
+        next();
       }
-      ]);
     }
+  }
+
+  static async sendBillingNotification(user, req, body) {
+    await mailer([{
+      body,
+      name: `${user.firstName}`
+    }, {
+      from: 'Cinetie support',
+      to: req.body.email,
+      subject: 'Cinetie subscription',
+    },
+    {
+      path: `${path.join(__dirname, '../public/templates/notification.ejs')}`
+    }
+    ]);
   }
 
   static async updateSubscription(req, res, today) {
@@ -81,7 +102,7 @@ class billing {
         const token = jwt.jwtSign({ role: 'main-api', user: user.email }, process.env.SECRET, 1000);
         if (endDate.getTime() <= today.getTime()) {
           // if(earningsStatus)
-          await earnings(req.body.email);
+          // await earnings(req.body.email);
           if (Number(details.paymentMethod) === 1) {
             const momoStatus = await Fetch({
               currency: 'RWF',
@@ -143,12 +164,13 @@ class billing {
         req.headers.authorization.slice(7), process.env.SECRET
       );
       const data = await userService.getUserByMail(email);
-      if (data.isOnTrial === false) {
+      if (data.isOnTrial === false && data.isOnExtension === false) {
         next();
       } else {
         const today = new Date();
         const subscription = await billingService.getCurrentSubscription(email);
-        if (subscription.trialEnds > today.getTime()) {
+        const viewingSessions = await ViewingSessions.getActiveSessionsPerUser(email);
+        if ((subscription.trialEnds > today.getTime()) && viewingSessions.length < 3) {
           next();
         } else {
           const updates = await userService.updateUser(email, { permissionLevel: -1 });

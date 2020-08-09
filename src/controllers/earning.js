@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 /* eslint-disable vars-on-top */
 /* eslint-disable no-var */
 /* eslint-disable no-useless-catch */
@@ -23,7 +24,7 @@ class earningController {
 
   // obtains details about the current user viewing sessions
   static async getCurrentViewingSessions(email) {
-    const details = await viewSessionService.getActiveSessionsPerUser(email);
+    const details = await viewSessionService.getActiveAndSuspendedSessionsPerUser(email);
     if (details) {
       return details;
     }
@@ -69,7 +70,7 @@ class earningController {
         };
         results = await earningService.createNewEarnings(earnings);
       });
-      // const updates = await subscriptionService.setSubscriptionToSettled(email,{state:"settled"})
+      const updates = await subscriptionService.setSubscriptionToSettled(email,{state:"settled"})
       if (results) {
         return true;
       }
@@ -94,7 +95,7 @@ class earningController {
           let count = 0;
           for (let j = 0; j < data.length; j++) {
             var { monthYear } = data[i];
-            if (data[i].monthYear == data[j].monthYear) {
+            if (data[i].monthYear === data[j].monthYear) {
               count += Number(data[j].amount);
             }
           }
@@ -132,7 +133,7 @@ class earningController {
           let count = 0;
           for (let j = 0; j < data.length; j++) {
             var { monthYear } = data[i];
-            if (data[i].monthYear == data[j].monthYear) {
+            if (data[i].monthYear === data[j].monthYear) {
               count += Number(data[j].amount);
             }
           }
@@ -171,7 +172,7 @@ class earningController {
           let count = 0;
           for (let j = 0; j < data.length; j++) {
             var { monthYear } = data[i];
-            if (data[i].monthYear == data[j].monthYear) {
+            if (data[i].monthYear === data[j].monthYear) {
               count += Number(data[j].amount);
             }
           }
@@ -247,7 +248,7 @@ class earningController {
           let count = 0;
           for (let j = 0; j < data.length; j++) {
             var { monthYear } = data[i];
-            if (data[i].monthYear == data[j].monthYear) {
+            if (data[i].monthYear === data[j].monthYear) {
               count += Number(data[j].amount);
             }
           }

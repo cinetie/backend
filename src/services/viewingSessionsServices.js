@@ -51,12 +51,31 @@ class viewingSessionservices {
       const sessions = await database.viewingSessions.findAll({
 
         where: {
-          [op.and]: [{
-            userId
-          },
-          {
-            sessionState: 'Active'
-          }
+          [op.and]: [
+            { userId },
+            { sessionState: 'Active' }
+          ]
+        }
+      });
+      if (sessions) {
+        return sessions;
+      }
+      return null;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // active and suspended streams represent all streams recorded in both the duration
+  // of the subscription and the extension when the automatic payment failed
+  static async getActiveAndSuspendedSessionsPerUser(userId) {
+    try {
+      const sessions = await database.viewingSessions.findAll({
+
+        where: {
+          [op.and]: [
+            { userId },
+            { sessionState: { [op.not]: 'Active' } }
           ]
         }
       });
