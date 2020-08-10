@@ -9,9 +9,8 @@ import cry from '../helpers/crypto';
 import mailer from '../helpers/mailer';
 import Util from '../helpers/utilities';
 import uuid from '../helpers/uuid';
-import cloudinary from '../helpers/cloudinary';
 import date from '../helpers/date';
-import { upload } from '../helpers/aws';
+import { upload, getObject } from '../helpers/aws';
 
 const util = new Util();
 // add an isVerified column to cp
@@ -103,24 +102,34 @@ class cpController {
   static async loginUser(req, res) {
     try {
       const user = await cp.getCpByMail(req.body.email);
-      if (!user) util.setErrorResponse(res, 'Invalid email or password!', 400);
-      const status = bcrypt.compare(req.body.password, user.password);
-      if (!status) util.setErrorResponse(res, 'Passwords don\'t match', 400);
-      if (!user.isVerified) util.setErrorResponse(res, 'Verify your account first!', 401);
-      const token = jwt.jwtSign({ key: cry.crypto(), email: user.email, clientId: user.clientId }, process.env.SECRET, '1d');
-      user.token = token;
-      delete user.password;
-      const date = new Date();
-      const session = {
-        email: user.email,
-        date: date.toDateString(),
-        timeIn: date.toTimeString(),
-        timeOut: null,
-        state: 'in'
-      };
-      const addedSession = await sessionService.addSession(session);
-      if (!addedSession)util.setErrorResponse(res, 'Can\'t register session', 500);
-      util.setSuccessResponse(res, 'Logged in successfully!', 200, token);
+      if (!user) {
+        util.setErrorResponse(res, 'Invalid email or password!', 400);
+      } else {
+        const status = bcrypt.compare(req.body.password, user.password);
+        if (!status) {
+          util.setErrorResponse(res, 'Passwords don\'t match', 400);
+        } else if (!user.isVerified) {
+          util.setErrorResponse(res, 'Verify your account first!', 401);
+        } else {
+          const token = jwt.jwtSign({ key: cry.crypto(), email: user.email, clientId: user.clientId }, process.env.SECRET, '1d');
+          user.token = token;
+          delete user.password;
+          const cpDate = new Date();
+          const session = {
+            email: user.email,
+            date: cpDate.toDateString(),
+            timeIn: cpDate.toTimeString(),
+            timeOut: null,
+            state: 'in'
+          };
+          const addedSession = await sessionService.addSession(session);
+          if (!addedSession) {
+            util.setErrorResponse(res, 'Can\'t register session', 500);
+          } else {
+            util.setSuccessResponse(res, 'Logged in successfully!', 200, token);
+          }
+        }
+      }
     } catch (error) {
       util.setErrorResponse(res, `Something Went wrong logging in ${error.message}`, 500);
     }
@@ -130,6 +139,7 @@ class cpController {
     try {
       const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const user = await cp.getCpByMail(decoded.email);
+      user.idLink = await getObject('contentproviderids', user.idLink, 5000);
       if (!user) {
         util.setErrorResponse(res, 'Data not found', 404);
       } else {
