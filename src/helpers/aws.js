@@ -1,5 +1,7 @@
 import AWS from 'aws-sdk';
+import fs from 'fs';
 import { v4 as V4 } from 'uuid';
+import { promisify } from 'util';
 
 const {
   AWS_REGION, AWS_ID, AWS_SECRET
@@ -21,6 +23,27 @@ const S3 = new AWS.S3({ apiVersion: '2006-03-01' });
 const getObject = async (Bucket, Key, Expires) => {
   const uri = S3.getSignedUrl('getObject', { Bucket, Key, Expires });
   return uri;
+};
+
+const upload = async (bucket, file) => {
+  config({
+    AWS_SECRET: process.env.AWS_UPLOAD_ACCESS_KEY,
+    AWS_ID: process.env.AWS_UPLOAD_ID
+  });
+  const readFileAsync = promisify(fs.readFile);
+  const S3Upload = new AWS.S3({ apiVersion: '2006-03-01' });
+  const extension = file.name.split('.').pop();
+  const fileToUpload = await readFileAsync(file.tempFilePath);
+  const params = {
+    Bucket: bucket,
+    Key: `${V4()}.${extension}`,
+    Body: fileToUpload
+  };
+  const data = await S3Upload.upload(params).promise();
+  return {
+    file: fileToUpload,
+    data
+  };
 };
 
 const deleteObject = async (Bucket, Key) => {
@@ -69,5 +92,5 @@ const getSignedUrl = async (Bucket, ContentType, extension) => {
 };
 
 export {
-  getObject, deleteObject, copyObjects, getSignedUrl
+  getObject, deleteObject, copyObjects, getSignedUrl, upload
 };
