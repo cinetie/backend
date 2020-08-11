@@ -11,11 +11,11 @@ module.exports = {
     }
   },
   production: {
-    use_env_variable: 'PROD_DATABASE_URL',
+    use_env_variable: 'TEST_DATABASE_URL',
     dialect: 'mysql',
     dialectOptions: {
       typeCast: true,
-      ssl: 'Amazon RDS'
+      // ssl: 'Amazon RDS'
     }
   },
   test: {
