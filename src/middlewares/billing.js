@@ -24,7 +24,7 @@ class billing {
 
   static async verifyStatus(req, res, status, next) {
     // if (status.redirect !== null || undefined) {
-    if (1>10) {
+    if (1 > 10) {
       // change user state from onhold to active
       let today = '';
       let updates;

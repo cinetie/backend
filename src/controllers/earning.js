@@ -70,7 +70,7 @@ class earningController {
         };
         results = await earningService.createNewEarnings(earnings);
       });
-      const updates = await subscriptionService.setSubscriptionToSettled(email,{state:"settled"})
+      const updates = await subscriptionService.setSubscriptionToSettled(email, { state: 'settled' });
       if (results) {
         return true;
       }
