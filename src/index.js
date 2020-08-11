@@ -15,22 +15,13 @@ app.enable('trust proxy');
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use((req, res, next) => {
-  if (req.header('x-forwarded-proto') !== 'https' && process.env.NODE_ENV === 'production') {
-    const newUrl = `https://${req.get('host') + req.originalUrl}`;
-    res.redirect(newUrl);
-  }
-  next();
-});
 app.use(fileUpload({
   useTempFiles: true,
   tempFileDir: '/tmp/',
   limits: { fileSize: 5000 * 1024 * 1024 }
 }));
 
-app.get('/', (req, res) => {
-  response.successResponse(res, 200, 'Welcome to Cinetie');
-});
+app.get('/', (req, res) => response.successResponse(res, 200, 'Welcome to Cinetie'));
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'GET, POST, PUT, PATCH, OPTIONS, DELETE');
@@ -39,9 +30,7 @@ app.use((req, res, next) => {
 });
 app.use('/', routes);
 
-app.use((req, res) => {
-  response.errorResponse(res, 404, 'Not found', 'Undefined URL');
-});
+app.use((req, res) => response.errorResponse(res, 404, 'Not found', 'Undefined URL'));
 app.set('views', path.join(__dirname, '/public/templates'));
 app.set('view engine', 'ejs');
 const PORT = process.env.PORT || 3001;
