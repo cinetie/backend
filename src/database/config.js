@@ -7,7 +7,6 @@ module.exports = {
     dialect: 'postgres',
     dialectOptions: {
       typeCast: true,
-      ssl: 'Amazon RDS'
     }
   },
   production: {

@@ -22,7 +22,7 @@ export default class Rave {
         tx_ref: uuid.generator(),
       }, {
         'Content-Type': 'application/json',
-        Authorization: process.env.RAVE_SECRET_TEST
+        Authorization: process.env.RAVE_SECRET
       }, `${process.env.RAVE_CHARGE_URL}/v3/charges?type=mobile_money_rwanda`, 'POST');
       return responseMomo;
     } catch (error) {
@@ -38,10 +38,10 @@ export default class Rave {
         tx_ref: uuid.generator(),
         flw_ref: uuid.generator(),
       };
-      const client = Rave.encrypt(payload, process.env.RAVE_ENC_KEY_TEST);
+      const client = Rave.encrypt(payload, process.env.RAVE_ENC_KEY);
       const responseCard = await Fetch({ client }, {
         'Content-Type': 'application/json',
-        Authorization: process.env.RAVE_SECRET_TEST
+        Authorization: process.env.RAVE_SECRET
       }, `${process.env.RAVE_CHARGE_URL}/v3/charges?type=card`, 'POST');
       return responseCard;
     } catch (error) {
@@ -53,7 +53,7 @@ export default class Rave {
     try {
       const responseVerification = await Fetch('', {
         'Content-Type': 'application/json',
-        Authorization: process.env.RAVE_SECRET_TEST
+        Authorization: process.env.RAVE_SECRET
       }, `${process.env.RAVE_CHARGE_URL}/v3/transactions/${id}/verify`, 'GET');
       return responseVerification;
     } catch (error) {
@@ -65,7 +65,7 @@ export default class Rave {
     try {
       const responseChargeValidation = await Fetch(raw, {
         'Content-Type': 'application/json',
-        Authorization: process.env.RAVE_SECRET_TEST
+        Authorization: process.env.RAVE_SECRET
       }, `${process.env.RAVE_CHARGE_URL}/v3/validate-charge`, 'POST');
       return responseChargeValidation;
     } catch (error) {

@@ -162,15 +162,16 @@ class Video {
       const { type } = req.query;
       const video = await videoService.getMainFeaturedVideo(type);
       Video.getAttachedThumbs(video);
-      const trailer = await trailerServices.getAllTrailers(video.videoId);
-      const data = {
-        video,
-        trailer: trailer[0].trailerLink
-      };
-      if (data) {
-        util.setSuccessResponse(res, 'videos Found', 200, data);
+      console.log(video)
+      const trailer = await trailerServices.getAllTrailers(video[0].videoId);
+      if (trailer.length > 0) {
+        const data = {
+          video,
+          trailer: trailer[0].trailerLink
+        };
+        util.setSuccessResponse(res, 'Trailer Found', 200, data);
       } else {
-        util.setErrorResponse(res, 'Video can\'t be found', 404);
+        util.setErrorResponse(res, 'Trailer can\'t be found', 404);
       }
     } catch (error) {
       util.setErrorResponse(res, `something went wrong ${error.message}`, 503);
