@@ -6,6 +6,7 @@
   "scripts": {
     "build": "rm -rf ./src/dist && babel ./src/. --out-dir ./src/dist --copy-files",
     "start": "export NODE_ENV=staging && npm run migrate:staging && npm run build && node  ./src/dist/index.js",
+    "start-prod": "export NODE_ENV=production && npm run migrate && npm run build && node  ./src/dist/index.js",
     "dev": "set NODE_ENV=development && nodemon --exec babel-node src/index.js",
     "migrate": "sequelize db:migrate --env production ",
     "migrate:undo": "sequelize db:migrate:undo:all --env production ",
@@ -44,7 +45,6 @@
     "express-fileupload": "^1.1.6-alpha.6",
     "express-session": "^1.16.2",
     "flutterwave-node-v3": "^1.0.0",
-    "heroku-cli": "^7.0.9",
     "image-size": "^0.8.3",
     "iplocation": "^6.1.0",
     "jsonwebtoken": "^8.5.1",
@@ -58,7 +58,6 @@
     "node-forge": "^0.9.1",
     "nodemailer": "^6.4.2",
     "nodemailer-express-handlebars": "^3.1.0",
-    "nodemailer-sendgrid-transport": "^0.2.0",
     "passport": "^0.4.0",
     "passport-facebook": "^3.0.0",
     "passport-google-oauth": "^2.0.0",
@@ -89,10 +88,10 @@
     "coveralls": "^3.0.9",
     "eslint-plugin-import": "^2.20.1",
     "mocha": "^7.0.1",
-    "nodemon": "^1.19.2",
+    "nodemon": "^2.0.4",
     "nyc": "^15.0.0",
     "prettier-eslint": "^9.0.0",
     "prettier-eslint-cli": "^5.0.0"
   },
-  "snyk": true
+  "snyk": false
 }
