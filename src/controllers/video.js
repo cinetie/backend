@@ -161,17 +161,16 @@ class Video {
     try {
       const { type } = req.query;
       const video = await videoService.getMainFeaturedVideo(type);
-      Video.getAttachedThumbs(video);
-      console.log(video)
+      Video.getAttachedThumbsMultiple(video);
       const trailer = await trailerServices.getAllTrailers(video[0].videoId);
       if (trailer.length > 0) {
         const data = {
           video,
-          trailer: trailer[0].trailerLink
+          trailer: Video.attachThumbnails(trailer[0].trailerLink, 'cinetie-trailers')
         };
-        util.setSuccessResponse(res, 'Trailer Found', 200, data);
+        util.setSuccessResponse(res, 'Video Found', 200, data);
       } else {
-        util.setErrorResponse(res, 'Trailer can\'t be found', 404);
+        util.setErrorResponse(res, 'Video can\'t be found', 404);
       }
     } catch (error) {
       util.setErrorResponse(res, `something went wrong ${error.message}`, 503);
@@ -182,11 +181,11 @@ class Video {
     try {
       const { type } = req.query;
       const video = await videoService.getSecondFeaturedVideo(type);
-      Video.getAttachedThumbs(video);
+      Video.getAttachedThumbsMultiple(video);
       const trailer = await trailerServices.getAllTrailers(video[0].videoId);
       const data = {
         video,
-        trailer: trailer[0].trailerLink
+        trailer: Video.attachThumbnails(trailer[0].trailerLink, 'cinetie-trailers')
       };
       if (data) {
         util.setSuccessResponse(res, 'videos Found', 200, data);
@@ -199,9 +198,9 @@ class Video {
   }
 
   static getAttachedThumbs(video) {
-    video.videoThumbnailLink = Video.attachThumbnails(video.videoThumbnailLink, 'cinetie-thumbnails');
-    video.tallThumbNailLink = Video.attachThumbnails(video.tallThumbNailLink, 'cinetie-thumbnails');
-    video.nameTagThumbNailLink = Video.attachThumbnails(video.nameTagThumbNailLink, 'cinetie-thumbnails');
+    video.videoThumbnailLink = Video.attachThumbnails(video[0].videoThumbnailLink, 'cinetie-thumbnails');
+    video.tallThumbNailLink = Video.attachThumbnails(video[0].tallThumbNailLink, 'cinetie-thumbnails');
+    video.nameTagThumbNailLink = Video.attachThumbnails(video[0].nameTagThumbNailLink, 'cinetie-thumbnails');
   }
 
   static async getAllNewVideos(req, res) {

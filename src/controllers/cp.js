@@ -140,6 +140,7 @@ class cpController {
       const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const user = await cp.getCpByMail(decoded.email);
       user.idLink = await getObject('contentproviderids', user.idLink, 5000);
+      user.password = undefined;
       if (!user) {
         util.setErrorResponse(res, 'Data not found', 404);
       } else {
@@ -253,8 +254,13 @@ class cpController {
 
   static async getAllAccounts(req, res) {
     try {
-      const users = await cp.getAllCps();
-      util.setSuccessResponse(res, 'success', 200, users);
+      const cps = await cp.getAllCps();
+      for (let i = 0; i < cps.length; i += 1) {
+        // eslint-disable-next-line no-await-in-loop
+        cps[i].idLink = await getObject('contentproviderids', cps[i].idLink, 5000);
+        cps[i].password = undefined;
+      }
+      util.setSuccessResponse(res, 'success', 200, cps);
     } catch (error) {
       util.setErrorResponse(res, error, 503);
     }
