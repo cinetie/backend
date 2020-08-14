@@ -106,9 +106,14 @@ class videoService {
         offset: Number(offset),
         limit: 20,
         where: {
-          [op.col]: Sequelize.where(Sequelize.fn('lower', Sequelize.col('videoName')), {
-            [op.like]: `%${query}%`
-          })
+          [op.and]: [
+            {
+              [op.col]: Sequelize.where(Sequelize.fn('lower', Sequelize.col('videoName')), {
+                [op.like]: `%${query}%`
+              }),
+              videoSuspensionState: '0',
+            }
+          ]
         }
       });
       if (data) {

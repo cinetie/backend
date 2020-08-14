@@ -448,7 +448,11 @@ class userController {
       const currentSubscription = await billingServices.getCurrentSubscription(email);
       if (user) {
         if (currentSubscription) {
-          util.setSuccessResponse(res, 'Found', 200, { user, paymentMethod: currentSubscription.paymentMethod });
+          util.setSuccessResponse(res, 'Found', 200, {
+            user,
+            paymentMethod: currentSubscription.paymentMethod,
+            price: currentSubscription.price
+          });
         } else {
           util.setSuccessResponse(res, 'Found', 200, user);
         }
