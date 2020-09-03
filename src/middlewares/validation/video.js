@@ -6,6 +6,7 @@ import validator from '../../helpers/validator';
 
 export const addVideo = (req, res, next) => {
   if (req.body.type === 'serie') {
+    delete req.body.video;
     validator(addSerie, req.body, res, next);
   } else {
     validator(AddMovie, req.body, res, next);
