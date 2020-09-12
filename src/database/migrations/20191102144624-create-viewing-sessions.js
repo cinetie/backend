@@ -21,6 +21,12 @@ module.exports = {
     userId: {
       type: Sequelize.STRING
     },
+    location: {
+      type: Sequelize.STRING
+    },
+    ip: {
+      type: Sequelize.STRING
+    },
     createdAt: {
       allowNull: false,
       type: Sequelize.DATE

@@ -41,6 +41,7 @@ class userController {
         util.setSuccessResponse(res, 'Signed up successfully', 201, createdUser);
       }
     } catch (error) {
+      console.log(error)
       util.setErrorResponse(res, error.message, 500);
     }
   }

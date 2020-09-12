@@ -35,6 +35,35 @@ module.exports = {
     videoClientId: {
       type: Sequelize.STRING
     },
+    rate: {
+      type: Sequelize.STRING
+    },
+    tallThumbNailLink: {
+      type: Sequelize.STRING,
+      null: true
+    },
+    nameTagThumbNailLink: {
+      type: Sequelize.STRING,
+      null: true
+    },
+    videoSuspensionState: {
+      type: Sequelize.BOOLEAN
+    },
+    featureType: {
+      type: Sequelize.INTEGER,
+      defaultValue: 0
+    },
+    isFeatured: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false
+    },
+    type: {
+      type: Sequelize.STRING,
+      defaultValue: 'movie'
+    },
+    category: {
+      type: Sequelize.STRING
+    },
     creationTime: {
       type: Sequelize.BIGINT
     },

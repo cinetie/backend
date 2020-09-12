@@ -13,8 +13,14 @@ module.exports = {
       type: Sequelize.STRING
     },
     videoUri: {
-      type: Sequelize.STRING
+      type: Sequelize.TEXT,
+      allowNull: false,
     },
+    // videoWatchCount: {
+    //   type: Sequelize.INTEGER,
+    //   allowNull: true,
+    //   defaultValue: 0
+    // },
     createdAt: {
       allowNull: false,
       type: Sequelize.DATE
