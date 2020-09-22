@@ -348,6 +348,27 @@ class userController {
             break;
           }
 
+          case 3: {
+            const pay = await Fetch({
+              phone: user.phoneNumber,
+              amount: price
+            }, {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }, `${process.env.PAY_HOST}/charge/spenn`, 'POST');
+            if (pay.status === 200) {
+              const updates = await userService.updateUser(email, { isOnTrial: false });
+              if (updates[1] === 1) {
+                util.setSuccessResponse(res, pay.message, 200, pay);
+              } else {
+                util.setErrorResponse(res, pay.message, 500);
+              }
+            } else {
+              util.setErrorResponse(res, pay.message, 500);
+            }
+          }
+            break;
+
           default:
             util.setErrorResponse(res, 'Sorry payment failed', 500);
         }

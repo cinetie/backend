@@ -39,32 +39,9 @@ export default class WebHooks {
         // eslint-disable-next-line no-console
         console.log(updates);
         // creating sales
-        const sales = await Sales.addRecord({
-          method: response.payment_type,
-          plan: user.plan,
-          amount: response.amount * 0.3,
-          user: user.email
-        });
-        if (sales) {
-          const sessions = viewingSessions.getActiveAndSuspendedSessionsPerUser(user.email);
-          if (sessions.length > 0) {
-            // We are renewing subscription as this createdAt
-            // is different from today meaning this is not first time we bill them
-            const earnings = await Earnings(req.body.email);
-            if (!earnings) {
-              // check earnings for failure
-              throw new Error('Earnings recording error');
-            } else {
-              // earnings and sales are both created successfully
-              util.setSuccessResponse(res, 'Webhook processed', 200, { state: 'success' });
-            }
-          } else {
-            // we are not renewing the subscription as isNew is true i.e first time payment
-            util.setSuccessResponse(res, 'Webhook processed', 200, { state: 'success' });
-          }
-        } else {
-          // something went wrong registering the sale
-          throw new Error('Sales recording error');
+        const status = await WebHooks.registerSalesAndEarnings(response, user, req, res);
+        if (status === true) {
+          util.setSuccessResponse(res, 'Success', 200, { status: 'sucesss' });
         }
       } else {
         const updates = await UserService.updateUser(
@@ -90,6 +67,36 @@ export default class WebHooks {
       }
     } catch (error) {
       util.setErrorResponse(res, `Server Error ${error || error.message}`, 500);
+    }
+  }
+
+  static async registerSalesAndEarnings(response, user, req, res) {
+    const sales = await Sales.addRecord({
+      method: response.payment_type,
+      plan: user.plan,
+      amount: response.amount * 0.3,
+      user: user.email
+    });
+    if (sales) {
+      const sessions = viewingSessions.getActiveAndSuspendedSessionsPerUser(user.email);
+      if (sessions.length > 0) {
+        // we are recording earnings since they exist meaning they watched some movies
+        // this month or year
+        const earnings = await Earnings(req.body.email);
+        if (!earnings) {
+          // check earnings for failure
+          throw new Error('Earnings recording error');
+        } else {
+          // earnings and sales are both created successfully
+          return true;
+        }
+      } else {
+        // we are not renewing the subscription as isNew is true i.e first time payment
+        return true;
+      }
+    } else {
+      // something went wrong registering the sale
+      throw new Error('Sales recording error');
     }
   }
 }

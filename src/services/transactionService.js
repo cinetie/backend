@@ -1,10 +1,12 @@
+import sequelize from 'sequelize';
 import database from '../database/models';
 
+const op = sequelize.Op;
 class transactionService {
   static async createTransaction(data) {
     try {
       const newTrans = await database.transactions.create(data);
-      (newTrans) || null;
+      return newTrans;
     } catch (error) {
       throw error;
     }
@@ -17,20 +19,18 @@ class transactionService {
           transactionId: id
         }
       });
-      (data) || null;
+      return data;
     } catch (error) {
       throw error;
     }
   }
 
-  static async getTransactionsByEmail(email) {
+  static async getTransactionsByEmail(email, statusDesc) {
     try {
       const data = await database.transactions.findAll({
-        where: {
-          email
-        }
+        where: { [op.and]: [{ email }, { statusDesc }] }
       });
-      (data) || null;
+      return data;
     } catch (error) {
       throw error;
     }
@@ -43,7 +43,7 @@ class transactionService {
           transactionId: id
         }
       });
-      (deleted) || null;
+      return deleted;
     } catch (error) {
       throw error;
     }
@@ -56,7 +56,7 @@ class transactionService {
           transactionId: id
         }
       });
-      (data) || null;
+      return data;
     } catch (error) {
       throw error;
     }

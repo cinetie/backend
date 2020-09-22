@@ -90,10 +90,9 @@ class cpTransController {
         await services.createTrans(transactInfo);
         const status = await earningService.setEarningsToInactive(raw.clientId);
         if (!status) return helpers.setErrorResponse(res, 'Can\'t cashout easily', 500);
-        helpers.setSuccessResponse(res, 'Successfully checkout', 200);
-      } else {
-        helpers.setErrorResponse(res, 'Can\'t Cash out', 400);
+        return helpers.setSuccessResponse(res, 'Successfully checkout', 200);
       }
+      return helpers.setErrorResponse(res, 'Can\'t Cash out', 400);
     } catch (error) {
       helpers.setErrorResponse(res, error.message, 500);
     }

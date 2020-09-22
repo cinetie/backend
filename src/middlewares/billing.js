@@ -1,3 +1,5 @@
+/* eslint-disable no-dupe-class-members */
+/* eslint-disable no-return-await */
 /* eslint-disable no-param-reassign */
 /* eslint-disable consistent-return */
 import path from 'path';
@@ -9,6 +11,8 @@ import date from '../helpers/date';
 import jwt from '../helpers/jwt';
 import Fetch from '../helpers/fetch';
 import ViewingSessions from '../services/viewingSessionsServices';
+import transactions from '../services/transactionService';
+import webhooks from '../controllers/webhooks';
 
 const util = new Util();
 // middlware to perfom actual payment and registering transactions
@@ -85,8 +89,6 @@ class billing {
         const endDate = new Date(details.endDate);
         const token = jwt.jwtSign({ role: 'main-api', user: user.email }, process.env.SECRET, 1000);
         if (endDate.getTime() <= today.getTime()) { // remember to change >= to <=
-          // if(earningsStatus)
-          // await earnings(req.body.email);
           if (Number(details.paymentMethod) === 1) {
             const momoStatus = await Fetch({
               currency: 'RWF',
@@ -105,14 +107,39 @@ class billing {
             } else {
               billing.handleFailPaymentStatus(req, next);
             }
-          // service.get
+            // service.get
           } else if (Number(details.paymentMethod) === 2) {
             // charge tokenised
-            const status = await Fetch({ email: user.email }, {
+            await Fetch({ email: user.email }, {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json'
             }, `${process.env.PAY_HOST}/charge/card-token`, 'POST');
             billing.handleFailPaymentStatus(req, next);
+          } else if (Number(details.paymentMethod) === 3) {
+            const recentTransactions = await transactions.getTransactionsByEmail(user.email, 'Pending');
+            if (recentTransactions.length > 0) {
+              const recentTransaction = await billing.checkSpenn(
+                recentTransactions[0].transactionId,
+                token
+              );
+              console.log(recentTransaction.data.Status);
+              if (recentTransaction.data.Status === 'Approved'
+              || recentTransaction.data.Status === 'TransactionVerified') {
+                await billing.updateTransactionsAndRegisterSales(
+                  recentTransactions[0].transactionId, user, details, req, res, next
+                );
+              } else {
+                billing.handleFailPaymentStatus(req, next);
+              }
+            } else {
+              const pay = await billing.chargeSpenn(user, details, token);
+              await billing.recordTransaction(user, details, pay);
+              if (pay.status === 200) {
+                util.setSuccessResponse(res, pay.message, 200, pay);
+              } else {
+                billing.handleFailPaymentStatus(req, next);
+              }
+            }
           }
         } else {
           next();
@@ -121,6 +148,55 @@ class billing {
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
     }
+  }
+
+  static async updateTransactionsAndRegisterSales(recentTrans, user, details, req, res, next) {
+    const updates = await userService.updateUser(user.email, { permissionLevel: 1 });
+    const updatedSubscription = (user.isBilledAnnually === true)
+      ? await billingService.updateSubscription(user.email,
+        { endDate: date.addMoreDays(365).toDateString(), })
+      : await billingService.updateSubscription(user.email,
+        { endDate: date.addMoreDays(30).toDateString(), });
+    if (updates[1] === 1 && updatedSubscription[1] === 1) {
+      const status = await webhooks.registerSalesAndEarnings('Spenn', details, req, res);
+      if (status === true) {
+        await transactions.updateTransaction(recentTrans, { statusDesc: 'Approved' });
+        next();
+      } else {
+        util.setErrorResponse(res, 'Contact support Error: SPENN transaction error', 500);
+      }
+    } else {
+      util.setErrorResponse(res, 'Contact support Error: Subscription renewal', 500);
+    }
+  }
+
+  static async chargeSpenn(user, details, token) {
+    return await Fetch({
+      phone: user.phoneNumber,
+      amount: details.price,
+    }, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    }, `${process.env.PAY_HOST}/charge/spenn`, 'POST');
+  }
+
+  static async checkSpenn(requestId, token) {
+    return await Fetch(undefined, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    }, `${process.env.PAY_HOST}/charge/spenn-check?requestId=${requestId}`, 'GET');
+  }
+
+  static async recordTransaction(user, details, pay) {
+    await transactions.createTransaction(
+      {
+        email: user.email,
+        statusDesc: 'Pending',
+        paidAmount: details.price,
+        transactionId: pay.data.RequestId,
+        currency: 'RWF',
+      }
+    );
   }
 
   static async verifyPermissionLevel(req, res, next) {
