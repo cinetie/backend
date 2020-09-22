@@ -5,6 +5,8 @@ import Util from '../helpers/utilities';
 import Sales from '../helpers/sales';
 import Earnings from '../helpers/earnings';
 import mailer from '../helpers/mailer';
+import viewingSessions from '../services/viewingSessionsServices';
+import billingService from '../services/billingServices';
 import date from '../helpers/date';
 
 const util = new Util();
@@ -21,9 +23,19 @@ export default class WebHooks {
       const user = await UserService.getUserByMail(response.customer.email);
       const transVerification = await rave.Transaction.verify({ id: response.id });
       if (transVerification.status === 'success') {
-        const updates = await UserService.updateUser(
-          user.email, { permissionLevel: 1, card_nonce: transVerification.data.card.token }
-        );
+        let updates = {};
+        await billingService.updateSubscription(req.body.email, {
+          endDate: date.addMoreDays(30).toDateString(),
+        });
+        if (response['event.type'] === 'CARD_TRANSACTION') {
+          updates = await UserService.updateUser(
+            user.email, { permissionLevel: 1, card_nonce: transVerification.data.card.token }
+          );
+        } else {
+          updates = await UserService.updateUser(
+            user.email, { permissionLevel: 1 }
+          );
+        }
         // eslint-disable-next-line no-console
         console.log(updates);
         // creating sales
@@ -34,10 +46,8 @@ export default class WebHooks {
           user: user.email
         });
         if (sales) {
-          const sysDate = new Date();
-          const thisDate = new Date(response.customer.createdAt.replace(/\s/g, ''));
-          const status = date.compareDates(sysDate, thisDate);
-          if (status === false) {
+          const sessions = viewingSessions.getActiveAndSuspendedSessionsPerUser(user.email);
+          if (sessions.length > 0) {
             // We are renewing subscription as this createdAt
             // is different from today meaning this is not first time we bill them
             const earnings = await Earnings(req.body.email);

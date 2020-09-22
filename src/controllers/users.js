@@ -33,6 +33,7 @@ class userController {
         const token = userController.signToken(part1, newUser);
         const tokenToSave = userController.generateTokenToSave(newUser, token);
         await tokenService.createNewToken(tokenToSave, token);
+        console.log(EmailStatus);
         if (EmailStatus) util.setErrorResponse(res, EmailStatus, 500);
         const userToken = jwt.jwtSign(createdUser.email, process.env.SECRET);
         createdUser.token = userToken;

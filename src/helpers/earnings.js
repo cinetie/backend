@@ -1,7 +1,7 @@
 import earningController from '../controllers/earning';
 import subscriptions from '../services/billingServices';
 import userServices from '../services/userServices';
-// middleware for registering earnings/shares based
+// helper for registering earnings/shares based
 // on the amount of videos watched and subscription plan
 const registerEarnings = async (email) => {
   try {

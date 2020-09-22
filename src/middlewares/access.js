@@ -98,5 +98,19 @@ class Access {
       util.setErrorResponse(res, error.message || error, 500);
     }
   }
+
+  static async isPayment(req, res, next) {
+    try {
+      const token = req.headers.authorization.slice(7);
+      const user = jwt.jwtVerify(token, process.env.SECRET);
+      if (user.role === 'payment-api') {
+        next();
+      } else {
+        util.setErrorResponse(res, 'Access denied', 403);
+      }
+    } catch (error) {
+      util.setErrorResponse(res, error.message || error, 500);
+    }
+  }
 }
 export default Access;

@@ -84,7 +84,7 @@ class billing {
         const details = await billing.fetchCurrentSubscription(req, res);
         const endDate = new Date(details.endDate);
         const token = jwt.jwtSign({ role: 'main-api', user: user.email }, process.env.SECRET, 1000);
-        if (endDate.getTime() >= today.getTime()) { // remember to change >= to <=
+        if (endDate.getTime() <= today.getTime()) { // remember to change >= to <=
           // if(earningsStatus)
           // await earnings(req.body.email);
           if (Number(details.paymentMethod) === 1) {
