@@ -4,6 +4,6 @@ import Authorization from '../middlewares/access';
 
 const app = Router();
 
-app.post('/rave', WebHooks.flutterWave);
+app.post('/rave', Authorization.isRave, WebHooks.flutterWave);
 
 export default app;

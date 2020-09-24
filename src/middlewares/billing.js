@@ -22,42 +22,26 @@ class billing {
     }
   }
 
-  static async verifyStatus(req, res, status, next) {
-    // if (status.redirect !== null || undefined) {
-    if (1 > 10) {
-      // change user state from onhold to active
-      let today = '';
-      let updates;
-      // eslint-disable-next-line prefer-const
-      ({ updates, today } = await billing.updateSubscription(req, res, today));
-      if (updates[0]) {
-        next();
-      } else {
-        util.setErrorResponse(res, 'can\'t grant access to user', 503);
-      }
-      next(); // this probably fails somewhere as in headers are already sent
+  static async handleFailPaymentStatus(req, next) {
+    const user = await userService.getUserByMail(req.body.email);
+    if (user.isOnExtension === true) {
+      await userService.updateUser(req.body.email, { permissionLevel: -1 });
+      await billing.sendBillingNotification(user, req, 'We would like you to know that your account has been put onhold . \n since your  payment didn\'t work out');
+      next();
     } else {
-      // put user account onhold
-      const user = await userService.getUserByMail(req.body.email);
-      if (user.isOnExtension === true) {
-        await userService.updateUser(req.body.email, { permissionLevel: -1 });
-        await billing.sendBillingNotification(user, req, 'We would like you to know that your account has been put onhold . \n since your  payment didn\'t work out');
-        next();
-      } else {
-        const viewingSessions = await ViewingSessions.getActiveSessionsPerUser(req.body.email);
-        viewingSessions.forEach(async (data) => {
-          const updates = {
-            sessionState: 'suspended'
-          };
-          await ViewingSessions.updateViewingSessions(data.id, updates);
-        });
-        await billingService.updateSubscription(req.body.email, {
-          endDate: date.addMoreDays(5).toDateString(),
-        });
-        await userService.updateUser(req.body.email, { isOnExtension: true });
-        await billing.sendBillingNotification(user, req, 'Hello, Your cinetie subscription has ended and automatic billing has failed, we extended your subscription for five days ');
-        next();
-      }
+      const viewingSessions = await ViewingSessions.getActiveSessionsPerUser(req.body.email);
+      viewingSessions.forEach(async (data) => {
+        const updates = {
+          sessionState: 'suspended'
+        };
+        await ViewingSessions.updateViewingSessions(data.id, updates);
+      });
+      await billingService.updateSubscription(req.body.email, {
+        endDate: date.addMoreDays(5).toDateString(),
+      });
+      await userService.updateUser(req.body.email, { isOnExtension: true });
+      await billing.sendBillingNotification(user, req, 'Hello, Your cinetie subscription has ended and automatic billing has failed, we extended your subscription for five days ');
+      next();
     }
   }
 
@@ -100,7 +84,7 @@ class billing {
         const details = await billing.fetchCurrentSubscription(req, res);
         const endDate = new Date(details.endDate);
         const token = jwt.jwtSign({ role: 'main-api', user: user.email }, process.env.SECRET, 1000);
-        if (endDate.getTime() <= today.getTime()) {
+        if (endDate.getTime() <= today.getTime()) { // remember to change >= to <=
           // if(earningsStatus)
           // await earnings(req.body.email);
           if (Number(details.paymentMethod) === 1) {
@@ -113,18 +97,13 @@ class billing {
 
             }, { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
             `${process.env.PAY_HOST}/charge/momo`, 'POST');
-            if (momoStatus.data.redirect) {
-              let todayDate = '';
-              let updates;
-              // eslint-disable-next-line prefer-const
-              ({ updates, todayDate } = await billing.updateSubscription(req, res, todayDate));
-              if (updates[1] === 1) {
-                util.setSuccessResponse(res, 'Please follow this link to renew your subscription with Mobile money', 200, momoStatus);
-              } else {
-                util.setErrorResponse(res, 'Can\'t renew subscription', 500);
-              }
+            if (momoStatus.status === 200) {
+              util.setSuccessResponse(res,
+                'Please follow this link to renew your subscription with Mobile money',
+                200,
+                momoStatus);
             } else {
-              billing.verifyStatus(req, res, momoStatus.data, next);
+              billing.handleFailPaymentStatus(req, next);
             }
           // service.get
           } else if (Number(details.paymentMethod) === 2) {
@@ -133,7 +112,7 @@ class billing {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json'
             }, `${process.env.PAY_HOST}/charge/card-token`, 'POST');
-            billing.verifyStatus(req, res, status, next);
+            billing.handleFailPaymentStatus(req, next);
           }
         } else {
           next();
@@ -163,10 +142,12 @@ class billing {
       const { email } = jwt.jwtVerify(
         req.headers.authorization.slice(7), process.env.SECRET
       );
+      console.log('checking trial status');
       const data = await userService.getUserByMail(email);
       if (data.isOnTrial === false && data.isOnExtension === false) {
         next();
       } else {
+        console.log('check failed');
         const today = new Date();
         const subscription = await billingService.getCurrentSubscription(email);
         const viewingSessions = await ViewingSessions.getActiveSessionsPerUser(email);
@@ -174,7 +155,8 @@ class billing {
           next();
         } else {
           const updates = await userService.updateUser(email, { permissionLevel: -1 });
-          if (updates[0] > 0) {
+          console.log(updates);
+          if (updates[1] > 0) {
             await mailer([{
               body: 'We would like you to know that your account has been put onhold. \n since your  trial just ended'
             }, {
