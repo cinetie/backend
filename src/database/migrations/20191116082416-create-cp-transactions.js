@@ -19,6 +19,10 @@ module.exports = {
     cashableBalance: {
       type: Sequelize.FLOAT
     },
+    state: {
+      type: Sequelize.STRING,
+      defaultValue: 'Not Approved'
+    },
     createdAt: {
       allowNull: false,
       type: Sequelize.DATE

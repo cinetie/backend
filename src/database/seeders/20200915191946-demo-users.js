@@ -1,0 +1,27 @@
+export default {
+  up: (queryInterface) => queryInterface.bulkInsert('Users', [
+    {
+      id: 0,
+      firstName: 'Izabayo',
+      lastName: 'Blaise',
+      email: 'blaise1@gmail.com',
+      password: '$2a$10$JUCGXOZMZUDUHXqRpbdoVuQ.0RuEEV26NKwnZUQJ2K1tE4FwW.nE.',
+      nationality: 'Rwandan',
+      cityOfResidence: 'Muhima',
+      isVerified: true,
+      plan: 'Setup',
+      permissionLevel: 1,
+      isOnTrial: true,
+      isBilledAnnually: null,
+      phoneNumber: null,
+      card_nonce: null,
+      card_brand: null,
+      customerId: null,
+      isOnExtension: null,
+      updatedAt: new Date(),
+      createdAt: new Date(),
+    }
+
+  ]),
+  down: (queryInterface) => queryInterface.bulkDelete('Users', null, {}),
+};

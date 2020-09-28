@@ -20,11 +20,28 @@ module.exports = {
       endDate: {
         type: Sequelize.STRING
       },
+      dueState: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+      },
+      paymentMethod: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      },
       state: {
         type: Sequelize.STRING
       },
       phoneNumber: {
         type: Sequelize.STRING
+      },
+      trialEnds: {
+        type: Sequelize.BIGINT
+      },
+      start: {
+        type: Sequelize.BIGINT,
+        defaultValue: Date.now()
       },
       createdAt: {
         allowNull: false,

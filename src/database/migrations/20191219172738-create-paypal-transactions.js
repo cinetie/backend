@@ -27,6 +27,10 @@ module.exports = {
     transCurrency: {
       type: Sequelize.STRING
     },
+    date: {
+      type: Sequelize.BIGINT,
+      allowNull: false
+    },
     createdAt: {
       allowNull: false,
       type: Sequelize.DATE
