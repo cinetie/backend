@@ -80,7 +80,8 @@ class Video {
   static async getVideosByPopularity(req, res) {
     try {
       const { type } = req.query;
-      const videos = await videoService.getPopularVideos(req.query.offset, req.query.limit, type);
+      const { country } = req.headers;
+      const videos = await videoService.getPopularVideos(req.query.offset, req.query.limit, type, country);
       Video.getAttachedThumbsMultiple(videos);
 
       if (Object.values(videos).length > 0) {

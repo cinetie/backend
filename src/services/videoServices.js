@@ -1,6 +1,7 @@
-import sequelize, { Sequelize } from 'sequelize';
-import database from '../database/models';
-import date from '../helpers/date';
+import sequelize, { Sequelize } from "sequelize";
+import database from "../database/models";
+import date from "../helpers/date";
+import resCountry from "../helpers/resCountry";
 
 const op = sequelize.Op;
 
@@ -11,11 +12,11 @@ class videoService {
     try {
       const video = await database.videos.findOne({
         attributes: {
-          exclude: ['createdAt', 'updatedAt']
+          exclude: ["createdAt", "updatedAt"],
         },
         where: {
-          videoId
-        }
+          videoId,
+        },
       });
       if (video) {
         return video;
@@ -32,15 +33,14 @@ class videoService {
         offset: Number(offsetValue),
         limit: Number(limitValue),
         where: {
-          [op.and]: [{
-            type,
-            videoSuspensionState: '0'
-          }]
-
+          [op.and]: [
+            {
+              type,
+              videoSuspensionState: "0",
+            },
+          ],
         },
-        order: [
-          ['creationTime', 'DESC']
-        ]
+        order: [["creationTime", "DESC"]],
       });
       if (videos) {
         return videos;
@@ -55,11 +55,13 @@ class videoService {
     try {
       const videos = await database.videos.findAll({
         where: {
-          [op.and]: [{
-            type,
-            videoClientId: clientId
-          }]
-        }
+          [op.and]: [
+            {
+              type,
+              videoClientId: clientId,
+            },
+          ],
+        },
       });
       if (videos) {
         return videos;
@@ -76,17 +78,19 @@ class videoService {
         offset: Number(offsetValue),
         limit: Number(limit),
         where: {
-          [op.and]: [{
-            videoWatchCount: {
-              [op.gte]: process.env.TRENDING_WATCH_COUNT
+          [op.and]: [
+            {
+              videoWatchCount: {
+                [op.gte]: process.env.TRENDING_WATCH_COUNT,
+              },
+              creationTime: {
+                [op.gte]: date.removeDays(180),
+              },
+              type,
+              videoSuspensionState: "0",
             },
-            creationTime: {
-              [op.gte]: date.removeDays(180)
-            },
-            type,
-            videoSuspensionState: '0'
-          }]
-        }
+          ],
+        },
       });
       if (videos) {
         return videos;
@@ -100,21 +104,22 @@ class videoService {
   static async search(query, offset) {
     try {
       const data = await database.videos.findAll({
-        order: [
-          ['id', 'DESC']
-        ],
+        order: [["id", "DESC"]],
         offset: Number(offset),
         limit: 20,
         where: {
           [op.and]: [
             {
-              [op.col]: Sequelize.where(Sequelize.fn('lower', Sequelize.col('videoName')), {
-                [op.like]: `%${query}%`
-              }),
-              videoSuspensionState: '0',
-            }
-          ]
-        }
+              [op.col]: Sequelize.where(
+                Sequelize.fn("lower", Sequelize.col("videoName")),
+                {
+                  [op.like]: `%${query}%`,
+                }
+              ),
+              videoSuspensionState: "0",
+            },
+          ],
+        },
       });
       if (data) {
         return data;
@@ -127,10 +132,10 @@ class videoService {
 
   static async incrementWatchCountService(videoId) {
     try {
-      const data = await database.videos.increment('videoWatchCount', {
+      const data = await database.videos.increment("videoWatchCount", {
         where: {
-          videoId
-        }
+          videoId,
+        },
       });
       if (data) {
         return data;
@@ -141,23 +146,27 @@ class videoService {
     }
   }
 
-  static async getPopularVideos(offSetValue, limitValue, type) {
+  static async getPopularVideos(offSetValue, limitValue, type, country) {
     try {
       const data = await database.videos.findAll({
         offset: Number(offSetValue),
         limit: Number(limitValue),
         where: {
-          [op.and]: [{
-            videoWatchCount: {
-              [op.gte]: process.env.TRENDING_WATCH_COUNT
+          [op.and]: [
+            {
+              videoWatchCount: {
+                [op.gte]: process.env.TRENDING_WATCH_COUNT,
+              },
+              type,
+              videoSuspensionState: "0",
             },
-            type,
-            videoSuspensionState: '0'
-          }]
-        }
+          ],
+        },
       });
+
       if (data) {
-        return data;
+        const results = resCountry(data, country);
+        return results;
       }
       return null;
     } catch (error) {
@@ -169,8 +178,8 @@ class videoService {
     try {
       const data = await database.videos.findAll({
         where: {
-          category
-        }
+          category,
+        },
       });
       if (data) {
         return data;
@@ -193,8 +202,8 @@ class videoService {
     try {
       return await database.videos.update(newVideo, {
         where: {
-          videoId
-        }
+          videoId,
+        },
       });
     } catch (error) {
       throw error;
@@ -203,16 +212,15 @@ class videoService {
 
   static async resetFeaturedVideo(featureType, isFeatured, type) {
     try {
-      return await database.videos.update({ isFeatured: false }, {
-        returning: true,
-        where: {
-          [op.and]: [
-            { featureType },
-            { isFeatured },
-            { type }
-          ]
+      return await database.videos.update(
+        { isFeatured: false },
+        {
+          returning: true,
+          where: {
+            [op.and]: [{ featureType }, { isFeatured }, { type }],
+          },
         }
-      });
+      );
     } catch (error) {
       throw error;
     }
@@ -223,8 +231,8 @@ class videoService {
       return await database.videos.destroy({
         returning: true,
         where: {
-          videoId
-        }
+          videoId,
+        },
       });
     } catch (error) {
       throw error;
@@ -235,14 +243,26 @@ class videoService {
     try {
       return await database.videos.findAll({
         attributes: {
-          exclude: ['videoLink', 'createdAt', 'updatedAt', 'videoCast', 'videoSynopsis', 'nameTagThumbNailLink', 'isFeatured', 'tallThumbNailLink', 'videoIdVimeo', 'videoClientId', 'featureType', 'category', 'rate']
+          exclude: [
+            "videoLink",
+            "createdAt",
+            "updatedAt",
+            "videoCast",
+            "videoSynopsis",
+            "nameTagThumbNailLink",
+            "isFeatured",
+            "tallThumbNailLink",
+            "videoIdVimeo",
+            "videoClientId",
+            "featureType",
+            "category",
+            "rate",
+          ],
         },
         where: {
-          videoClientId
+          videoClientId,
         },
-        order: [
-          ['id', 'DESC']
-        ]
+        order: [["id", "DESC"]],
       });
     } catch (error) {
       throw error;
@@ -253,17 +273,25 @@ class videoService {
     try {
       return await database.videos.findAll({
         attributes: {
-          exclude: ['videoLink', 'createdAt', 'updatedAt', 'videoCast', 'videoSynopsis', 'nameTagThumbNailLink', 'isFeatured', 'tallThumbNailLink', 'videoIdVimeo', 'videoClientId', 'featureType', 'category']
+          exclude: [
+            "videoLink",
+            "createdAt",
+            "updatedAt",
+            "videoCast",
+            "videoSynopsis",
+            "nameTagThumbNailLink",
+            "isFeatured",
+            "tallThumbNailLink",
+            "videoIdVimeo",
+            "videoClientId",
+            "featureType",
+            "category",
+          ],
         },
         where: {
-          [op.and]: [
-            { videoClientId },
-            { type }
-          ]
+          [op.and]: [{ videoClientId }, { type }],
         },
-        order: [
-          ['id', 'DESC']
-        ]
+        order: [["id", "DESC"]],
       });
     } catch (error) {
       throw error;
@@ -274,11 +302,22 @@ class videoService {
     try {
       return await database.videos.findAll({
         attributes: {
-          exclude: ['videoLink', 'createdAt', 'updatedAt', 'videoCast', 'videoSynopsis', 'nameTagThumbNailLink', 'isFeatured', 'tallThumbNailLink', 'videoIdVimeo', 'videoClientId', 'featureType', 'category']
+          exclude: [
+            "videoLink",
+            "createdAt",
+            "updatedAt",
+            "videoCast",
+            "videoSynopsis",
+            "nameTagThumbNailLink",
+            "isFeatured",
+            "tallThumbNailLink",
+            "videoIdVimeo",
+            "videoClientId",
+            "featureType",
+            "category",
+          ],
         },
-        order: [
-          ['id', 'DESC']
-        ]
+        order: [["id", "DESC"]],
       });
     } catch (error) {
       throw error;
@@ -288,12 +327,22 @@ class videoService {
   static async getMainFeaturedVideo(type) {
     try {
       const videos = await database.videos.findAll({
-        order: [
-          ['id', 'DESC']
-        ],
+        order: [["id", "DESC"]],
         limit: 1,
         attributes: {
-          exclude: ['videoLink', 'creationTime', 'videoWatchCount', 'videoSuspensionState', 'createdAt', 'updatedAt', 'isFeatured', 'tallThumbNailLink', 'videoIdVimeo', 'videoClientId', 'featureType']
+          exclude: [
+            "videoLink",
+            "creationTime",
+            "videoWatchCount",
+            "videoSuspensionState",
+            "createdAt",
+            "updatedAt",
+            "isFeatured",
+            "tallThumbNailLink",
+            "videoIdVimeo",
+            "videoClientId",
+            "featureType",
+          ],
         },
         where: {
           [op.and]: [
@@ -301,10 +350,10 @@ class videoService {
               isFeatured: true,
               type,
               featureType: 1,
-              videoSuspensionState: '0'
-            }
-          ]
-        }
+              videoSuspensionState: "0",
+            },
+          ],
+        },
       });
       if (videos) {
         return videos;
@@ -318,21 +367,33 @@ class videoService {
   static async getSecondFeaturedVideo(type) {
     try {
       const videos = await database.videos.findAll({
-        order: [
-          ['id', 'DESC']
-        ],
+        order: [["id", "DESC"]],
         limit: 1,
         attributes: {
-          exclude: ['videoLink', 'creationTime', 'videoWatchCount', 'videoSuspensionState', 'createdAt', 'updatedAt', 'isFeatured', 'tallThumbNailLink', 'videoIdVimeo', 'videoClientId', 'featureType']
+          exclude: [
+            "videoLink",
+            "creationTime",
+            "videoWatchCount",
+            "videoSuspensionState",
+            "createdAt",
+            "updatedAt",
+            "isFeatured",
+            "tallThumbNailLink",
+            "videoIdVimeo",
+            "videoClientId",
+            "featureType",
+          ],
         },
         where: {
-          [op.and]: [{
-            isFeatured: true,
-            type,
-            featureType: 2,
-            videoSuspensionState: '0'
-          }]
-        }
+          [op.and]: [
+            {
+              isFeatured: true,
+              type,
+              featureType: 2,
+              videoSuspensionState: "0",
+            },
+          ],
+        },
       });
       if (videos) {
         return videos;
