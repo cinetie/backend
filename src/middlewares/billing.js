@@ -28,25 +28,26 @@ class billing {
 
   static async handleFailPaymentStatus(req, next) {
     const user = await userService.getUserByMail(req.body.email);
-    if (user.isOnExtension === true) {
+    // if (user.isOnExtension === true) {
       await userService.updateUser(req.body.email, { permissionLevel: -1 });
       await billing.sendBillingNotification(user, req, 'We would like you to know that your account has been put onhold . \n since your  payment didn\'t work out');
       next();
-    } else {
-      const viewingSessions = await ViewingSessions.getActiveSessionsPerUser(req.body.email);
-      viewingSessions.forEach(async (data) => {
-        const updates = {
-          sessionState: 'suspended'
-        };
-        await ViewingSessions.updateViewingSessions(data.id, updates);
-      });
-      await billingService.updateSubscription(req.body.email, {
-        endDate: date.addMoreDays(5).toDateString(),
-      });
-      await userService.updateUser(req.body.email, { isOnExtension: true });
-      await billing.sendBillingNotification(user, req, 'Hello, Your cinetie subscription has ended and automatic billing has failed, we extended your subscription for five days ');
-      next();
-    }
+    // } else {
+      // Temporarily disable extensions
+      // const viewingSessions = await ViewingSessions.getActiveSessionsPerUser(req.body.email);
+      // viewingSessions.forEach(async (data) => {
+      //   const updates = {
+      //     sessionState: 'suspended'
+      //   };
+      //   await ViewingSessions.updateViewingSessions(data.id, updates);
+      // });
+      // await billingService.updateSubscription(req.body.email, {
+      //   endDate: date.addMoreDays(5).toDateString(),
+      // });
+      // await userService.updateUser(req.body.email, { isOnExtension: true });
+      // await billing.sendBillingNotification(user, req, 'Hello, Your cinetie subscription has ended and automatic billing has failed, we extended your subscription for five days ');
+      // next();~
+    // }
   }
 
   static async sendBillingNotification(user, req, body) {
