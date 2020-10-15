@@ -34,9 +34,9 @@ class payment {
       }
       data.paymentMethod = details.paymentMethod;
       const user = await userService.getUserByMail(details.email);
-      if (user.isOnTrial === true) {
-        data.trialEnds = date.addMoreDays(5).getTime();
-      }
+      // if (user.isOnTrial === true) {
+      //   data.trialEnds = date.addMoreDays(5).getTime();
+      // }
       const bill = await billingService.registerSubscription(data);
       if (bill) {
         return bill;
