@@ -82,7 +82,7 @@ class userController {
     newUser.isVerified = false;
     newUser.plan = 'Setup';
     newUser.permissionLevel = 1;
-    newUser.isOnTrial = true;
+    newUser.isOnTrial = false;
     return newUser;
   }
 
@@ -245,12 +245,15 @@ class userController {
     try {
       const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const user = await userService.getUserByMail(decoded.email);
+      console.log(decoded.email);
       if (!user) util.setErrorResponse(res, 'Can\'t find that user', 422);
       const newInfo = req.body;
+      console.log(newInfo)
       const updated = await userService.updateUser(decoded.email, newInfo);
       if (updated[0] !== 0) {
         util.setSuccessResponse(res, 'updated successfully', 200, updated);
       } else {
+        console.log(updated);
         util.setErrorResponse(res, 'An error occured', 400);
       }
     } catch (error) {
@@ -298,10 +301,10 @@ class userController {
       const price = await payment.getPlanPricing(subscriptionData);
       const currentSubsctption = await billingServices.getCurrentSubscription(email);
       console.log('298');
-      if (user.isOnTrial === false) {
-        console.log('300');
-        util.setErrorResponse(res, 'account is already activated', 400);
-      } else {
+      // if (user.isOnTrial === false) {
+      //   console.log('300');
+      //   util.setErrorResponse(res, 'account is already activated', 400);
+      // } else {
         console.log('303');
         const paymentData = userController.getAndSetPaymentData(req, price, user, email);
         const token = jwt.jwtSign({ role: 'main-api', user: email }, process.env.SECRET, 1000);
@@ -372,7 +375,7 @@ class userController {
           default:
             util.setErrorResponse(res, 'Sorry payment failed', 500);
         }
-      }
+      // }
     } catch (error) {
       return response.errorResponse(res, 500, `Something wrong happened ${error.message}`, error);
     }
@@ -472,6 +475,7 @@ class userController {
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const user = await userService.getUserByMail(email);
       const currentSubscription = await billingServices.getCurrentSubscription(email);
+      console.log(currentSubscription.plan);
       if (user) {
         if (currentSubscription) {
           util.setSuccessResponse(res, 'Found', 200, {
