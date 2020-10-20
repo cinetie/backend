@@ -27,7 +27,7 @@ class videoService {
     }
   }
 
-  static async getNewVideos(limitValue, offsetValue, type) {
+  static async getNewVideos(limitValue, offsetValue, type,country) {
     try {
       const videos = await database.videos.findAll({
         offset: Number(offsetValue),
@@ -43,7 +43,8 @@ class videoService {
         order: [["creationTime", "DESC"]],
       });
       if (videos) {
-        return videos;
+        const results = resCountry(videos, country);
+        return results;
       }
       return null;
     } catch (error) {
@@ -72,7 +73,7 @@ class videoService {
     }
   }
 
-  static async getTrendingVideos(offsetValue, limit, type) {
+  static async getTrendingVideos(offsetValue, limit, type,country) {
     try {
       const videos = await database.videos.findAll({
         offset: Number(offsetValue),
@@ -93,7 +94,8 @@ class videoService {
         },
       });
       if (videos) {
-        return videos;
+        const results = resCountry(videos, country);
+        return results;
       }
       return null;
     } catch (error) {
@@ -101,8 +103,9 @@ class videoService {
     }
   }
 
-  static async search(query, offset) {
+  static async search(query, offset,country) {
     try {
+      
       const data = await database.videos.findAll({
         order: [["id", "DESC"]],
         offset: Number(offset),
@@ -122,7 +125,8 @@ class videoService {
         },
       });
       if (data) {
-        return data;
+        const results = resCountry(data, country);
+        return results;
       }
       return null;
     } catch (error) {
@@ -174,7 +178,7 @@ class videoService {
     }
   }
 
-  static async getVideosByCategory(category) {
+  static async getVideosByCategory(category,country) {
     try {
       const data = await database.videos.findAll({
         where: {
@@ -182,7 +186,8 @@ class videoService {
         },
       });
       if (data) {
-        return data;
+        const results = resCountry(data, country);
+        return results;
       }
       return null;
     } catch (error) {
@@ -324,7 +329,7 @@ class videoService {
     }
   }
 
-  static async getMainFeaturedVideo(type) {
+  static async getMainFeaturedVideo(type,country) {
     try {
       const videos = await database.videos.findAll({
         order: [["id", "DESC"]],
@@ -356,7 +361,8 @@ class videoService {
         },
       });
       if (videos) {
-        return videos;
+        const results = resCountry(videos, country);
+        return results;
       }
       return null;
     } catch (error) {
@@ -364,7 +370,7 @@ class videoService {
     }
   }
 
-  static async getSecondFeaturedVideo(type) {
+  static async getSecondFeaturedVideo(type,country) {
     try {
       const videos = await database.videos.findAll({
         order: [["id", "DESC"]],
@@ -396,7 +402,8 @@ class videoService {
         },
       });
       if (videos) {
-        return videos;
+        const results = resCountry(videos, country);
+        return results;
       }
       return null;
     } catch (error) {
