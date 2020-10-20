@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     isFeatured: DataTypes.BOOLEAN,
     tallThumbNailLink: DataTypes.STRING,
     nameTagThumbNailLink: DataTypes.STRING,
-    resCountries: { type: DataTypes.ARRAY(DataTypes.JSON) },
+    resCountries: DataTypes.STRING,
     type: DataTypes.STRING,
     rate: DataTypes.STRING
   }, {});

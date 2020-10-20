@@ -2,7 +2,8 @@ const resCountry = (data, country) => {
   const results = [];
   data.map((el) => {
     const { resCountries } = el;
-    if (resCountries.includes(country)) {
+    const arrResCountries = resCountries !== null ? resCountries.split(',') : [] 
+    if (arrResCountries.includes(country)) {
       console.log(true);
     } else {
       results.push(el);

@@ -90,6 +90,7 @@ class Video {
         util.setErrorResponse(res, 'Data not found', 404);
       }
     } catch (error) {
+      console.log(error);
       util.setErrorResponse(res, error.message, 500);
     }
   }

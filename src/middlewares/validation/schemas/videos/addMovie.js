@@ -21,7 +21,5 @@ export default joi.object().keys({
     .error(() => 'You did not provide  video'),
   rate: joi.string().required()
     .error(() => 'You have to enter age rating'),
-  resCountries: joi.array().required()
+  resCountries: joi.string().required()
 }).options({ allowUnknown: false });
-
-// 03d44171-95d9-4954-9af0-e72975f51e1d.avi
