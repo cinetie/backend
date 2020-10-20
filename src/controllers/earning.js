@@ -2,12 +2,15 @@
 /* eslint-disable vars-on-top */
 /* eslint-disable no-var */
 /* eslint-disable no-useless-catch */
-import earningService from '../services/earningServices';
-import subscriptionService from '../services/billingServices';
-import viewSessionService from '../services/viewingSessionsServices';
-import response from '../helpers/response';
+import date from '../helpers/date';
 import jwt from '../helpers/jwt';
+import response from '../helpers/response';
 import Util from '../helpers/utilities';
+import { default as billingServices, default as subscriptionService } from '../services/billingServices';
+import earningService from '../services/earningServices';
+import userService from '../services/userServices';
+import viewSessionService from '../services/viewingSessionsServices';
+import webhooks from './webhooks';
 
 const util = new Util();
 // IMPORTANT  when pulling earnings make sure to map a new
@@ -70,7 +73,7 @@ class earningController {
         };
         results = await earningService.createNewEarnings(earnings);
       });
-      const updates = await subscriptionService.setSubscriptionToSettled(email, { state: 'settled' });
+      // const updates = await subscriptionService.setSubscriptionToSettled(email, { state: 'settled' });
       if (results) {
         return true;
       }
@@ -268,6 +271,39 @@ class earningController {
       return response.successResponse(res, 404, 'Data Not found', 0);
     } catch (error) {
       return response.errorResponse(res, 500, 'Something happened', error.message);
+    }
+  }
+
+  static async calculateEarningsPerUser(req, res) {
+    try {
+      const updates = await userService.updateUser(req.user, { permissionLevel: 1 });
+      const currentSubscription = await billingServices.getCurrentSubscription(req.user);
+      console.log(currentSubscription);
+      console.log(req.user);
+      if (updates[1] === 1) {
+        const status = await webhooks.registerSalesAndEarnings({
+          payment_type: req.body.paymentMethod,
+          amount: currentSubscription.price
+        }, currentSubscription, req, res);
+        if (status === true) {
+          const updateSubscription = (updates.isBilledAnnually === true)
+            ? await billingServices.updateSubscription(req.user, { endDate: date.addMoreDays(365).toDateString(), state: "current",dueState: false })
+            : await billingServices.updateSubscription(req.user, { endDate: date.addMoreDays(30).toDateString(), state: "current", dueState: false })
+            console.log(updateSubscription);
+            if (updateSubscription[1] !== 0) {
+              return response.successResponse(res, 200, 'Success transaction finished', status);
+            } else {
+              return response.errorResponse(res, 400, 'something went wrong updating subscription', 'BAD_REQUEST')
+            }
+        } else {
+          return response.errorResponse(res, 400, 'something went wrong registering earnings', 'BAD_REQUEST')
+        }
+      } else {
+        return response.errorResponse(res, 400, 'user updates are not running', 'BAD_REQUEST')
+      }
+    } catch (error) {
+      console.log(error)
+      return response.errorResponse(res, 500, 'Something happened', 'SERVER_ERROR');
     }
   }
 }
