@@ -111,10 +111,10 @@ class billing {
             // service.get
           } else if (Number(details.paymentMethod) === 2) {
             // charge tokenised
-            await Fetch({ email: user.email }, {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }, `${process.env.PAY_HOST}/charge/card-token`, 'POST');
+            // await Fetch({ email: user.email }, {
+            //   Authorization: `Bearer ${token}`,
+            //   'Content-Type': 'application/json'
+            // }, `${process.env.PAY_HOST}/charge/card-token`, 'POST');
             billing.handleFailPaymentStatus(req, next);
           } else if (Number(details.paymentMethod) === 3) {
             const recentTransactions = await transactions.getTransactionsByEmail(user.email, 'Pending');
@@ -159,7 +159,10 @@ class billing {
       : await billingService.updateSubscription(user.email,
         { endDate: date.addMoreDays(30).toDateString(), });
     if (updates[1] === 1 && updatedSubscription[1] === 1) {
-      const status = await webhooks.registerSalesAndEarnings('Spenn', details, req, res);
+      const status = await webhooks.registerSalesAndEarnings({
+        payment_type: 'spenn',
+        amount: details.price
+      }, details, req, res);
       if (status === true) {
         await transactions.updateTransaction(recentTrans, { statusDesc: 'Approved' });
         next();

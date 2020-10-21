@@ -70,7 +70,7 @@ export default class WebHooks {
     }
   }
 
-  static async registerSalesAndEarnings(response, user, req, res) {
+  static async  registerSalesAndEarnings(response, user, req, res) {
     const sales = await Sales.addRecord({
       method: response.payment_type,
       plan: user.plan,
@@ -78,20 +78,24 @@ export default class WebHooks {
       user: user.email
     });
     if (sales) {
-      const sessions = viewingSessions.getActiveAndSuspendedSessionsPerUser(user.email);
+      const sessions = await viewingSessions.getActiveAndSuspendedSessionsPerUser(user.email);
+      console.log(sessions);
       if (sessions.length > 0) {
         // we are recording earnings since they exist meaning they watched some movies
         // this month or year
-        const earnings = await Earnings(req.body.email);
-        if (!earnings) {
+        const earnings = await Earnings(user.email);
+        if (earnings === 0) {
           // check earnings for failure
+          console.log(earnings);
           throw new Error('Earnings recording error');
         } else {
           // earnings and sales are both created successfully
+          console.log(earnings);
           return true;
         }
       } else {
         // we are not renewing the subscription as isNew is true i.e first time payment
+        console.log("new user");
         return true;
       }
     } else {

@@ -11,7 +11,7 @@ const registerEarnings = async (email) => {
         dueState: true
       });
       const results = await earningController.assignRateToEachVideo(email);
-      if (updates[0] && results) {
+      if (updates[1] && results) {
         return 1;
       }
       return 0;
