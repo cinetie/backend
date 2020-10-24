@@ -8,3 +8,4 @@ yarn.lock
 yarn.ts
 .nyc_output/
 .vscode/
+coverage
