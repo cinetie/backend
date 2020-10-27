@@ -11,8 +11,4 @@ export default Joi.object().keys({
     .error(() => 'You have to enter a valid last name. Example: Doe'),
   password: Joi.string().min(6).required()
     .error(() => 'You have to enter a valid password with more than 6 characters. Example: qqw12@#!23#frf_e3_@'),
-  nationality: Joi.string().min(3).required()
-    .error(() => 'You have to provide a valid Country. Ex: Rwanda'),
-  cityOfResidence: Joi.string().min(3).required()
-    .error(() => 'You have to provide a valid city like Ex:kigali')
 }).options({ allowUnknown: false });
