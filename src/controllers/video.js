@@ -80,7 +80,8 @@ class Video {
   static async getVideosByPopularity(req, res) {
     try {
       const { type } = req.query;
-      const videos = await videoService.getPopularVideos(req.query.offset, req.query.limit, type);
+      const { country } = req.headers;
+      const videos = await videoService.getPopularVideos(req.query.offset, req.query.limit, type, country);
       Video.getAttachedThumbsMultiple(videos);
 
       if (Object.values(videos).length > 0) {
@@ -89,6 +90,7 @@ class Video {
         util.setErrorResponse(res, 'Data not found', 404);
       }
     } catch (error) {
+      console.log(error);
       util.setErrorResponse(res, error.message, 500);
     }
   }
@@ -96,7 +98,8 @@ class Video {
   static async getVideosByTrend(req, res) {
     try {
       const { type } = req.query;
-      const videos = await videoService.getTrendingVideos(req.query.offset, req.query.limit, type);
+      const { country } = req.headers;
+      const videos = await videoService.getTrendingVideos(req.query.offset, req.query.limit, type, country);
       Video.getAttachedThumbsMultiple(videos);
 
       if (Object.values(videos).length > 0) {
@@ -111,7 +114,8 @@ class Video {
 
   static async getVideosByCategory(req, res) {
     try {
-      const videos = await videoService.getVideosByCategory(req.query.q);
+      const { country } = req.headers;
+      const videos = await videoService.getVideosByCategory(req.query.q, country);
       Video.getAttachedThumbsMultiple(videos);
       if (Object.values(videos).length > 0) {
         util.setSuccessResponse(res, `${req.query.q} videos found`, 200, videos);
@@ -126,7 +130,8 @@ class Video {
   static async search(req, res) {
     try {
       const { q, offset } = req.query;
-      const videos = await videoService.search(q, offset);
+      const { country } = req.headers;
+      const videos = await videoService.search(q, offset, country);
       Video.getAttachedThumbsMultiple(videos);
 
       if (Object.values(videos).length > 0) {

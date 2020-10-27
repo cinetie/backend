@@ -41,7 +41,7 @@ class userController {
         util.setSuccessResponse(res, 'Signed up successfully', 201, createdUser);
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       util.setErrorResponse(res, error.message, 500);
     }
   }
@@ -248,7 +248,7 @@ class userController {
       console.log(decoded.email);
       if (!user) util.setErrorResponse(res, 'Can\'t find that user', 422);
       const newInfo = req.body;
-      console.log(newInfo)
+      console.log(newInfo);
       const updated = await userService.updateUser(decoded.email, newInfo);
       if (updated[0] !== 0) {
         util.setSuccessResponse(res, 'updated successfully', 200, updated);
@@ -305,76 +305,76 @@ class userController {
       //   console.log('300');
       //   util.setErrorResponse(res, 'account is already activated', 400);
       // } else {
-        console.log('303');
-        const paymentData = userController.getAndSetPaymentData(req, price, user, email);
-        const token = jwt.jwtSign({ role: 'main-api', user: email }, process.env.SECRET, 1000);
-        switch (Number(currentSubsctption.paymentMethod)) {
-          case 1: {
-            console.log('308');
-            const momoData = await Fetch(paymentData,
-              { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-              `${process.env.PAY_HOST}/charge/momo`, 'POST');
-            console.log(momoData, 'happening');
-            if (momoData.status === 200) {
-              const updates = await userService.updateUser(email,
-                { isOnTrial: false });
-              if (updates[1] > 0) {
-                util.setSuccessResponse(res, 'Pending subscription  activation with MoMo', 201, momoData);
-              } else {
-                util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
-              }
+      console.log('303');
+      const paymentData = userController.getAndSetPaymentData(req, price, user, email);
+      const token = jwt.jwtSign({ role: 'main-api', user: email }, process.env.SECRET, 1000);
+      switch (Number(currentSubsctption.paymentMethod)) {
+        case 1: {
+          console.log('308');
+          const momoData = await Fetch(paymentData,
+            { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+            `${process.env.PAY_HOST}/charge/momo`, 'POST');
+          console.log(momoData, 'happening');
+          if (momoData.status === 200) {
+            const updates = await userService.updateUser(email,
+              { isOnTrial: false });
+            if (updates[1] > 0) {
+              util.setSuccessResponse(res, 'Pending subscription  activation with MoMo', 201, momoData);
             } else {
-              util.setErrorResponse(res, 'Sorry payment failed', 500);
+              util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
             }
-            break;
-          }
-
-          case 2: {
-            const pay = await Fetch(paymentData,
-              { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-              `${process.env.PAY_HOST}/charge/card`, 'POST');
-            console.log(pay, 'card');
-            if (pay.status !== 400) {
-              if (pay.meta.authorization.mode === 'avs_noauth') {
-                return util.setSuccessResponse(res, 'Please provide these details', 200, ['city', 'address', 'state', 'country', 'zipcode']);
-              } if (pay.meta.authorization.mode === 'pin') {
-                return util.setSuccessResponse(res, 'Please provide your pin', 200, undefined);
-              } if (pay.meta.authorization.mode === 'otp') {
-                return util.setSuccessResponse(
-                  res, pay.data.processor_response, 200, { flw_ref: pay.data.flw_ref }
-                );
-              }
-              await userController.removeTrial(email, res, pay);
-            } else {
-              util.setErrorResponse(res, pay.message, 500);
-            }
-            break;
-          }
-
-          case 3: {
-            const pay = await Fetch({
-              phone: user.phoneNumber,
-              amount: price
-            }, {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }, `${process.env.PAY_HOST}/charge/spenn`, 'POST');
-            if (pay.status === 200) {
-              const updates = await userService.updateUser(email, { isOnTrial: false });
-              if (updates[1] === 1) {
-                util.setSuccessResponse(res, pay.message, 200, pay);
-              } else {
-                util.setErrorResponse(res, pay.message, 500);
-              }
-            } else {
-              util.setErrorResponse(res, pay.message, 500);
-            }
-          }
-            break;
-
-          default:
+          } else {
             util.setErrorResponse(res, 'Sorry payment failed', 500);
+          }
+          break;
         }
+
+        case 2: {
+          const pay = await Fetch(paymentData,
+            { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+            `${process.env.PAY_HOST}/charge/card`, 'POST');
+          console.log(pay, 'card');
+          if (pay.status !== 400) {
+            if (pay.meta.authorization.mode === 'avs_noauth') {
+              return util.setSuccessResponse(res, 'Please provide these details', 200, ['city', 'address', 'state', 'country', 'zipcode']);
+            } if (pay.meta.authorization.mode === 'pin') {
+              return util.setSuccessResponse(res, 'Please provide your pin', 200, undefined);
+            } if (pay.meta.authorization.mode === 'otp') {
+              return util.setSuccessResponse(
+                res, pay.data.processor_response, 200, { flw_ref: pay.data.flw_ref }
+              );
+            }
+            await userController.removeTrial(email, res, pay);
+          } else {
+            util.setErrorResponse(res, pay.message, 500);
+          }
+          break;
+        }
+
+        case 3: {
+          const pay = await Fetch({
+            phone: user.phoneNumber,
+            amount: price
+          }, {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }, `${process.env.PAY_HOST}/charge/spenn`, 'POST');
+          if (pay.status === 200) {
+            const updates = await userService.updateUser(email, { isOnTrial: false });
+            if (updates[1] === 1) {
+              util.setSuccessResponse(res, pay.message, 200, pay);
+            } else {
+              util.setErrorResponse(res, pay.message, 500);
+            }
+          } else {
+            util.setErrorResponse(res, pay.message, 500);
+          }
+        }
+          break;
+
+        default:
+          util.setErrorResponse(res, 'Sorry payment failed', 500);
+      }
       // }
     } catch (error) {
       return response.errorResponse(res, 500, `Something wrong happened ${error.message}`, error);
@@ -474,8 +474,8 @@ class userController {
     try {
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const user = await userService.getUserByMail(email);
+      console.log(user);
       const currentSubscription = await billingServices.getCurrentSubscription(email);
-      console.log(currentSubscription.plan);
       if (user) {
         if (currentSubscription) {
           util.setSuccessResponse(res, 'Found', 200, {
@@ -490,6 +490,7 @@ class userController {
         util.setErrorResponse(res, 'Data not found', 404);
       }
     } catch (error) {
+      console.log(error);
       util.setErrorResponse(res, error.message, 500);
     }
   }

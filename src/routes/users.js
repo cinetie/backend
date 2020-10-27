@@ -1,12 +1,12 @@
-import passport from 'passport';
 import { Router } from 'express';
-import auth from '../controllers/users';
-import * as validation from '../middlewares/validation/user';
+import passport from 'passport';
 import '../config/passport';
+import auth from '../controllers/users';
 import access from '../middlewares/access';
-import screenValidator from '../middlewares/screenValidation';
-import isAdmin from '../middlewares/isAdmin';
 import billing from '../middlewares/billing';
+import isAdmin from '../middlewares/isAdmin';
+import screenValidator from '../middlewares/screenValidation';
+import * as validation from '../middlewares/validation/user';
 
 const router = new Router();
 

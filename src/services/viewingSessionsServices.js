@@ -75,7 +75,7 @@ class viewingSessionservices {
         where: {
           [op.and]: [
             { userId },
-            { sessionState: { [op.not]: 'Active' } }
+            { sessionState: { [op.not]: 'inActive' } }
           ]
         }
       });

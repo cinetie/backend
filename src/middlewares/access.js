@@ -64,6 +64,7 @@ class Access {
       if (user.permissionLevel === 0) {
         util.setErrorResponse(res, 'Access denied ', 403);
       } else {
+        req.user = email;
         next();
       }
     } catch (error) {
@@ -77,6 +78,7 @@ class Access {
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
       const { email } = decoded;
       if (email) {
+        req.user = email;
         next();
       } else {
         util.setErrorResponse(res, 'Access denied', 403);
