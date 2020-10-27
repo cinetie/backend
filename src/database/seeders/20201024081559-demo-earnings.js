@@ -1,0 +1,56 @@
+export default {
+  up: (queryInterface) => queryInterface.bulkInsert('earnings', [
+    {
+      id: 0,
+      videoId: '17e63e02-3b95-46bc-9db7-c1cc0b3369cb',
+      clientId: '0',
+      amount: '30',
+      monthYear: '2020',
+      state: 'Active',
+      updatedAt: new Date(),
+      createdAt: new Date(),
+    },
+    {
+      id: 1,
+      videoId: 'd0fe2561-2164-4eb0-8113-f1a7dd4cfa73',
+      clientId: 'f9a02384-d04a-4ef6-aaee-afb745630474',
+      amount: '30',
+      monthYear: '2020',
+      state: 'inActive',
+      updatedAt: new Date(),
+      createdAt: new Date(),
+    },
+    {
+      id: 2,
+      videoId: '0d6e7a8c-e4e6-4d11-ab5d-82f536298d24',
+      clientId: 'f9a02384-d04a-4ef6-aaee-afb745630474',
+      amount: '30',
+      monthYear: '2020',
+      state: 'Active',
+      updatedAt: new Date(),
+      createdAt: new Date(),
+    },
+    {
+      id: 3,
+      videoId: '67404feb-f743-481c-bb19-9841324188a3',
+      clientId: 'f9a02384-d04a-4ef6-aaee-afb745630474',
+      amount: '30',
+      monthYear: '2020',
+      state: 'inActive',
+      updatedAt: new Date(),
+      createdAt: new Date(),
+    },
+    {
+      id: 4,
+      videoId: '67404feb-f743-481c-bb19-9841324188a3',
+      clientId: '1999',
+      amount: '30',
+      monthYear: '2020',
+      state: 'inActive',
+      updatedAt: new Date(),
+      createdAt: new Date(),
+    }
+
+  ]),
+  down: (queryInterface) => queryInterface.bulkDelete('earnings', null, {}),
+};

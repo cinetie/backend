@@ -67,10 +67,6 @@ module.exports = {
     creationTime: {
       type: Sequelize.BIGINT
     },
-    resCountries: {
-      type: Sequelize.ARRAY(Sequelize.STRING),
-      defaultValue: []
-    },
     createdAt: {
       allowNull: false,
       type: Sequelize.DATE
