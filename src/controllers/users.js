@@ -480,11 +480,11 @@ class userController {
         if (currentSubscription) {
           util.setSuccessResponse(res, 'Found', 200, {
             user,
-            paymentMethod: currentSubscription.paymentMethod,
-            price: currentSubscription.price
+            paymentMethod: currentSubscription.paymentMethod || 'null',
+            price: currentSubscription.price || 'null'
           });
         } else {
-          util.setSuccessResponse(res, 'Found', 200, user);
+          util.setSuccessResponse(res, 'Found', 200, { user });
         }
       } else {
         util.setErrorResponse(res, 'Data not found', 404);
@@ -512,7 +512,7 @@ class userController {
     try {
       const date = new Date();
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
-      console.log("token here", req.headers.authorization)
+      console.log('token here', req.headers.authorization);
       const sessions = await sessionService.getParticularSession(email);
       if (sessions.length === 0) util.setErrorResponse(res, 'Login to logout', 400);
       const logoutStatus = await sessionService.updateSession(sessions[0].id, { state: 'out', timeOut: date.toTimeString() },);
