@@ -4,34 +4,18 @@ import { describe, it } from 'mocha';
 import app from '../index';
 import {
   UserUp,
-  UserUpNo,
   UserUpNoEmail,
   UserUpNoFirstName,
   UserUpExist,
   UserUpNoLastName,
   UserUpNoPassword,
-  UserUpNoNationality,
 } from './mock/users.up.mock';
 
 chai.use(chaiHttp);
 
 const prefix = '/auth/signup';
 
-describe('SERVER CONFIG CHECK', () => {
-  it('users should provide error signup with no cityOfResidence', (done) => {
-    chai
-      .request(app)
-      .post(`${prefix}`)
-      .send(UserUpNo)
-      .end((err, res) => {
-        expect(res).to.have.status(422);
-        expect(res.body).to.have.property(
-          'message',
-          'You have to provide a valid city like Ex:kigali'
-        );
-        done();
-      });
-  });
+describe('SIGNUP', () => {
   it('users should provide error signup with no email', (done) => {
     chai
       .request(app)
@@ -92,21 +76,7 @@ describe('SERVER CONFIG CHECK', () => {
       });
   });
 
-  it('users should provide error signup with no nationality', (done) => {
-    chai
-      .request(app)
-      .post(`${prefix}`)
-      .send(UserUpNoNationality)
-      .end((err, res) => {
-        expect(res).to.have.status(422);
-        expect(res.body).to.have.property(
-          'message',
-          'You have to provide a valid Country. Ex: Rwanda'
-        );
-        done();
-      });
-  });
-
+ 
   it('users should not be able to create a user with the same email', (done) => {
     chai
       .request(app)

@@ -18,7 +18,7 @@ const rave = new Flutterwave(
 export default class WebHooks {
   static async flutterWave(req, res) {
     try {
-      console.log(req.body);
+      // console.log(req.body);
       const response = (req.body.data) ? req.body.data : req.body;
       const user = await UserService.getUserByMail(response.customer.email);
       const transVerification = await rave.Transaction.verify({ id: response.id });
@@ -37,7 +37,7 @@ export default class WebHooks {
           );
         }
         // eslint-disable-next-line no-console
-        console.log(updates);
+        // console.log(updates);
         // creating sales
         const status = await WebHooks.registerSalesAndEarnings(response, user, req, res);
         if (status === true) {
@@ -61,12 +61,12 @@ export default class WebHooks {
             path: `${path.join(__dirname, '../public/templates/notification.ejs')}`
           }
           ]);
-          util.setSuccessResponse(res, 'Payment failed', 200, updates);
+        return  util.setSuccessResponse(res, 'Payment failed', 200, updates);
         }
-        util.setErrorResponse(res, 'Server Error: can\'t update subscription', 400);
+     return   util.setErrorResponse(res, 'Server Error: can\'t update subscription', 400);
       }
     } catch (error) {
-      util.setErrorResponse(res, `Server Error ${error || error.message}`, 500);
+    return  util.setErrorResponse(res, `Server Error ${error || error.message}`, 500);
     }
   }
 
@@ -79,23 +79,23 @@ export default class WebHooks {
     });
     if (sales) {
       const sessions = await viewingSessions.getActiveAndSuspendedSessionsPerUser(user.email);
-      console.log(sessions);
+      // console.log(sessions);
       if (sessions.length > 0) {
         // we are recording earnings since they exist meaning they watched some movies
         // this month or year
         const earnings = await Earnings(user.email);
         if (earnings === 0) {
           // check earnings for failure
-          console.log(earnings);
+          // console.log(earnings);
           throw new Error('Earnings recording error');
         } else {
           // earnings and sales are both created successfully
-          console.log(earnings);
+          // console.log(earnings);
           return true;
         }
       } else {
         // we are not renewing the subscription as isNew is true i.e first time payment
-        console.log("new user");
+        // console.log("new user");
         return true;
       }
     } else {
