@@ -21,11 +21,15 @@ export default class WebHooks {
     try {
       // console.log(req.body);
       const response = (req.body.data) ? req.body.data : req.body;
-      const user = await UserService.getUserByMail(response.customer.email);
+      // console.log(response.customer.email);
+      const user = await UserService.getUserByMail(response.customer.email
+        || response.data.customer.email);
+      console.log(user)
       const transVerification = await rave.Transaction.verify({ id: response.id });
+      // console.log(transVerification, '------------------', req.body);
       if (transVerification.status === 'success') {
         let updates = {};
-        await billingService.updateSubscription(req.body.email, {
+        await billingService.updateSubscription(user.email, {
           endDate: date.addMoreDays(30).toDateString(),
         });
         if (response['event.type'] === 'CARD_TRANSACTION') {
@@ -46,7 +50,7 @@ export default class WebHooks {
         }
       } else {
         const updates = await UserService.updateUser(
-          response.customer.email,
+          user.email,
           { permissionLevel: -1 }
         );
         if (updates) {
@@ -55,7 +59,7 @@ export default class WebHooks {
             name: `${user.firstName}`
           }, {
             from: 'Cinetie support',
-            to: req.body.email,
+            to: user.email,
             subject: 'Update payment details',
           },
           {
@@ -67,6 +71,7 @@ export default class WebHooks {
         return util.setErrorResponse(res, 'Server Error: can\'t update subscription', 400);
       }
     } catch (error) {
+      console.log(error);
       return util.setErrorResponse(res, `Server Error ${error || error.message}`, 500);
     }
   }
