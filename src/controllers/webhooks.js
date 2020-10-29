@@ -16,6 +16,7 @@ const rave = new Flutterwave(
   Boolean(process.env.RAVE_PRODUCTION)
 );
 export default class WebHooks {
+  // eslint-disable-next-line consistent-return
   static async flutterWave(req, res) {
     try {
       // console.log(req.body);
@@ -61,16 +62,16 @@ export default class WebHooks {
             path: `${path.join(__dirname, '../public/templates/notification.ejs')}`
           }
           ]);
-        return  util.setSuccessResponse(res, 'Payment failed', 200, updates);
+          return util.setSuccessResponse(res, 'Payment failed', 200, updates);
         }
-     return   util.setErrorResponse(res, 'Server Error: can\'t update subscription', 400);
+        return util.setErrorResponse(res, 'Server Error: can\'t update subscription', 400);
       }
     } catch (error) {
-    return  util.setErrorResponse(res, `Server Error ${error || error.message}`, 500);
+      return util.setErrorResponse(res, `Server Error ${error || error.message}`, 500);
     }
   }
 
-  static async  registerSalesAndEarnings(response, user, req, res) {
+  static async registerSalesAndEarnings(response, user, req, res) {
     const sales = await Sales.addRecord({
       method: response.payment_type,
       plan: user.plan,

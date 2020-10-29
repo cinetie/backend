@@ -90,7 +90,8 @@ class Access {
 
   static async isRave(req, res, next) {
     try {
-      const hash = req.headers['verify-hash'];
+      console.log(req.headers, '-----------------=========-----------------', req);
+      const hash = req.headers['verif-hash'];
       if (hash !== process.env.RAVE_SECRET) {
         util.setErrorResponse(res, 'Access denied', 403);
       } else {
