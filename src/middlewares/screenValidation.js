@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 // this middleware checks whether the user hasn't exceeded the amount of simultaneus screens
 // this middleware implements the number of screens feature of cinetie
 import Util from '../helpers/utilities';
@@ -8,7 +9,8 @@ import loginSessionService from '../services/loginSessionServices';
 const util = new Util();
 
 class screenValidation {
-  // this method uses a decoded email from the token to fetch and return the type of plan a user subscribed on
+  // this method uses a decoded email from the token to fetch
+  // and return the type of plan a user subscribed on
   static async getEmail(req, res) {
     try {
       const { email } = req.body;

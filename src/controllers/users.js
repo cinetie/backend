@@ -28,7 +28,11 @@ class userController {
       } else {
         // eslint-disable-next-line no-use-before-define
         const EmailStatus = await userController.sendEmail(req);
-        const createdUser = await userService.createNewUser({ ...newUser, isOnExtension: false });
+        const createdUser = await userService.createNewUser({
+          ...newUser,
+          isOnExtension: false,
+          permissionLevel: -1
+        });
         const part1 = cry.crypto();
         const token = userController.signToken(part1, newUser);
         const tokenToSave = userController.generateTokenToSave(newUser, token);
