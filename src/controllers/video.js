@@ -173,6 +173,7 @@ class Video {
           video,
           trailer: Video.attachThumbnails(trailer[0].trailerLink, 'cinetie-trailers')
         };
+        console.log(data);
         util.setSuccessResponse(res, 'Video Found', 200, data);
       } else {
         util.setErrorResponse(res, 'Video can\'t be found', 404);
