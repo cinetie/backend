@@ -65,6 +65,10 @@ PORT=
 
 - [Add watch count](#2-add-watch-count-post-request)
 
+### Transactions
+
+- [Get Rave standard link](#3-get-rave-standard-link-get-request)
+
 ## Endpoints
 
 ### 1. Calculate earnings: POST Request
@@ -137,4 +141,38 @@ Response:
     }
 }
 
+```
+
+### 3. Get rave standard link: GET Request
+
+Endpoint:
+
+```text
+/trans/rave-standard
+```
+
+Headers:
+
+```json
+{
+  "Authorization": `Bearer ${token}`,
+  "Content-Type": "application/json"
+}
+```
+
+Body:
+
+#### NONE
+
+Repsonse:
+
+```json
+{
+    "statusCode": 201,
+    "status": "success",
+    "message": "Link generated",
+    "data": {
+        "link": "https://checkout.flutterwave.com/v3/hosted/pay/6bb2b8983df00a0875e9"
+    }
+}
 ```
