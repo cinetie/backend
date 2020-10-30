@@ -522,7 +522,7 @@ class userController {
       } else {
         const logoutStatus = await sessionService.updateSession(sessions[0].id, { state: 'out', timeOut: date.toTimeString() },);
         if (logoutStatus) {
-          util.setErrorResponse(res, 'Logout successfully', 200);
+          util.setSuccessResponse(res, 'Logout successfully', 200);
         } else {
           console.log(logoutStatus);
           util.setErrorResponse(res, 'Something went wrong', 400);
