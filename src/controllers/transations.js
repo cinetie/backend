@@ -3,6 +3,7 @@ import service from '../services/transactionService';
 import Util from '../helpers/utilities';
 import Fetch from '../helpers/fetch';
 import jwt from '../helpers/jwt';
+import Users from '../services/userServices';
 
 const util = new Util();
 class transactionsController {
@@ -32,6 +33,34 @@ class transactionsController {
         }, `${process.env.PAY_HOST}/charge/get-session-id`, 'GET');
       if (raw.status === 201) {
         util.setSuccessResponse(res, 'Session id found', 200, raw);
+      } else {
+        util.setErrorResponse(res, 'Something went wrong', 400);
+      }
+    } catch (error) {
+      console.log(error);
+      util.setErrorResponse(res, error, 500);
+    }
+  }
+
+  static async getRaveStandardLink(req, res) {
+    try {
+      const token = jwt.jwtSign({ role: 'main-api', user: req.user }, process.env.SECRET, 1000);
+      const user = await Users.getUserByMail(req.user);
+      console.log(user);
+      const raw = await Fetch({
+        plan: user.plan,
+        isBilledAnnually: user.isBilledAnnually,
+        email: user.email,
+        name: `${user.firstName} ${user.lastName}`,
+        paymentOptions: 'card'
+      },
+      {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      }, `${process.env.PAY_HOST}/charge/rave-standard`, 'POST');
+      console.log(raw);
+      if (raw.status === 200) {
+        util.setSuccessResponse(res, 'Link generated', 201, { link: raw.data.link });
       } else {
         util.setErrorResponse(res, 'Something went wrong', 400);
       }
