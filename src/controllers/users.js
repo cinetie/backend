@@ -31,7 +31,8 @@ class userController {
         const createdUser = await userService.createNewUser({
           ...newUser,
           isOnExtension: false,
-          permissionLevel: -1
+          permissionLevel: -1,
+          isBilledAnnually: false,
         });
         const part1 = cry.crypto();
         const token = userController.signToken(part1, newUser);
@@ -515,17 +516,21 @@ class userController {
   static async logout(req, res) {
     try {
       const date = new Date();
-      const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
-      console.log('token here', req.headers.authorization);
+      const email = req.user;
       const sessions = await sessionService.getParticularSession(email);
-      if (sessions.length === 0) util.setErrorResponse(res, 'Login to logout', 400);
-      const logoutStatus = await sessionService.updateSession(sessions[0].id, { state: 'out', timeOut: date.toTimeString() },);
-      if (logoutStatus) {
-        util.setErrorResponse(res, 'Logout successfully', 200);
+      if (sessions.length === 0) {
+        util.setErrorResponse(res, 'Login to logout', 400);
       } else {
-        util.setErrorResponse(res, 'Something went wrong', 500);
+        const logoutStatus = await sessionService.updateSession(sessions[0].id, { state: 'out', timeOut: date.toTimeString() },);
+        if (logoutStatus) {
+          util.setSuccessResponse(res, 'Logout successfully', 200);
+        } else {
+          console.log(logoutStatus);
+          util.setErrorResponse(res, 'Something went wrong', 400);
+        }
       }
     } catch (error) {
+      console.log(error);
       util.setErrorResponse(res, error.message, 500);
     }
   }
