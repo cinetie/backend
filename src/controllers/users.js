@@ -31,7 +31,8 @@ class userController {
         const createdUser = await userService.createNewUser({
           ...newUser,
           isOnExtension: false,
-          permissionLevel: -1
+          permissionLevel: -1,
+          isBilledAnnually: false,
         });
         const part1 = cry.crypto();
         const token = userController.signToken(part1, newUser);
