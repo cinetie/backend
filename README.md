@@ -69,6 +69,12 @@ PORT=
 
 - [Get Rave standard link](#3-get-rave-standard-link-get-request)
 
+### Users
+
+- [Signup](#4-signup-users-post-request)
+
+- [login](#5-login-users-post-request)
+
 ## Endpoints
 
 ### 1. Calculate earnings: POST Request
@@ -174,5 +180,95 @@ Repsonse:
     "data": {
         "link": "https://checkout.flutterwave.com/v3/hosted/pay/6bb2b8983df00a0875e9"
     }
+}
+```
+
+### 4. Signup users: POST Request
+
+Endpoint:
+
+```text
+/auth/signup
+```
+
+Headers:
+
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+Body:
+
+```json
+{
+    "firstName": "Mugisha",
+    "lastName": "Alain a",
+    "email": "hafajo1128w6@soowz.com",
+    "password": "nAdia123"
+}
+```
+
+Response:
+
+```json
+{
+    "statusCode": 201,
+    "status": "success",
+    "message": "Signed up successfully",
+    "data": {
+        "id": 8,
+        "firstName": "Mugisha",
+        "lastName": "Alain a",
+        "email": "hafajo1128w6@soowz.com",
+        "password": "$2b$10$e5Yy2HkzD4.zaaAArAEMWeUytqoS5lAelJMShokwgcxlkWTqycj.2",
+        "isVerified": false,
+        "plan": "Setup",
+        "permissionLevel": -1,
+        "isOnTrial": false,
+        "isOnExtension": false,
+        "isBilledAnnually": false,
+        "updatedAt": "2020-11-01T04:57:28.222Z",
+        "createdAt": "2020-11-01T04:57:28.222Z"
+    }
+}
+
+```
+
+### 5. Login users: POST Request
+
+Endpoint:
+
+```text
+/auth/login
+```
+
+Headers:
+
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+Body:
+
+```json
+{
+ "email":"lowiwo5426@jah8.com",
+  "password": "kamunikwi"
+}
+
+```
+
+Response:
+
+```json
+{
+    "statusCode": 200,
+    "status": "success",
+    "message": "Logged in successfully!",
+    "data": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6Imxvd2l3bzU0MjZAamFoOC5jb20iLCJpYXQiOjE2MDQyMDY3ODJ9.Lgs7mU3zThqoyO759rIc-II9L8w_tFDQbdlkWAXycGs"
 }
 ```
