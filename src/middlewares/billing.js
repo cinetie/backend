@@ -207,7 +207,7 @@ class billing {
     try {
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const data = await userService.getUserByMail(email);
-      if (data.permissionLevel !== 1) {
+      if (data.permissionLevel === -1) {
         util.setErrorResponse(res, 'Please set up your billing', 402);
       } else {
         next();

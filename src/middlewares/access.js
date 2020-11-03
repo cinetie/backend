@@ -65,6 +65,7 @@ class Access {
         util.setErrorResponse(res, 'Access denied ', 403);
       } else {
         req.user = email;
+        req.fullUser = user;
         next();
       }
     } catch (error) {
