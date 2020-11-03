@@ -21,8 +21,8 @@ router.get('/earnings', earnings.getAllEarningsPerVideo);
 router.get('/main/ft', access.isNormalUser, video.getMainFeaturedFilm);
 router.get('/second/ft', access.isNormalUser, video.getSecondFeaturedFilm);
 router.get('/sort/type', access.isProducer, video.getAllVideosByType);
-router.put('/', access.isProducer, video.updateVideos);
+router.put('/', access.isAdmin, video.updateVideos);
 router.put('/set-featured', access.isAdmin, video.featureVideo);
-router.delete('/', access.isProducer, video.deleteAvideo);
+router.delete('/', access.isAdmin, video.deleteAvideo);
 
 export default router;
