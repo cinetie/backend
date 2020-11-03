@@ -75,6 +75,26 @@ PORT=
 
 - [login](#5-login-users-post-request)
 
+### Trailers
+
+- [Add new trailer](#6-add-new-trailer-post-request)
+
+- [Get trailers](#9-get-trailers-get-request)
+
+- [Get trailer upload link](#10-get-upload-link-get-request)
+
+- [Get signed urls for temporay urls](#11-get-signed-urls-for-temporay-urls-get-request)
+
+### Temp videos
+
+- [Add a temporary video](#7-add-temp-video-post-request)
+
+- [Approve a temporary video](#8-approve-temp-video-post-request)
+
+### Series
+
+- [Get a full season](#12-get-a-full-season-get-request)
+
 ## Endpoints
 
 ### 1. Calculate earnings: POST Request
@@ -270,5 +290,426 @@ Response:
     "status": "success",
     "message": "Logged in successfully!",
     "data": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6Imxvd2l3bzU0MjZAamFoOC5jb20iLCJpYXQiOjE2MDQyMDY3ODJ9.Lgs7mU3zThqoyO759rIc-II9L8w_tFDQbdlkWAXycGs"
+}
+```
+
+### 6. Add new trailer: POST Request
+
+Endpoint:
+
+```text
+/trailer/new
+```
+
+Headers:
+
+```json
+{
+  "Content-Type": "application/json",
+  "Authorization": "Bearer <token>" //admin token
+}
+```
+
+Body:
+
+```json
+{
+    "trailer": "94856593-c138-4547-b7bb-f7002fca64f8.mp4",
+    "videoId": "ba27823d-41a2-471e-8d12-483cbb8eeb98"
+}
+```
+
+Response:
+
+```json
+{
+    "statusCode": 201,
+    "status": "success",
+    "message": "successfully saved the trailer",
+    "data": {
+        "id": 1,
+        "videoId": "ba27823d-41a2-471e-8d12-483cbb8eeb98",
+        "trailerLink": "94856593-c138-4547-b7bb-f7002fca64f8.mp4",
+        "updatedAt": "2020-11-03T10:02:41.602Z",
+        "createdAt": "2020-11-03T10:02:41.602Z"
+    }
+}
+
+```
+
+### 7. Add temp video: POST Request
+
+Endpoint:
+
+```text
+/temp/new
+```
+
+Headers:
+
+```json
+{
+  "cpid": `<content provider id>`,
+  "Content-Type": "application/json",
+  "Authorization": "Bearer <token>" //admin token
+}
+
+```
+
+Body:
+
+```json
+{
+    "videoName": "You never know ",
+    "videoCast": "Gisa  ally D'akim , Ntwari Aimable , Ingabire claudine ,  Ndungutse makanda Dady  , sangano joyeuse ",
+    "videoSynopsis": "Brave Tomas is young resilient and hardworking man, well educated, smart and intelligent. , he applied for job many times but did not get a chance to be hired.",
+    "category": "Drama",
+    "landscape": "6e696b42-914c-4bcc-81ab-3b742cca2929.jpg",
+    "nameTag": "db7730cf-8cda-452b-a556-c0941142d6c6.png",
+    "portrait": "2d0a3e40-e005-4480-85a8-5ac52b13bd32.jpg",
+    "type": "serie",
+    "rate": "Everyone",
+    "video": null,
+    "resCountries": "[]"
+}
+```
+
+Response:
+
+```json
+{
+    "statusCode": 201,
+    "status": "success",
+    "message": "video uploaded successfully",
+    "data": {
+        "status": "upload success"
+    }
+}
+```
+
+### 8. Approve temp video: POST Request
+
+Endpoint:
+
+```text
+/video/new?id=<id>
+```
+
+***this is not the video id but the id property in the video object not the videoId***
+
+Headers:
+
+```json
+{
+  "Content-Type": "application/json",
+  "Authorization": "Bearer <token>" //admin token
+}
+```
+
+Body:
+
+***NONE***
+
+Response:
+
+```json
+{
+    "statusCode": 201,
+    "status": "success",
+    "message": "Video approved",
+    "data": [
+        1
+    ]
+}
+```
+
+### 9. Get trailers: GET Request
+
+Endpoint:
+
+```text
+/trailer/sort/video?id=ba27823d-41a2-471e-8d12-483cbb8eeb98
+```
+
+Headers:
+
+```json
+{
+  "Content-Type": "application/json",
+  "Authorization": "Bearer <token>" //admin token
+}
+```
+
+Body:
+
+***NONE***
+
+Response:
+
+```json
+
+{
+    "statusCode": 200,
+    "status": "success",
+    "message": "Found",
+    "data": [
+        {
+            "id": 1,
+            "videoId": "ba27823d-41a2-471e-8d12-483cbb8eeb98",
+            "trailerLink": "https://cinetie-trailers.s3.us-east-2.amazonaws.com/94856593-c138-4547-b7bb-f7002fca64f8.mp4",
+            "createdAt": "2020-11-03T10:02:41.000Z",
+            "updatedAt": "2020-11-03T10:02:41.000Z"
+        }
+    ]
+}
+```
+
+### 10. Get upload link: GET Request
+
+Endpoint:
+
+```text
+/trailer/upload-link?extension=mp4
+```
+
+Headers:
+
+```json
+{
+  "Content-Type": "application/json",
+  "Authorization": "Bearer <token>" //admin token
+}
+```
+
+Body:
+
+***NONE***
+
+Response:
+
+```json
+{
+    "statusCode": 201,
+    "status": "success",
+    "message": "Upload link created",
+    "data": {
+        "url": "https://cinetie-trailers.s3.us-east-2.amazonaws.com/ce316bd8-72ba-4a89-bf6f-d7233598cf36.mp4?Content-Type=video%2F%2A&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIATSWY74DVRYMLE344%2F20201103%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20201103T102538Z&X-Amz-Expires=21600&X-Amz-Signature=01a60afa17e5e00d26e41aae90369dbcbfc6d81a298f7e253a6cf9698fffc771&X-Amz-SignedHeaders=host",
+        "Key": "ce316bd8-72ba-4a89-bf6f-d7233598cf36.mp4"
+    }
+}
+```
+
+### 11. Get signed urls for temporay urls: GET Request
+
+Endpoint:
+
+```text
+/temp/series/signed-url?extension=mp4
+```
+
+Headers:
+
+```json
+{
+  "Content-Type": "application/json",
+  "Authorization": "Bearer <token>" //admin token
+}
+```
+
+Body:
+
+***NONE***
+
+Response:
+
+```json
+{
+    "statusCode": 200,
+    "status": "success",
+    "message": "Temporary urls",
+    "data": {
+        "thumb": {
+            "url": "https://cinetie-thumbnails.s3.us-east-2.amazonaws.com/1fe6d4f9-4946-4b46-bf0e-40e0e5e14086.jpg?Content-Type=image%2F%2A&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIATSWY74DVRYMLE344%2F20201103%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20201103T103932Z&X-Amz-Expires=21600&X-Amz-Signature=34f488f2d0f295c4ecb259e8aba2cb97f9ac2d439e3a2092776ccd483afc19dc&X-Amz-SignedHeaders=host",
+            "Key": "1fe6d4f9-4946-4b46-bf0e-40e0e5e14086.jpg"
+        },
+        "video": {
+            "url": "https://cinetie-temp-series.s3.us-east-2.amazonaws.com/6510f578-36cb-4a29-a74c-803eb4fac0af.mp4?Content-Type=video%2F%2A&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIATSWY74DVRYMLE344%2F20201103%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20201103T103932Z&X-Amz-Expires=21600&X-Amz-Signature=c6d39709511641dd6efe6b36b8e4836eab1b3fbb81ed93302e75914ed5cfb550&X-Amz-SignedHeaders=host",
+            "Key": "6510f578-36cb-4a29-a74c-803eb4fac0af.mp4"
+        }
+    }
+}
+```
+
+### 12. Get a full season GET Request
+
+Endpoint
+
+```text
+/series/single/season?s=<season number>&id=<videoId>&limit=<don't exceed>&offset=<skip>
+ex: /series/single/season?s=1&id=ab8d5899-5ca6-40dc-95d9-ce15587a0373&limit=10&offset=0
+```
+
+Headers:
+
+```json
+{
+  "Content-Type": "application/json",
+  "Authorization": "Bearer <token>" //admin token
+}
+```
+
+Body:
+
+***NONE***
+
+Response:
+
+```json
+{
+    "statusCode": 200,
+    "status": "success",
+    "message": "Retrieved successfully",
+    "data": [
+        {
+            "id": 2,
+            "episode": "f12fc881-2e5d-422e-9e72-2a1d213a19b7.mp4",
+            "season": 1,
+            "episodeName": "the World cup project - Brazil ",
+            "videoId": "ab8d5899-5ca6-40dc-95d9-ce15587a0373",
+            "thumbNailUrl": "https://cinetie-thumbnails.s3.us-east-2.amazonaws.com/33d9d5d9-9d34-418c-b9b0-c158ca5effda.jpg",
+            "suspensionState": false,
+            "synopsis": "a World cup Project perspective from Brazil ",
+            "clientId": "67b6c3a8-884f-48af-8e8f-1a60b15824de",
+            "episodeNumber": 1,
+            "createdAt": "2020-09-03T15:14:34.000Z",
+            "updatedAt": "2020-09-03T15:16:08.000Z"
+        },
+        {
+            "id": 3,
+            "episode": "d8eeb219-31bf-4b46-a52f-8cf3bc4159f4.mp4",
+            "season": 1,
+            "episodeName": "the World cup project - Australia ",
+            "videoId": "ab8d5899-5ca6-40dc-95d9-ce15587a0373",
+            "thumbNailUrl": "https://cinetie-thumbnails.s3.us-east-2.amazonaws.com/319a70e1-9206-4906-92fe-c2516499c27e.jpg",
+            "suspensionState": false,
+            "synopsis": "a World cup Project perspective from Australia ",
+            "clientId": "67b6c3a8-884f-48af-8e8f-1a60b15824de",
+            "episodeNumber": 2,
+            "createdAt": "2020-09-03T15:18:14.000Z",
+            "updatedAt": "2020-09-03T15:18:29.000Z"
+        },
+        {
+            "id": 4,
+            "episode": "caa9868a-4041-4aae-881d-29a96065568a.mp4",
+            "season": 1,
+            "episodeName": "the World cup project - Colombia ",
+            "videoId": "ab8d5899-5ca6-40dc-95d9-ce15587a0373",
+            "thumbNailUrl": "https://cinetie-thumbnails.s3.us-east-2.amazonaws.com/9e51d924-2920-40b2-bcc0-c991276c1a76.jpg",
+            "suspensionState": false,
+            "synopsis": "a World cup Project perspective from  Colombia ",
+            "clientId": "67b6c3a8-884f-48af-8e8f-1a60b15824de",
+            "episodeNumber": 3,
+            "createdAt": "2020-09-03T15:22:30.000Z",
+            "updatedAt": "2020-09-03T15:22:42.000Z"
+        },
+        {
+            "id": 5,
+            "episode": "c4cb4741-6e84-425c-a4ab-4701f60ca41e.mp4",
+            "season": 1,
+            "episodeName": "the World cup project - England",
+            "videoId": "ab8d5899-5ca6-40dc-95d9-ce15587a0373",
+            "thumbNailUrl": "https://cinetie-thumbnails.s3.us-east-2.amazonaws.com/01300dda-4daf-4737-a388-efe2e5f8726b.jpg",
+            "suspensionState": false,
+            "synopsis": "a World cup Project perspective from  England ",
+            "clientId": "67b6c3a8-884f-48af-8e8f-1a60b15824de",
+            "episodeNumber": 4,
+            "createdAt": "2020-09-03T15:25:57.000Z",
+            "updatedAt": "2020-09-03T15:30:42.000Z"
+        },
+        {
+            "id": 6,
+            "episode": "a348e9b2-5744-4bb6-95e5-76a1cace54a6.mp4",
+            "season": 1,
+            "episodeName": "the World cup project - Haiti ",
+            "videoId": "ab8d5899-5ca6-40dc-95d9-ce15587a0373",
+            "thumbNailUrl": "https://cinetie-thumbnails.s3.us-east-2.amazonaws.com/ce7c5831-3bc0-486e-b43d-f83df6e146a3.jpg",
+            "suspensionState": false,
+            "synopsis": "a World cup Project perspective from  Haiti",
+            "clientId": "67b6c3a8-884f-48af-8e8f-1a60b15824de",
+            "episodeNumber": 5,
+            "createdAt": "2020-09-03T15:28:34.000Z",
+            "updatedAt": "2020-09-03T15:30:41.000Z"
+        },
+        {
+            "id": 7,
+            "episode": "def9ccf9-c944-4c61-b154-3ee2a811194b.mp4",
+            "season": 1,
+            "episodeName": "the World cup project - India ",
+            "videoId": "ab8d5899-5ca6-40dc-95d9-ce15587a0373",
+            "thumbNailUrl": "https://cinetie-thumbnails.s3.us-east-2.amazonaws.com/ebbe0670-da54-4551-9ef5-bb1eeb9423f7.jpg",
+            "suspensionState": false,
+            "synopsis": "a World cup Project perspective from  India",
+            "clientId": "67b6c3a8-884f-48af-8e8f-1a60b15824de",
+            "episodeNumber": 6,
+            "createdAt": "2020-09-03T15:30:40.000Z",
+            "updatedAt": "2020-09-03T15:30:53.000Z"
+        },
+        {
+            "id": 8,
+            "episode": "9ce8ad03-e48d-4823-bc2f-650a9ee50de1.mp4",
+            "season": 1,
+            "episodeName": "the World cup project - Israel & Palestine ",
+            "videoId": "ab8d5899-5ca6-40dc-95d9-ce15587a0373",
+            "thumbNailUrl": "https://cinetie-thumbnails.s3.us-east-2.amazonaws.com/ac64069c-1af3-4ec0-b193-e8d736349bdc.jpg",
+            "suspensionState": false,
+            "synopsis": "a World cup Project perspective from  Israel and Palestine ",
+            "clientId": "67b6c3a8-884f-48af-8e8f-1a60b15824de",
+            "episodeNumber": 7,
+            "createdAt": "2020-09-03T15:33:16.000Z",
+            "updatedAt": "2020-09-04T17:07:53.000Z"
+        },
+        {
+            "id": 9,
+            "episode": "92bedec2-1e03-4f18-bcdb-ce23675d6054.mp4",
+            "season": 1,
+            "episodeName": "the World cup project - Liberia  ",
+            "videoId": "ab8d5899-5ca6-40dc-95d9-ce15587a0373",
+            "thumbNailUrl": "https://cinetie-thumbnails.s3.us-east-2.amazonaws.com/4f464e90-5b7e-43b0-b663-9e306b42836e.jpg",
+            "suspensionState": false,
+            "synopsis": "a World cup Project perspective from  Liberia",
+            "clientId": "67b6c3a8-884f-48af-8e8f-1a60b15824de",
+            "episodeNumber": 8,
+            "createdAt": "2020-09-03T15:36:14.000Z",
+            "updatedAt": "2020-09-04T17:07:53.000Z"
+        },
+        {
+            "id": 10,
+            "episode": "fa8ca8e7-dbd6-4037-8af9-4f7d02c2c033.mp4",
+            "season": 1,
+            "episodeName": "the World cup project - Sierra Leone ",
+            "videoId": "ab8d5899-5ca6-40dc-95d9-ce15587a0373",
+            "thumbNailUrl": "https://cinetie-thumbnails.s3.us-east-2.amazonaws.com/20e78ce5-5acd-4f60-97e3-dc9b18bb8c4e.jpg",
+            "suspensionState": false,
+            "synopsis": "a World cup Project perspective from  Sierra Leone",
+            "clientId": "67b6c3a8-884f-48af-8e8f-1a60b15824de",
+            "episodeNumber": 9,
+            "createdAt": "2020-09-03T15:39:09.000Z",
+            "updatedAt": "2020-09-04T17:07:51.000Z"
+        },
+        {
+            "id": 11,
+            "episode": "e1931d31-6cb6-4e61-bd2b-63da176bd94f.mp4",
+            "season": 1,
+            "episodeName": "the World cup project - USA  ",
+            "videoId": "ab8d5899-5ca6-40dc-95d9-ce15587a0373",
+            "thumbNailUrl": "https://cinetie-thumbnails.s3.us-east-2.amazonaws.com/da1512a0-39d7-4739-a56b-f14d0d1b34a0.jpg",
+            "suspensionState": false,
+            "synopsis": "a World cup Project perspective from  USA ",
+            "clientId": "67b6c3a8-884f-48af-8e8f-1a60b15824de",
+            "episodeNumber": 10,
+            "createdAt": "2020-09-03T15:41:22.000Z",
+            "updatedAt": "2020-09-04T17:07:43.000Z"
+        }
+    ]
 }
 ```
