@@ -11,6 +11,6 @@ router.get('/single/season', access.isNormalUser, controller.getSingleSeason);
 router.get('/all/seasons', access.isLoggedIn, controller.getAllSeasons);
 router.get('/cp/single/season', access.isProducer, controller.getSingleSeason);
 router.put('/update', access.isProducer, controller.updateSerie);
-router.delete('/delete/:id', access.isProducer, controller.delete);
+router.delete('/delete/:id', access.isAdmin, controller.delete);
 
 export default router;
