@@ -8,6 +8,7 @@ import jwt from '../helpers/jwt';
 import trailerServices from '../services/trailerService';
 import tempService from '../services/tempVideoServices';
 import { getObject, deleteObject, copyObjects } from '../helpers/aws';
+import { getAttachedThumbsMultiple } from '../helpers/video';
 import videoService from '../services/videoServices';
 import viewingSessions from '../services/viewingSessionsServices';
 import userService from '../services/userServices';
@@ -29,6 +30,7 @@ class Video {
         } else {
           // copy back the same key from the temp bucket
           // delete the object in temp
+          data.videoClientId = decoded.clientId;
           data.videoLink = decoded.videoUri;
           data.videoIdVimeo = '0000';
           const updatedVideo = await videoService.updateVideo(decoded.videoId, data);
@@ -82,7 +84,7 @@ class Video {
       const { type } = req.query;
       const { country } = req.headers;
       const videos = await videoService.getPopularVideos(req.query.offset, req.query.limit, type, country);
-      Video.getAttachedThumbsMultiple(videos);
+      getAttachedThumbsMultiple(videos);
 
       if (Object.values(videos).length > 0) {
         util.setSuccessResponse(res, 'videos found', 200, videos);
@@ -100,7 +102,7 @@ class Video {
       const { type } = req.query;
       const { country } = req.headers;
       const videos = await videoService.getTrendingVideos(req.query.offset, req.query.limit, type, country);
-      Video.getAttachedThumbsMultiple(videos);
+      getAttachedThumbsMultiple(videos);
 
       if (Object.values(videos).length > 0) {
         util.setSuccessResponse(res, 'videos found', 200, videos);
@@ -116,7 +118,7 @@ class Video {
     try {
       const { country } = req.headers;
       const videos = await videoService.getVideosByCategory(req.query.q, country);
-      Video.getAttachedThumbsMultiple(videos);
+      getAttachedThumbsMultiple(videos);
       if (Object.values(videos).length > 0) {
         util.setSuccessResponse(res, `${req.query.q} videos found`, 200, videos);
       } else {
@@ -132,7 +134,7 @@ class Video {
       const { q, offset } = req.query;
       const { country } = req.headers;
       const videos = await videoService.search(q, offset, country);
-      Video.getAttachedThumbsMultiple(videos);
+      getAttachedThumbsMultiple(videos);
 
       if (Object.values(videos).length > 0) {
         util.setSuccessResponse(res, 'Videos found', 200, videos);
@@ -146,7 +148,7 @@ class Video {
 
   static async getAllVideosLocal(req, res) {
     const videos = await videoService.getAllVideosForAdmin();
-    Video.getAttachedThumbsMultiple(videos);
+    getAttachedThumbsMultiple(videos);
     if (Object.values(videos).length > 0) {
       util.setSuccessResponse(res, 'Data found', 200, videos);
     } else {
@@ -166,7 +168,7 @@ class Video {
     try {
       const { type } = req.query;
       const video = await videoService.getMainFeaturedVideo(type);
-      Video.getAttachedThumbsMultiple(video);
+      getAttachedThumbsMultiple(video);
       const trailer = await trailerServices.getAllTrailers(video[0].videoId);
       if (trailer.length > 0) {
         const data = {
@@ -187,7 +189,7 @@ class Video {
     try {
       const { type } = req.query;
       const video = await videoService.getSecondFeaturedVideo(type);
-      Video.getAttachedThumbsMultiple(video);
+      getAttachedThumbsMultiple(video);
       const trailer = await trailerServices.getAllTrailers(video[0].videoId);
       const data = {
         video,
@@ -203,16 +205,10 @@ class Video {
     }
   }
 
-  static getAttachedThumbs(video) {
-    video.videoThumbnailLink = Video.attachThumbnails(video[0].videoThumbnailLink, 'cinetie-thumbnails');
-    video.tallThumbNailLink = Video.attachThumbnails(video[0].tallThumbNailLink, 'cinetie-thumbnails');
-    video.nameTagThumbNailLink = Video.attachThumbnails(video[0].nameTagThumbNailLink, 'cinetie-thumbnails');
-  }
-
   static async getAllNewVideos(req, res) {
     try {
       const videos = await videoService.getNewVideos(req.query.limit, req.query.offset, req.query.type);
-      Video.getAttachedThumbsMultiple(videos);
+      getAttachedThumbsMultiple(videos);
       if (Object.values(videos).length >= 1) {
         util.setSuccessResponse(res, 'videos Found', 200, videos);
       } else {
@@ -229,7 +225,7 @@ class Video {
       const { type } = req.query;
       const { clientId } = jwt.jwtVerify(token, process.env.SECRET);
       const videos = await videoService.getVideosByType(clientId, type);
-      Video.getAttachedThumbsMultiple(videos);
+      getAttachedThumbsMultiple(videos);
       if (Object.values(videos).length > 0) {
         util.setSuccessResponse(res, 'Videos Found', 200, videos);
       } else {

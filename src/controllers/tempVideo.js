@@ -14,7 +14,6 @@ class tempVideoController {
   static async createVideoController(req, res) {
     try {
       // get token
-      const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const data = req.body;
       data.tallThumbNailLink = data.portrait;
       data.nameTagThumbNailLink = data.nameTag;
@@ -24,11 +23,12 @@ class tempVideoController {
       // generate video parameters
       data.creationTime = new Date().getTime();
       data.videoId = uuid.generator();
-      data.clientId = decoded.clientId;
+      data.clientId = req.headers.cpid;
+      console.log(req.headers.cpid);
       data.type = req.body.type;
       if (data.type === 'movie') {
         data.videoUri = jwt.jwtSign({
-          videoUri: data.video, size: data.size, clientId: decoded.clientId, videoId: data.videoId, type: 'movie'
+          videoUri: data.video, size: data.size, clientId: req.headers.cpid, videoId: data.videoId, type: 'movie'
         }, process.env.SECRET);
         // register to both temp server and real server
         data.videoUrl = data.videoUri;
@@ -39,7 +39,7 @@ class tempVideoController {
       } else {
         // set to serie since this video represents an entire serie
         data.videoUri = jwt.jwtSign({
-          videoUri: null, type: 'serie', videoId: data.videoId, clientId: decoded.clientId
+          videoUri: null, type: 'serie', videoId: data.videoId, clientId: req.headers.cpid
         }, process.env.SECRET);
         const uploadedVideo = await services.createNewVideos(data);
         const newVideo = await videoService.createNewVideo(data);

@@ -7,6 +7,7 @@ import videoService from '../services/videoServices';
 import Util from '../helpers/utilities';
 import JWT from '../helpers/jwt';
 import cry from '../helpers/crypto';
+import { getAttachedThumbsMultiple } from '../helpers/video';
 
 const util = new Util();
 
@@ -57,6 +58,7 @@ class adminController {
       const date = new Date(Number(videos[i].creationTime));
       videos[i].creationTime = `${date.toDateString()}`;
     }
+    getAttachedThumbsMultiple(videos);
     if (!videos) util.setErrorResponse(res, 'videos not found', 400);
     util.setSuccessResponse(res, 'videos found', 200, videos);
   }

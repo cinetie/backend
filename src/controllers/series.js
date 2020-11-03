@@ -51,12 +51,12 @@ class Episodes {
         id, s, limit, offset
       } = req.query;
       const episodes = await services.getSingleSeason(id, s, limit, offset);
-      for (let i = 0; i < episodes.length; i++) {
-        episodes[i].thumbNailUrl = Episodes.attachThumbnails(episodes[i].thumbNailUrl, 'cinetie-thumbnails');
-      }
       if (!episodes) {
         util.setErrorResponse(res, 'Can\'t find what you requested', 400);
       } else {
+        for (let i = 0; i < episodes.length; i++) {
+          episodes[i].thumbNailUrl = Episodes.attachThumbnails(episodes[i].thumbNailUrl, 'cinetie-thumbnails');
+        }
         util.setSuccessResponse(res, 'Retrieved successfully', 200, episodes);
       }
     } catch (error) {
