@@ -5,7 +5,7 @@ import { addEpisode } from '../middlewares/validation/episode';
 
 const router = new Router();
 
-router.post('/new', access.isProducer, addEpisode, controller.createSerie);
+router.post('/new', access.isAdmin, addEpisode, controller.createSerie);
 router.get('/all', access.isAdmin, controller.getAllSeries);
 router.get('/signed-url', access.isAdmin, controller.getSignedUrlTempSeries);
 router.get('/', access.isAdmin, controller.generateSignedUrl);

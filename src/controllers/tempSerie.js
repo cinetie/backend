@@ -13,8 +13,8 @@ class tempSerieController {
   static async createSerie(req, res) {
     try {
       const data = req.body;
-      const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
-      data.clientId = decoded.clientId;
+      console.log(req.headers);
+      data.clientId = req.headers.cpid;
       // data.size = req.files.video.size;
       data.thumbNailUrl = req.body.thumb;
       const newserie = await series.createNewEpisode(data);
