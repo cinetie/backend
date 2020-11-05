@@ -69,6 +69,10 @@ PORT=
 
 - [Get Rave standard link](#3-get-rave-standard-link-get-request)
 
+- [Cancel subscription](#13-cancel-subscription-put-request)
+
+- [Reactivate subscription](#14-reactivate-subscription-put-request)
+
 ### Users
 
 - [Signup](#4-signup-users-post-request)
@@ -711,5 +715,69 @@ Response:
             "updatedAt": "2020-09-04T17:07:43.000Z"
         }
     ]
+}
+```
+
+### 13. Cancel subscription: PUT Request
+
+Endpoint:
+
+```text
+/trans/cancel-subscription
+```
+
+Headers:
+
+```json
+{
+  "Content-Type": "application/json",
+  "Authorization": "Bearer <token>" //users token
+}
+```
+
+Body:
+
+***NONE***
+
+Response:
+
+```json
+
+{
+    "statusCode": 201,
+    "status": "success",
+    "message": "Subscription Canceled"
+}
+```
+
+### 14. Reactivate subscription: PUT Request
+
+Endpoint:
+
+```text
+/trans/reactivate-subscription
+```
+
+Headers:
+
+```json
+{
+  "Content-Type": "application/json",
+  "Authorization": "Bearer <token>" //users token
+}
+```
+
+Body:
+
+***NONE***
+
+Response:
+
+```json
+
+{
+    "statusCode": 201,
+    "status": "success",
+    "message": "Subscription activated"
 }
 ```
