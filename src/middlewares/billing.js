@@ -13,6 +13,7 @@ import Fetch from '../helpers/fetch';
 import ViewingSessions from '../services/viewingSessionsServices';
 import transactions from '../services/transactionService';
 import webhooks from '../controllers/webhooks';
+import payment from '../helpers/payment';
 
 const util = new Util();
 // middlware to perfom actual payment and registering transactions
@@ -45,7 +46,9 @@ class billing {
     //   endDate: date.addMoreDays(5).toDateString(),
     // });
     // await userService.updateUser(req.body.email, { isOnExtension: true });
-    // await billing.sendBillingNotification(user, req, 'Hello, Your cinetie subscription has ended and automatic billing has failed, we extended your subscription for five days ');
+    // await billing.sendBillingNotification(user, req,
+    // 'Hello, Your cinetie subscription has ended and automatic billing has failed,
+    // we extended your subscription for five days ');
     // next();~
     // }
   }
@@ -119,23 +122,13 @@ class billing {
           } else if (Number(details.paymentMethod) === 3) {
             const recentTransactions = await transactions.getTransactionsByEmail(user.email, 'Pending');
             if (recentTransactions.length > 0) {
-              const recentTransaction = await billing.checkSpenn(
-                recentTransactions[0].transactionId,
-                token
+              await billing.checkRecentPendingSpennTransaction(
+                recentTransactions, token, user, details, req, res, next
               );
-              console.log(recentTransaction.data.Status);
-              if (recentTransaction.data.Status === 'Approved'
-              || recentTransaction.data.Status === 'TransactionVerified') {
-                await billing.updateTransactionsAndRegisterSales(
-                  recentTransactions[0].transactionId, user, details, req, res, next
-                );
-              } else {
-                billing.handleFailPaymentStatus(req, next);
-              }
             } else {
-              const pay = await billing.chargeSpenn(user, details, token);
-              await billing.recordTransaction(user, details, pay);
+              const pay = await payment.chargeSpenn(user, details, token);
               if (pay.status === 200) {
+                await payment.recordTransaction(user, details, pay);
                 util.setSuccessResponse(res, pay.message, 200, pay);
               } else {
                 billing.handleFailPaymentStatus(req, next);
@@ -147,6 +140,61 @@ class billing {
         }
       }
     } catch (error) {
+      util.setErrorResponse(res, error.message, 500);
+    }
+  }
+
+  static async checkRecentPendingSpennTransaction(
+    recentTransactions, token, user, details, req, res, next
+  ) {
+    const recentTransaction = await billing.checkSpenn(
+      recentTransactions[0].transactionId,
+      token
+    );
+    // eslint-disable-next-line no-console
+    console.log(recentTransaction.data.Status);
+    if (recentTransaction.data.Status === 'Approved'
+      || recentTransaction.data.Status === 'TransactionVerified') {
+      await billing.updateTransactionsAndRegisterSales(
+        recentTransactions[0].transactionId, user, details, req, res, next
+      );
+    } else {
+      console.log('something -----------------------=-=-=-=-=-=');
+      billing.handleFailPaymentStatus(req, next);
+    }
+  }
+
+  static async verifySpennTransactions(req, res, next) {
+    try {
+      const user = await userService.getUserByMail(req.body.email);
+      if (!user) {
+        util.setErrorResponse(res, 'user doesn\'t exist', 400);
+      } else {
+        const details = await billing.fetchCurrentSubscription(req, res);
+        console.log(details);
+        if (details === null) {
+          next();
+        } else if (Number(details.paymentMethod) === 3) {
+          console.log('checking.......');
+          const recentTransactions = await transactions.getTransactionsByEmail(user.email, 'Pending');
+          console.log(recentTransactions);
+          if (recentTransactions.length > 0) {
+            console.log('found.......');
+            const token = jwt.jwtSign({ role: 'main-api', user: user.email }, process.env.SECRET, 1000);
+            await billing.checkRecentPendingSpennTransaction(
+              recentTransactions, token, user, details, req, res, next
+            );
+          } else {
+            console.log('not found.......');
+            next();
+          }
+        } else {
+          next();
+        }
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log(error);
       util.setErrorResponse(res, error.message, 500);
     }
   }
