@@ -357,31 +357,30 @@ class userController {
         }
 
         case 3: {
-          const pay = await Fetch({
-            phone: user.phoneNumber,
-            amount: price
-          }, {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }, `${process.env.PAY_HOST}/charge/spenn`, 'POST');
+          const pay = await payment.chargeSpenn(user, currentSubsctption, token);
           if (pay.status === 200) {
             const updates = await userService.updateUser(email, { isOnTrial: false });
             if (updates[1] === 1) {
+              await payment.recordTransaction(user, currentSubsctption, pay);
               util.setSuccessResponse(res, pay.message, 200, pay);
             } else {
-              util.setErrorResponse(res, pay.message, 500);
+              console.log(updates);
+              util.setErrorResponse(res, pay.message, 400);
             }
           } else {
-            util.setErrorResponse(res, pay.message, 500);
+            console.log(pay);
+            util.setErrorResponse(res, pay.message, 400);
           }
         }
           break;
 
         default:
+          console.log('no payment method ------------');
           util.setErrorResponse(res, 'Sorry payment failed', 500);
       }
       // }
     } catch (error) {
+      console.log(error);
       return response.errorResponse(res, 500, `Something wrong happened ${error.message}`, error);
     }
   }

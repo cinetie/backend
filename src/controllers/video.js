@@ -337,6 +337,7 @@ class Video {
         }
       }
     } catch (error) {
+      console.log(error);
       return response.errorResponse(res, 500, 'Something went wrong', error.message);
     }
   }

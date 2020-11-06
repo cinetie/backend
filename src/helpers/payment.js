@@ -2,6 +2,8 @@
 import billingService from '../services/billingServices';
 import userService from '../services/userServices';
 import planService from '../services/planServices';
+import transactions from '../services/transactionService';
+import Fetch from './fetch';
 import date from './date';
 
 class payment {
@@ -45,6 +47,33 @@ class payment {
     } catch (error) {
       throw error;
     }
+  }
+
+  static async chargeSpenn(user, details, token) {
+    try {
+      const pay = await Fetch({
+        phone: user.phoneNumber,
+        amount: details.price,
+      }, {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }, `${process.env.PAY_HOST}/charge/spenn`, 'POST');
+      return pay;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async recordTransaction(user, details, pay) {
+    await transactions.createTransaction(
+      {
+        email: user.email,
+        statusDesc: 'Pending',
+        paidAmount: details.price,
+        transactionId: pay.data.RequestId,
+        currency: 'RWF',
+      }
+    );
   }
 }
 export default payment;
