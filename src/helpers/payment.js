@@ -27,7 +27,7 @@ class payment {
       (details.isBilledAnnually) ? data.price = plan.yearlyPrice : data.price = plan.monthlyPrice;
       data.email = details.email;
       data.plan = details.plan;
-      data.state = 'current';
+      data.state = 'pending';
       data.phoneNumber = details.phoneNumber;
       if (details.isBilledAnnually === true) {
         data.endDate = date.addMoreDays(365).toDateString();
@@ -51,6 +51,7 @@ class payment {
 
   static async chargeSpenn(user, details, token) {
     try {
+      console.log(details.price, details.plan);
       const pay = await Fetch({
         phone: user.phoneNumber,
         amount: details.price,
@@ -71,7 +72,7 @@ class payment {
         statusDesc: 'Pending',
         paidAmount: details.price,
         transactionId: pay.data.RequestId,
-        currency: 'RWF',
+        currency: 'USD',
       }
     );
   }

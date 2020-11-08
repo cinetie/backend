@@ -305,7 +305,8 @@ class userController {
         isBilledAnnually: user.isBilledAnnually,
       };
       const price = await payment.getPlanPricing(subscriptionData);
-      const currentSubsctption = await billingServices.getCurrentSubscription(email);
+      console.log(`sending ------------------ ${price}`);
+      const currentSubscription = await billingServices.getCurrentSubscription(email, 'pending');
       console.log('298');
       // if (user.isOnTrial === false) {
       //   console.log('300');
@@ -314,7 +315,7 @@ class userController {
       console.log('303');
       const paymentData = userController.getAndSetPaymentData(req, price, user, email);
       const token = jwt.jwtSign({ role: 'main-api', user: email }, process.env.SECRET, 1000);
-      switch (Number(currentSubsctption.paymentMethod)) {
+      switch (Number(currentSubscription.paymentMethod)) {
         case 1: {
           console.log('308');
           const momoData = await Fetch(paymentData,
@@ -358,11 +359,11 @@ class userController {
         }
 
         case 3: {
-          const pay = await payment.chargeSpenn(user, currentSubsctption, token);
+          const pay = await payment.chargeSpenn(user, currentSubscription, token);
           if (pay.status === 200) {
             const updates = await userService.updateUser(email, { isOnTrial: false });
             if (updates[1] === 1) {
-              await payment.recordTransaction(user, currentSubsctption, pay);
+              await payment.recordTransaction(user, currentSubscription, pay);
               util.setSuccessResponse(res, pay.message, 200, pay);
             } else {
               console.log(updates);

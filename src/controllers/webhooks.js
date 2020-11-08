@@ -30,7 +30,7 @@ export default class WebHooks {
       if (transVerification.status === 'success') {
         let updates = {};
         await billingService.updateSubscription(user.email, {
-          endDate: date.addMoreDays(30).toDateString(),
+          endDate: date.addMoreDays(30).toDateString(),state: 'current'
         });
         if (response['event.type'] === 'CARD_TRANSACTION') {
           updates = await UserService.updateUser(
@@ -46,6 +46,8 @@ export default class WebHooks {
         // creating sales
         const status = await WebHooks.registerSalesAndEarnings(response, user, req, res);
         if (status === true) {
+          await billingService.updateSubscription(user.email,
+            { state: 'current'});
           util.setSuccessResponse(res, 'Success', 200, { status: 'sucesss' });
         }
       } else {
