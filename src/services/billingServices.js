@@ -24,17 +24,18 @@ class billingServices {
       const date = new Date();
       const currentSubs = await database.subscriptions.findOne({
         where: {
-          [op.and]: [{
-            email
-          },
-          {
-            state: 'current'
-          },
-          {
-            endDate: date.toDateString().toString()
-          }
-          ]
-        }
+          [op.and]: [
+            {
+              email,
+            },
+            {
+              state: 'current',
+            },
+            {
+              endDate: date.toDateString().toString(),
+            },
+          ],
+        },
       });
       if (currentSubs) {
         return currentSubs;
@@ -45,19 +46,19 @@ class billingServices {
     }
   }
 
-  static async getCurrentSubscription(email) {
+  static async getCurrentSubscription(email, state) {
     try {
       const currentSubs = await database.subscriptions.findOne({
         where: {
-          [op.and]: [{
-            email
-          },
-          {
-            state: 'current'
-          },
-
-          ]
-        }
+          [op.and]: [
+            {
+              email,
+            },
+            {
+              state: state || 'current',
+            },
+          ],
+        },
       });
       if (currentSubs) {
         return currentSubs;
@@ -73,20 +74,19 @@ class billingServices {
     try {
       const data = await database.subscriptions.findAll({
         where: {
-          [op.and]: [{
-            start: {
-              [op.gte]: start
-            }
-
-          },
-          {
-            start: {
-              [op.lte]: end
-            }
-          }
-
-          ]
-        }
+          [op.and]: [
+            {
+              start: {
+                [op.gte]: start,
+              },
+            },
+            {
+              start: {
+                [op.lte]: end,
+              },
+            },
+          ],
+        },
       });
       if (data) {
         return data;
@@ -101,7 +101,7 @@ class billingServices {
     try {
       const status = await database.subscriptions.update(updated, {
         returning: true,
-        where: { email }
+        where: { email },
       });
       if (status) {
         return status;
@@ -116,16 +116,35 @@ class billingServices {
     try {
       const status = await database.subscriptions.update(updated, {
         where: {
-          [op.and]: [
-            { email },
-            { state: 'current' }
-          ]
-        }
+          [op.and]: [{ email }, { state: 'current' }],
+        },
       });
       if (status) {
         return status;
       }
       return null;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // get subscription given an email
+  static async getSubscriptionByEmail(email) {
+    try {
+      if (email) {
+        const data = await database.subscriptions.findOne({
+          where: { email },
+        });
+
+        if (data) {
+          return data;
+        }
+        return null;
+      }
+      return {
+        status: 400,
+        message: 'Parameter email is not provided',
+      };
     } catch (error) {
       throw error;
     }
