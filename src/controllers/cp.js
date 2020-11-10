@@ -64,6 +64,7 @@ class cpController {
     }
   }
 
+  // eslint-disable-next-line consistent-return
   static async verify(req, res) {
     try {
       const { id } = req.query;
@@ -92,7 +93,7 @@ class cpController {
         util.setErrorResponse(res, 'can\'t send email', 500);
       } else {
         updatedUser.password = undefined;
-        res.redirect(200, 'https://www.cinetie.com');
+        return res.render('redirect', { url: 'https://cp.cinetie.com/signin' });
       }
     } catch (error) {
       util.setErrorResponse(res, `Something went wrong ${error.message}`, 500);

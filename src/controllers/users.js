@@ -118,7 +118,7 @@ class userController {
         path: `${path.join(__dirname, '../public/templates/EmailVerificationSuccess.ejs')}`
       }
       ]);
-      res.redirect(200, 'https://www.cinetie.com');
+      return res.render('redirect', { url: 'https://www.cinetie.com/u/signin' });
     } catch (error) {
       util.setErrorResponse(res, `Something went wrong ${error.message}`, 500);
     }
@@ -183,6 +183,7 @@ class userController {
   static async resetPassword(req, res) {
     try {
       const { token, id } = req.query;
+      console.log(token, id);
       jwt.jwtVerify(token, process.env.SECRET);
       const user_ = await userService.getUserById(id);
       if (!user_) response.errorResponse(res, 404, 'User not found!', 'user undefined');
@@ -206,7 +207,7 @@ class userController {
           path: `${path.resolve('src/public/templates/notification.ejs')}`
         }
         ]);
-        res.redirect(200, 'http://www.cinetie.com/signin');
+        return res.render('redirect');
       }
     } catch (error) {
       util.setErrorResponse(res, `Something Went wrong resetting password ${error}`, 500);
