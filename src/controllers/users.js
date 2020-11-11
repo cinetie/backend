@@ -164,7 +164,7 @@ class userController {
       const newDate = date.addMoreDays(1);
       const token = jwt.jwtSign(newDate.getTime(), process.env.SECRET);
       await mailer([{
-        link: `${process.env.HOST}/auth/serve-verify?id=${user.id}&&token=${token}`
+        link: `${process.env.FRONT_END_USER}/u/new-password?id=${user.id}&&token=${token}`
       }, {
         from: 'CINETIE support',
         to: req.body.email,
@@ -207,7 +207,7 @@ class userController {
           path: `${path.resolve('src/public/templates/notification.ejs')}`
         }
         ]);
-        return res.render('redirect');
+        return res.render('redirect', { url: 'https://cinetie.com/u/signin' });
       }
     } catch (error) {
       util.setErrorResponse(res, `Something Went wrong resetting password ${error}`, 500);
