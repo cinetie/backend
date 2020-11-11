@@ -83,7 +83,14 @@ const getSignedUrl = async (Bucket, ContentType, extension) => {
     ContentType,
     Expires: 21600
   };
-  const S3SignedUrls = new AWS.S3({ apiVersion: '2006-03-01' });
+  const options = {
+    signatureVersion: 'v4',
+    region: AWS_REGION,
+    endpoint: new AWS.Endpoint(`${Bucket}.s3-accelerate.amazonaws.com`),
+    useAccelerateEndpoint: true,
+    apiVersion: '2006-03-01'
+  };
+  const S3SignedUrls = new AWS.S3(options);
   const signedUrl = await S3SignedUrls.getSignedUrlPromise('putObject', params);
   return {
     url: signedUrl,
