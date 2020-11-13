@@ -251,10 +251,14 @@ class userController {
     try {
       const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const user = await userService.getUserByMail(decoded.email);
+      const { paymentMethod } = req.body;
       console.log(decoded.email);
       if (!user) util.setErrorResponse(res, 'Can\'t find that user', 422);
       const newInfo = req.body;
       console.log(newInfo);
+      if (paymentMethod !== undefined || paymentMethod !== null) {
+        await billingServices.updateSubscription(decoded.email, { paymentMethod });
+      }
       const updated = await userService.updateUser(decoded.email, newInfo);
       if (updated[0] !== 0) {
         util.setSuccessResponse(res, 'updated successfully', 200, updated);
@@ -481,13 +485,14 @@ class userController {
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const user = await userService.getUserByMail(email);
       console.log(user);
-      const currentSubscription = await billingServices.getCurrentSubscription(email);
+      const subscription = await billingServices.getSubscriptionByEmail(email);
       if (user) {
-        if (currentSubscription) {
+        if (subscription) {
           util.setSuccessResponse(res, 'Found', 200, {
             user,
-            paymentMethod: currentSubscription.paymentMethod || 'null',
-            price: currentSubscription.price || 'null'
+            paymentMethod: subscription.paymentMethod || 'null',
+            price: subscription.price || 'null',
+            subscritption: subscription.state
           });
         } else {
           util.setSuccessResponse(res, 'Found', 200, { user });
