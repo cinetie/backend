@@ -1,7 +1,7 @@
 export default {
   up: (queryInterface) => queryInterface.bulkInsert('viewingSessions', [
     {
-      id: 0,
+      id: 9920420,
       videoId: 'd0fe2561-2164-4eb0-8113-f1a7dd4cfa73',
       clientId: '1999',
       time: '10000',
@@ -13,7 +13,7 @@ export default {
       createdAt: new Date(),
     },
     {
-      id: 1,
+      id: 82498,
       videoId: 'd0fe2561-2164-4eb0-8113-f1a7dd4cfa73',
       clientId: '0',
       time: '10000',
