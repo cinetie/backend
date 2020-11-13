@@ -4,6 +4,7 @@ import Util from '../helpers/utilities';
 import Fetch from '../helpers/fetch';
 import jwt from '../helpers/jwt';
 import Users from '../services/userServices';
+import Subscriptions from '../services/billingServices';
 
 const util = new Util();
 class transactionsController {
@@ -88,6 +89,7 @@ class transactionsController {
     try {
       const email = req.user;
       const { permissionLevel } = req.fullUser;
+      const subscription = await Subscriptions.getSubscriptionByEmail(email);
       if (permissionLevel === -2) {
         return util.setErrorResponse(res, 'your subscription is already canceled', 400);
       }
@@ -97,6 +99,21 @@ class transactionsController {
         process.env.SECRET,
         1000
       );
+      console.log(subscription.paymentMethod);
+      if (subscription.paymentMethod === 3) {
+        const userUpdate = await Users.updateUser(email, { permissionLevel: -2 });
+        const subscriptionUpdate = await Subscriptions.updateSubscription(email, { state: 'canceled' });
+        return util.setSuccessResponse(
+          res,
+          'Cancelled',
+          200,
+          {
+            userUpdate,
+            subscriptionUpdate
+          }
+        );
+      }
+      console.log('executing');
       const raw = await Fetch(
         { email },
         {

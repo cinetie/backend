@@ -24,13 +24,13 @@ export default class WebHooks {
       // console.log(response.customer.email);
       const user = await UserService.getUserByMail(response.customer.email
         || response.data.customer.email);
-      console.log(user)
+      console.log(user);
       const transVerification = await rave.Transaction.verify({ id: response.id });
       // console.log(transVerification, '------------------', req.body);
       if (transVerification.status === 'success') {
         let updates = {};
         await billingService.updateSubscription(user.email, {
-          endDate: date.addMoreDays(30).toDateString(),state: 'current'
+          endDate: date.addMoreDays(30).toDateString(), state: 'current'
         });
         if (response['event.type'] === 'CARD_TRANSACTION') {
           updates = await UserService.updateUser(
@@ -47,7 +47,7 @@ export default class WebHooks {
         const status = await WebHooks.registerSalesAndEarnings(response, user, req, res);
         if (status === true) {
           await billingService.updateSubscription(user.email,
-            { state: 'current'});
+            { state: 'current' });
           util.setSuccessResponse(res, 'Success', 200, { status: 'sucesss' });
         }
       } else {
