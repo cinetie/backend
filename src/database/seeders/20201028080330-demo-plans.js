@@ -1,7 +1,7 @@
 export default {
   up: (queryInterface) => queryInterface.bulkInsert('plans', [
     {
-      id: 0,
+      id: 245,
       type: 'Promo',
       hasHd: true,
       hasUltraHd: true,

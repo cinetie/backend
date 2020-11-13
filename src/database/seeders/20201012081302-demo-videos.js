@@ -16,7 +16,7 @@ export default {
       category: 'Documentary',
       type: 'movie',
       featureType: 0,
-      resCountries: ['Uganda', 'Kenya'],
+      resCountries: 'Uganda, Kenya',
       videoSuspensionState: false,
       nameTagThumbNailLink: '742bfa3b-1b94-418e-a584-82ce251103ce.jpg',
       tallThumbNailLink: '6bbdb89d-2455-4440-b9ea-7ba412f9c914.png',
