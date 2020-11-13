@@ -114,7 +114,7 @@ class transactionsController {
       console.log(raw);
       return util.setErrorResponse(res, 'Something went wrong', 400, raw);
     } catch (error) {
-      util.setErrorResponse(res, error, 500);
+      return util.setErrorResponse(res, error, 500);
     }
   }
 
@@ -152,7 +152,7 @@ class transactionsController {
       }
       return util.setErrorResponse(res, 'Something went wrong', 400, raw);
     } catch (error) {
-      util.setErrorResponse(res, error, 500);
+      return util.setErrorResponse(res, error, 500);
     }
   }
 }
