@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import Flutterwave from 'flutterwave-node-v3';
 import path from 'path';
 import UserService from '../services/userServices';
@@ -19,12 +20,10 @@ export default class WebHooks {
   // eslint-disable-next-line consistent-return
   static async flutterWave(req, res) {
     try {
-      // console.log(req.body);
       const response = (req.body.data) ? req.body.data : req.body;
       // console.log(response.customer.email);
       const user = await UserService.getUserByMail(response.customer.email
         || response.data.customer.email);
-      console.log(user);
       const transVerification = await rave.Transaction.verify({ id: response.id });
       // console.log(transVerification, '------------------', req.body);
       if (transVerification.status === 'success') {
