@@ -2,6 +2,8 @@
 import billingService from '../services/billingServices';
 import userService from '../services/userServices';
 import planService from '../services/planServices';
+import transactions from '../services/transactionService';
+import Fetch from './fetch';
 import date from './date';
 
 class payment {
@@ -25,7 +27,7 @@ class payment {
       (details.isBilledAnnually) ? data.price = plan.yearlyPrice : data.price = plan.monthlyPrice;
       data.email = details.email;
       data.plan = details.plan;
-      data.state = 'current';
+      data.state = 'pending';
       data.phoneNumber = details.phoneNumber;
       if (details.isBilledAnnually === true) {
         data.endDate = date.addMoreDays(365).toDateString();
@@ -45,6 +47,34 @@ class payment {
     } catch (error) {
       throw error;
     }
+  }
+
+  static async chargeSpenn(user, details, token) {
+    try {
+      console.log(details.price, details.plan);
+      const pay = await Fetch({
+        phone: user.phoneNumber,
+        amount: details.price,
+      }, {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }, `${process.env.PAY_HOST}/charge/spenn`, 'POST');
+      return pay;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async recordTransaction(user, details, pay) {
+    await transactions.createTransaction(
+      {
+        email: user.email,
+        statusDesc: 'Pending',
+        paidAmount: details.price,
+        transactionId: pay.data.RequestId,
+        currency: 'USD',
+      }
+    );
   }
 }
 export default payment;

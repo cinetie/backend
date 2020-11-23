@@ -118,7 +118,7 @@ class userController {
         path: `${path.join(__dirname, '../public/templates/EmailVerificationSuccess.ejs')}`
       }
       ]);
-      res.redirect(200, 'https://www.cinetie.com');
+      return res.render('redirect', { url: 'https://www.cinetie.com/u/signin' });
     } catch (error) {
       util.setErrorResponse(res, `Something went wrong ${error.message}`, 500);
     }
@@ -164,7 +164,7 @@ class userController {
       const newDate = date.addMoreDays(1);
       const token = jwt.jwtSign(newDate.getTime(), process.env.SECRET);
       await mailer([{
-        link: `${process.env.HOST}/auth/serve-verify?id=${user.id}&&token=${token}`
+        link: `${process.env.FRONT_END_USER}/u/new-password?id=${user.id}&&token=${token}`
       }, {
         from: 'CINETIE support',
         to: req.body.email,
@@ -183,6 +183,7 @@ class userController {
   static async resetPassword(req, res) {
     try {
       const { token, id } = req.query;
+      console.log(token, id);
       jwt.jwtVerify(token, process.env.SECRET);
       const user_ = await userService.getUserById(id);
       if (!user_) response.errorResponse(res, 404, 'User not found!', 'user undefined');
@@ -206,7 +207,7 @@ class userController {
           path: `${path.resolve('src/public/templates/notification.ejs')}`
         }
         ]);
-        res.redirect(200, 'http://www.cinetie.com/signin');
+        return res.render('redirect', { url: 'https://cinetie.com/u/signin' });
       }
     } catch (error) {
       util.setErrorResponse(res, `Something Went wrong resetting password ${error}`, 500);
@@ -250,10 +251,14 @@ class userController {
     try {
       const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const user = await userService.getUserByMail(decoded.email);
+      const { paymentMethod } = req.body;
       console.log(decoded.email);
       if (!user) util.setErrorResponse(res, 'Can\'t find that user', 422);
       const newInfo = req.body;
       console.log(newInfo);
+      if (paymentMethod !== undefined || paymentMethod !== null) {
+        await billingServices.updateSubscription(decoded.email, { paymentMethod });
+      }
       const updated = await userService.updateUser(decoded.email, newInfo);
       if (updated[0] !== 0) {
         util.setSuccessResponse(res, 'updated successfully', 200, updated);
@@ -304,7 +309,8 @@ class userController {
         isBilledAnnually: user.isBilledAnnually,
       };
       const price = await payment.getPlanPricing(subscriptionData);
-      const currentSubsctption = await billingServices.getCurrentSubscription(email);
+      console.log(`sending ------------------ ${price}`);
+      const currentSubscription = await billingServices.getCurrentSubscription(email, 'pending');
       console.log('298');
       // if (user.isOnTrial === false) {
       //   console.log('300');
@@ -313,7 +319,7 @@ class userController {
       console.log('303');
       const paymentData = userController.getAndSetPaymentData(req, price, user, email);
       const token = jwt.jwtSign({ role: 'main-api', user: email }, process.env.SECRET, 1000);
-      switch (Number(currentSubsctption.paymentMethod)) {
+      switch (Number(currentSubscription.paymentMethod)) {
         case 1: {
           console.log('308');
           const momoData = await Fetch(paymentData,
@@ -357,31 +363,30 @@ class userController {
         }
 
         case 3: {
-          const pay = await Fetch({
-            phone: user.phoneNumber,
-            amount: price
-          }, {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }, `${process.env.PAY_HOST}/charge/spenn`, 'POST');
+          const pay = await payment.chargeSpenn(user, currentSubscription, token);
           if (pay.status === 200) {
             const updates = await userService.updateUser(email, { isOnTrial: false });
             if (updates[1] === 1) {
+              await payment.recordTransaction(user, currentSubscription, pay);
               util.setSuccessResponse(res, pay.message, 200, pay);
             } else {
-              util.setErrorResponse(res, pay.message, 500);
+              console.log(updates);
+              util.setErrorResponse(res, pay.message, 400);
             }
           } else {
-            util.setErrorResponse(res, pay.message, 500);
+            console.log(pay);
+            util.setErrorResponse(res, pay.message, 400);
           }
         }
           break;
 
         default:
+          console.log('no payment method ------------');
           util.setErrorResponse(res, 'Sorry payment failed', 500);
       }
       // }
     } catch (error) {
+      console.log(error);
       return response.errorResponse(res, 500, `Something wrong happened ${error.message}`, error);
     }
   }
@@ -480,13 +485,14 @@ class userController {
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const user = await userService.getUserByMail(email);
       console.log(user);
-      const currentSubscription = await billingServices.getCurrentSubscription(email);
+      const subscription = await billingServices.getSubscriptionByEmail(email);
       if (user) {
-        if (currentSubscription) {
+        if (subscription) {
           util.setSuccessResponse(res, 'Found', 200, {
             user,
-            paymentMethod: currentSubscription.paymentMethod || 'null',
-            price: currentSubscription.price || 'null'
+            paymentMethod: subscription.paymentMethod || 'null',
+            price: subscription.price || 'null',
+            subscritption: subscription.state
           });
         } else {
           util.setSuccessResponse(res, 'Found', 200, { user });
