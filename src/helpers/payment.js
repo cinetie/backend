@@ -66,7 +66,7 @@ class payment {
   }
 
   static async recordTransaction(user, details, pay) {
-    await transactions.createTransaction(
+    const result = await transactions.createTransaction(
       {
         email: user.email,
         statusDesc: 'Pending',
@@ -75,6 +75,7 @@ class payment {
         currency: 'USD',
       }
     );
+    return result;
   }
 }
 export default payment;
