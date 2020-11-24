@@ -3,7 +3,7 @@ import chaiHttp from 'chai-http';
 import { describe, it } from 'mocha';
 import app from '../index';
 import {
-  UserUp,
+  UserUpFine,
   UserUpNoEmail,
   UserUpNoFirstName,
   UserUpExist,
@@ -76,7 +76,6 @@ describe('SIGNUP', () => {
       });
   });
 
- 
   it('users should not be able to create a user with the same email', (done) => {
     chai
       .request(app)
@@ -93,7 +92,7 @@ describe('SIGNUP', () => {
     chai
       .request(app)
       .post(`${prefix}`)
-      .send(UserUp)
+      .send(UserUpFine)
       .end((err, res) => {
         expect(res).to.have.status(201);
         expect(res.body).to.have.property('message', 'Signed up successfully');
