@@ -287,22 +287,19 @@ class earningController {
         }, currentSubscription, req, res);
         if (status === true) {
           const updateSubscription = (updates.isBilledAnnually === true)
-            ? await billingServices.updateSubscription(req.user, { endDate: date.addMoreDays(365).toDateString(), state: "current",dueState: false })
-            : await billingServices.updateSubscription(req.user, { endDate: date.addMoreDays(30).toDateString(), state: "current", dueState: false })
-            console.log(updateSubscription);
-            if (updateSubscription[1] !== 0) {
-              return response.successResponse(res, 200, 'Success transaction finished', status);
-            } else {
-              return response.errorResponse(res, 400, 'something went wrong updating subscription', 'BAD_REQUEST')
-            }
-        } else {
-          return response.errorResponse(res, 400, 'something went wrong registering earnings', 'BAD_REQUEST')
+            ? await billingServices.updateSubscription(req.user, { endDate: date.addMoreDays(365).toDateString(), state: 'current', dueState: false })
+            : await billingServices.updateSubscription(req.user, { endDate: date.addMoreDays(30).toDateString(), state: 'current', dueState: false });
+          console.log(updateSubscription);
+          if (updateSubscription[1] !== 0) {
+            return response.successResponse(res, 200, 'Success transaction finished', status);
+          }
+          return response.errorResponse(res, 400, 'something went wrong updating subscription', 'BAD_REQUEST');
         }
-      } else {
-        return response.errorResponse(res, 400, 'user updates are not running', 'BAD_REQUEST')
+        return response.errorResponse(res, 400, 'something went wrong registering earnings', 'BAD_REQUEST');
       }
+      return response.errorResponse(res, 400, 'user updates are not running', 'BAD_REQUEST');
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return response.errorResponse(res, 500, 'Something happened', 'SERVER_ERROR');
     }
   }

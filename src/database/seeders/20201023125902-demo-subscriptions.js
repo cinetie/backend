@@ -3,9 +3,9 @@ export default {
     {
       id: 0,
       email: 'blaise1@gmail.com',
-      plan: "Promo",
+      plan: 'Promo',
       price: 3,
-      endDate: "DataTypes.STRING",
+      endDate: 'DataTypes.STRING',
       dueState: false,
       paymentMethod: 1,
       state: 'current',

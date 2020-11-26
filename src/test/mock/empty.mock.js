@@ -4,10 +4,9 @@ const response = mocks.createResponse();
 
 const emptyMock = {
   response,
-    request: {
+  request: {
 
   }
 };
-
 
 export default emptyMock;

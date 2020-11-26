@@ -1,5 +1,5 @@
-import billingServices from '../services/billingServices';
 import chai, { expect } from 'chai';
+import billingServices from '../services/billingServices';
 
 describe('getSubscriptionByEmail', () => {
   it('should return null if email matches no sub', async () => {

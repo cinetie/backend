@@ -1,11 +1,5 @@
-'use strict';
-
 module.exports = {
-  up: (queryInterface, Sequelize) => {
-   return queryInterface.addColumn('videos', 'resCountries',  { type: Sequelize.STRING, defaultValues: '' })
-  },
+  up: (queryInterface, Sequelize) => queryInterface.addColumn('videos', 'resCountries', { type: Sequelize.STRING, defaultValues: '' }),
 
-  down: (queryInterface, Sequelize) => {
-   return queryInterface.removeColumn('videos', 'resCountries')
-  }
+  down: (queryInterface, Sequelize) => queryInterface.removeColumn('videos', 'resCountries')
 };

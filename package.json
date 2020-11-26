@@ -13,11 +13,11 @@
     "migrate:dev": "sequelize db:migrate --env development",
     "migrate:undo:dev": "sequelize db:migrate:undo:all --env development",
     "migrate:staging": "sequelize db:migrate --env staging",
-    "migrate:test": "sequelize db:migrate:undo:all && sequelize db:migrate && sequelize db:seed:all --debug",
+    "migrate:test": "sequelize db:migrate:undo:all --env test && sequelize db:migrate --env test && sequelize db:seed:all --debug --env test",
     "generate-lcov": "nyc report --reporter=text > lcov.info",
     "lint": "eslint . --fix --ignore-path .gitignore",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "test": "NODE_ENV=test npm run migrate:test && NODE_ENV=test nyc --reporter=html --reporter=text mocha --require @babel/register 'src/**/**test.js' --timeout 60000 --exit",
+    "test": "NODE_ENV=test && export TEST_DATABASE_URL=mysql://b8c6ecfc8baa7d:9bf30ea6@us-cdbr-east-02.cleardb.com/heroku_5e7390789a036cf?reconnect=true && npm run migrate:test && nyc --reporter=html --reporter=text mocha --require @babel/register 'src/**/**test.js' --timeout 60000 --exit",
     "snyk-protect": "snyk protect",
     "prepare": "npm run snyk-protect"
   },
