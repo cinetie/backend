@@ -1,7 +1,7 @@
 {
   "name": "cinetie-backend",
   "version": "1.0.0",
-  "description": "Movies for everybody",
+  "description": "Movies forr everybody",
   "main": "index.js",
   "scripts": {
     "build": "rm -rf ./src/dist && babel ./src/. --out-dir ./src/dist --copy-files",
