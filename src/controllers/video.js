@@ -59,7 +59,7 @@ class Video {
   static async deleteAvideo(req, res) {
     try {
       const returned = await videoService.getVideoById(req.query.id);
-      if (returned && returned.videoClientId === req.user) {
+      if (returned) {
         const deletedVideo = await videoService.deleteVideo(req.query.id);
         if (returned.videoLink) {
           const results = await deleteObject('movies-cinetie', returned.videoLink);
