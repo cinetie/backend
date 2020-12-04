@@ -3,11 +3,16 @@ import '@babel/polyfill';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import cron from 'node-cron';
+import { config } from 'dotenv';
 import path from 'path';
 import fileUpload from 'express-fileupload';
 import response from './helpers/response';
+import stopLoginSessions from "./helpers/stopLoginSessions";
 import routes from './routes';
 
+config();
+cron.schedule(process.env.FREQUENCY_CRON, stopLoginSessions);
 const app = express();
 
 app.enable('trust proxy');
