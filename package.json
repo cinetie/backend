@@ -1,11 +1,11 @@
 {
   "name": "cinetie-backend",
   "version": "1.0.0",
-  "description": "Movies for everybody",
+  "description": "Movies forr everybody",
   "main": "index.js",
   "scripts": {
     "build": "rm -rf ./src/dist && babel ./src/. --out-dir ./src/dist --copy-files",
-    "start": "export NODE_ENV=staging && npm run migrate:staging && npm run build && node  ./src/dist/index.js",
+    "start": "export NODE_ENV=staging && npm run migrate:staging && node  ./src/dist/index.js",
     "start-prod": "export NODE_ENV=production && npm run migrate && npm run build && node  ./src/dist/index.js",
     "dev": "NODE_ENV=development nodemon --exec babel-node src/index.js",
     "migrate": "sequelize db:migrate --env production ",

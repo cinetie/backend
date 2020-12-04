@@ -7,7 +7,7 @@ import app from '../index';
 chai.use(chaiHttp);
 
 const prefix = `/auth/verify?token=${jwt.jwtSign(
-  'blaise2@gmail.com',
+  'blaise1@gmail.com',
   process.env.SECRET
 )}`;
 
