@@ -11,14 +11,13 @@ RUN apt-get install nodejs
 # when we change our application's nodejs dependencies:
 ADD package*.json /tmp/
 RUN cd /tmp && npm install
-RUN cd /tmp && npm run test
 RUN mkdir -p /opt/app && cp -a /tmp/node_modules /opt/app/
 
 # From here we load our application's code in, therefore the previous docker
 # "layer" thats been cached will be used if possible
 WORKDIR /opt/app
 ADD . /opt/app
-
+RUN npm run test
 
 EXPOSE 3001
 
