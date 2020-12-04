@@ -43,13 +43,13 @@ describe('PAYMENT HELPER', () => {
   it('should return bill registerNewSubscription()', async () => {
     const results = await payment.registerNewSubscription(details);
     expect(results.email).to.be.equal('blaise1@gmail.com');
-    expect(results.price).to.be.equal(12);
+    expect(Number(results.price)).to.be.equal(12);
   });
 
   it('should return bill registerNewSubscription() isBilledAnnually false,', async () => {
     const results = await payment.registerNewSubscription(details2);
     expect(results.email).to.be.equal('blaise12@gmail.com');
-    expect(results.price).to.be.equal(3);
+    expect(Number(results.price)).to.be.equal(3);
   });
 
   it('should return pay chargeSpenn', async () => {
