@@ -114,9 +114,6 @@ class billing {
                 200,
                 momoStatus);
             } else {
-              // console.log("+++++++++++++++++++++++")
-              // console.log(momoStatus)
-              // console.log("+++++++++++++++++++++++")
               billing.handleFailPaymentStatus(req, next);
             }
             // service.get
