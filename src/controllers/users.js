@@ -88,6 +88,7 @@ class userController {
     newUser.plan = 'Setup';
     newUser.permissionLevel = 1;
     newUser.isOnTrial = false;
+    console.log(newUser)
     return newUser;
   }
 

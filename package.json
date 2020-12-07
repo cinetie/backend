@@ -10,14 +10,17 @@
     "dev": "NODE_ENV=development nodemon --exec babel-node src/index.js",
     "migrate": "sequelize db:migrate --env production ",
     "migrate:undo": "sequelize db:migrate:undo:all --env production ",
-    "migrate:dev": "sequelize db:migrate --env development",
+    "migrate:dev": "sequelize db:migrate && sequelize db:seed:all --env development",
     "migrate:undo:dev": "sequelize db:migrate:undo:all --env development",
     "migrate:staging": "sequelize db:migrate --env staging",
     "migrate:test": "sequelize db:migrate:undo:all && sequelize db:migrate && sequelize db:seed:all --debug",
     "generate-lcov": "nyc report --reporter=text > lcov.info",
     "lint": "eslint . --fix --ignore-path .gitignore",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "test": "NODE_ENV=test npm run migrate:test && NODE_ENV=test nyc --reporter=html --reporter=text mocha --require @babel/register 'src/**/**test.js' --timeout 60000 --exit",
+    "test:two": "NODE_ENV=test npm run migrate:test && NODE_ENV=test nyc --reporter=html --reporter=text mocha --require @babel/register 'src/**/**test.js' --timeout 60000 --exit",
+    "test:one": "NODE_ENV=test nyc --reporter=html --reporter=text mocha --require @babel/register 'src/**/**test.js' --timeout 60000 --exit",
+    "test:right": "NODE_ENV=test npm run migrate:test && NODE_ENV=test mocha --require @babel/register -- src/test/8.billing.test.js",
+    "test": "NODE_ENV=test mocha --require @babel/register -- src/test/8.billing.test.js",
     "snyk-protect": "snyk protect",
     "prepare": "npm run snyk-protect"
   },
@@ -55,7 +58,6 @@
     "node-cron": "^2.0.3",
     "node-fetch": "^2.6.0",
     "node-forge": "^0.10.0",
-    "node-mocks-http": "^1.9.0",
     "nodemailer": "^6.4.2",
     "nodemailer-express-handlebars": "^3.1.0",
     "passport": "^0.4.0",
@@ -87,11 +89,13 @@
     "coveralls": "^3.1.0",
     "eslint-plugin-import": "^2.20.1",
     "mocha": "^7.0.1",
+    "node-mocks-http": "^1.9.0",
     "nodemon": "^2.0.4",
     "nyc": "^15.0.0",
     "prettier-eslint": "^9.0.0",
     "prettier-eslint-cli": "^5.0.0",
-    "sequelize-cli": "^5.5.1"
+    "sequelize-cli": "^5.5.1",
+    "sinon": "^9.2.1"
   },
   "snyk": false
 }
