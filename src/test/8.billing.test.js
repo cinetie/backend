@@ -86,17 +86,17 @@ describe('BILLING MIDDLEWARE', (req, res, status) => {
     //     billing.sendBillingNotification(user, req, body)
     // });
     
-    // it('Test renewPayment Method with registered email and subscription with current status should be okay', async () => {
-    //     var nextSpy = sinon.spy();
-    //     var req = httpMocks.createRequest({ 
-    //         body: {
-    //             "email": "blaise120@gmail.com",
-    //             "password": "nAdia123"
-    //         }
-    //     });
-    //     var res = httpMocks.createResponse();
-    //     const data = await billing.renewPayment(req, res, nextSpy)
-    //     console.log(data)
-    //     // expect(nextSpy.calledOnce).to.be.false;
-    // });    
+    it.only('Test renewPayment Method with registered email and subscription with current status should be okay', async () => {
+        var nextSpy = sinon.spy();
+        var req = httpMocks.createRequest({ 
+            body: {
+                "email": "blaise120@gmail.com",
+                "password": "nAdia123"
+            }
+        });
+        var res = httpMocks.createResponse();
+        const data = await billing.renewPayment(req, res, nextSpy)
+        console.log(data)
+        // expect(nextSpy.calledOnce).to.be.false;
+    });    
 });
