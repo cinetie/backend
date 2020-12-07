@@ -95,6 +95,7 @@ class billing {
         const token = jwt.jwtSign({ role: 'main-api', user: user.email }, process.env.SECRET, 1000);
         if (endDate.getTime() <= today.getTime()) { // remember to change >= to <=
           if (Number(details.paymentMethod) === 1) {
+            console.log('Paying with momo ........')
             const momoStatus = await Fetch({
               currency: 'RWF',
               amount: details.price,
@@ -107,7 +108,7 @@ class billing {
             if (momoStatus.status === 200) {
               util.setSuccessResponse(res,
                 'Please follow this link to renew your subscription with Mobile money',
-                200,
+                202,
                 momoStatus);
             } else {
               billing.handleFailPaymentStatus(req, next);
@@ -131,11 +132,12 @@ class billing {
             } else {
               console.log('found none charging');
               const pay = await payment.chargeSpenn(user, details, token);
+              console.log(pay)
               if (pay.status === 200) {
                 await payment.recordTransaction(user, details, pay);
                 // await billingService.updateSubscription(user.email,
                 //   { state: 'current' });
-                util.setSuccessResponse(res, pay.message, 200, pay);
+                util.setSuccessResponse(res, pay.message, 202, pay);
               } else {
                 billing.handleFailPaymentStatus(req, next);
               }
