@@ -26,12 +26,12 @@ describe('EARNING CONTROLLER', () => {
     expect(data.email).to.be.equal('blaise1@gmail.com');
   });
 
-  it('should return true while tryin to get assign Rate', async () => {
-    const data = await earningController.assignRateToEachVideo(
-      'blaise1@gmail.com'
-    );
-    expect(data).to.be.equal(true);
-  });
+  // it('should return true while tryin to get assign Rate', async () => {
+  //   const data = await earningController.assignRateToEachVideo(
+  //     'blaise1@gmail.com'
+  //   );
+  //   expect(data).to.be.equal(true);
+  // });
 
   it('should return 200/OK getting all earnings', async () => {
     const data = await earningController.getAllEarnings(

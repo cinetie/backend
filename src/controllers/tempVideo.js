@@ -43,7 +43,7 @@ class tempVideoController {
         }, process.env.SECRET);
         const uploadedVideo = await services.createNewVideos(data);
         const newVideo = await videoService.createNewVideo(data);
-        if ((newVideo && uploadedVideo) === (null || undefined)) util.setErrorResponse(res, 'Video can\'t be saved', 401);
+        if (!(newVideo && uploadedVideo) === (null || undefined)) util.setErrorResponse(res, 'Video can\'t be saved', 401);
         util.setSuccessResponse(res, 'video uploaded successfully', 201, { status: 'upload success' });
       }
     } catch (error) {

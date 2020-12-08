@@ -105,6 +105,7 @@ class billing {
 
             }, { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
             `${process.env.PAY_HOST}/charge/momo`, 'POST');
+            console.log(momoStatus)
             if (momoStatus.status === 200) {
               util.setSuccessResponse(res,
                 'Please follow this link to renew your subscription with Mobile money',
@@ -122,6 +123,7 @@ class billing {
             // }, `${process.env.PAY_HOST}/charge/card-token`, 'POST');
             billing.handleFailPaymentStatus(req, next);
           } else if (Number(details.paymentMethod) === 3) {
+            console.log('spenn ....................')
             const recentTransactions = await transactions.getTransactionsByEmail(user.email, 'Pending');
             console.log('got here');
             if (recentTransactions.length > 0) {
@@ -176,25 +178,25 @@ class billing {
 
   static async verifySpennTransactions(req, res, next) {
     try {
-      console.log('starting ---------------');
+      console.log('started------------')
       const user = await userService.getUserByMail(req.body.email);
+      console.log('started again ------------');
       if (!user) {
         util.setErrorResponse(res, 'user doesn\'t exist', 400);
       } else {
         const details = await billing.fetchCurrentSubscription(req, res, 'pending');
+        console.log(details)
         if (details === null) {
           next();
         } else if (Number(details.paymentMethod) === 3) {
           console.log('spenn');
           const recentTransactions = await transactions.getTransactionsByEmail(user.email, 'Pending');
           if (recentTransactions.length > 0) {
-            console.log('found ---------------');
             const token = jwt.jwtSign({ role: 'main-api', user: user.email }, process.env.SECRET, 1000);
             await billing.checkRecentPendingSpennTransaction(
               recentTransactions, token, user, details, req, res, next
             );
           } else {
-            console.log('not found ---------------');
             next();
           }
         } else {
