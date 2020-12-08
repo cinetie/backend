@@ -86,7 +86,6 @@ class billing {
       const user = await userService.getUserByMail(req.body.email);
       const pendingSubscription = await billing.fetchCurrentSubscription(req, res, 'pending');
       const details = await billing.fetchCurrentSubscription(req, res);
-
       if (!user) {
         return util.setErrorResponse(res, "user doesn't exist", 400);
       } else if (pendingSubscription || user.plan === 'Setup' || details === null) {
@@ -97,6 +96,7 @@ class billing {
 
         const token = jwt.jwtSign({ role: 'main-api', user: user.email }, process.env.SECRET, 1000);
         if (endDate.getTime() <= today.getTime()) { // remember to change >= to <=
+  
           if (Number(details.paymentMethod) === 1) {
             const momoStatus = await Fetch({
               currency: 'RWF',
@@ -107,6 +107,7 @@ class billing {
 
             }, { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
             `${process.env.PAY_HOST}/charge/momo`, 'POST');
+            
             if (momoStatus.status === 200) {
               util.setSuccessResponse(res,
                 'Please follow this link to renew your subscription with Mobile money',
