@@ -10,7 +10,7 @@
     "dev": "NODE_ENV=development nodemon --exec babel-node src/index.js",
     "migrate": "sequelize db:migrate --env production ",
     "migrate:undo": "sequelize db:migrate:undo:all --env production ",
-    "migrate:dev": "sequelize db:migrate && sequelize db:seed:all --env development",
+    "migrate:dev": "sequelize db:migrate:undo:all && sequelize db:migrate && sequelize db:seed:all --env development",
     "migrate:undo:dev": "sequelize db:migrate:undo:all --env development",
     "migrate:staging": "sequelize db:migrate --env staging",
     "migrate:test": "sequelize db:migrate:undo:all && sequelize db:migrate && sequelize db:seed:all --debug",
@@ -19,8 +19,8 @@
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "test:two": "NODE_ENV=test npm run migrate:test && NODE_ENV=test nyc --reporter=html --reporter=text mocha --require @babel/register 'src/**/**test.js' --timeout 60000 --exit",
     "test:one": "NODE_ENV=test nyc --reporter=html --reporter=text mocha --require @babel/register 'src/**/**test.js' --timeout 60000 --exit",
-    "test:right": "NODE_ENV=test npm run migrate:test && NODE_ENV=test mocha --require @babel/register -- src/test/8.billing.test.js",
-    "test": "NODE_ENV=test mocha --require @babel/register -- src/test/8.billing.test.js",
+    "test:right": "NODE_ENV=test npm run migrate:test && NODE_ENV=test mocha --require @babel/register -- src/test/8.billing.test.js --timeout 60000 --exit",
+    "test": "NODE_ENV=test mocha --require @babel/register -- src/test/8.billing.test.js --timeout 60000 --exit",
     "snyk-protect": "snyk protect",
     "prepare": "npm run snyk-protect"
   },
@@ -69,7 +69,7 @@
     "pg": "^7.17.1",
     "pg-hstore": "^2.3.3",
     "request": "^2.88.0",
-    "sequelize": "^5.21.5",
+    "sequelize": "^5.22.3",
     "snyk": "^1.316.1",
     "superagent": "^5.2.1",
     "uuid": "^3.4.0",
@@ -95,7 +95,8 @@
     "prettier-eslint": "^9.0.0",
     "prettier-eslint-cli": "^5.0.0",
     "sequelize-cli": "^5.5.1",
-    "sinon": "^9.2.1"
+    "sinon": "^9.2.1",
+    "sinon-stub-promise": "^4.0.0"
   },
   "snyk": false
 }

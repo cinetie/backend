@@ -1,0 +1,18 @@
+export default {
+  up: (queryInterface) => queryInterface.bulkInsert('transactions', [
+    {
+      id: 10,
+      email: 'blaise127@gmail.com',
+      statusDesc: "Pending",
+      spTransactionId: null,
+      walletTransactionId: null,
+      chargedCommission: null,
+      currency: 'USD',
+      paidAmount: 3,
+      transactionId: '1115a95e-973d-4abe-9b80-bde4acf74610',
+      updatedAt: new Date(),
+      createdAt: new Date(),
+    },
+  ]),
+  down: (queryInterface) => queryInterface.bulkDelete('transactions', null, {}),
+};

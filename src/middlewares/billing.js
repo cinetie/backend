@@ -81,11 +81,12 @@ class billing {
   }
 
   static async renewPayment(req, res, next) {
+    
     try {
       const user = await userService.getUserByMail(req.body.email);
       const pendingSubscription = await billing.fetchCurrentSubscription(req, res, 'pending');
       const details = await billing.fetchCurrentSubscription(req, res);
-    
+
       if (!user) {
         return util.setErrorResponse(res, "user doesn't exist", 400);
       } else if (pendingSubscription || user.plan === 'Setup' || details === null) {
@@ -96,7 +97,6 @@ class billing {
 
         const token = jwt.jwtSign({ role: 'main-api', user: user.email }, process.env.SECRET, 1000);
         if (endDate.getTime() <= today.getTime()) { // remember to change >= to <=
-  
           if (Number(details.paymentMethod) === 1) {
             const momoStatus = await Fetch({
               currency: 'RWF',
@@ -107,7 +107,6 @@ class billing {
 
             }, { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
             `${process.env.PAY_HOST}/charge/momo`, 'POST');
-            
             if (momoStatus.status === 200) {
               util.setSuccessResponse(res,
                 'Please follow this link to renew your subscription with Mobile money',
@@ -126,20 +125,19 @@ class billing {
             billing.handleFailPaymentStatus(req, next);
           } else if (Number(details.paymentMethod) === 3) {
             const recentTransactions = await transactions.getTransactionsByEmail(user.email, 'Pending');
-            console.log('got here');
+            
             if (recentTransactions.length > 0) {
-              console.log(`found some ${recentTransactions.length}`);
               await billing.checkRecentPendingSpennTransaction(
                 recentTransactions, token, user, details, req, res, next
-              );
+              )
             } else {
-              console.log('found none charging');
               const pay = await payment.chargeSpenn(user, details, token);
+
               if (pay.status === 200) {
                 await payment.recordTransaction(user, details, pay);
                 // await billingService.updateSubscription(user.email,
                 //   { state: 'current' });
-                util.setSuccessResponse(res, pay.message, 200, pay);
+                util.setSuccessResponse(res, pay.message, 201, pay);
               } else {
                 billing.handleFailPaymentStatus(req, next);
               }
@@ -171,7 +169,6 @@ class billing {
       );
       await billingService.updateSubscription(user.email, { state: 'current' });
     } else {
-      console.log('failed ---------------');
       billing.handleFailPaymentStatus(req, next);
     }
   }

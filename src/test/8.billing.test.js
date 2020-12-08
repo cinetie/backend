@@ -5,10 +5,14 @@ import billing from '../middlewares/billing';
 // import chaiAsPromised from 'chai-as-promised'
 import sinon  from 'sinon'
 import httpMocks from 'node-mocks-http';
+import approvedTransaction from "./mock/chackSpennTransaction.mock"
+import sinonStubPromise from 'sinon-stub-promise';
+
  
 // chai.use(chaiAsPromised);
 chai.use(chaiHttp);
 chai.should();
+sinonStubPromise(sinon);
 
 
 describe('BILLING MIDDLEWARE', (req, res, status) => {
@@ -86,17 +90,67 @@ describe('BILLING MIDDLEWARE', (req, res, status) => {
     //     billing.sendBillingNotification(user, req, body)
     // });
     
-    it.only('Test renewPayment Method with registered email and subscription with current status should be okay', async () => {
+    it('Test renewPayment Method with registered email and no active subscription and momo payment should be okay', async () => {
         var nextSpy = sinon.spy();
         var req = httpMocks.createRequest({ 
             body: {
-                "email": "blaise120@gmail.com",
+                "email": "blaise125@gmail.com",
                 "password": "nAdia123"
             }
         });
         var res = httpMocks.createResponse();
-        const data = await billing.renewPayment(req, res, nextSpy)
-        console.log(data)
-        // expect(nextSpy.calledOnce).to.be.false;
-    });    
+        await billing.renewPayment(req, res, nextSpy)
+        expect(res.statusCode).to.equal(200)
+        expect(nextSpy.calledOnce).to.be.false;
+    });
+
+    it('Test renewPayment Method with registered email and no active subscription and spenn payment for the first time should be okay', async () => {
+        var nextSpy = sinon.spy();
+        var req = httpMocks.createRequest({ 
+            body: {
+                "email": "blaise126@gmail.com",
+                "password": "nAdia123"
+            }
+        });
+        var res = httpMocks.createResponse();
+        await billing.renewPayment(req, res, nextSpy)
+        expect(res.statusCode).to.equal(201)
+        expect(nextSpy.calledOnce).to.be.false;
+    }); 
+
+    it('Test renewPayment Method with registered email and no active subscription user use spenn payment it check spenn pending transaction before login should be okay but this is failed transaction', async () => {
+        var nextSpy = sinon.spy();
+        var req = httpMocks.createRequest({ 
+            body: {
+                "email": "blaise126@gmail.com",
+                "password": "nAdia123"
+            }
+        });
+        var res = httpMocks.createResponse();
+        await billing.renewPayment(req, res, nextSpy)
+        expect(res.statusCode).to.equal(200)
+        expect(nextSpy.calledOnce).to.be.false;
+    });
+
+    it('Test renewPayment Method with registered email and no active subscription user use spenn payment it check spenn pending transaction before login should be okay but this is Approved transaction', async () => {
+        const stub = sinon.stub(billing, 'checkSpenn').callsFake(() => {
+            return approvedTransaction
+          })
+
+        
+        var nextSpy = sinon.spy();
+        var req = httpMocks.createRequest({ 
+            body: {
+                "email": "blaise127@gmail.com",
+                "password": "nAdia123"
+            }
+        });
+        var res = httpMocks.createResponse();
+        await billing.renewPayment(req, res, nextSpy)
+        expect(res.statusCode).to.equal(200)
+        expect(nextSpy.calledOnce).to.be.true;
+
+        stub.restore();
+    });
+    
 });
