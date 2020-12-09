@@ -18,7 +18,7 @@ router.get('/particular', auth.getUserByEmail);
 router.post('/login',
   isAdmin.verifyAdmin, 
   validation.login, 
-  // billing.verifySpennTransactions,
+  billing.verifySpennTransactions,
   billing.renewPayment,
   screenValidator.validateNumberOfScreens,
   auth.loginUser);
