@@ -5,10 +5,13 @@ import viewingSessions from '../services/viewingSessionsServices';
 import videoService from '../services/videoServices';
 import response from '../helpers/response';
 import jwt from '../helpers/jwt';
+import { session } from 'passport';
+import { result } from 'lodash';
 
 class viewingSession {
   static async createNewWatchCount(req, res, next) {
     try {
+      
       const { ip } = req.headers;
       const { id } = req.query;
       const videoId = id;
@@ -18,16 +21,20 @@ class viewingSession {
       if (!videoData) return response.errorResponse(res, 404, 'Can\'t find the video you\'re looking for', 'NotFoundError');
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
       const data = req.body;
+      
       data.sessionState = 'Active';
       data.userId = decoded.email;
       data.time = new Date().getTime();
+      
       const locationServiceData = await fetch(`http://api.ipstack.com/${ip}?access_key=${process.env.IP_STACK_ACCESS_TOKEN}`);
       const JsonlocationData = await locationServiceData.json();
+
       // check if there is an exact session before same like the provided one
       const sessions = await viewingSessions.getSesssionPerVideoUser(decoded.email, videoId);
       if (Object.values(sessions).length >= 1) {
         next();
       } else {
+        
         const results = await viewingSessions.registerViewingSessions({
           sessionState: 'Active',
           userId: decoded.email,
