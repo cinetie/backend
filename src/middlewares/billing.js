@@ -71,7 +71,6 @@ class billing {
   static async updateSubscription(req, res) {
     let today;
     const details = await userService.getUserByMail(req.body.email);
-    console.log(details.isBilledAnnually)
     if (details.isBilledAnnually === true) {
       today = date.addMoreDays(365).toDateString();
       
@@ -166,7 +165,6 @@ class billing {
     // eslint-disable-next-line no-console
     if (recentTransaction.data.Status === 'Approved'
       || recentTransaction.data.Status === 'TransactionVerified') {
-      console.log(' success ---------------');
       await billing.updateTransactionsAndRegisterSales(
         recentTransactions[0].transactionId, user, details, req, res, next
       );
@@ -269,7 +267,6 @@ class billing {
         next();
       }
     } catch (error) {
-      console.log(error)
       util.setErrorResponse(res, `an error occured  ${error}`, 500);
     }
   }
