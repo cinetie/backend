@@ -51,7 +51,6 @@ class payment {
 
   static async chargeSpenn(user, details, token) {
     try {
-      console.log(details.price, details.plan);
       const pay = await Fetch({
         phone: user.phoneNumber,
         amount: details.price,

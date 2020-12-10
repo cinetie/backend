@@ -167,7 +167,7 @@ class transactionsController {
         await Users.updateUser(email, { permissionLevel: 1 });
         return util.setSuccessResponse(res, raw.message, raw.status);
       }
-      return util.setErrorResponse(res, 'Something went wrong', 400, raw);
+      return util.setErrorResponse(res, raw.message, 400, raw);
     } catch (error) {
       return util.setErrorResponse(res, error, 500);
     }
