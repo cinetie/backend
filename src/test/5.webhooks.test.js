@@ -3,6 +3,7 @@ import chaiHttp from 'chai-http';
 import { describe, it } from 'mocha';
 import WebHooks from '../controllers/webhooks';
 import emptyMock from './mock/empty.mock';
+import sinon from 'sinon'
 import { FlutterMocksEmpty, FlutterMocks } from './mock/flutterwave.mock';
 
 chai.use(chaiHttp);

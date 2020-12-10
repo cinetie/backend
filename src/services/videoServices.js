@@ -330,6 +330,7 @@ class videoService {
   }
 
   static async getMainFeaturedVideo(type,country) {
+    console.log(type)
     try {
       const videos = await database.videos.findAll({
         order: [["id", "DESC"]],
