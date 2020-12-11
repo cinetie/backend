@@ -29,7 +29,7 @@ export default class WebHooks {
       if (transVerification.status === 'success') {
         let updates = {};
         await billingService.updateSubscription(user.email, {
-          endDate: date.addMoreDays(30).toDateString(), state: 'current'
+          endDate: !user.isBilledAnnually ? date.addMoreDays(30).toDateString() : date.addMoreDays(365).toDateString(), state: 'current'
         });
         if (response['event.type'] === 'CARD_TRANSACTION') {
           updates = await UserService.updateUser(
