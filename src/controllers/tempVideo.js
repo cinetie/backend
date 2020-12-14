@@ -96,9 +96,12 @@ class tempVideoController {
 
   static async deleteParticularVideoController(req, res) {
     try {
+      const video = await services.getParticularVideo(req.query.id);
       const videos = await services.deleteVideos(req.query.id);
-      if (videos) {
-        util.setSuccessResponse(res, 'Video deleted', 200, videos);
+      const decoded = jwt.jwtVerify(video.videoUri, process.env.SECRET);
+      const deleteTitle = await videoService.deleteVideo(decoded.videoId);
+      if (videos && deleteTitle) {
+        util.setSuccessResponse(res, 'Video deleted', 200, { videos, deleteTitle });
       } else {
         util.setErrorResponse(res, 'No video found', 401);
       }
@@ -106,6 +109,7 @@ class tempVideoController {
       util.setErrorResponse(res, `something happened ${error.message}`, 503);
     }
   }
+
 
   static async updateParticularVideoController(req, res) {
     try {

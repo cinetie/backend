@@ -3,7 +3,7 @@ import video from '../controllers/video';
 import access from '../middlewares/access';
 import earnings from '../controllers/earning';
 import billing from '../middlewares/billing';
-
+import { updateVideo } from '../middlewares/validation/video';
 // import imageValidation from '../middlewares/validators/imageValidator'
 const router = new Router();
 router.post('/new', access.isAdmin, video.addVideo);
@@ -21,7 +21,7 @@ router.get('/earnings', earnings.getAllEarningsPerVideo);
 router.get('/main/ft', access.isNormalUser, video.getMainFeaturedFilm);
 router.get('/second/ft', access.isNormalUser, video.getSecondFeaturedFilm);
 router.get('/sort/type', access.isProducer, video.getAllVideosByType);
-router.put('/', access.isAdmin, video.updateVideos);
+router.put('/', access.isAdmin,updateVideo, video.updateVideos);
 router.put('/set-featured', access.isAdmin, video.featureVideo);
 router.delete('/', access.isAdmin, video.deleteAvideo);
 

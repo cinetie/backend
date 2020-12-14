@@ -66,6 +66,8 @@ FREQUENCY_CRON=
 
 - [Add watch count](#2-add-watch-count-post-request)
 
+- [Update video](#17-update-video-put-request)
+
 ### Transactions
 
 - [Get Rave standard link](#3-get-rave-standard-link-get-request)
@@ -95,6 +97,8 @@ FREQUENCY_CRON=
 - [Add a temporary video](#7-add-temp-video-post-request)
 
 - [Approve a temporary video](#8-approve-temp-video-post-request)
+
+- [Update temporary video](#16-update-temporary-video-put-request)
 
 ### Series
 
@@ -780,5 +784,83 @@ Response:
     "statusCode": 201,
     "status": "success",
     "message": "Subscription activated"
+}
+```
+
+### 16. Update temporary video: PUT Request
+
+Endpoint:
+
+```text
+/temp/update?id=<id>
+```
+
+Headers:
+
+```json
+{
+    "Authorization": "Bearer <Admin token>",
+    "Content-Type": "application/json"
+}
+```
+
+Body:
+
+```json
+{
+    "property": "value"
+}
+
+```
+
+Response:
+
+```json
+{
+    "statusCode": 200,
+    "status": "success",
+    "message": "Video updated",
+    "data": [
+        1
+    ]
+}
+```
+
+### 17. Update  video: PUT Request
+
+Endpoint:
+
+```text
+/video?id=<videoId>
+```
+
+Headers:
+
+```json
+{
+    "Authorization": "Bearer <Admin token>",
+    "Content-Type": "application/json"
+}
+```
+
+Body:
+
+```json
+{
+    "property": "value"
+}
+
+```
+
+Response:
+
+```json
+{
+    "statusCode": 200,
+    "status": "success",
+    "message": "Video updated",
+    "data": [
+        1
+    ]
 }
 ```

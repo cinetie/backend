@@ -2,6 +2,7 @@
 import AddMovie from './schemas/videos/addMovie';
 import addSerie from './schemas/videos/addSerie';
 import ApproveVideoSchema from './schemas/videos/approveVideo';
+import UpdateVideoSchema from './schemas/videos/updateVideo';
 import validator from '../../helpers/validator';
 
 export const addVideo = (req, res, next) => {
@@ -16,3 +17,7 @@ export const addVideo = (req, res, next) => {
 export const approveVideo = (req, res, next) => {
   validator(ApproveVideoSchema, req.body, res, next);
 };
+
+export const updateVideo = (req, res, next) => {
+  validator(UpdateVideoSchema, req.body, res, next);
+}
