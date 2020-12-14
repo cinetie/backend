@@ -127,7 +127,7 @@ class billing {
             // }, `${process.env.PAY_HOST}/charge/card-token`, 'POST');
             billing.handleFailPaymentStatus(req, next);
           } else if (Number(details.paymentMethod) === 3) {
-            const recentTransactions = await transactions.getTransactionsByEmail(user.email, 'Pending');
+            const recentTransactions = await transactions.getTransactionsByEmail(user.email, 'pending');
             
             if (recentTransactions.length > 0) {
               await billing.checkRecentPendingSpennTransaction(
@@ -135,9 +135,9 @@ class billing {
               )
             } else {
               const pay = await payment.chargeSpenn(user, details, token);
-
               if (pay.status === 200) {
-                await payment.recordTransaction(user, details, pay);
+                // await payment.recordTransaction(user, details, pay);
+                await payment.recordTransaction(user, details, pay.data.RequestId, 'pending');
                 // await billingService.updateSubscription(user.email,
                 //   { state: 'current' });
                 util.setSuccessResponse(res, pay.message, 201, pay);
@@ -186,6 +186,7 @@ class billing {
         } else if (Number(details.paymentMethod) === 3) {
           
           const recentTransactions = await transactions.getTransactionsByEmail(user.email, 'pending');
+          console.log(recentTransactions, recentTransactions[recentTransactions.length - 1]);
           if (recentTransactions.length > 0) {
             const token = jwt.jwtSign({ role: 'main-api', user: user.email }, process.env.SECRET, 1000);
             await billing.checkRecentPendingSpennTransaction(
@@ -200,6 +201,7 @@ class billing {
       }
     } catch (error) {
       // eslint-disable-next-line no-console
+      console.log(error);
       util.setErrorResponse(res, error.message, 500);
     }
   }
@@ -217,7 +219,7 @@ class billing {
         amount: details.price
       }, details, req, res);
       if (status === true) {
-        await transactions.updateTransaction(recentTrans, { statusDesc: 'Approved' });
+        await transactions.updateTransaction(recentTrans, { statusDesc: 'approved' });
         next();
       } else {
         return util.setErrorResponse(res, 'Contact support Error: SPENN transaction error', 500);
@@ -248,7 +250,7 @@ class billing {
     await transactions.createTransaction(
       {
         email: user.email,
-        statusDesc: 'Pending',
+        statusDesc: 'pending',
         paidAmount: details.price,
         transactionId: pay.data.RequestId,
         currency: 'RWF',

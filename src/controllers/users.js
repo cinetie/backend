@@ -2,6 +2,7 @@
 /* eslint-disable no-shadow */
 /* eslint-disable consistent-return */
 import path from 'path';
+import { v4 as uuid } from 'uuid';
 import userService from '../services/userServices';
 import tokenService from '../services/tokenService';
 import billingServices from '../services/billingServices';
@@ -331,6 +332,7 @@ class userController {
             const updates = await userService.updateUser(email,
               { isOnTrial: false });
             if (updates[1] > 0) {
+              await payment.recordTransaction(user, currentSubscription, paymentData.txRef, 'pending');
               util.setSuccessResponse(res, 'Pending subscription  activation with MoMo', 201, momoData);
             } else {
               util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
@@ -352,6 +354,7 @@ class userController {
             } if (pay.meta.authorization.mode === 'pin') {
               return util.setSuccessResponse(res, 'Please provide your pin', 200, undefined);
             } if (pay.meta.authorization.mode === 'otp') {
+              await payment.recordTransaction(user, currentSubscription, paymentData.txRef, 'pending');
               return util.setSuccessResponse(
                 res, pay.data.processor_response, 200, { flw_ref: pay.data.flw_ref }
               );
@@ -368,7 +371,7 @@ class userController {
           if (pay.status === 200) {
             const updates = await userService.updateUser(email, { isOnTrial: false });
             if (updates[1] === 1) {
-              await payment.recordTransaction(user, currentSubscription, pay);
+              await payment.recordTransaction(user, currentSubscription, pay.data.RequestId, 'pending');
               util.setSuccessResponse(res, pay.message, 200, pay);
             } else {
               console.log(updates);
@@ -433,7 +436,8 @@ class userController {
       currency: 'RWF',
       phone_number: user.phoneNumber,
       fullname: `${user.firstName} ${user.lastName}`,
-      email
+      email,
+      txRef: uuid()
     };
   }
 
