@@ -17,6 +17,7 @@ import date from '../helpers/date';
 import mailer from '../helpers/mailer';
 import Rave from '../helpers/rave';
 import Fetch from '../helpers/fetch';
+import billing from '../middlewares/billing';
 
 const util = new Util();
 class userController {
@@ -277,7 +278,10 @@ class userController {
     try {
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const currentSubscription = await billingServices.getCurrentSubscription(email);
-      if (!currentSubscription) {
+      const pendingSubscription  = await billingServices.getPendingSubscription(email)
+      const getSubscription = await billingServices.getSubscription(email)
+
+      if (!getSubscription) {
         const user = await userService.getUserByMail(email);
         const { paymentMethod } = req.body;
         const subscriptionData = {
@@ -293,9 +297,48 @@ class userController {
         } else {
           util.setErrorResponse(res, 'Something went sideways completing the signup', 400);
         }
+      } else if(getSubscription.state === 'pending') {
+
+        const user = await userService.getUserByMail(email);
+        const { paymentMethod } = req.body;
+        const subscriptionData = {
+          paymentMethod,
+          email,
+          plan: user.plan,
+          phoneNumber: user.phoneNumber,
+          isBilledAnnually: user.isBilledAnnually,
+        };
+        const subscriptionDetails = await payment.updatePendingSubscription(subscriptionData);
+        if (subscriptionDetails) {
+          util.setSuccessResponse(res, 'Completed signup process and update', 200, subscriptionDetails);
+        } else {
+          util.setErrorResponse(res, 'Something went sideways completing the signup', 400);
+        }
       } else {
-        util.setErrorResponse(res, 'user has an active subscription', 400);
+        util.setErrorResponse(res, 'You have an active current subscription', 400);
       }
+
+
+      
+      // if (!currentSubscription) {
+      //   const user = await userService.getUserByMail(email);
+      //   const { paymentMethod } = req.body;
+      //   const subscriptionData = {
+      //     paymentMethod,
+      //     email,
+      //     plan: user.plan,
+      //     phoneNumber: user.phoneNumber,
+      //     isBilledAnnually: user.isBilledAnnually,
+      //   };
+      //   const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
+      //   if (subscriptionDetails) {
+      //     util.setSuccessResponse(res, 'Completed signup process', 201, subscriptionDetails);
+      //   } else {
+      //     util.setErrorResponse(res, 'Something went sideways completing the signup', 400);
+      //   }
+      // } else {
+      //   util.setErrorResponse(res, 'user has an active subscription', 400);
+      // }
     } catch (error) {
       util.setErrorResponse(res, `Something went sideways totally sideways contact support ${error}`, 500);
     }
