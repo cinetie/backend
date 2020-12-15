@@ -50,9 +50,6 @@ class screenValidation {
         const details = await screenValidation.getPlan(req, res);
         const activeSessions = await loginSessionService.getParticularSession(details.email);
         const subscriptionStatus = await billingService.getSubscription(req.body.email)
-console.log("+++++++++++++++++++++++++++++++")
-        console.log(subscriptionStatus.state)
-console.log("+++++++++++++++++++++++++++++++")
 
         if (activeSessions.length !== details.screens || user.plan === 'Setup' || subscriptionStatus.state === "pending") {
           next();

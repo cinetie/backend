@@ -281,8 +281,7 @@ class userController {
       const pendingSubscription  = await billingServices.getPendingSubscription(email)
       const getSubscription = await billingServices.getSubscription(email)
       const today = new Date();
-      const endDate = new Date(getSubscription.endDate);
-      console.log(endDate)
+      const endDate = new Date(getSubscription ? getSubscription.endDate: '');
 
       if (!getSubscription) {
         const user = await userService.getUserByMail(email);
