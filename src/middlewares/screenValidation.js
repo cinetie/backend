@@ -5,6 +5,7 @@ import Util from '../helpers/utilities';
 import userService from '../services/userServices';
 import planService from '../services/planServices';
 import loginSessionService from '../services/loginSessionServices';
+import billingService from "../services/billingServices"
 
 const util = new Util();
 
@@ -48,8 +49,12 @@ class screenValidation {
         const user = await userService.getUserByMail(req.body.email);
         const details = await screenValidation.getPlan(req, res);
         const activeSessions = await loginSessionService.getParticularSession(details.email);
+        const subscriptionStatus = await billingService.getSubscription(req.body.email)
+console.log("+++++++++++++++++++++++++++++++")
+        console.log(subscriptionStatus.state)
+console.log("+++++++++++++++++++++++++++++++")
 
-        if (activeSessions.length !== details.screens || user.plan === 'Setup') {
+        if (activeSessions.length !== details.screens || user.plan === 'Setup' || subscriptionStatus.state === "pending") {
           next();
         } else {
           util.setErrorResponse(res, 'Maximum screens in your plan has reached ', 403);

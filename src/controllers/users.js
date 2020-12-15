@@ -280,6 +280,9 @@ class userController {
       const currentSubscription = await billingServices.getCurrentSubscription(email);
       const pendingSubscription  = await billingServices.getPendingSubscription(email)
       const getSubscription = await billingServices.getSubscription(email)
+      const today = new Date();
+      const endDate = new Date(getSubscription.endDate);
+      console.log(endDate)
 
       if (!getSubscription) {
         const user = await userService.getUserByMail(email);
@@ -297,7 +300,7 @@ class userController {
         } else {
           util.setErrorResponse(res, 'Something went sideways completing the signup', 400);
         }
-      } else if(getSubscription.state === 'pending') {
+      } else if(getSubscription.state === 'pending' || endDate.getTime() <= today.getTime()) {
 
         const user = await userService.getUserByMail(email);
         const { paymentMethod } = req.body;
@@ -317,28 +320,6 @@ class userController {
       } else {
         util.setErrorResponse(res, 'You have an active current subscription', 400);
       }
-
-
-      
-      // if (!currentSubscription) {
-      //   const user = await userService.getUserByMail(email);
-      //   const { paymentMethod } = req.body;
-      //   const subscriptionData = {
-      //     paymentMethod,
-      //     email,
-      //     plan: user.plan,
-      //     phoneNumber: user.phoneNumber,
-      //     isBilledAnnually: user.isBilledAnnually,
-      //   };
-      //   const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
-      //   if (subscriptionDetails) {
-      //     util.setSuccessResponse(res, 'Completed signup process', 201, subscriptionDetails);
-      //   } else {
-      //     util.setErrorResponse(res, 'Something went sideways completing the signup', 400);
-      //   }
-      // } else {
-      //   util.setErrorResponse(res, 'user has an active subscription', 400);
-      // }
     } catch (error) {
       util.setErrorResponse(res, `Something went sideways totally sideways contact support ${error}`, 500);
     }
