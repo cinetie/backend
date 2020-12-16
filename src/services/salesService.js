@@ -5,13 +5,13 @@ import database from '../database/models';
 const op = sequelize.Op;
 
 class saleService {
-  static async getSalesByModeOfPayment(modeOfPayment) {
+  static async getSalesByModeOfPayment(method) {
     try {
       const user = await database.sales.findOne({
         attributes: {
           exclude: ['createdAt', 'updatedAt', 'id']
         },
-        where: { modeOfPayment }
+        where: { method }
       });
       if (user) {
         return user;
@@ -31,12 +31,12 @@ class saleService {
         where: {
           [op.and]: [
             {
-              start: {
+              creationTime: {
                 [op.gte]: start
               }
             },
             {
-              start: {
+              creationTime: {
                 [op.lte]: end
               }
             }
