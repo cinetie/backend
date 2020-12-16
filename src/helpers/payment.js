@@ -20,6 +20,35 @@ class payment {
     }
   }
 
+  static async updatePendingSubscription(details) {
+    try {
+      const data = {};
+      const plan = await planService.getParticalPlan(details.plan);
+      (details.isBilledAnnually) ? data.price = plan.yearlyPrice : data.price = plan.monthlyPrice;
+      data.email = details.email;
+      data.plan = details.plan;
+      data.state = 'pending';
+      data.phoneNumber = details.phoneNumber;
+      if (details.isBilledAnnually === true) {
+        data.endDate = date.addMoreDays(365).toDateString();
+      } else {
+        data.endDate = date.addMoreDays(30).toDateString();
+      }
+      data.paymentMethod = details.paymentMethod;
+      const user = await userService.getUserByMail(details.email);
+      if (user.isOnTrial === true) {
+        data.trialEnds = date.addMoreDays(5).getTime();
+      }
+      const bill = await billingService.updateSubscription(data.email, data);
+      if (bill) {
+        return bill;
+      }
+      return null;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static async registerNewSubscription(details) {
     try {
       const data = {};
