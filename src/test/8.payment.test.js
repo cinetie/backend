@@ -58,8 +58,9 @@ describe('PAYMENT HELPER', () => {
   });
 
   it('should return pay recordTransaction', async () => {
-    const results = await payment.recordTransaction(user, details, pay);
+    // const results = await payment.recordTransaction(user, details, pay);
+    const results = await payment.recordTransaction(user, details, pay.data.RequestId, 'pending');
     expect(results.email).to.be.equal('blaise1@gmail.com');
-    expect(results.statusDesc).to.be.equal('Pending');
+    expect(results.statusDesc).to.be.equal('pending');
   });
 });

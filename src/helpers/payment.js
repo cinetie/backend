@@ -64,17 +64,17 @@ class payment {
     }
   }
 
-  static async recordTransaction(user, details, pay) {
-    const result = await transactions.createTransaction(
-      {
-        email: user.email,
-        statusDesc: 'Pending',
-        paidAmount: details.price,
-        transactionId: pay.data.RequestId,
-        currency: 'USD',
-      }
-    );
-    return result;
-  }
+static async recordTransaction(user, details, requestId, status) {
+  const result = await transactions.createTransaction(
+    {
+      email: user.email,
+      statusDesc: status,
+      paidAmount: details.price,
+      transactionId: requestId,
+      currency: 'USD',
+    }
+  );
+  return result;
+}
 }
 export default payment;

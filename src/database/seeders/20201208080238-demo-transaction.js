@@ -3,7 +3,7 @@ export default {
     {
       id: 10,
       email: 'blaise127@gmail.com',
-      statusDesc: "Pending",
+      statusDesc: "pending",
       spTransactionId: null,
       walletTransactionId: null,
       chargedCommission: null,
@@ -16,7 +16,7 @@ export default {
     {
       id: 11,
       email: 'blaise1269910@gmail.com',
-      statusDesc: "Pending",
+      statusDesc: "pending",
       spTransactionId: null,
       walletTransactionId: null,
       chargedCommission: null,
