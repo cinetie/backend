@@ -8,7 +8,7 @@ class salesController {
   static async getSalesByModeOfPayment(req, res) {
     try {
       const sales = await service.getSalesByModeOfPayment(req.query.mode);
-      if (sales) util.setSuccessResponse(res, 'data found', 200, sales);
+      if (sales) return util.setSuccessResponse(res, 'data found', 200, sales);
       util.setErrorResponse(res, 'data not found', 400);
     } catch (error) {
       util.setErrorResponse(res, 'something went wrong', 503);
@@ -18,8 +18,13 @@ class salesController {
   static async getSalesInTimeRange(req, res) {
     try {
       const { start, end } = req.body;
-      const sales = await service.getSalesInTimeRange(start, end);
-      if (sales) util.setSuccessResponse(res, 'data found', 200, sales);
+
+      const startDate = new Date(start).getTime()
+      const endDate =  new Date(end).getTime()
+
+      const sales = await service.getSalesInTimeRange(startDate, endDate);
+
+      if (sales) return util.setSuccessResponse(res, 'data found', 200, sales);
       util.setErrorResponse(res, 'data not found', 400);
     } catch (error) {
       util.setErrorResponse(res, 'something went wrong', 503);
@@ -57,7 +62,7 @@ class salesController {
           data: uniqueValues
         });
       }
-      return response.successResponse(res, 200, 'Data Not found', 0);
+      return response.successResponse(res, 400, 'Data Not found', 0);
     } catch (error) {
       util.setErrorResponse(res, `something went wrong ${error}`, 503);
     }
