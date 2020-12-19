@@ -1,8 +1,11 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable quotes */
+import { config } from 'dotenv';
 import Util from '../helpers/utilities';
 import { deleteObject, getSignedUrl } from '../helpers/aws';
 import trailerServices from '../services/trailerService';
+
+config()
 
 const util = new Util();
 
@@ -24,7 +27,7 @@ class Trailers {
       const { id } = req.query;
       const trailers = await trailerServices.getAllTrailers(id);
       for (let i = 0; i < trailers.length; i++) {
-        trailers[i].trailerLink = Trailers.attachThumbnails(trailers[i].trailerLink, 'cinetie-trailers');
+        trailers[i].trailerLink = Trailers.attachThumbnails(trailers[i].trailerLink, process.env.TRAILERS_BUCKET);
       }
       if (Object.values(trailers).length > 0) {
         util.setSuccessResponse(res, 'Found', 200, trailers);
@@ -40,7 +43,7 @@ class Trailers {
     try {
       const trailers = await trailerServices.getAllTrailers();
       for (let i = 0; i < trailers.length; i++) {
-        trailers[i].trailerLink = Trailers.attachThumbnails(trailers[i].trailerLink, 'cinetie-trailers');
+        trailers[i].trailerLink = Trailers.attachThumbnails(trailers[i].trailerLink, process.env.TRAILERS_BUCKET);
       }
       if (trailers) {
         util.setSuccessResponse(res, 'Found', 200, trailers);
@@ -56,7 +59,7 @@ class Trailers {
     try {
       const trailers = await trailerServices.getAllTrailers(req.query.videoId);
       for (let i = 0; i < trailers.length; i++) {
-        trailers[i].trailerLink = Trailers.attachThumbnails(trailers[i].trailerLink, 'cinetie-trailers');
+        trailers[i].trailerLink = Trailers.attachThumbnails(trailers[i].trailerLink, process.env.TRAILERS_BUCKET);
       }
       if (trailers) {
         util.setSuccessResponse(res, 'Found', 200, trailers);
@@ -71,7 +74,7 @@ class Trailers {
   static async deleteParticularTrailerController(req, res) {
     try {
       const trailer = await trailerServices.getParticularTrailer(req.query.id);
-      const deleteTrailer = await deleteObject('cinetie-trailers', trailer.trailerLink);
+      const deleteTrailer = await deleteObject(process.env.TRAILERS_BUCKET, trailer.trailerLink);
       const trailers = await trailerServices.deleteTrailers(req.query.id);
       if (trailers && !deleteTrailer.$response.error) {
         util.setSuccessResponse(res, 'Trailer deleted', 200, trailers);
@@ -107,7 +110,7 @@ class Trailers {
   // eslint-disable-next-line consistent-return
   static async getTrailerUploadLink(req, res) {
     try {
-      const url = await getSignedUrl('cinetie-trailers', 'video/*', req.query.extension);
+      const url = await getSignedUrl(process.env.TRAILERS_BUCKET, 'video/*', req.query.extension);
       if (!url) {
         util.setErrorResponse(res, 'Something went wrong', 400);
       } else {
