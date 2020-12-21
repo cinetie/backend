@@ -36,6 +36,23 @@ class transactionService {
     }
   }
 
+  static async getRecentTransactionsByEmail(email, statusDesc)  {
+    try {
+      const data = await database.transactions.findOne({
+        where: {
+          [op.and]: [
+            { email },
+            { statusDesc },
+          ],
+        },
+        order: [ [ 'createdAt', 'DESC' ]],
+      });
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static async deleteTransaction(id) {
     try {
       const deleted = await database.transactions.destroy({
