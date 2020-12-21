@@ -7,6 +7,7 @@ import jwt from '../helpers/jwt';
 import response from '../helpers/response';
 import Util from '../helpers/utilities';
 import { default as billingServices, default as subscriptionService } from '../services/billingServices';
+import { default as transactionService, default as getTransactionsByEmail } from '../services/transactionService';
 import earningService from '../services/earningServices';
 import userService from '../services/userServices';
 import viewSessionService from '../services/viewingSessionsServices';
@@ -18,7 +19,7 @@ const util = new Util();
 class earningController {
   // obtains details about the current users subscription
   static async getCurrentSubscriptionDetails(email) {
-    const details = await subscriptionService.getCurrentSubscription(email);
+    const details = await transactionService.getRecentTransactionsByEmail(email, 'approved')
     if (details) {
       return details;
     }
@@ -38,7 +39,7 @@ class earningController {
   static async calculateRatePerVideo(email) {
     const sessionDetails = await this.getCurrentViewingSessions(email);
     const subscriptionDetails = await this.getCurrentSubscriptionDetails(email);
-    const rate = (Number(subscriptionDetails.price) * 0.7) / Object.values(sessionDetails).length;
+    const rate = (Number(subscriptionDetails.paidAmount) * 0.7) / Object.values(sessionDetails).length;
     if (rate) {
       return rate;
     }
