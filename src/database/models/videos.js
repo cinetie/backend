@@ -1,6 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
   const videos = sequelize.define('videos', {
     videoLink: DataTypes.STRING,
+    videoKey: DataTypes.STRING,
     videoId: DataTypes.STRING,
     videoName: DataTypes.STRING,
     videoCast: DataTypes.TEXT,

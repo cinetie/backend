@@ -1,6 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
   const series = sequelize.define('series', {
     episode: DataTypes.STRING,
+    episodeKey: DataTypes.STRING,
     season: DataTypes.STRING,
     episodeName: DataTypes.STRING,
     videoId: DataTypes.STRING,
