@@ -5,7 +5,6 @@ import viewingSessions from '../services/viewingSessionsServices';
 import videoService from '../services/videoServices';
 import response from '../helpers/response';
 import jwt from '../helpers/jwt';
-import { session } from 'passport';
 import { result } from 'lodash';
 
 class viewingSession {

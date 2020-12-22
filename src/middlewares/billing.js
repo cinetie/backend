@@ -201,7 +201,6 @@ class billing {
       }
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.log(error);
       util.setErrorResponse(res, error.message, 500);
     }
   }

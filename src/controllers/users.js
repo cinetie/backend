@@ -101,7 +101,7 @@ class userController {
       } = req.query;
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
       const user = await userService.getUserByMail(decoded);
-      if (!user) response.errorResponse(res, 404, 'User not found');
+      if (!user) return response.errorResponse(res, 404, 'User not found');
       jwt.jwtVerify(token, process.env.SECRET);
       const newUser = {
         isVerified: true
