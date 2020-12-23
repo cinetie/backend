@@ -17,7 +17,6 @@ phases:
   build:
     commands:
       - echo Build started on `date`
-      - npm run test
       - echo building docker image
       - aws s3 cp s3://cinetie-config/ca-certificate.crt .
       - aws s3 cp s3://cinetie-config/.env .
