@@ -17,7 +17,6 @@ RUN mkdir -p /opt/app && cp -a /tmp/node_modules /opt/app/
 # "layer" thats been cached will be used if possible
 WORKDIR /opt/app
 ADD . /opt/app
-RUN npm run test
 
 EXPOSE 3001
 
