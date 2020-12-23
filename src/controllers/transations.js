@@ -18,9 +18,9 @@ class transactionsController {
       delete data.status;
       const createdTrans = await service.createTransaction(data);
       if (createdTrans) {
-        util.setSuccessResponse(res, 'Payment Done', 200, createdTrans);
+        return util.setSuccessResponse(res, 'Payment Done', 200, createdTrans);
       } else {
-        util.setErrorResponse(res, 'Oops something went wrong', 500);
+        return util.setErrorResponse(res, 'Oops something went wrong', 503);
       }
     } catch (error) {
       util.setErrorResponse(res, error, 500);
@@ -40,12 +40,11 @@ class transactionsController {
         'GET'
       );
       if (raw.status === 201) {
-        util.setSuccessResponse(res, 'Session id found', 200, raw);
+        return util.setSuccessResponse(res, 'Session id found', 200, raw);
       } else {
-        util.setErrorResponse(res, 'Something went wrong', 400);
+        return util.setErrorResponse(res, 'Something went wrong', 400);
       }
     } catch (error) {
-      console.log(error);
       util.setErrorResponse(res, error, 500);
     }
   }
@@ -57,6 +56,7 @@ class transactionsController {
         process.env.SECRET,
         1000
       );
+      
       const user = await Users.getUserByMail(req.user);
       const currentSubscription = await billingServices.getCurrentSubscription(user.email, 'pending');
       const txRef = uuid();
@@ -76,17 +76,15 @@ class transactionsController {
         `${process.env.PAY_HOST}/charge/rave-standard`,
         'POST'
       );
-      console.log(raw);
       if (raw.status === 200) {
         await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
-        util.setSuccessResponse(res, 'Link generated', 201, {
+        return util.setSuccessResponse(res, 'Link generated', 201, {
           link: raw.data.link,
         });
       } else {
-        util.setErrorResponse(res, 'Something went wrong', 400);
+        return util.setErrorResponse(res, 'Something went wrong', 400);
       }
     } catch (error) {
-      console.log(error);
       util.setErrorResponse(res, error, 500);
     }
   }
@@ -105,7 +103,6 @@ class transactionsController {
         process.env.SECRET,
         1000
       );
-      console.log(subscription.paymentMethod);
       if (subscription.paymentMethod === 3) {
         const userUpdate = await Users.updateUser(email, { permissionLevel: -2 });
         const subscriptionUpdate = await Subscriptions.updateSubscription(email, { state: 'canceled' });
@@ -119,7 +116,6 @@ class transactionsController {
           }
         );
       }
-      console.log('executing');
       const raw = await Fetch(
         { email },
         {
@@ -130,11 +126,9 @@ class transactionsController {
         'PUT'
       );
       if (raw.status === 201) {
-        console.log(raw);
         await Users.updateUser(email, { permissionLevel: -2 });
         return util.setSuccessResponse(res, raw.message, raw.status);
       }
-      console.log(raw);
       return util.setErrorResponse(res, 'Something went wrong', 400, raw);
     } catch (error) {
       return util.setErrorResponse(res, error, 500);

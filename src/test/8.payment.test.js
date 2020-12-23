@@ -2,6 +2,10 @@ import chai, { expect } from 'chai';
 import payment from '../helpers/payment';
 import { data, data1 } from './mock/resData.mock';
 import jwt from '../helpers/jwt';
+import { config } from 'dotenv';
+
+
+config();
 
 const details = {
   isBilledAnnually: true,

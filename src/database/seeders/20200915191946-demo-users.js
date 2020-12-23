@@ -421,6 +421,28 @@ export default {
       createdAt: new Date(),
     },
 
+    {
+      id: 10489,
+      firstName: 'Izabayo',
+      lastName: 'Blaise',
+      email: 'blaias129129@gmail.com',
+      password: '$2b$10$bryek73ChjIvE5bcZFGtm.6vxqCdgmfkWnUQIjRNaHdnq/DCkTRC2',
+      nationality: 'Rwandan',
+      cityOfResidence: 'Muhima',
+      isVerified: true,
+      plan: 'Promo',
+      permissionLevel: 1,
+      isOnTrial: true,
+      isBilledAnnually: false,
+      phoneNumber: +250781250006,
+      card_nonce: null,
+      card_brand: null,
+      customerId: null,
+      isOnExtension: true,
+      updatedAt: new Date(),
+      createdAt: new Date(),
+    },
+
 
 
 
