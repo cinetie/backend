@@ -52,6 +52,11 @@ RAVE_SECRET=
 PAY_HOST=
 NODE_ENV=
 PORT=
+FREQUENCY_CRON=
+TEMP_BUCKET_SERIES=
+TEMP_BUCKET_MOVIE=
+PERMANENT_BUCKET_SERIES=
+PERMANENT_BUCKET_MOVIE=
 
 ```
 
@@ -64,6 +69,10 @@ PORT=
 ### Videos
 
 - [Add watch count](#2-add-watch-count-post-request)
+
+- [Update video](#17-update-video-put-request)
+
+- [Get single video](#18-get-single-video-get-request)
 
 ### Transactions
 
@@ -94,6 +103,8 @@ PORT=
 - [Add a temporary video](#7-add-temp-video-post-request)
 
 - [Approve a temporary video](#8-approve-temp-video-post-request)
+
+- [Update temporary video](#16-update-temporary-video-put-request)
 
 ### Series
 
@@ -779,5 +790,136 @@ Response:
     "statusCode": 201,
     "status": "success",
     "message": "Subscription activated"
+}
+```
+
+### 16. Update temporary video: PUT Request
+
+Endpoint:
+
+```text
+/temp/update?id=<id>
+```
+
+Headers:
+
+```json
+{
+    "Authorization": "Bearer <Admin token>",
+    "Content-Type": "application/json"
+}
+```
+
+Body:
+
+```json
+{
+    "property": "value"
+}
+
+```
+
+Response:
+
+```json
+{
+    "statusCode": 200,
+    "status": "success",
+    "message": "Video updated",
+    "data": [
+        1
+    ]
+}
+```
+
+### 17. Update  video: PUT Request
+
+Endpoint:
+
+```text
+/video?id=<videoId>
+```
+
+Headers:
+
+```json
+{
+    "Authorization": "Bearer <Admin token>",
+    "Content-Type": "application/json"
+}
+```
+
+Body:
+
+```json
+{
+    "property": "value"
+}
+
+```
+
+Response:
+
+```json
+{
+    "statusCode": 200,
+    "status": "success",
+    "message": "Video updated",
+    "data": [
+        1
+    ]
+}
+```
+
+### 18. Get single video: GET Request
+
+Endpoint
+
+```text
+/video/unique?ip=&id=e52e3b69-1015-46d0-b1fb-dc504e0eeaf5
+```
+
+Headers:
+
+```json
+{
+    "Authorization": "Bearer <User token>",
+    "Content-Type": "application/json"
+}
+```
+
+Body:
+**NONE**
+
+Response:
+
+```json
+{
+    "statusCode": 200,
+    "status": "success",
+    "message": "videos Found",
+    "data": {
+        "id": 81,
+        "videoLink": "https://d1n93qtmcsa1om.cloudfront.net/4658f065-86cc-4ab1-aeaa-71d8fabaec26/dash/f8f9027d-d730-4407-818f-60c71f31edd1.mpd",
+        "videoKey": "f8f9027d-d730-4407-818f-60c71f31edd1.mp4",
+        "videoId": "e52e3b69-1015-46d0-b1fb-dc504e0eeaf5",
+        "videoName": "test 43",
+        "videoCast": "rgrtg",
+        "videoSynopsis": "ewfefer",
+        "videoWatchCount": null,
+        "videoThumbnailLink": "c2a888c3-c220-487b-8285-8b5e35ee9c41.jpg",
+        "videoIdVimeo": "0000",
+        "videoClientId": "67b6c3a8-884f-48af-8e8f-1a60b15824de",
+        "videoSuspensionState": 0,
+        "creationTime": 1608559176667,
+        "category": "Short-Film",
+        "featureType": 0,
+        "isFeatured": false,
+        "tallThumbNailLink": "29222b5b-7d3b-4d26-897c-fd2cea89b517.jpg",
+        "nameTagThumbNailLink": "161cdab5-7efb-4cc5-9257-3ed370f1bf5a.png",
+        "resCountries": "Antarctica,Bouvet Island,Heard Island and McDonald Islands",
+        "type": "movie",
+        "rate": "Everyone"
+    }
 }
 ```

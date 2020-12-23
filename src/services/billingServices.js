@@ -69,6 +69,49 @@ class billingServices {
     }
   }
 
+  static async getPendingSubscription(email, state) {
+    try {
+      const currentSubs = await database.subscriptions.findOne({
+        where: {
+          [op.and]: [
+            {
+              email,
+            },
+            {
+              state: 'pending',
+            },
+          ],
+        },
+      });
+      if (currentSubs) {
+        return currentSubs;
+      }
+      return null;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async getSubscription(email, state) {
+    try {
+      const currentSubs = await database.subscriptions.findOne({
+        where: {
+          [op.and]: [
+            {
+              email,
+            }
+          ],
+        },
+      });
+      if (currentSubs) {
+        return currentSubs;
+      }
+      return null;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static async getMonthlySubscribers(start, end) {
     // gte start and lte end in  milliseconds
     try {

@@ -1,9 +1,12 @@
 /* eslint-disable no-plusplus */
+import { config } from 'dotenv';
 import services from '../services/serieServices';
 import Util from '../helpers/utilities';
 import temp from '../services/tempSerieService';
 import jwt from '../helpers/jwt';
 import { getObject, deleteObject, copyObjects } from '../helpers/aws';
+
+config()
 
 const util = new Util();
 
@@ -13,13 +16,13 @@ class Episodes {
       const { id } = req.query;
       const tempVideo = await temp.getParticularVideo(id);
       const decoded = jwt.jwtVerify(tempVideo.uri, process.env.SECRET);
-      await copyObjects('cinetie-temp-series', 'series-cinetie', decoded.uri);
+      await copyObjects(process.env.TEMP_BUCKET_SERIES, process.env.PERMANENT_BUCKET_SERIES, decoded.uri);
       const createdSerie = await services.update(decoded.id, {
         suspensionState: false,
-        episode: decoded.uri
+        episodeKey: decoded.uri
       });
       const deleted = await temp.deleteSeries(id);
-      const deletionStatus = await deleteObject('cinetie-temp-series', decoded.uri);
+      const deletionStatus = await deleteObject(process.env.TEMP_BUCKET_SERIES, decoded.uri);
       if (createdSerie && deleted && deletionStatus) {
         util.setSuccessResponse(res, 'Created successfully', 201);
       } else {
@@ -33,7 +36,7 @@ class Episodes {
   static async getSingleEpisode(req, res) {
     try {
       const episode = await services.getSingleEpisode(req.query.ep);
-      const uri = await getObject('series-cinetie', episode.episode, 20000);
+      const uri = await getObject(process.env.PERMANENT_BUCKET_SERIES, episode.episode, 20000);
       episode.episode = uri;
       if (!episode) {
         util.setErrorResponse(res, 'Can\'t find what you requested', 400);
@@ -55,7 +58,7 @@ class Episodes {
         util.setErrorResponse(res, 'Can\'t find what you requested', 400);
       } else {
         for (let i = 0; i < episodes.length; i++) {
-          episodes[i].thumbNailUrl = Episodes.attachThumbnails(episodes[i].thumbNailUrl, 'cinetie-thumbnails');
+          episodes[i].thumbNailUrl = Episodes.attachThumbnails(episodes[i].thumbNailUrl, process.env.THUMBNAIL_BUCKET);
         }
         util.setSuccessResponse(res, 'Retrieved successfully', 200, episodes);
       }
@@ -90,7 +93,7 @@ class Episodes {
   static async delete(req, res) {
     try {
       const videoFile = await services.getSingleEpisode(req.params.id);
-      const results = await deleteObject('series-cinetie', videoFile.episode);
+      const results = await deleteObject(process.env.TEMP_BUCKET_SERIES, videoFile.episode);
       const deleted = await services.deleteEpisode(req.params.id);
       if (deleted && Object.values(results).length === 0) {
         util.setSuccessResponse(res, 'deleted easily', 200, deleted);
@@ -108,7 +111,7 @@ class Episodes {
       const { clientId } = jwt.jwtVerify(token, process.env.SECRET);
       const episodes = await services.getEpisodesByClientId(clientId);
       for (let i = 0; i < episodes.length; i++) {
-        episodes[i].thumbNailUrl = Episodes.attachThumbnails(episodes[i].thumbNailUrl, 'cinetie-thumbnails');
+        episodes[i].thumbNailUrl = Episodes.attachThumbnails(episodes[i].thumbNailUrl, process.env.THUMBNAIL_BUCKET);
       }
       if (Object.values(episodes).length > 0) {
         util.setSuccessResponse(res, 'Sucess', 200, episodes);

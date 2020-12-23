@@ -20,6 +20,35 @@ class payment {
     }
   }
 
+  static async updatePendingSubscription(details) {
+    try {
+      const data = {};
+      const plan = await planService.getParticalPlan(details.plan);
+      (details.isBilledAnnually) ? data.price = plan.yearlyPrice : data.price = plan.monthlyPrice;
+      data.email = details.email;
+      data.plan = details.plan;
+      data.state = 'pending';
+      data.phoneNumber = details.phoneNumber;
+      if (details.isBilledAnnually === true) {
+        data.endDate = date.addMoreDays(365).toDateString();
+      } else {
+        data.endDate = date.addMoreDays(30).toDateString();
+      }
+      data.paymentMethod = details.paymentMethod;
+      const user = await userService.getUserByMail(details.email);
+      if (user.isOnTrial === true) {
+        data.trialEnds = date.addMoreDays(5).getTime();
+      }
+      const bill = await billingService.updateSubscription(data.email, data);
+      if (bill) {
+        return bill;
+      }
+      return null;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static async registerNewSubscription(details) {
     try {
       const data = {};
@@ -51,7 +80,6 @@ class payment {
 
   static async chargeSpenn(user, details, token) {
     try {
-      console.log(details.price, details.plan);
       const pay = await Fetch({
         phone: user.phoneNumber,
         amount: details.price,
@@ -65,16 +93,17 @@ class payment {
     }
   }
 
-  static async recordTransaction(user, details, pay) {
-    await transactions.createTransaction(
-      {
-        email: user.email,
-        statusDesc: 'Pending',
-        paidAmount: details.price,
-        transactionId: pay.data.RequestId,
-        currency: 'USD',
-      }
-    );
-  }
+static async recordTransaction(user, details, requestId, status) {
+  const result = await transactions.createTransaction(
+    {
+      email: user.email,
+      statusDesc: status,
+      paidAmount: details.price,
+      transactionId: requestId,
+      currency: 'USD',
+    }
+  );
+  return result;
+}
 }
 export default payment;

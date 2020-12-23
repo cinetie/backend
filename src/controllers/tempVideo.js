@@ -1,5 +1,6 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable no-await-in-loop */
+import { config } from 'dotenv';
 import services from '../services/tempVideoServices';
 import videoService from '../services/videoServices';
 import cpService from '../services/cpServices';
@@ -7,6 +8,8 @@ import Helpers from '../helpers/utilities';
 import uuid from '../helpers/uuid';
 import jwt from '../helpers/jwt';
 import { getSignedUrl, getObject } from '../helpers/aws';
+
+config();
 
 const util = new Helpers();
 
@@ -81,7 +84,7 @@ class tempVideoController {
         util.setErrorResponse(res, 'No video available', 404);
       } else {
         const decoded = jwt.jwtVerify(videos.videoUri, process.env.SECRET);
-        const uri = await getObject('cinetie-temp-movies', decoded.videoUri, 60000);
+        const uri = await getObject(process.env.TEMP_BUCKET_MOVIE, decoded.videoUri, 60000);
         videos.videoUri = uri;
         if (uri) {
           util.setSuccessResponse(res, 'Video found', 200, videos);
@@ -96,9 +99,12 @@ class tempVideoController {
 
   static async deleteParticularVideoController(req, res) {
     try {
+      const video = await services.getParticularVideo(req.query.id);
       const videos = await services.deleteVideos(req.query.id);
-      if (videos) {
-        util.setSuccessResponse(res, 'Video deleted', 200, videos);
+      const decoded = jwt.jwtVerify(video.videoUri, process.env.SECRET);
+      const deleteTitle = await videoService.deleteVideo(decoded.videoId);
+      if (videos && deleteTitle) {
+        util.setSuccessResponse(res, 'Video deleted', 200, { videos, deleteTitle });
       } else {
         util.setErrorResponse(res, 'No video found', 401);
       }
@@ -106,6 +112,7 @@ class tempVideoController {
       util.setErrorResponse(res, `something happened ${error.message}`, 503);
     }
   }
+
 
   static async updateParticularVideoController(req, res) {
     try {
@@ -123,10 +130,11 @@ class tempVideoController {
   static async getSignedUrlTempVideos(req, res) {
     try {
       const { type, extension } = req.query;
-      const portrait = await getSignedUrl('cinetie-thumbnails', 'image/*', 'jpg');
-      const landscape = await getSignedUrl('cinetie-thumbnails', 'image/*', 'jpg');
-      const nameTag = await getSignedUrl('cinetie-thumbnails', 'image/*', 'png');
-      const video = (type === 'movie') ? await getSignedUrl('cinetie-temp-movies', 'video/*', extension) : null;
+      const portrait = await getSignedUrl(process.env.THUMBNAIL_BUCKET, 'image/*', 'jpg');
+      const landscape = await getSignedUrl(process.env.THUMBNAIL_BUCKET, 'image/*', 'jpg');
+      const nameTag = await getSignedUrl(process.env.THUMBNAIL_BUCKET, 'image/*', 'png');
+      const video = (type === 'movie') ? await getSignedUrl(process.env.TEMP_BUCKET_MOVIE, 'video/*', extension) : null;
+      console.log(video, portrait, landscape, nameTag, '================ links ========================');
       util.setSuccessResponse(res, 'Temporary urls', 200, {
         portrait,
         landscape,

@@ -23,3 +23,4 @@ export default joi.object().keys({
     .error(() => 'You have to enter age rating'),
   resCountries: joi.string().required()
 }).options({ allowUnknown: false });
+ 

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import Flutterwave from 'flutterwave-node-v3';
 import path from 'path';
 import UserService from '../services/userServices';
@@ -5,6 +6,7 @@ import Util from '../helpers/utilities';
 import Sales from '../helpers/sales';
 import Earnings from '../helpers/earnings';
 import mailer from '../helpers/mailer';
+import transactions from '../services/transactionService';
 import viewingSessions from '../services/viewingSessionsServices';
 import billingService from '../services/billingServices';
 import date from '../helpers/date';
@@ -18,19 +20,19 @@ const rave = new Flutterwave(
 export default class WebHooks {
   // eslint-disable-next-line consistent-return
   static async flutterWave(req, res) {
-    try {
-      // console.log(req.body);
+        try {
       const response = (req.body.data) ? req.body.data : req.body;
       // console.log(response.customer.email);
       const user = await UserService.getUserByMail(response.customer.email
         || response.data.customer.email);
-      console.log(user);
+        // const recentTrans = await transactions.getTransactionsByEmail(user.email, 'pending');
+        const test = await transactions.updateTransaction(response.txRef, { statusDesc: response.status.toLowerCase() });
+        console.log(test);
       const transVerification = await rave.Transaction.verify({ id: response.id });
-      // console.log(transVerification, '------------------', req.body);
       if (transVerification.status === 'success') {
         let updates = {};
         await billingService.updateSubscription(user.email, {
-          endDate: date.addMoreDays(30).toDateString(), state: 'current'
+          endDate: !user.isBilledAnnually ? date.addMoreDays(30).toDateString() : date.addMoreDays(365).toDateString(), state: 'current'
         });
         if (response['event.type'] === 'CARD_TRANSACTION') {
           updates = await UserService.updateUser(

@@ -5,6 +5,13 @@ export const UserUp = {
   password: 'Password123',
 };
 
+export const UserUpFine = {
+  firstName: 'Izabayo',
+  lastName: 'Blaise',
+  email: 'blaise4@gmail.com',
+  password: 'Password123',
+};
+
 export const UserUpExist = {
   firstName: 'Izabayo',
   lastName: 'Blaise',

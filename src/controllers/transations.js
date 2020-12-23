@@ -1,6 +1,9 @@
 /* eslint-disable no-console */
 import service from '../services/transactionService';
 import Util from '../helpers/utilities';
+import { v4 as uuid } from 'uuid';
+import billingServices from '../services/billingServices';
+import payment from '../helpers/payment';
 import Fetch from '../helpers/fetch';
 import jwt from '../helpers/jwt';
 import Users from '../services/userServices';
@@ -55,7 +58,8 @@ class transactionsController {
         1000
       );
       const user = await Users.getUserByMail(req.user);
-      console.log(user);
+      const currentSubscription = await billingServices.getCurrentSubscription(user.email, 'pending');
+      const txRef = uuid();
       const raw = await Fetch(
         {
           plan: user.plan,
@@ -63,6 +67,7 @@ class transactionsController {
           email: user.email,
           name: `${user.firstName} ${user.lastName}`,
           paymentOptions: 'card',
+          txRef,
         },
         {
           'Content-Type': 'application/json',
@@ -73,6 +78,7 @@ class transactionsController {
       );
       console.log(raw);
       if (raw.status === 200) {
+        await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
         util.setSuccessResponse(res, 'Link generated', 201, {
           link: raw.data.link,
         });
@@ -167,7 +173,7 @@ class transactionsController {
         await Users.updateUser(email, { permissionLevel: 1 });
         return util.setSuccessResponse(res, raw.message, raw.status);
       }
-      return util.setErrorResponse(res, 'Something went wrong', 400, raw);
+      return util.setErrorResponse(res, raw.message, 400, raw);
     } catch (error) {
       return util.setErrorResponse(res, error, 500);
     }

@@ -40,7 +40,7 @@ class adminController {
         }
         // remove duplicates
         const uniqueValues = util.getUnique(formattedData, 'monthYear');
-        util.setSuccessResponse(res, 'Earnings found ', 200, {
+        return util.setSuccessResponse(res, 'Earnings found ', 200, {
           sum: Number(sum.toFixed(2)),
           data: uniqueValues
         });
@@ -54,23 +54,23 @@ class adminController {
   static async getVideosPerCp(req, res) {
     const { clientId } = req.query;
     const videos = await videoService.getAllVideos(clientId);
+    if (!videos) return util.setErrorResponse(res, 'videos not found', 400);
     for (let i = 0; i < Object.values(videos).length; i++) {
       const date = new Date(Number(videos[i].creationTime));
       videos[i].creationTime = `${date.toDateString()}`;
     }
     getAttachedThumbsMultiple(videos);
-    if (!videos) util.setErrorResponse(res, 'videos not found', 400);
     util.setSuccessResponse(res, 'videos found', 200, videos);
   }
 
   static async getAllVideos(req, res) {
     const videos = await videoService.getAllVideosForAdmin();
+    if (!videos) return util.setErrorResponse(res, 'videos not found', 400);
     for (let i = 0; i < Object.values(videos).length; i++) {
       const date = new Date(Number(videos[i].creationTime));
       videos[i].creationTime = `${date.toDateString()}`;
     }
-    if (!videos) util.setErrorResponse(res, 'videos not found', 400);
-    util.setSuccessResponse(res, 'videos found', 200, videos);
+    return util.setSuccessResponse(res, 'videos found', 200, videos);
   }
 
   static async getAllEarningsPerVideo(req, res) {
@@ -100,7 +100,7 @@ class adminController {
         }
         // remove duplicates
         const uniqueValues = util.getUnique(formattedData, 'monthYear');
-        util.setSuccessResponse(res, 'Earnings found ', 200, {
+        return util.setSuccessResponse(res, 'Earnings found ', 200, {
           sum: Number(sum.toFixed(2)),
           data: uniqueValues
         });
@@ -115,7 +115,7 @@ class adminController {
     try {
       const { email, clientId } = req.body;
       const token = JWT.jwtSign({ key: cry.crypto(), email, clientId }, process.env.SECRET, '1d');
-      if (!token) util.setErrorResponse(res, 'something went wrong', 400);
+      if (!token) return util.setErrorResponse(res, 'something went wrong', 400);
       util.setSuccessResponse(res, 'Token generated', 200, token);
     } catch (error) {
       util.setErrorResponse(res, `Something Went wrong logging in ${error}`, 500);

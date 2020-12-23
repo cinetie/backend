@@ -3,11 +3,16 @@ import '@babel/polyfill';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import cron from 'node-cron';
+import { config } from 'dotenv';
 import path from 'path';
 import fileUpload from 'express-fileupload';
 import response from './helpers/response';
+import stopLoginSessions from "./helpers/stopLoginSessions";
 import routes from './routes';
 
+config();
+cron.schedule(process.env.FREQUENCY_CRON, stopLoginSessions);
 const app = express();
 
 app.enable('trust proxy');
@@ -34,6 +39,7 @@ app.use((req, res) => response.errorResponse(res, 404, 'Not found', 'Undefined U
 app.set('views', path.join(__dirname, '/public/templates'));
 app.set('view engine', 'ejs');
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Up and running on port ${PORT} ${process.env.HOST}`));
-
+if (!module.parent) {
+  app.listen(PORT, () => console.log(`Up and running on port ${PORT} ${process.env.HOST}`));
+}
 module.exports = app;

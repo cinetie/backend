@@ -68,10 +68,12 @@ class billing {
     ]);
   }
 
-  static async updateSubscription(req, res, today) {
-    const details = await billing.fetchCurrentSubscription(req, res);
+  static async updateSubscription(req, res) {
+    let today;
+    const details = await userService.getUserByMail(req.body.email);
     if (details.isBilledAnnually === true) {
       today = date.addMoreDays(365).toDateString();
+      
     } else {
       today = date.addMoreDays(31).toDateString();
     }
@@ -81,19 +83,23 @@ class billing {
   }
 
   static async renewPayment(req, res, next) {
+    
     try {
       const user = await userService.getUserByMail(req.body.email);
       const pendingSubscription = await billing.fetchCurrentSubscription(req, res, 'pending');
+      const details = await billing.fetchCurrentSubscription(req, res);
+
       if (!user) {
-        util.setErrorResponse(res, "user doesn't exist", 400);
-      } else if (pendingSubscription || user.plan === 'Setup') {
+        return util.setErrorResponse(res, "user doesn't exist", 400);
+      } else if (pendingSubscription || user.plan === 'Setup' || details === null) {
         next();
       } else {
-        const details = await billing.fetchCurrentSubscription(req, res);
         const today = new Date();
         const endDate = new Date(details.endDate);
+
         const token = jwt.jwtSign({ role: 'main-api', user: user.email }, process.env.SECRET, 1000);
         if (endDate.getTime() <= today.getTime()) { // remember to change >= to <=
+          
           if (Number(details.paymentMethod) === 1) {
             const momoStatus = await Fetch({
               currency: 'RWF',
@@ -121,23 +127,22 @@ class billing {
             // }, `${process.env.PAY_HOST}/charge/card-token`, 'POST');
             billing.handleFailPaymentStatus(req, next);
           } else if (Number(details.paymentMethod) === 3) {
-            const recentTransactions = await transactions.getTransactionsByEmail(user.email, 'Pending');
-            console.log('got here');
+            const recentTransactions = await transactions.getTransactionsByEmail(user.email, 'pending');
+            
             if (recentTransactions.length > 0) {
-              console.log(`found some ${recentTransactions.length}`);
               await billing.checkRecentPendingSpennTransaction(
                 recentTransactions, token, user, details, req, res, next
-              );
+              )
             } else {
-              console.log('found none charging');
               const pay = await payment.chargeSpenn(user, details, token);
               if (pay.status === 200) {
-                await payment.recordTransaction(user, details, pay);
+                // await payment.recordTransaction(user, details, pay);
+                await payment.recordTransaction(user, details, pay.data.RequestId, 'pending');
                 // await billingService.updateSubscription(user.email,
                 //   { state: 'current' });
-                util.setSuccessResponse(res, pay.message, 200, pay);
+                util.setSuccessResponse(res, pay.message, 201, pay);
               } else {
-                billing.handleFailPaymentStatus(req, next);
+                return billing.handleFailPaymentStatus(req, next);
               }
             }
           }
@@ -158,41 +163,36 @@ class billing {
       token
     );
     // eslint-disable-next-line no-console
-    console.log(recentTransaction.data.Status);
     if (recentTransaction.data.Status === 'Approved'
       || recentTransaction.data.Status === 'TransactionVerified') {
-      console.log(' success ---------------');
       await billing.updateTransactionsAndRegisterSales(
         recentTransactions[0].transactionId, user, details, req, res, next
       );
       await billingService.updateSubscription(user.email, { state: 'current' });
     } else {
-      console.log('failed ---------------');
       billing.handleFailPaymentStatus(req, next);
     }
   }
 
   static async verifySpennTransactions(req, res, next) {
     try {
-      console.log('starting ---------------');
       const user = await userService.getUserByMail(req.body.email);
       if (!user) {
-        util.setErrorResponse(res, 'user doesn\'t exist', 400);
+        return util.setErrorResponse(res, 'user doesn\'t exist', 400);
       } else {
         const details = await billing.fetchCurrentSubscription(req, res, 'pending');
         if (details === null) {
           next();
         } else if (Number(details.paymentMethod) === 3) {
-          console.log('spenn');
-          const recentTransactions = await transactions.getTransactionsByEmail(user.email, 'Pending');
+          
+          const recentTransactions = await transactions.getTransactionsByEmail(user.email, 'pending');
+          console.log(recentTransactions, recentTransactions[recentTransactions.length - 1]);
           if (recentTransactions.length > 0) {
-            console.log('found ---------------');
             const token = jwt.jwtSign({ role: 'main-api', user: user.email }, process.env.SECRET, 1000);
             await billing.checkRecentPendingSpennTransaction(
               recentTransactions, token, user, details, req, res, next
             );
           } else {
-            console.log('not found ---------------');
             next();
           }
         } else {
@@ -219,13 +219,13 @@ class billing {
         amount: details.price
       }, details, req, res);
       if (status === true) {
-        await transactions.updateTransaction(recentTrans, { statusDesc: 'Approved' });
+        await transactions.updateTransaction(recentTrans, { statusDesc: 'approved' });
         next();
       } else {
-        util.setErrorResponse(res, 'Contact support Error: SPENN transaction error', 500);
+        return util.setErrorResponse(res, 'Contact support Error: SPENN transaction error', 500);
       }
     } else {
-      util.setErrorResponse(res, 'Contact support Error: Subscription renewal', 500);
+      return util.setErrorResponse(res, 'Contact support Error: Subscription renewal', 500);
     }
   }
 
@@ -250,7 +250,7 @@ class billing {
     await transactions.createTransaction(
       {
         email: user.email,
-        statusDesc: 'Pending',
+        statusDesc: 'pending',
         paidAmount: details.price,
         transactionId: pay.data.RequestId,
         currency: 'RWF',
@@ -260,10 +260,11 @@ class billing {
 
   static async verifyPermissionLevel(req, res, next) {
     try {
+      
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const data = await userService.getUserByMail(email);
       if (data.permissionLevel === -1) {
-        util.setErrorResponse(res, 'Please set up your billing', 402);
+        return util.setErrorResponse(res, 'Please set up your billing', 402);
       } else {
         next();
       }
@@ -274,23 +275,23 @@ class billing {
 
   static async trial(req, res, next) {
     try {
+      
       const { email } = jwt.jwtVerify(
         req.headers.authorization.slice(7), process.env.SECRET
       );
-      console.log('checking trial status');
       const data = await userService.getUserByMail(email);
       if (data.isOnTrial === false && data.isOnExtension === false) {
         next();
       } else {
-        console.log('check failed');
+        
         const today = new Date();
         const subscription = await billingService.getCurrentSubscription(email);
         const viewingSessions = await ViewingSessions.getActiveSessionsPerUser(email);
         if ((subscription.trialEnds > today.getTime()) && viewingSessions.length < 3) {
           next();
         } else {
+         
           const updates = await userService.updateUser(email, { permissionLevel: -1 });
-          console.log(updates);
           if (updates[1] > 0) {
             await mailer([{
               body: 'We would like you to know that your account has been put onhold. \n since your  trial just ended'
@@ -305,7 +306,7 @@ class billing {
             ]);
             util.setErrorResponse(res, 'Please activate your account as your trial just ended', 402);
           } else {
-            util.setErrorResponse(res, 'Something went wrong ', 402);
+            return util.setErrorResponse(res, 'Something went wrong ', 502);
           }
         }
       }

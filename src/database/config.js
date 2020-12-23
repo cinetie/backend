@@ -19,7 +19,7 @@ module.exports = {
   },
   test: {
     use_env_variable: 'TEST_DATABASE_URL',
-    dialect: 'postgres',
+    dialect: 'mysql',
     logging: false,
   },
 

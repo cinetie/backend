@@ -1,11 +1,14 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable no-await-in-loop */
+import { config } from 'dotenv';
 import Helpers from '../helpers/utilities';
 import services from '../services/tempSerieService';
 import jwt from '../helpers/jwt';
 import { getSignedUrl, getObject } from '../helpers/aws';
 import series from '../services/serieServices';
 import videoServices from '../services/videoServices';
+
+config()
 
 const util = new Helpers();
 
@@ -58,8 +61,8 @@ class tempSerieController {
   static async getSignedUrlTempSeries(req, res) {
     try {
       const { extension } = req.query;
-      const thumb = await getSignedUrl('cinetie-thumbnails', 'image/*', 'jpg');
-      const video = await getSignedUrl('cinetie-temp-series', 'video/*', extension);
+      const thumb = await getSignedUrl(process.env.THUMBNAIL_BUCKET, 'image/*', 'jpg');
+      const video = await getSignedUrl(process.env.TEMP_BUCKET_SERIES, 'video/*', extension);
       util.setSuccessResponse(res, 'Temporary urls', 200, {
         thumb,
         video
@@ -74,7 +77,7 @@ class tempSerieController {
       const episode = await services.getParticularVideo(req.query.id);
       if (episode) {
         const decoded = jwt.jwtVerify(episode.uri, process.env.SECRET);
-        episode.uri = await getObject('cinetie-temp-series', decoded.uri, 6000);
+        episode.uri = await getObject(process.env.TEMP_BUCKET_SERIES, decoded.uri, 6000);
         util.setSuccessResponse(res, 'Episode found', 200, episode);
       } else {
         util.setErrorResponse(res, 'Can not find that episode', 404);
