@@ -12,7 +12,7 @@ import stopLoginSessions from "./helpers/stopLoginSessions";
 import routes from './routes';
 
 config();
-cron.schedule(process.env.FREQUENCY_CRON, stopLoginSessions);
+cron.schedule('0 0 0 * * *', stopLoginSessions);
 const app = express();
 
 app.enable('trust proxy');
