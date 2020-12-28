@@ -2,7 +2,7 @@
 /* eslint-disable quotes */
 import { config } from 'dotenv';
 import Util from '../helpers/utilities';
-import { deleteObject, getSignedUrl } from '../helpers/aws';
+import { deleteObject, getSignedUrl, getObject } from '../helpers/aws';
 import trailerServices from '../services/trailerService';
 
 config()
@@ -27,7 +27,8 @@ class Trailers {
       const { id } = req.query;
       const trailers = await trailerServices.getAllTrailers(id);
       for (let i = 0; i < trailers.length; i++) {
-        trailers[i].trailerLink = Trailers.attachThumbnails(trailers[i].trailerLink, process.env.TRAILERS_BUCKET);
+        // trailers[i].trailerLink = Trailers.attachThumbnails(trailers[i].trailerLink, process.env.TRAILERS_BUCKET);
+        trailers[i].trailerLink = await getObject(process.env.TRAILERS_BUCKET, trailers[i].trailerLink, 60000);
       }
       if (Object.values(trailers).length > 0) {
         util.setSuccessResponse(res, 'Found', 200, trailers);
