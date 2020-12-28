@@ -29,7 +29,7 @@ app.use(fileUpload({
 app.get('/', (req, res) => response.successResponse(res, 200, 'Welcome to Cinetie'));
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'GET, POST, PUT, PATCH, OPTIONS, DELETE');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, OPTIONS, DELETE');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });
