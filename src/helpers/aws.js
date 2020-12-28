@@ -4,9 +4,10 @@ import { v4 as V4 } from 'uuid';
 import { promisify } from 'util';
 
 const {
-  AWS_REGION, AWS_ID, AWS_SECRET
+  AWS_ID, AWS_SECRET
 } = process.env;
 
+const AWS_REGION = 'eu-west-1'
 function config(credentials) {
   AWS.config.update({
     region: AWS_REGION,
