@@ -36,8 +36,6 @@ class Episodes {
   static async getSingleEpisode(req, res) {
     try {
       const episode = await services.getSingleEpisode(req.query.ep);
-      const uri = await getObject(process.env.PERMANENT_BUCKET_SERIES, episode.episode, 20000);
-      episode.episode = uri;
       if (!episode) {
         util.setErrorResponse(res, 'Can\'t find what you requested', 400);
       } else {
