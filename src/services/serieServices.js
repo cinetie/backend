@@ -31,7 +31,7 @@ class serieServices {
   }
 
   static async getEpisodesByClientId(clientId) {
-    const episode = await database.series.findOne({
+    const episode = await database.series.findAll({
       where: { clientId }
     });
     if (episode) {

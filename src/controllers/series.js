@@ -36,13 +36,13 @@ class Episodes {
   static async getSingleEpisode(req, res) {
     try {
       const episode = await services.getSingleEpisode(req.query.ep);
+      if (!episode) {
+        return util.setErrorResponse(res, 'Can\'t find what you requested', 400);
+      }
       const uri = await getObject(process.env.PERMANENT_BUCKET_SERIES, episode.episode, 20000);
       episode.episode = uri;
-      if (!episode) {
-        util.setErrorResponse(res, 'Can\'t find what you requested', 400);
-      } else {
-        util.setSuccessResponse(res, 'Retrieved successfully', 200, episode);
-      }
+      util.setSuccessResponse(res, 'Retrieved successfully', 200, episode);
+
     } catch (error) {
       util.setErrorResponse(res, `Something happened ${error.message}`, 500);
     }
@@ -83,7 +83,7 @@ class Episodes {
   static async updateSerie(req, res) {
     try {
       const updated = await services.update(req.body.id, req.body);
-      if (!updated) util.setErrorResponse(res, 'Can\'t updated what you requested', 400);
+      if (!updated[0]) return util.setErrorResponse(res, 'Can\'t updated what you requested', 400);
       util.setSuccessResponse(res, 'Updated easily', 201, updated);
     } catch (error) {
       util.setErrorResponse(res, `Something happened ${error.message}`, 500);
@@ -93,6 +93,7 @@ class Episodes {
   static async delete(req, res) {
     try {
       const videoFile = await services.getSingleEpisode(req.params.id);
+      if(!videoFile) return util.setErrorResponse(res, 'Can\'t find what you requested', 400);
       const results = await deleteObject(process.env.TEMP_BUCKET_SERIES, videoFile.episode);
       const deleted = await services.deleteEpisode(req.params.id);
       if (deleted && Object.values(results).length === 0) {
@@ -110,14 +111,11 @@ class Episodes {
       const token = req.headers.authorization.slice(7);
       const { clientId } = jwt.jwtVerify(token, process.env.SECRET);
       const episodes = await services.getEpisodesByClientId(clientId);
+      if(!(episodes.length > 0)) return util.setErrorResponse(res, 'can\'t find matching episodes', 400);
       for (let i = 0; i < episodes.length; i++) {
         episodes[i].thumbNailUrl = Episodes.attachThumbnails(episodes[i].thumbNailUrl, process.env.THUMBNAIL_BUCKET);
       }
-      if (Object.values(episodes).length > 0) {
-        util.setSuccessResponse(res, 'Sucess', 200, episodes);
-      } else {
-        util.setErrorResponse(res, 'can\'t find matching episodes', 400);
-      }
+      util.setSuccessResponse(res, 'Sucess', 200, episodes);
     } catch (error) {
       util.setErrorResponse(res, `Something happened ${error.message}`, 500);
     }

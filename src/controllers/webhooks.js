@@ -75,7 +75,7 @@ export default class WebHooks {
         return util.setErrorResponse(res, 'Server Error: can\'t update subscription', 400);
       }
     } catch (error) {
-      console.log(error);
+      console.log(error, 'vgrgregergegr');
       return util.setErrorResponse(res, `Server Error ${error || error.message}`, 500);
     }
   }

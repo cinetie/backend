@@ -16,7 +16,6 @@ class tempSerieController {
   static async createSerie(req, res) {
     try {
       const data = req.body;
-      console.log(req.headers);
       data.clientId = req.headers.cpid;
       // data.size = req.files.video.size;
       data.thumbNailUrl = req.body.thumb;

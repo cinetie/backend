@@ -59,7 +59,7 @@ class Video {
             process.env.TEMP_BUCKET_MOVIE,
             decoded.videoUri
           );
-          if (!updatedVideo || !deleted || !deleteAWS) {
+          if (!updatedVideo[0] || !deleted || !deleteAWS) {
             util.setErrorResponse(
               res,
               "something went wrong while approving video",
@@ -75,7 +75,7 @@ class Video {
           videoSuspensionState: false,
           videoClientId: decoded.clientId,
         });
-        if (!updatedVideo || !deleted) {
+        if (!updatedVideo[0] || !deleted) {
           util.setErrorResponse(
             res,
             "Something went wrong approving video",
@@ -86,11 +86,7 @@ class Video {
         }
       }
     } catch (error) {
-      util.setErrorResponse(
-        res,
-        `Something went wrong : ${error.message}`,
-        503
-      );
+      util.setErrorResponse(res, `Something went wrong : ${error.message}`, 500);
     }
   }
 
@@ -168,7 +164,6 @@ class Video {
         util.setErrorResponse(res, "Data not found", 404);
       }
     } catch (error) {
-      console.log(error);
       util.setErrorResponse(res, error.message, 500);
     }
   }
@@ -266,6 +261,9 @@ class Video {
     try {
       const { type } = req.query;
       const video = await videoService.getMainFeaturedVideo(type);
+      if (!video.length) {
+        return util.setErrorResponse(res, 'Video can\'t be found', 404);
+      }
       getAttachedThumbsMultiple(video);
       const trailer = await trailerServices.getAllTrailers(video[0].videoId);
       if (trailer.length > 0) {
@@ -290,8 +288,12 @@ class Video {
     try {
       const { type } = req.query;
       const video = await videoService.getSecondFeaturedVideo(type);
+      if (!video.length) {
+        return util.setErrorResponse(res, 'Video can\'t be found', 404);
+      }
       getAttachedThumbsMultiple(video);
       const trailer = await trailerServices.getAllTrailers(video[0].videoId);
+      if(!trailer[0]) return util.setErrorResponse(res, "Video can't be found", 404);
       const data = {
         video,
         trailer: Video.attachThumbnails(
@@ -305,6 +307,7 @@ class Video {
         util.setErrorResponse(res, "Video can't be found", 404);
       }
     } catch (error) {
+      console.log(error)
       util.setErrorResponse(res, `something went wrong ${error.message}`, 503);
     }
   }
@@ -441,6 +444,7 @@ class Video {
           "NotFoundError"
         );
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
+
       const data = req.body;
       data.sessionState = "Active";
       data.userId = decoded.email;
@@ -450,11 +454,8 @@ class Video {
       );
       const JsonlocationData = await locationServiceData.json();
       // check if there is an exact session before same like the provided one
-      const sessions = await viewingSessions.getSesssionPerVideoUser(
-        decoded.email,
-        videoId
-      );
-      const user = await userService.getUserByMail(decoded.email);
+      const sessions = await viewingSessions.getSesssionPerVideoUser(decoded.email, videoId);
+      const user = await userService.getUserByMail(decoded.email);;
       if (Object.values(sessions).length >= 1 || user.isOnTrial === true) {
         util.setErrorResponse(
           res,

@@ -27,7 +27,6 @@ class tempVideoController {
       data.creationTime = new Date().getTime();
       data.videoId = uuid.generator();
       data.clientId = req.headers.cpid;
-      console.log(req.headers.cpid);
       data.type = req.body.type;
       if (data.type === 'movie') {
         data.videoUri = jwt.jwtSign({
@@ -37,7 +36,9 @@ class tempVideoController {
         data.videoUrl = data.videoUri;
         const uploadedVideo = await services.createNewVideos(data);
         const newVideo = await videoService.createNewVideo(data);
-        if (!uploadedVideo && newVideo) util.setErrorResponse(res, 'Video can\'t be saved', 401);
+        if (!(uploadedVideo && newVideo)) {
+          return util.setErrorResponse(res, 'Video can\'t be saved', 401);
+        }
         util.setSuccessResponse(res, 'video uploaded successfully', 201, { status: 'upload success' });
       } else {
         // set to serie since this video represents an entire serie
@@ -46,7 +47,9 @@ class tempVideoController {
         }, process.env.SECRET);
         const uploadedVideo = await services.createNewVideos(data);
         const newVideo = await videoService.createNewVideo(data);
-        if ((newVideo && uploadedVideo) === (null || undefined)) util.setErrorResponse(res, 'Video can\'t be saved', 401);
+        if (!(newVideo && uploadedVideo)) {
+          return util.setErrorResponse(res, 'Video can\'t be saved', 401);
+        }
         util.setSuccessResponse(res, 'video uploaded successfully', 201, { status: 'upload success' });
       }
     } catch (error) {
@@ -68,7 +71,7 @@ class tempVideoController {
         videos[i].videoUri = decoded.videoUri;
       }
       if (Object.values(videos).length > 0) {
-        util.setSuccessResponse(res, 'Videos found', 200, videos);
+        return util.setSuccessResponse(res, 'Videos found', 200, videos);
       } else {
         util.setErrorResponse(res, 'No videos available', 404);
       }
@@ -100,15 +103,21 @@ class tempVideoController {
   static async deleteParticularVideoController(req, res) {
     try {
       const video = await services.getParticularVideo(req.query.id);
+      
+      if(!video) {
+        return util.setErrorResponse(res, 'No video found', 401);
+      }
       const videos = await services.deleteVideos(req.query.id);
       const decoded = jwt.jwtVerify(video.videoUri, process.env.SECRET);
       const deleteTitle = await videoService.deleteVideo(decoded.videoId);
+      console.log(video, decoded, videos, deleteTitle)
       if (videos && deleteTitle) {
         util.setSuccessResponse(res, 'Video deleted', 200, { videos, deleteTitle });
       } else {
         util.setErrorResponse(res, 'No video found', 401);
       }
     } catch (error) {
+      console.log(error)
       util.setErrorResponse(res, `something happened ${error.message}`, 503);
     }
   }
@@ -117,7 +126,7 @@ class tempVideoController {
   static async updateParticularVideoController(req, res) {
     try {
       const videos = await services.updateVideos(req.query.id, req.body);
-      if (videos) {
+      if (videos[0]) {
         util.setSuccessResponse(res, 'Video updated', 200, videos);
       } else {
         util.setErrorResponse(res, 'No video found', 401);
@@ -134,7 +143,6 @@ class tempVideoController {
       const landscape = await getSignedUrl(process.env.THUMBNAIL_BUCKET, 'image/*', 'jpg');
       const nameTag = await getSignedUrl(process.env.THUMBNAIL_BUCKET, 'image/*', 'png');
       const video = (type === 'movie') ? await getSignedUrl(process.env.TEMP_BUCKET_MOVIE, 'video/*', extension) : null;
-      console.log(video, portrait, landscape, nameTag, '================ links ========================');
       util.setSuccessResponse(res, 'Temporary urls', 200, {
         portrait,
         landscape,
