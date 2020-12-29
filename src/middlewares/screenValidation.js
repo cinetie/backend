@@ -51,7 +51,10 @@ class screenValidation {
         const activeSessions = await loginSessionService.getParticularSession(details.email);
         const subscriptionStatus = await billingService.getSubscription(req.body.email)
 
-        if (activeSessions.length !== details.screens || user.plan === 'Setup' || subscriptionStatus.state === "pending") {
+        const today = new Date();
+        const endDate = new Date(subscriptionStatus.endDate);
+
+        if (activeSessions.length !== details.screens || user.plan === 'Setup' || subscriptionStatus.state === "pending" || (endDate.getTime() <= today.getTime())) {
           next();
         } else {
           util.setErrorResponse(res, 'Maximum screens in your plan has reached ', 403);
