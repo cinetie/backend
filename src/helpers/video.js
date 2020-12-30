@@ -19,4 +19,4 @@ const getAttachedThumbsMultiple = (videos) => {
   }
 };
 
-export { getAttachedThumbsMultiple };
+export { getAttachedThumbsMultiple, attachThumbnails };
