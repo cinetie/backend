@@ -9,3 +9,4 @@ yarn.ts
 .nyc_output/
 .vscode/
 coverage
+env*
