@@ -39,8 +39,6 @@ class Episodes {
       if (!episode) {
         return util.setErrorResponse(res, 'Can\'t find what you requested', 400);
       }
-      const uri = await getObject(process.env.PERMANENT_BUCKET_SERIES, episode.episode, 20000);
-      episode.episode = uri;
       util.setSuccessResponse(res, 'Retrieved successfully', 200, episode);
 
     } catch (error) {
