@@ -72,6 +72,15 @@ export default {
       createdAt: new Date(),
 
     },
+    {
+      id: 1669,
+      videoName: 'serie 1',
+      clientId: '31978540-8bdf-41cc-81d7-26200b847c0a',
+      videoUri: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2aWRlb1VyaSI6bnVsbCwic2l6ZSI6bnVsbCwiY2xpZW50SWQiOiIzMTk3ODU0MC04YmRmLTQxY2MtODFkNy0yNjIwMGI4NDdjMGEiLCJ2aWRlb0lkIjoiZnI0NzRydHQ3dzMtNGYzNzhpLXZ2NHctNzg2NS1jMGYzNjRkZmd0czV0eWgiLCJ0eXBlIjoic2VyaWUiLCJpYXQiOjE2MDgyMDgxODV9.oXTTqBddAsYPtGzJF91h-zUZMJAH8vbJY8AKL6Y2qjc',
+      updatedAt: new Date(),
+      createdAt: new Date(),
+
+    },
 
   ]),
   down: (queryInterface) => queryInterface.bulkDelete('tempVideos', null, {}),
