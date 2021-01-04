@@ -207,6 +207,12 @@ class billing {
   }
 
   static async updateTransactionsAndRegisterSales(recentTrans, user, details, req, res, next) {
+    const rates = await Fetch(undefined, { Accept: 'application/json' }, `https://apilayer.net/api/live?access_key=${process.env.ACCESS_KEY_CURRENCY_LAYER}&currencies=RWF&source=USD&format=1`, 'GET');
+    const converted = Math.floor(rates.quotes.USDRWF * details.price);
+    details.price = converted
+
+
+
     const updates = await userService.updateUser(user.email, { permissionLevel: 1 });
     const updatedSubscription = (user.isBilledAnnually === true)
       ? await billingService.updateSubscription(user.email,
