@@ -15,6 +15,7 @@ const tokenUser = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6
 const tokenUser1 = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiIiwidXNlciI6InNkZmxzZGpmbGpAY2luZXRpZS5jb20iLCJpYXQiOjE1ODMwODI4NDF9.HoiOou1gminOlWp_v1YKuVALbSyDilh0kAibrLUZJUY`
 const tokenCp = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6InVzZXIxQGV4YW1wbGUuY29tIiwiY2xpZW50SWQiOiIzMTk3ODU0MC04YmRmLTQxY2MtODFkNy0yNjIwMGI4NDdjMGEiLCJpYXQiOjE2MDk0MTYwNzh9.jf5erLXrfnKLtESaCc2ZKVoEmmqwwMzmJNitRt7cZFs`
 const token2 = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiIiwidXNlciI6InNkZmxzZGpmbGpAY2luZXRpZS5jb20iLCJpYXQiOjE1ODYzNDQzMDh9.TmNDgZDr6UkYst00G6G8Pk8HuGgcwrVcPVrzmPaunLM`
+const token3 = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlhczE5NzU2NzVAZ21haWwuY29tIiwiaWF0IjoxNjA5ODM3NTc5fQ.AQVYqg4aOIbhSCq3Ng-5EbSvfS1dzIG5ApQB7RKMLRk`
 
 describe('INTEGRATION FOR VIDEO', () => {
     it('Test for upload temp video should be okay', (done) => {
@@ -182,35 +183,35 @@ describe('INTEGRATION FOR VIDEO', () => {
           });
       });
 
-      // it('Test for get video by id video should be okay', (done) => {
-      //   chai
-      //     .request(app)
-      //     .get(`${prefixVideo}/unique?id=b467da83-4f0d-4421-8818-c0f364ca9de1`)
-      //     .set({ Authorization: `Bearer ${tokenUser}` })
-      //     .end((err, res) => {
-      //       expect(res).to.have.status(200);
-      //       expect(res.body).to.have.property(
-      //           'message',
-      //           "videos Found"
-      //       );
-      //         done();
-      //     });
-      // });
+      it('Test for get video by id video should be okay', (done) => {
+        chai
+          .request(app)
+          .get(`${prefixVideo}/unique?id=b467da83-4f0d-4421-8818-c0f364ca9de1`)
+          .set({ Authorization: `Bearer ${token3}` })
+          .end((err, res) => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.have.property(
+                'message',
+                "videos Found"
+            );
+              done();
+          });
+      });
 
-      // it('Test for get video by id video should be 404', (done) => {
-      //   chai
-      //     .request(app)
-      //     .get(`${prefixVideo}/unique?id=4b4de3ed-3935-4a6b-a13c-a6a55e534538`)
-      //     .set({ Authorization: `Bearer ${tokenUser}` })
-      //     .end((err, res) => {
-      //       expect(res).to.have.status(404);
-      //       expect(res.body).to.have.property(
-      //           'message',
-      //           "Video can't be found"
-      //       );
-      //         done();
-      //     });
-      // });
+      it('Test for get video by id video should be 404', (done) => {
+        chai
+          .request(app)
+          .get(`${prefixVideo}/unique?id=4b4de3ed-3935-4a6b-a13c-a6a55e534538`)
+          .set({ Authorization: `Bearer ${token3}` })
+          .end((err, res) => {
+            expect(res).to.have.status(404);
+            expect(res.body).to.have.property(
+                'message',
+                "Video can't be found"
+            );
+              done();
+          });
+      });
 
       it('Test for get feature video should be okay', (done) => {
         chai
@@ -407,34 +408,34 @@ describe('INTEGRATION FOR VIDEO', () => {
           });
       });
 
-      // it('Test for get single video should be okay', (done) => {
-      //   chai
-      //     .request(app)
-      //     .get(`${prefixVideo}/unique?id=b467da83-4f0d-4421-8818-c0f364ca9de1`)
-      //     .set({ Authorization: `Bearer ${tokenUser}` })
-      //     .end((err, res) => {
-      //       expect(res).to.have.status(200);
-      //       expect(res.body).to.have.property(
-      //           'message',
-      //           "videos Found"
-      //       );
-      //         done();
-      //     });
-      // });
-      // it('Test for get single video should be 404', (done) => {
-      //   chai
-      //     .request(app)
-      //     .get(`${prefixVideo}/unique?id=b467da83-4f0d-4421-8818-c0f364ca9de`)
-      //     .set({ Authorization: `Bearer ${tokenUser}` })
-      //     .end((err, res) => {
-      //       expect(res).to.have.status(404);
-      //       expect(res.body).to.have.property(
-      //           'message',
-      //           "Video can't be found"
-      //       );
-      //         done();
-      //     });
-      // });
+      it('Test for get single video should be okay', (done) => {
+        chai
+          .request(app)
+          .get(`${prefixVideo}/unique?id=b467da83-4f0d-4421-8818-c0f364ca9de1`)
+          .set({ Authorization: `Bearer ${token3}` })
+          .end((err, res) => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.have.property(
+                'message',
+                "videos Found"
+            );
+              done();
+          });
+      });
+      it('Test for get single video should be 404', (done) => {
+        chai
+          .request(app)
+          .get(`${prefixVideo}/unique?id=b467da83-4f0d-4421-8818-c0f364ca9de`)
+          .set({ Authorization: `Bearer ${token3}` })
+          .end((err, res) => {
+            expect(res).to.have.status(404);
+            expect(res.body).to.have.property(
+                'message',
+                "Video can't be found"
+            );
+              done();
+          });
+      });
 
        it('Test for get video earning should be 404', (done) => {
         chai
@@ -541,21 +542,21 @@ describe('INTEGRATION FOR VIDEO', () => {
           });
       });
 
-      // it('Test for set video as featured should be okay', (done) => {
-      //   chai
-      //     .request(app)
-      //     .put(`${prefixVideo}/set-featured?id=b467da83-4f0d-4421-8818-c0f364cty9de1`)
-      //     .set({ Authorization: `Bearer ${token2}` })
-      //     .send(featureData)
-      //     .end((err, res) => {
-      //       expect(res).to.have.status(200);
-      //       expect(res.body).to.have.property(
-      //           'message',
-      //           "Video successfully updated!",
-      //       );
-      //         done();
-      //     });
-      // });
+      it('Test for set video as featured should be okay', (done) => {
+        chai
+          .request(app)
+          .put(`${prefixVideo}/set-featured?id=fr474rtt7w3-4f378i-kk21-0878-c0f364dfrty9de1`)
+          .set({ Authorization: `Bearer ${token2}` })
+          .send(featureData)
+          .end((err, res) => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.have.property(
+                'message',
+                "Video successfully updated!",
+            );
+              done();
+          });
+      });
 
       it('Test for set video as featured should be 404', (done) => {
         chai
