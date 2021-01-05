@@ -14,6 +14,7 @@ const videoMock = {
     query: {
       videoId: '17e63e02-3b95-46bc-9db7-c1cc0b3369cb'
     },
+    user: '0',
     headers: {
       authorization: `Bearer ${token}`
 
