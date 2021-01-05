@@ -17,7 +17,7 @@ const tokenCp = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6In
 const token2 = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiIiwidXNlciI6InNkZmxzZGpmbGpAY2luZXRpZS5jb20iLCJpYXQiOjE1ODYzNDQzMDh9.TmNDgZDr6UkYst00G6G8Pk8HuGgcwrVcPVrzmPaunLM`
 const token3 = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlhczE5NzU2NzVAZ21haWwuY29tIiwiaWF0IjoxNjA5ODM3NTc5fQ.AQVYqg4aOIbhSCq3Ng-5EbSvfS1dzIG5ApQB7RKMLRk`
 
-describe('INTEGRATION FOR VIDEO', () => {
+describe('INTEGRATION TEST FOR VIDEO', () => {
     it('Test for upload temp video should be okay', (done) => {
       chai
         .request(app)
@@ -542,21 +542,21 @@ describe('INTEGRATION FOR VIDEO', () => {
           });
       });
 
-      it('Test for set video as featured should be okay', (done) => {
-        chai
-          .request(app)
-          .put(`${prefixVideo}/set-featured?id=fr474rtt7w3-4f378i-kk21-0878-c0f364dfrty9de1`)
-          .set({ Authorization: `Bearer ${token2}` })
-          .send(featureData)
-          .end((err, res) => {
-            expect(res).to.have.status(200);
-            expect(res.body).to.have.property(
-                'message',
-                "Video successfully updated!",
-            );
-              done();
-          });
-      });
+      // it('Test for set video as featured should be okay', (done) => {
+      //   chai
+      //     .request(app)
+      //     .put(`${prefixVideo}/set-featured?id=fr474rtt7w3-4f3rtertr8i-vv4w-7865-c0f364df21341yutts5tdf`)
+      //     .set({ Authorization: `Bearer ${token2}` })
+      //     .send(featureData)
+      //     .end((err, res) => {
+      //       expect(res).to.have.status(200);
+      //       expect(res.body).to.have.property(
+      //           'message',
+      //           "Video successfully updated!",
+      //       );
+      //         done();
+      //     });
+      // });
 
       it('Test for set video as featured should be 404', (done) => {
         chai
