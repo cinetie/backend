@@ -10,6 +10,7 @@ import transactions from '../services/transactionService';
 import viewingSessions from '../services/viewingSessionsServices';
 import billingService from '../services/billingServices';
 import date from '../helpers/date';
+import Fetch from '../helpers/fetch'
 
 const util = new Util();
 const rave = new Flutterwave(
@@ -27,7 +28,6 @@ export default class WebHooks {
         || response.data.customer.email);
         // const recentTrans = await transactions.getTransactionsByEmail(user.email, 'pending');
         const test = await transactions.updateTransaction(response.txRef, { statusDesc: response.status.toLowerCase() });
-        console.log(test);
       const transVerification = await rave.Transaction.verify({ id: response.id });
       if (transVerification.status === 'success') {
         let updates = {};
@@ -46,6 +46,13 @@ export default class WebHooks {
         // eslint-disable-next-line no-console
         // console.log(updates);
         // creating sales
+
+        if(response.currency === 'USD') {
+          const rates = await Fetch(undefined, { Accept: 'application/json' }, `https://apilayer.net/api/live?access_key=${process.env.ACCESS_KEY_CURRENCY_LAYER}&currencies=RWF&source=USD&format=1`, 'GET');
+          const converted = Math.floor(rates.quotes.USDRWF * response.amount);
+          response.amount = converted
+        }
+      
         const status = await WebHooks.registerSalesAndEarnings(response, user, req, res);
         if (status === true) {
           await billingService.updateSubscription(user.email,
@@ -75,7 +82,6 @@ export default class WebHooks {
         return util.setErrorResponse(res, 'Server Error: can\'t update subscription', 400);
       }
     } catch (error) {
-      console.log(error, 'vgrgregergegr');
       return util.setErrorResponse(res, `Server Error ${error || error.message}`, 500);
     }
   }
