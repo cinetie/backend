@@ -4,7 +4,7 @@ export default {
       clientId: '31978540-8bdf-41cc-81d7-26200b847c0a',
       name: 'user first',
       email: 'user1@example.com',
-      password: '$2a$10$JUCGXOZMZUDUHXqRpbdoVuQ.0RuEEV26NKwnZUQJ2K1tE4FwW.nE.',
+      password: '$2b$10$e4mDUxqPFvW5boZpmPdNYOoWWTnNLOpDnpAorm5f45wAP2rjjfYA.',
       nationality: 'Rwandan',
       cityOfResidence: 'Muhima',
       isVerified: true,

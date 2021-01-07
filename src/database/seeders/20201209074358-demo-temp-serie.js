@@ -35,6 +35,33 @@ export default {
       updatedAt: new Date(),
       createdAt: new Date(),
 
+    },
+    {
+      id: 160,
+      videoId: 'fr474rtt7w3-4f378i-vv4w-7865-c0f364dfr567hji',
+      uri: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmkiOiJocmZlaGJoZTg5Z2hyZy1yZ3I2NTR0Lm1wNCIsImlkIjoxNDgsImlhdCI6MTYwOTg0ODE2OH0.RDnY3TnTy_VaBuSFd0r_tAqCWXmMLKNJZley8nPr7E0',
+      size: null,
+      updatedAt: new Date(),
+      createdAt: new Date(),
+
+    },
+    {
+      id: 161,
+      videoId: 'fr474rtt7w3-4f378i-vv4w-7865-c0f364dfr567hji',
+      uri: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmkiOiJocmZlaGJoZTg5Z3JlaHJnLXJncjY1NHQubXA0IiwiaWQiOjE0OSwiaWF0IjoxNjA5ODQ4OTE2fQ.K6PyFm2hkkYy04wH2BMQUfMPAeDObmA7YbQRbKTbkSM',
+      size: null,
+      updatedAt: new Date(),
+      createdAt: new Date(),
+
+    },
+    {
+      id: 162,
+      videoId: 'fr474rtt7w3-4f378i-vv4w-7865-c0f364dfr567hji',
+      uri: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmkiOiJocmZlaGJoZTg5Z3JlaHJnLXJncjY1NHQubXA0IiwiaWQiOjE0OSwiaWF0IjoxNjA5ODQ4OTE2fQ.K6PyFm2hkkYy04wH2BMQUfMPAeDObmA7YbQRbKTbkSM',
+      size: null,
+      updatedAt: new Date(),
+      createdAt: new Date(),
+
     }
   ]),
   down: (queryInterface) => queryInterface.bulkDelete('tempSeries', null, {}),
