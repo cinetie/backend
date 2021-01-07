@@ -2,6 +2,7 @@
 
 API documentation for CINETIE main api
 
+ ![BUILD_MASTER](https://codefactory-eu-west-1-prod-default-build-badges.s3-eu-west-1.amazonaws.com/passing.svg)
 ## Installation
 
 > npm install
