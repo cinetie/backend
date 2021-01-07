@@ -55,7 +55,8 @@ describe('GET CP ACTIVE EARNINGS', () => {
             .request(app)
             .get('/cp/earnings/active')
             .set('authorization', `bearer ${loginRes.body.data}`)
+        stub.restore()
         expect(res.statusCode).to.equal(500)
         expect(res.body).to.have.property('message', 'Something happened')
     });
-})
+});
