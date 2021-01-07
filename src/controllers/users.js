@@ -35,6 +35,7 @@ class userController {
           isOnExtension: false,
           permissionLevel: -1,
           isBilledAnnually: false,
+          isVerified: true
         });
         const part1 = cry.crypto();
         const token = userController.signToken(part1, newUser);

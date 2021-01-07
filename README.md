@@ -239,8 +239,6 @@ Body:
 
 ```json
 {
-    "firstName": "Mugisha",
-    "lastName": "Alain a",
     "email": "hafajo1128w6@soowz.com",
     "password": "nAdia123"
 }
