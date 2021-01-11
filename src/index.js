@@ -27,7 +27,6 @@ app.use(fileUpload({
   limits: { fileSize: 5000 * 1024 * 1024 }
 }));
 app.use(morgan('dev'))
-// app.use(morgan(':id :method :url :response-time'))
 
 app.get('/', (req, res) => response.successResponse(res, 200, 'Welcome to Cinetie'));
 app.use((req, res, next) => {
