@@ -19,7 +19,6 @@ const mailer = async (emailToSend) => {
     const { path } = emailToSend[2];
     return ejs.renderFile(path, emailToSend[0], (error, data) => {
       if (error) {
-        console.log(error);
       } else {
         const emailOptions = {
           from: '"Cinetie Support" <support@cinetie.com>',
@@ -29,7 +28,7 @@ const mailer = async (emailToSend) => {
         };
         transporter.sendMail(emailOptions)
           .then((success) => success)
-          .catch((err) => console.log(err));
+          .catch((err) => {throw error});
       }
     });
   } catch (error) {

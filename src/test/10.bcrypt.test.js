@@ -16,11 +16,9 @@ const encrypted = '$2a$10$JUCGXOZMZUDUHXqRpbdoVuQ.0RuEEV26NKwnZUQJ2K1tE4FwW.nE.'
 describe('BCRYPT', () => {
     it('CHECK COMPARE TRUE', async () => {
         const results = await bcrypt.compare('password', encrypted);
-        console.log('results', results)
     });
 
     it('CHECK COMPARE TRUE', async () => {
         const results = await bcrypt.encrypt('password');
-        console.log('results', results)
     });
 });

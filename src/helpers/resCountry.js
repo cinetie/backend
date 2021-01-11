@@ -8,7 +8,6 @@ const resCountry = (data, country) => {
     data.map((el) => {
       const { resCountries } = el;
       if (resCountries.includes(ResCountry)) {
-        console.log(true);
       } else {
         results.push(el);
       }

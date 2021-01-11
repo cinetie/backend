@@ -38,7 +38,6 @@ describe('DELETE CP ACCOUNT TEST', () => {
             .request(app)
             .delete('/cp/delete_acc')
             .set('authorization', `bearer ${loginRes.body.data}`)
-        console.log(res.body)
         stub.restore()
         expect(res.statusCode).to.equal(522)
         expect(res.body.message.includes('An error occured')).to.be.true

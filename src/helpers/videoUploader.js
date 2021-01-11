@@ -15,7 +15,7 @@ const videoUploader = async (video, landScape, portrait, nameTag, type, extensio
             await axios.put(urls[key].url, file, {
                 headers: { 'Content-Type': type }, onUploadProgress: progressEvent => {
                     let progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                    console.log(progress);
+
                 }
             })
         }
