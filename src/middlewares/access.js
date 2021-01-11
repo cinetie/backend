@@ -14,22 +14,22 @@ class Access {
   static async isAdmin(req, res, next) {
     try {
       if (!req.headers.authorization) {
-        util.setErrorResponse(res, 'Invalid access token', 400);
+        return util.setErrorResponse(res, 'Invalid access token', 400);
       } else {
         const token = req.headers.authorization.slice(7);
         const decoded = jwt.jwtVerify(token, process.env.SECRET);
         const { user } = decoded;
         if (!user) {
-          util.setErrorResponse(res, 'Invalid access token', 400);
+         return util.setErrorResponse(res, 'Invalid access token', 400);
         }
         if (user !== process.env.ADMIN_USER) {
-          util.setErrorResponse(res, 'Access denied  ', 403);
+          return util.setErrorResponse(res, 'Access denied  ', 403);
         } else {
-          next();
+          return next();
         }
       }
     } catch (error) {
-      util.setErrorResponse(res, error.message, 500);
+      return util.setErrorResponse(res, error.message, 500);
     }
   }
 

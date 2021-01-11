@@ -26,7 +26,7 @@ class cpController {
       newUser.idLink = uploadedThumb.data.Key;
       const checkUser = await cp.getCpByMail(newUser.email);
       if (checkUser != null) {
-        util.setErrorResponse(res, 'cp already exists', 422);
+        return util.setErrorResponse(res, 'cp already exists', 422);
       } else {
         const createdUser = await cp.createNewCp(newUser);
         const part1 = cry.crypto();
@@ -60,6 +60,7 @@ class cpController {
         }
       }
     } catch (error) {
+      console.log(error)
       util.setErrorResponse(res, `Something went wrong ${error.message}`, 500);
     }
   }
@@ -70,7 +71,7 @@ class cpController {
       const { id } = req.query;
       const { token } = req.query;
       const user = await cp.getCpById(id);
-      if (!user) util.setErrorResponse(res, 'can\'t find user', 404);
+      if (!user) return util.setErrorResponse(res, 'can\'t find user', 404);
       jwt.jwtVerify(token, process.env.SECRET);
       const newUser = {
         isVerified: true
@@ -155,7 +156,7 @@ class cpController {
   static async forgotPassword(req, res) {
     try {
       const user = await cp.getCpByMail(req.body.email);
-      if (!user) util.setErrorResponse(res, 'can\'t find user', 404);
+      if (!user) return util.setErrorResponse(res, 'can\'t find user', 404);
       const exp = date.addMoreDays(2);
       const token = jwt.jwtSign({ exp: exp.getTime() }, process.env.SECRET, '1d');
       await mailer([{
@@ -169,9 +170,9 @@ class cpController {
         path: `${path.resolve('src/public/templates/ForgotPassword.ejs')}`
       }
       ]);
-      util.setSuccessResponse(res, 'Password reset link sent successfully', 200, user);
+      return util.setSuccessResponse(res, 'Password reset link sent successfully', 200, user);
     } catch (error) {
-      util.setErrorResponse(res, 'Something went wrong', 500);
+      return util.setErrorResponse(res, 'Something went wrong', 500);
     }
   }
 
@@ -263,6 +264,7 @@ class cpController {
       }
       util.setSuccessResponse(res, 'success', 200, cps);
     } catch (error) {
+      console.log(error)
       util.setErrorResponse(res, error, 503);
     }
   }
@@ -271,7 +273,7 @@ class cpController {
     const { type } = req.query;
     const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
     const videos = await videoService.getAllVideos(decoded.clientId, type);
-    if (videos) {
+    if (videos.length) {
       util.setSuccessResponse(res, 'Data found', 200, videos);
     } else {
       util.setErrorResponse(res, 'Data not found', 400);

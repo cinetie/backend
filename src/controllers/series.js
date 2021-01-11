@@ -15,6 +15,9 @@ class Episodes {
     try {
       const { id } = req.query;
       const tempVideo = await temp.getParticularVideo(id);
+      if(!tempVideo) {
+        return util.setErrorResponse(res, 'Serie not found', 404);
+      }
       const decoded = jwt.jwtVerify(tempVideo.uri, process.env.SECRET);
       await copyObjects(process.env.TEMP_BUCKET_SERIES, process.env.PERMANENT_BUCKET_SERIES, decoded.uri);
       const createdSerie = await services.update(decoded.id, {
@@ -24,9 +27,9 @@ class Episodes {
       const deleted = await temp.deleteSeries(id);
       const deletionStatus = await deleteObject(process.env.TEMP_BUCKET_SERIES, decoded.uri);
       if (createdSerie && deleted && deletionStatus) {
-        util.setSuccessResponse(res, 'Created successfully', 201);
+        return util.setSuccessResponse(res, 'Created successfully', 201);
       } else {
-        util.setErrorResponse(res, 'Can\'t upload', 400);
+        return util.setErrorResponse(res, 'Can\'t upload', 400);
       }
     } catch (error) {
       util.setErrorResponse(res, `Something happened ${error.message}`, 500);
@@ -90,7 +93,7 @@ class Episodes {
 
   static async delete(req, res) {
     try {
-      const videoFile = await services.getSingleEpisode(req.params.id);
+      const videoFile = await services.getSingleEpisode(req.params.id); 
       if(!videoFile) return util.setErrorResponse(res, 'Can\'t find what you requested', 400);
       const results = await deleteObject(process.env.TEMP_BUCKET_SERIES, videoFile.episode);
       const deleted = await services.deleteEpisode(req.params.id);
@@ -113,9 +116,9 @@ class Episodes {
       for (let i = 0; i < episodes.length; i++) {
         episodes[i].thumbNailUrl = Episodes.attachThumbnails(episodes[i].thumbNailUrl, process.env.THUMBNAIL_BUCKET);
       }
-      util.setSuccessResponse(res, 'Sucess', 200, episodes);
+      return util.setSuccessResponse(res, 'Sucess', 200, episodes);
     } catch (error) {
-      util.setErrorResponse(res, `Something happened ${error.message}`, 500);
+      return util.setErrorResponse(res, `Something happened ${error.message}`, 500);
     }
   }
 

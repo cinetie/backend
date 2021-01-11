@@ -14,7 +14,7 @@ export const FlutterMocks = {
   request: {
     body: {
       id: 126122,
-      txRef: 'rave-pos-121775237991',
+      txRef: '1115a95e-973d-4abe-9b80-bde4acf74619',
       flwRef: 'FLW-MOCK-72d0b2d66273fad0bb32fdea9f0fa298',
       orderRef: 'URF_1523185223111_833935',
       paymentPlan: null,
@@ -23,7 +23,7 @@ export const FlutterMocks = {
       charged_amount: 1000,
       status: 'successful',
       IP: '197.149.95.62',
-      currency: 'NGN',
+      currency: 'USD',
       customer: {
         id: 22836,
         phone: null,

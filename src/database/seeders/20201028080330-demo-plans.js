@@ -5,7 +5,7 @@ export default {
       type: 'Promo',
       hasHd: true,
       hasUltraHd: true,
-      numberOfScreens: 2,
+      numberOfScreens: 300,
       monthlyPrice: 3,
       yearlyPrice: 12,
       updatedAt: new Date(),

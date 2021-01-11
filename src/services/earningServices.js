@@ -87,7 +87,7 @@ class earningsService {
     }
   }
 
-  static async getActiveEarningsByVideo(videoId) {
+  static async getActiveEarningsByVideo(videoId, clientId) {
     try {
       const user = await database.earnings.findAll({
         attributes: {
@@ -96,6 +96,7 @@ class earningsService {
         where: {
           [op.and]: [
             { videoId },
+            { clientId },
             { state: 'Active' }
           ]
         }

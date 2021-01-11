@@ -202,7 +202,7 @@ class earningController {
   static async getActiveEarningsPerVideo(req, res) {
     try {
       let sum = 0;
-      const data = await earningService.getActiveEarningsByVideo(req.query.videoId);
+      const data = await earningService.getActiveEarningsByVideo(req.query.videoId, req.user);
       if (Object.values(data).length > 0) {
         for (let i = 0; i < Object.values(data).length; i++) {
           sum += Number(data[i].amount);
