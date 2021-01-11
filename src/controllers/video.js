@@ -29,10 +29,6 @@ class Video {
         data.videoClientId = decoded.clientId;
         data.videoSuspensionState = false;
         data.size = decoded.size;
-        console.log(
-          process.env.TEMP_BUCKET_MOVIE,
-          process.env.PERMANENT_BUCKET_MOVIE
-        );
         const copyFile = await copyObjects(
           process.env.TEMP_BUCKET_MOVIE,
           process.env.PERMANENT_BUCKET_MOVIE,
@@ -274,7 +270,6 @@ class Video {
             process.env.TRAILERS_BUCKET
           ),
         };
-        console.log(data);
         util.setSuccessResponse(res, "Video Found", 200, data);
       } else {
         util.setErrorResponse(res, "Video can't be found", 404);
@@ -307,7 +302,6 @@ class Video {
         util.setErrorResponse(res, "Video can't be found", 404);
       }
     } catch (error) {
-      console.log(error)
       util.setErrorResponse(res, `something went wrong ${error.message}`, 503);
     }
   }
@@ -487,7 +481,6 @@ class Video {
         }
       }
     } catch (error) {
-      console.log(error);
       return response.errorResponse(
         res,
         500,

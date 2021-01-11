@@ -60,7 +60,6 @@ class cpController {
         }
       }
     } catch (error) {
-      console.log(error)
       util.setErrorResponse(res, `Something went wrong ${error.message}`, 500);
     }
   }
@@ -264,7 +263,6 @@ class cpController {
       }
       util.setSuccessResponse(res, 'success', 200, cps);
     } catch (error) {
-      console.log(error)
       util.setErrorResponse(res, error, 503);
     }
   }

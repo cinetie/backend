@@ -34,7 +34,6 @@ class paymentHandler {
     });
     const results = await response.json();
     if (response) {
-      console.log(results);
       if (results.error) {
         return 0;
       }
@@ -67,7 +66,6 @@ class paymentHandler {
     });
     const results = await response.json();
     if (response) {
-      console.log(results);
       if (results.error) {
         return 0;
       }

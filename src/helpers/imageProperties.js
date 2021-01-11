@@ -7,13 +7,10 @@ const properties = async (file, dimensions) => {
     const aspectRatio = (dim.width / dim.height).toFixed(1);
     if (Number(aspectRatio) === Number(dimensions.aspectRatio)) {
       if (dim.width === dimensions.resolution.width && dim.height === dimensions.resolution.height) {
-        console.log('True');
         return 1;
       }
-      // console.log(`${dim.width} by ${dim.height}`)
       return 2;
     }
-    console.log(`expecting ${dimensions.aspectRatio} but got ${aspectRatio}`);
     return 3;
   } catch (error) {
     throw error;

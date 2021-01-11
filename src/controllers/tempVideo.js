@@ -110,14 +110,12 @@ class tempVideoController {
       const videos = await services.deleteVideos(req.query.id);
       const decoded = jwt.jwtVerify(video.videoUri, process.env.SECRET);
       const deleteTitle = await videoService.deleteVideo(decoded.videoId);
-      console.log(video, decoded, videos, deleteTitle)
       if (videos && deleteTitle) {
         util.setSuccessResponse(res, 'Video deleted', 200, { videos, deleteTitle });
       } else {
         util.setErrorResponse(res, 'No video found', 401);
       }
     } catch (error) {
-      console.log(error)
       util.setErrorResponse(res, `something happened ${error.message}`, 503);
     }
   }

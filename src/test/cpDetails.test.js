@@ -17,7 +17,6 @@ describe('GET CP DETAILS TEST', () => {
             .get('/cp/details')
             .set('authorization', `bearer ${token}`)
             .end((err, res) => {
-                console.log(res.body)
                 expect(res).to.have.status(403);
                 expect(res.body).to.have.property('message', 'Access denied');
                 done();
@@ -36,7 +35,6 @@ describe('GET CP DETAILS TEST', () => {
             .request(app)
             .get('/cp/details')
             .set('authorization', `bearer ${loginRes.body.data}`)
-        console.log(res.body)
         expect(res.statusCode).to.equal(200)
         expect(res.body).to.have.property('message', 'Data found');
 
@@ -55,7 +53,6 @@ describe('GET CP DETAILS TEST', () => {
             .get('/cp/details')
             .set('authorization', `bearer ${loginRes.body.data}`)
         stub.restore()
-        console.log(res.body)
         expect(res.statusCode).to.equal(500)
         expect(res.body).to.have.property('message', 'Something went wrong');
     });

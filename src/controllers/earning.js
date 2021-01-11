@@ -279,8 +279,6 @@ class earningController {
     try {
       const updates = await userService.updateUser(req.user, { permissionLevel: 1 });
       const currentSubscription = await billingServices.getCurrentSubscription(req.user);
-      console.log(currentSubscription);
-      console.log(req.user);
       if (updates[1] === 1) {
         const status = await webhooks.registerSalesAndEarnings({
           payment_type: req.body.paymentMethod,
@@ -290,7 +288,6 @@ class earningController {
           const updateSubscription = (updates.isBilledAnnually === true)
             ? await billingServices.updateSubscription(req.user, { endDate: date.addMoreDays(365).toDateString(), state: "current",dueState: false })
             : await billingServices.updateSubscription(req.user, { endDate: date.addMoreDays(30).toDateString(), state: "current", dueState: false })
-            console.log(updateSubscription);
             if (updateSubscription[1] !== 0) {
               return response.successResponse(res, 200, 'Success transaction finished', status);
             } else {
@@ -303,7 +300,6 @@ class earningController {
         return response.errorResponse(res, 400, 'user updates are not running', 'BAD_REQUEST')
       }
     } catch (error) {
-      console.log(error)
       return response.errorResponse(res, 500, 'Something happened', 'SERVER_ERROR');
     }
   }
