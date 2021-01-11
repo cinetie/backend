@@ -10,6 +10,7 @@ import fileUpload from 'express-fileupload';
 import response from './helpers/response';
 import stopLoginSessions from "./helpers/stopLoginSessions";
 import routes from './routes';
+import morgan from 'morgan'
 
 config();
 cron.schedule('0 0 0 * * *', stopLoginSessions);
@@ -25,6 +26,8 @@ app.use(fileUpload({
   tempFileDir: '/tmp/',
   limits: { fileSize: 5000 * 1024 * 1024 }
 }));
+app.use(morgan('dev'))
+// app.use(morgan(':id :method :url :response-time'))
 
 app.get('/', (req, res) => response.successResponse(res, 200, 'Welcome to Cinetie'));
 app.use((req, res, next) => {
