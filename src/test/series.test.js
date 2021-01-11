@@ -115,7 +115,7 @@ describe('SERIES TEST', () => {
 
         });
         it('return 500 status code if there is a server error', async () => {
-            const stub = sinon.stub(aws, 'getObject').throws(new Error('something went wrong'));
+            const stub = sinon.stub(services, 'getSingleEpisode').throws(new Error('something went wrong'));
 
             const req = httpMock.createRequest({
                 query: {

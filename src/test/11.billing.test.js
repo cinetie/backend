@@ -458,7 +458,10 @@ describe('BILLING MIDDLEWARE', (req, res, status) => {
         let user = {
             "email": "blaise126991078@gmail.com"
         }
-        let details;
+
+        let details = {
+            "price": 3
+        };
         var res = httpMocks.createResponse();
         const data = await billing.updateTransactionsAndRegisterSales(recentTrans, user, details, req, res, nextSpy)
         expect(data.statusCode).to.equal(500)
