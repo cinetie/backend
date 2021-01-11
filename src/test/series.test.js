@@ -1,22 +1,13 @@
 import chai, { expect } from 'chai';
 import sinon from 'sinon';
-import fs from 'fs';
 import httpMock from "node-mocks-http";
 import dotenv from 'dotenv'
-import nock from 'nock'
-import fetch from 'node-fetch'
-import path from 'path';
-import trailerServices from '../services/trailerService';
 import serieController from '../controllers/series';
 import tempSerieService from '../services/tempSerieService';
-import { deleteObject } from '../helpers/aws';
-import uploader from '../helpers/videoUploader';
 import services from '../services/serieServices';
-import videoService from '../services/videoServices';
-import * as videoHelper from '../helpers/video';
+import temp from '../services/tempSerieService';
 import jwt from '../helpers/jwt';
 import * as aws from '../helpers/aws';
-import videoUploader from '../helpers/videoUploader';
 dotenv.config()
 
 describe('SERIES TEST', () => {
@@ -64,7 +55,7 @@ describe('SERIES TEST', () => {
 
         });
         it('should return 500 if there is a server error', async () => {
-            const stub = sinon.stub(aws, 'copyObjects').throws(new Error('Something went wrong'))
+            const stub = sinon.stub(temp, 'getParticularVideo').throws(new Error('Something went wrong'))
             const stub2 = sinon.stub(aws, 'deleteObject').callsFake(() => {
                 return [{ status: 'success' }];
             })
@@ -115,7 +106,7 @@ describe('SERIES TEST', () => {
 
         });
         it('return 500 status code if there is a server error', async () => {
-            const stub = sinon.stub(aws, 'getObject').throws(new Error('something went wrong'));
+            const stub = sinon.stub(services, 'getSingleEpisode').throws(new Error('something went wrong'));
 
             const req = httpMock.createRequest({
                 query: {
@@ -239,6 +230,7 @@ describe('SERIES TEST', () => {
             });
             const res = httpMock.createResponse();
             await serieController.updateSerie(req, res);
+            stub.restore()
             expect(res.statusCode).to.equal(500);
         });
     });

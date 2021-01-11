@@ -837,6 +837,7 @@ describe('VIDEO TEST', () => {
             });
             const res = httpMock.createResponse();
             await videoController.createNewWatchCount(req, res);
+            stub.restore()
             expect(res.statusCode).to.equal(500);
         });
     })
