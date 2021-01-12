@@ -27,7 +27,7 @@ export default class WebHooks {
       const user = await UserService.getUserByMail(response.customer.email
         || response.data.customer.email);
         // const recentTrans = await transactions.getTransactionsByEmail(user.email, 'pending');
-        const test = await transactions.updateTransaction(response.txRef, { statusDesc: response.status.toLowerCase() });
+        const test = await transactions.updateTransaction(response.tx_ref, { statusDesc: response.status.toLowerCase() });
       const transVerification = await rave.Transaction.verify({ id: response.id });
       if (transVerification.status === 'success') {
         let updates = {};
@@ -82,6 +82,7 @@ export default class WebHooks {
         return util.setErrorResponse(res, 'Server Error: can\'t update subscription', 400);
       }
     } catch (error) {
+      console.log(error)
       return util.setErrorResponse(res, `Server Error ${error || error.message}`, 500);
     }
   }
