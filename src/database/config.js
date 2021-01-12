@@ -7,7 +7,8 @@ module.exports = {
     dialect: 'postgres',
     dialectOptions: {
       typeCast: true,
-    }
+    },
+    logging: false,
   },
   production: {
     use_env_variable: 'PROD_DATABASE_URL',
@@ -15,7 +16,8 @@ module.exports = {
     dialectOptions: {
       typeCast: true,
       ssl: 'Amazon RDS'
-    }
+    },
+    logging: false,
   },
   test: {
     use_env_variable: 'TEST_DATABASE_URL',
@@ -28,6 +30,8 @@ module.exports = {
     dialect: 'mysql',
     dialectOptions: {
       typeCast: true
-    }
+    },
+    logging: false,
+
   }
 };
