@@ -23,7 +23,6 @@ export default class WebHooks {
   static async flutterWave(req, res) {
         try {
       const response = (req.body.data) ? req.body.data : req.body;
-      // console.log(response.customer.email);
       const user = await UserService.getUserByMail(response.customer.email
         || response.data.customer.email);
         // const recentTrans = await transactions.getTransactionsByEmail(user.email, 'pending');
@@ -44,7 +43,6 @@ export default class WebHooks {
           );
         }
         // eslint-disable-next-line no-console
-        // console.log(updates);
         // creating sales
 
         if(response.currency === 'USD') {
@@ -96,23 +94,19 @@ export default class WebHooks {
     });
     if (sales) {
       const sessions = await viewingSessions.getActiveAndSuspendedSessionsPerUser(user.email);
-      // console.log(sessions);
       if (sessions.length > 0) {
         // we are recording earnings since they exist meaning they watched some movies
         // this month or year
         const earnings = await Earnings(user.email);
         if (earnings === 0) {
           // check earnings for failure
-          // console.log(earnings);
           throw new Error('Earnings recording error');
         } else {
           // earnings and sales are both created successfully
-          // console.log(earnings);
           return true;
         }
       } else {
         // we are not renewing the subscription as isNew is true i.e first time payment
-        // console.log("new user");
         return true;
       }
     } else {

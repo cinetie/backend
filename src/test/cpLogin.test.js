@@ -17,7 +17,6 @@ describe('CP LOGIN TEST', () => {
                 password: 'fewfwefwefewfw'
             })
             .end((err, res) => {
-                console.log(res.body)
                 expect(res).to.have.status(400);
                 expect(res.body).to.have.property('message', 'some fields are empty');
                 done();
@@ -31,7 +30,6 @@ describe('CP LOGIN TEST', () => {
                 password: 'fewfwefwefewfw'
             })
             .end((err, res) => {
-                console.log(res.body)
                 expect(res).to.have.status(400);
                 expect(res.body).to.have.property('message', 'some fields are empty');
                 done();
@@ -46,7 +44,6 @@ describe('CP LOGIN TEST', () => {
                 password: 'f'
             })
             .end((err, res) => {
-                console.log(res.body)
                 expect(res).to.have.status(422);
                 expect(res.body).to.have.property('message', 'You have to enter a valid password');
                 done();
@@ -61,7 +58,6 @@ describe('CP LOGIN TEST', () => {
             password: 'fewfwefwefewfw'
         })
         .end((err, res) => {
-            console.log(res.body)
             expect(res).to.have.status(400);
             expect(res.body).to.have.property('message', 'Invalid email or password!');
             done();
@@ -76,7 +72,6 @@ describe('CP LOGIN TEST', () => {
             password: 'fewfwefwefewfw'
         })
         .end((err, res) => {
-            console.log(res.body)
             expect(res).to.have.status(400);
             expect(res.body).to.have.property('message', 'Passwords don\'t match');
             done();
@@ -92,7 +87,6 @@ describe('CP LOGIN TEST', () => {
             password: 'izzeddin'
         })
         .end((err, res) => {
-            console.log(res.body)
             expect(res).to.have.status(401);
             expect(res.body).to.have.property('message', 'Verify your account first!');
             done();
@@ -107,7 +101,6 @@ describe('CP LOGIN TEST', () => {
             password: 'izzeddin'
         })
         .end((err, res) => {
-            console.log(res.body)
             expect(res).to.have.status(200);
             expect(res.body).to.have.property('message', 'Logged in successfully!');
             done();
@@ -126,7 +119,6 @@ describe('CP LOGIN TEST', () => {
         })
         .end((err, res) => {
             stub.restore()
-            console.log(res.body)
             expect(res).to.have.status(500);
             expect(res.body).to.have.property('message', 'Can\'t register session');
             done();
@@ -143,7 +135,6 @@ describe('CP LOGIN TEST', () => {
         })
         .end((err, res) => {
             stub.restore()
-            console.log(res.body)
             expect(res).to.have.status(500);
             expect(res.body.message.includes('Something Went wrong logging in ')).to.be.true
             done();

@@ -114,7 +114,6 @@ describe('TEMP SERIE TESTS', () => {
             const req = httpMock.createRequest();
             const res = httpMock.createResponse();
             await TempSerieController.getAllSeries(req, res);
-            console.log(res);
             stub.restore();
             expect(res.statusCode).to.equal(404);
             

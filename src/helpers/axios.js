@@ -9,7 +9,6 @@ const post = async (url, data) => {
     });
 };
 const get = (url, options) => {
-  console.log(JSON.stringify(options));
   axios.get(url, options)
     .then((response) => response)
     .catch((error) => {

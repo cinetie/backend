@@ -13,7 +13,7 @@
 //     const tagname = fs.readFileSync(path.join(__dirname, 'mock/tagname.jpg'));
 //     const landScape = fs.readFileSync(path.join(__dirname, 'mock/landscape.jpg'));
 //     const portrait = fs.readFileSync(path.join(__dirname, 'mock/portrait.jpg'));
-//     console.log(tagname);
+
 //     const result = await uploader(video,landScape,portrait, tagname, 'movie', 'mp4');
 //     const req = httpMock.createRequest({
 //         body: {
@@ -25,5 +25,5 @@
 //         }
 //     })
 //     await TempVideoController.createVideoController(req, res);
-//     console.log(res);
+
 // })

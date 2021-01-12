@@ -186,7 +186,7 @@ class billing {
         } else if (Number(details.paymentMethod) === 3) {
           
           const recentTransactions = await transactions.getTransactionsByEmail(user.email, 'pending');
-          console.log(recentTransactions, recentTransactions[recentTransactions.length - 1]);
+
           if (recentTransactions.length > 0) {
             const token = jwt.jwtSign({ role: 'main-api', user: user.email }, process.env.SECRET, 1000);
             await billing.checkRecentPendingSpennTransaction(
@@ -201,7 +201,6 @@ class billing {
       }
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.log(error);
       util.setErrorResponse(res, error.message, 500);
     }
   }

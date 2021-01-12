@@ -92,7 +92,7 @@ describe('TEMP VIDEO TESTS', () => {
             })
             const res = httpMock.createResponse();
             const result = await TempVideoController.createVideoController(req, res);
-            // console.log(res);
+
             stub.restore();
             expect(res.statusCode).to.equal(401);
         })
@@ -114,7 +114,7 @@ describe('TEMP VIDEO TESTS', () => {
             })
             const res = httpMock.createResponse();
             const result = await TempVideoController.createVideoController(req, res);
-            // console.log(res);
+
             stub.restore();
             expect(res.statusCode).to.equal(401);
         })
@@ -126,7 +126,7 @@ describe('TEMP VIDEO TESTS', () => {
             const res = httpMock.createResponse();
             const result = await TempVideoController.getAllVideosController(req, res);
             expect(res.statusCode).to.equal(200);
-            // console.log(res);
+
     
         })
         it('should return a 404 error if no video is found', async () => {
@@ -138,7 +138,7 @@ describe('TEMP VIDEO TESTS', () => {
             const result = await TempVideoController.getAllVideosController(req, res);
             stub.restore();
             expect(res.statusCode).to.equal(404);
-            // console.log(res);
+
     
         })
         it('should return 503 if there is an error while getting all video', async () => {
@@ -159,7 +159,7 @@ describe('TEMP VIDEO TESTS', () => {
             });
             const res = httpMock.createResponse();
             await TempVideoController.getParticularVideoController(req, res);
-            // console.log(res);
+
             expect(res.statusCode).to.equal(404);
         })
         it('should return a 200 status code if the video is found', async () => {
@@ -170,7 +170,7 @@ describe('TEMP VIDEO TESTS', () => {
             });
             const res = httpMock.createResponse();
             await TempVideoController.getParticularVideoController(req, res);
-            console.log(res);
+
             expect(res.statusCode).to.equal(200);
         })
         it('should return a 401 status code if the video uri is not found', async () => {
@@ -212,7 +212,7 @@ describe('TEMP VIDEO TESTS', () => {
             });
             const res = httpMock.createResponse();
             await TempVideoController.deleteParticularVideoController(req, res);
-            // console.log(res);
+
             expect(res.statusCode).to.equal(401);
         })
         it('should return 200 when the video is found And delete', async () => {
@@ -224,7 +224,7 @@ describe('TEMP VIDEO TESTS', () => {
             });
             const res = httpMock.createResponse();
             await TempVideoController.deleteParticularVideoController(req, res);
-            // console.log(res);
+
             expect(res.statusCode).to.equal(200);
         })
         it('should return 503 when there is a server error', async () => {
@@ -252,7 +252,7 @@ describe('TEMP VIDEO TESTS', () => {
             });
             const res = httpMock.createResponse();
             await TempVideoController.updateParticularVideoController(req, res);
-            // console.log(res);
+
             expect(res.statusCode).to.equal(401);
         })
         it('should return 200 status when the video is found and update', async () => {

@@ -15,9 +15,6 @@ class authenticator {
       if (req.body.password === process.env.ADMIN_PASS && req.body.email === process.env.ADMIN_USER) {
         util.setSuccessResponse(res, 'Access granted', 200, token);
       } else {
-        // console.log(process.env.ADMIN_PASS)
-        // console.log(process.env.ADMIN_USER)
-        console.log('--------------isAdmin----------');
         next();
       }
     } catch (error) {

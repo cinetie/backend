@@ -41,7 +41,6 @@ class userController {
         const token = userController.signToken(part1, newUser);
         const tokenToSave = userController.generateTokenToSave(newUser, token);
         await tokenService.createNewToken(tokenToSave, token);
-        console.log(EmailStatus);
         if (EmailStatus) util.setErrorResponse(res, EmailStatus, 500);
         const userToken = jwt.jwtSign(createdUser.email, process.env.SECRET);
         createdUser.token = userToken;
@@ -49,7 +48,6 @@ class userController {
         util.setSuccessResponse(res, 'Signed up successfully', 201, createdUser);
       }
     } catch (error) {
-      console.log(error);
       util.setErrorResponse(res, error.message, 500);
     }
   }
@@ -91,7 +89,6 @@ class userController {
     newUser.plan = 'Setup';
     newUser.permissionLevel = 1;
     newUser.isOnTrial = false;
-    console.log(newUser)
     return newUser;
   }
 
@@ -187,7 +184,6 @@ class userController {
   static async resetPassword(req, res) {
     try {
       const { token, id } = req.query;
-      console.log(token, id);
       jwt.jwtVerify(token, process.env.SECRET);
       const user_ = await userService.getUserById(id);
       if (!user_) response.errorResponse(res, 404, 'User not found!', 'user undefined');
@@ -256,10 +252,8 @@ class userController {
       const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const user = await userService.getUserByMail(decoded.email);
       const { paymentMethod } = req.body;
-      console.log(decoded.email);
       if (!user) util.setErrorResponse(res, 'Can\'t find that user', 422);
       const newInfo = req.body;
-      console.log(newInfo);
       if (paymentMethod !== undefined || paymentMethod !== null) {
         await billingServices.updateSubscription(decoded.email, { paymentMethod });
       }
@@ -267,7 +261,6 @@ class userController {
       if (updated[0] !== 0) {
         util.setSuccessResponse(res, 'updated successfully', 200, updated);
       } else {
-        console.log(updated);
         util.setErrorResponse(res, 'An error occured', 400);
       }
     } catch (error) {
@@ -335,23 +328,17 @@ class userController {
         isBilledAnnually: user.isBilledAnnually,
       };
       const price = await payment.getPlanPricing(subscriptionData);
-      console.log(`sending ------------------ ${price}`);
       const currentSubscription = await billingServices.getCurrentSubscription(email, 'pending');
-      console.log('298');
       // if (user.isOnTrial === false) {
-      //   console.log('300');
       //   util.setErrorResponse(res, 'account is already activated', 400);
       // } else {
-      console.log('303');
       const paymentData = userController.getAndSetPaymentData(req, price, user, email);
       const token = jwt.jwtSign({ role: 'main-api', user: email }, process.env.SECRET, 1000);
       switch (Number(currentSubscription.paymentMethod)) {
         case 1: {
-          console.log('308');
           const momoData = await Fetch(paymentData,
             { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
             `${process.env.PAY_HOST}/charge/momo`, 'POST');
-          console.log(momoData, 'happening');
           if (momoData.status === 200) {
             const updates = await userService.updateUser(email,
               { isOnTrial: false });
@@ -371,7 +358,6 @@ class userController {
           const pay = await Fetch(paymentData,
             { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
             `${process.env.PAY_HOST}/charge/card`, 'POST');
-          console.log(pay, 'card');
           if (pay.status !== 400) {
             if (pay.meta.authorization.mode === 'avs_noauth') {
               return util.setSuccessResponse(res, 'Please provide these details', 200, ['city', 'address', 'state', 'country', 'zipcode']);
@@ -398,23 +384,19 @@ class userController {
               await payment.recordTransaction(user, currentSubscription, pay.data.RequestId, 'pending');
               util.setSuccessResponse(res, pay.message, 200, pay);
             } else {
-              console.log(updates);
               util.setErrorResponse(res, pay.message, 400);
             }
           } else {
-            console.log(pay);
             util.setErrorResponse(res, pay.message, 400);
           }
         }
           break;
 
         default:
-          console.log('no payment method ------------');
           util.setErrorResponse(res, 'Sorry payment failed', 500);
       }
       // }
     } catch (error) {
-      console.log(error);
       return response.errorResponse(res, 500, `Something wrong happened ${error.message}`, error);
     }
   }
@@ -439,7 +421,6 @@ class userController {
             flw_ref: req.body.flw_ref
           }
         );
-        console.log(otpStatus);
         if (otpStatus.data.processor_response !== 'successful') {
           return util.setErrorResponse(res, otpStatus.message, 400, 'BAD_REQUEST');
         // eslint-disable-next-line no-else-return
@@ -513,7 +494,6 @@ class userController {
     try {
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const user = await userService.getUserByMail(email);
-      console.log(user);
       const subscription = await billingServices.getSubscriptionByEmail(email);
       if (user) {
         if (subscription) {
@@ -530,7 +510,6 @@ class userController {
         util.setErrorResponse(res, 'Data not found', 404);
       }
     } catch (error) {
-      console.log(error);
       util.setErrorResponse(res, error.message, 500);
     }
   }
@@ -560,12 +539,10 @@ class userController {
         if (logoutStatus) {
           util.setSuccessResponse(res, 'Logout successfully', 200);
         } else {
-          console.log(logoutStatus);
           util.setErrorResponse(res, 'Something went wrong', 400);
         }
       }
     } catch (error) {
-      console.log(error);
       util.setErrorResponse(res, error.message, 500);
     }
   }
