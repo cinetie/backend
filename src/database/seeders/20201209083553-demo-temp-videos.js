@@ -72,6 +72,24 @@ export default {
       createdAt: new Date(),
 
     },
+    {
+      id: 164,
+      videoName: 'serie 1',
+      clientId: '31978540-8bdf-41cc-81d7-26200b847c0a',
+      videoUri: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2aWRlb1VyaSI6IjE0YWNkNDBmLTU0ZTYtNGQ0MWZnLTg4YTEtMmVmYmRmZmd0ZGZnY2FjNTkubXA0Iiwic2l6ZSI6bnVsbCwiY2xpZW50SWQiOiIzMTk3ODU0MC04YmRmLTQxY2MtODFkNy0yNjIwMGI4NDdjMGEiLCJ2aWRlb0lkIjoiZnI0NzRydGRkNHczLTRmMzc4aS1razIxLTA4NzgtYzBmMzY0ZGZndHM1dHloIiwidHlwZSI6Im1vdmllIiwiaWF0IjoxNjEwMDk3NTcwfQ.RJ8TlsueZCbGTJpDvtH-6kxgYnjgOzRmA3oD-II9ePY',
+      updatedAt: new Date(),
+      createdAt: new Date(),
+
+    },
+    {
+      id: 165,
+      videoName: 'video 11234',
+      clientId: '31978540-8bdf-41cc-81d7-26200b847c0a',
+      videoUri: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2aWRlb1VyaSI6IjE0YWNmZ2Q0MGYtNTRlNi00ZDQxZmctODhhMS0yZWZiZGZmZ3RkZmdjYWM1OS5tcDQiLCJzaXplIjpudWxsLCJjbGllbnRJZCI6IjMxOTc4NTQwLThiZGYtNDFjYy04MWQ3LTI2MjAwYjg0N2MwYSIsInZpZGVvSWQiOiJmcjQ3NHJ0ZGRmcmQ0dzMtNGYzNzhpLWtrMjEtMDg3OC1jMGYzNjRkZmd0czV0eWgiLCJ0eXBlIjoibW92aWUiLCJpYXQiOjE2MTAxMDEwNzJ9.84ua0dKOf4rkxf0ll5EPtNgd4loRuxjczxy1JMyf48c',
+      updatedAt: new Date(),
+      createdAt: new Date(),
+
+    },
 
   ]),
   down: (queryInterface) => queryInterface.bulkDelete('tempVideos', null, {}),
