@@ -30,37 +30,6 @@ describe('SIGNUP', () => {
         done();
       });
   });
-
-  it('users should provide error signup with no firstName', (done) => {
-    chai
-      .request(app)
-      .post(`${prefix}`)
-      .send(UserUpNoFirstName)
-      .end((err, res) => {
-        expect(res).to.have.status(422);
-        expect(res.body).to.have.property(
-          'message',
-          'You have to enter a valid first name. Example: Jane'
-        );
-        done();
-      });
-  });
-
-  it('users should provide error signup with no lastName', (done) => {
-    chai
-      .request(app)
-      .post(`${prefix}`)
-      .send(UserUpNoLastName)
-      .end((err, res) => {
-        expect(res).to.have.status(422);
-        expect(res.body).to.have.property(
-          'message',
-          'You have to enter a valid last name. Example: Doe'
-        );
-        done();
-      });
-  });
-
   it('users should provide error signup with no password', (done) => {
     chai
       .request(app)

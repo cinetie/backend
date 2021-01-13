@@ -19,7 +19,7 @@ sinonStubPromise(sinon);
 
 describe('BILLING MIDDLEWARE', (req, res, status) => {
     it('Test fetchCurrentSubscription Method with registered email should be okay', async () => {
-        res = {}
+        res = httpMocks.createResponse();
         let state = undefined
         let req = { 
             body: {
