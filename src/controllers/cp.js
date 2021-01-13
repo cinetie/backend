@@ -159,7 +159,7 @@ class cpController {
       const exp = date.addMoreDays(2);
       const token = jwt.jwtSign({ exp: exp.getTime() }, process.env.SECRET, '1d');
       await mailer([{
-        link: `${process.env.HOST}/cp/serve-verify?id=${user.id}&&token=${token}`
+        link: `${process.env.FRONT_END_USER}/newPassword?id=${user.id}&&token=${token}`
       }, {
         from: 'CINETIE support',
         to: req.body.email,

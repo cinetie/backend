@@ -1,45 +1,11 @@
 import chai, { expect } from 'chai';
 import sinon from 'sinon';
-import fs from 'fs';
 import httpMock from "node-mocks-http";
-import path from 'path';
 import TempSerieController from '../controllers/tempSerie';
-import TempVideoController from '../controllers/tempVideo';
-import { deleteObject } from '../helpers/aws';
-import uploader from '../helpers/videoUploader';
 import services from '../services/tempSerieService';
-import jwt from '../helpers/jwt';
 import * as aws from '../helpers/aws';
 
-let urls;
-const video = fs.readFileSync(path.join(__dirname, 'mock/test.mp4'));
-const tagname = fs.readFileSync(path.join(__dirname, 'mock/tagname.jpg'));
-const landScape = fs.readFileSync(path.join(__dirname, 'mock/landscape.jpg'));
-const portrait = fs.readFileSync(path.join(__dirname, 'mock/portrait.jpg'));
 describe('TEMP SERIE TESTS', () => {
-    // before(async () => {
-    //     urls = await uploader(video,landScape,portrait, tagname, 'movie', 'mp4');
-    
-    //     // const req = httpMock.createRequest({
-    //     //     headers: {
-    //     //         cpid:  '31978540-8bdf-41cc-81d7-26200b847c0a'
-    //     //     },
-    //     //     body: {
-    //     //         portrait: urls.portraitUrl.Key,
-    //     //         tagname: urls.nameTagUrl.Key,
-    //     //         landScape: urls.landscapeUrl.Key,
-    //     //         video: urls.videoUrl.Key,
-    //     //         type: 'serie',
-    //     //     }
-    //     // })
-    //     // const res = httpMock.createResponse();
-    //     // const result = await TempVideoController.createVideoController(req, res);
-    // });
-    // after(async () => {
-    //     await deleteObject('cinetie-temp-movies', urls.videoUrl.Key);
-    //     await deleteObject('cinetie-thumbnails', urls.portraitUrl.Key);
-    //     await deleteObject('cinetie-thumbnails', urls.landscapeUrl.Key);
-    // });
     describe('CREATE SERIE TEST', () => {
         it('should add a new serie', async () => {
             const req = httpMock.createRequest({
@@ -84,6 +50,7 @@ describe('TEMP SERIE TESTS', () => {
             expect(res.statusCode).to.equal(422)
         })
         it('should return 500 status when there is a server error', async () => {
+            const stub = sinon.stub(services, 'createNewSeries').throws(new Error('Something went wrong'));
             const req = httpMock.createRequest({
                 body: {
                         "video": 'erfergergergerg.mp4',
@@ -97,6 +64,7 @@ describe('TEMP SERIE TESTS', () => {
             })
             const res = httpMock.createResponse();
             await TempSerieController.createSerie(req, res);
+            stub.restore();
             expect(res.statusCode).to.equal(500)
         })
     })

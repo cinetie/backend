@@ -1,7 +1,7 @@
 export default {
   up: (queryInterface) => queryInterface.bulkInsert('subscriptions', [
     {
-      id: 0,
+      id: 200,
       email: 'blaise1@gmail.com',
       plan: "Promo",
       price: 3,
@@ -15,7 +15,7 @@ export default {
       createdAt: new Date(),
     },
     {
-      id: 0,
+      id: 201,
       email: 'blaise19@gmail.com',
       plan: "Promo",
       price: 3,
