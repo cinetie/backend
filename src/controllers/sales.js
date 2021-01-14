@@ -33,6 +33,7 @@ class salesController {
 
   static async getAllSales(req, res) {
     try {
+      let salesUpdate = []
       const sales = await service.getAllSaless();
       let sum = 0;
       if (Object.values(sales).length > 0) {
@@ -56,10 +57,43 @@ class salesController {
           };
           formattedData.push(obj);
         }
+        //For Grouping sales by moths and year they created from
+
+        for(let i = 0; i < Object.values(sales).length; i++) {
+  
+          const date = new Date(sales[i].dataValues.creationTime)
+          const dateFormat = new Intl.DateTimeFormat('nl-BE', {
+            month: '2-digit',
+            day: '2-digit',
+            year: 'numeric'
+          });
+          if(sales[i].dataValues.creationTime) {
+            sales[i].dataValues.creationTime = dateFormat.format(date)
+            salesUpdate.push(sales[i].dataValues)
+          }
+        }
+
+        let resp = {};
+
+        let fn = (year, month, o = resp, array = salesUpdate) => {
+          o[year][month] = {
+            [month]: array.filter(({creationTime: d}) => {
+              return `${month}/${year}` === d.slice(3, 10)})
+          };
+        }
+
+        for (let {creationTime} of salesUpdate) {
+          let [day, month, year] = creationTime.match(/\d+/g);
+          if (!resp[year]) resp[year] = {};
+          
+          fn(year, month)
+        }
+
         const uniqueValues = util.getUnique(formattedData, 'creationTime');
         return response.successResponse(res, 200, 'Earnings found ', {
           sum: Number(sum.toFixed(2)),
-          data: uniqueValues
+          data: uniqueValues,
+          result: resp
         });
       }
       return response.successResponse(res, 400, 'Data Not found', 0);
