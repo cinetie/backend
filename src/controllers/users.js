@@ -18,6 +18,7 @@ import mailer from '../helpers/mailer';
 import Rave from '../helpers/rave';
 import Fetch from '../helpers/fetch';
 import billing from '../middlewares/billing';
+import { decode } from 'querystring';
 
 const util = new Util();
 class userController {
@@ -237,6 +238,7 @@ class userController {
       const user = await userService.getUserByMail(decoded.email);
       const status = await userService.deleteUser(user.id);
       const cancelSubscription = await billingServices.updateSubscription(decoded.email, { state: 'canceled' });
+      await billingServices.deleteSubscription(decoded.email)
       if (status !== 0 && cancelSubscription[1] === 1) {
         util.setSuccessResponse(res, 'deleted successfully', 200, status);
       } else {
