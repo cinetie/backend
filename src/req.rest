@@ -1,0 +1,2 @@
+GET http://localhost:3004/admin/sales/all
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImNocmlzdG9waGVrd2l6ZXJhMUBnbWFpbC5jb20iLCJpYXQiOjE2MDkyMzE1NzB9.5H9HKlwcUBfunapqIfvewxFgQbz89cxhobmVTqhx4Gg

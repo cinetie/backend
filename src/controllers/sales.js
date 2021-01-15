@@ -37,29 +37,31 @@ class salesController {
       const sales = await service.getAllSaless();
       let sum = 0;
       if (Object.values(sales).length > 0) {
-        for (let i = 0; i < Object.values(sales).length; i++) {
-          const date = new Date(Number(sales[i].creationTime));
-          sales[i].creationTime = `${date.toDateString().slice(4, 7)}/${date.getFullYear()}`;
-          sum += Number(sales[i].amount);
-        }
-        const formattedData = [];
-        for (let i = 0; i < sales.length; i++) {
-          let count = 0;
-          for (let j = 0; j < sales.length; j++) {
-            var { creationTime } = sales[i];
-            if (sales[i].creationTime == sales[j].creationTime) {
-              count += Number(sales[j].amount);
-            }
-          }
-          const obj = {
-            amount: Number(count.toFixed(2)),
-            period: creationTime
-          };
-          formattedData.push(obj);
-        }
+        // for (let i = 0; i < Object.values(sales).length; i++) {
+        //   const date = new Date(Number(sales[i].creationTime));
+        //   sales[i].creationTime = `${date.toDateString().slice(4, 7)}/${date.getFullYear()}`;
+        //   sum += Number(sales[i].amount);
+        // }
+
+        // console.log(sales);
+        // const formattedData = [];
+        // for (let i = 0; i < sales.length; i++) {
+        //   let count = 0;
+        //   for (let j = 0; j < sales.length; j++) {
+        //     var { creationTime } = sales[i];
+        //     if (sales[i].creationTime == sales[j].creationTime) {
+        //       count += Number(sales[j].amount);
+        //     }
+        //   }
+        //   const obj = {
+        //     amount: Number(count.toFixed(2)),
+        //     period: creationTime
+        //   };
+        //   formattedData.push(obj);
+        // }
         //For Grouping sales by moths and year they created from
 
-        for(let i = 0; i < Object.values(sales).length; i++) {
+        for(let i = 0; i < sales.length; i++) {
   
           const date = new Date(sales[i].dataValues.creationTime)
           const dateFormat = new Intl.DateTimeFormat('nl-BE', {
@@ -78,21 +80,23 @@ class salesController {
         let fn = (year, month, o = resp, array = salesUpdate) => {
           o[year][month] = {
             [month]: array.filter(({creationTime: d}) => {
-              return `${month}/${year}` === d.slice(3, 10)})
+              return `${month}/${year}` === (`${d.slice(0, 2)}/${d.slice(6, 10)}`)})
           };
         }
 
         for (let {creationTime} of salesUpdate) {
-          let [day, month, year] = creationTime.match(/\d+/g);
+          let [month, day, year] = creationTime.match(/\d+/g);
           if (!resp[year]) resp[year] = {};
           
           fn(year, month)
         }
 
-        const uniqueValues = util.getUnique(formattedData, 'creationTime');
+        console.log(salesUpdate);
+
+        // const uniqueValues = util.getUnique(formattedData, 'creationTime');
         return response.successResponse(res, 200, 'Earnings found ', {
           sum: Number(sum.toFixed(2)),
-          data: uniqueValues,
+          // data: uniqueValues,
           result: resp
         });
       }

@@ -12,7 +12,9 @@ router.get('/earnings/cp', access.isAdmin, adminController.getEarningsPerClient)
 router.get('/earnings/video', access.isAdmin, adminController.getAllEarningsPerVideo);
 router.get('/videos/cp', access.isAdmin, adminController.getVideosPerCp);
 router.get('/videos', access.isAdmin, adminController.getAllVideos);
-router.get('/sales/all', access.isAdmin, sales.getAllSales);
+router.get('/sales/all',
+//  access.isAdmin, 
+ sales.getAllSales);
 router.get('/sales/range', access.isAdmin, sales.getSalesInTimeRange);
 router.post('/gain-access', access.isAdmin, adminController.gainAccess);
 export default router;
