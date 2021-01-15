@@ -90,8 +90,19 @@ class salesController {
           
           fn(year, month)
         }
+        for (var key in resp) {
+          if (resp.hasOwnProperty(key)) {
+            for(var key1 in resp[key]) {
+              resp[key][key1]['sum'] = 0;
+              for(let i = 0; i < resp[key][key1][key1].length; i++) {
+                resp[key][key1]['sum'] += resp[key][key1][key1][i].amount
+              }
+            }
+          }
+      }
 
-        console.log(salesUpdate);
+
+        console.log(resp);
 
         // const uniqueValues = util.getUnique(formattedData, 'creationTime');
         return response.successResponse(res, 200, 'Earnings found ', {
