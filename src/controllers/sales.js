@@ -37,28 +37,6 @@ class salesController {
       const sales = await service.getAllSaless();
       let sum = 0;
       if (Object.values(sales).length > 0) {
-        // for (let i = 0; i < Object.values(sales).length; i++) {
-        //   const date = new Date(Number(sales[i].creationTime));
-        //   sales[i].creationTime = `${date.toDateString().slice(4, 7)}/${date.getFullYear()}`;
-        //   sum += Number(sales[i].amount);
-        // }
-
-        // console.log(sales);
-        // const formattedData = [];
-        // for (let i = 0; i < sales.length; i++) {
-        //   let count = 0;
-        //   for (let j = 0; j < sales.length; j++) {
-        //     var { creationTime } = sales[i];
-        //     if (sales[i].creationTime == sales[j].creationTime) {
-        //       count += Number(sales[j].amount);
-        //     }
-        //   }
-        //   const obj = {
-        //     amount: Number(count.toFixed(2)),
-        //     period: creationTime
-        //   };
-        //   formattedData.push(obj);
-        // }
         //For Grouping sales by moths and year they created from
 
         for(let i = 0; i < sales.length; i++) {
@@ -90,6 +68,7 @@ class salesController {
           
           fn(year, month)
         }
+
         for (var key in resp) {
           if (resp.hasOwnProperty(key)) {
             for(var key1 in resp[key]) {
@@ -99,16 +78,37 @@ class salesController {
               }
             }
           }
-      }
-
-
-        console.log(resp);
-
-        // const uniqueValues = util.getUnique(formattedData, 'creationTime');
+        }
+        for (var key in resp) {
+          
+          if (resp.hasOwnProperty(key)) {
+            
+            for(var key1 in resp[key]) {
+              if(!resp[key]['sumYear']){
+                 resp[key]['sumYear'] = 0 
+              }
+              resp[key]['sumYear'] += resp[key][key1]['sum'];
+            }
+          }
+          
+        }
+        for(var key in resp){
+          if(!resp['sumTotal']){
+              resp['sumTotal'] = 0 
+           }
+          if (resp.hasOwnProperty(key)) {
+            resp['sumTotal'] += resp[key]['sumYear']
+          }
+        }
+        for (var key in resp) {
+          if (resp.hasOwnProperty(key)) {
+            for(var key1 in resp[key]) {
+              delete resp[key][key1][key1]
+            }
+          }
+        }
         return response.successResponse(res, 200, 'Earnings found ', {
-          sum: Number(sum.toFixed(2)),
-          // data: uniqueValues,
-          result: resp
+          data: resp
         });
       }
       return response.successResponse(res, 400, 'Data Not found', 0);
