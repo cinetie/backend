@@ -237,9 +237,8 @@ class userController {
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
       const user = await userService.getUserByMail(decoded.email);
       const status = await userService.deleteUser(user.id);
-      const cancelSubscription = await billingServices.updateSubscription(decoded.email, { state: 'canceled' });
-      await billingServices.deleteSubscription(decoded.email)
-      if (status !== 0 && cancelSubscription[1] === 1) {
+      const deleteSubscription = await billingServices.deleteSubscription(decoded.email)
+      if (status !== 0 && deleteSubscription !== 0) {
         util.setSuccessResponse(res, 'deleted successfully', 200, status);
       } else {
         util.setErrorResponse(res, 'An error occured', 400);
