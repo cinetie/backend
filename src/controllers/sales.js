@@ -33,33 +33,82 @@ class salesController {
 
   static async getAllSales(req, res) {
     try {
+      let salesUpdate = []
       const sales = await service.getAllSaless();
       let sum = 0;
       if (Object.values(sales).length > 0) {
-        for (let i = 0; i < Object.values(sales).length; i++) {
-          const date = new Date(Number(sales[i].creationTime));
-          sales[i].creationTime = `${date.toDateString().slice(4, 7)}/${date.getFullYear()}`;
-          sum += Number(sales[i].amount);
+        //For Grouping sales by moths and year they created from
+
+        for(let i = 0; i < sales.length; i++) {
+  
+          const date = new Date(sales[i].dataValues.creationTime)
+          const dateFormat = new Intl.DateTimeFormat('nl-BE', {
+            month: '2-digit',
+            day: '2-digit',
+            year: 'numeric'
+          });
+          if(sales[i].dataValues.creationTime) {
+            sales[i].dataValues.creationTime = dateFormat.format(date)
+            salesUpdate.push(sales[i].dataValues)
+          }
         }
-        const formattedData = [];
-        for (let i = 0; i < sales.length; i++) {
-          let count = 0;
-          for (let j = 0; j < sales.length; j++) {
-            var { creationTime } = sales[i];
-            if (sales[i].creationTime == sales[j].creationTime) {
-              count += Number(sales[j].amount);
+
+        let resp = {};
+
+        let fn = (year, month, o = resp, array = salesUpdate) => {
+          o[year][month] = {
+            [month]: array.filter(({creationTime: d}) => {
+              return `${month}/${year}` === (`${d.slice(0, 2)}/${d.slice(6, 10)}`)})
+          };
+        }
+
+        for (let {creationTime} of salesUpdate) {
+          let [month, day, year] = creationTime.match(/\d+/g);
+          if (!resp[year]) resp[year] = {};
+          
+          fn(year, month)
+        }
+
+        for (var key in resp) {
+          if (resp.hasOwnProperty(key)) {
+            for(var key1 in resp[key]) {
+              resp[key][key1]['sum'] = 0;
+              for(let i = 0; i < resp[key][key1][key1].length; i++) {
+                resp[key][key1]['sum'] += resp[key][key1][key1][i].amount
+              }
             }
           }
-          const obj = {
-            amount: Number(count.toFixed(2)),
-            period: creationTime
-          };
-          formattedData.push(obj);
         }
-        const uniqueValues = util.getUnique(formattedData, 'creationTime');
+        for (var key in resp) {
+          
+          if (resp.hasOwnProperty(key)) {
+            
+            for(var key1 in resp[key]) {
+              if(!resp[key]['sumYear']){
+                 resp[key]['sumYear'] = 0 
+              }
+              resp[key]['sumYear'] += resp[key][key1]['sum'];
+            }
+          }
+          
+        }
+        for(var key in resp){
+          if(!resp['sumTotal']){
+              resp['sumTotal'] = 0 
+           }
+          if (resp.hasOwnProperty(key)) {
+            resp['sumTotal'] += resp[key]['sumYear']
+          }
+        }
+        for (var key in resp) {
+          if (resp.hasOwnProperty(key)) {
+            for(var key1 in resp[key]) {
+              delete resp[key][key1][key1]
+            }
+          }
+        }
         return response.successResponse(res, 200, 'Earnings found ', {
-          sum: Number(sum.toFixed(2)),
-          data: uniqueValues
+          data: resp
         });
       }
       return response.successResponse(res, 400, 'Data Not found', 0);

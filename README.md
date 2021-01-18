@@ -922,3 +922,54 @@ Response:
     }
 }
 ```
+
+
+
+### 18. Get All Sales: GET Request
+
+Endpoint
+
+```text
+/admin/sales/all
+```
+
+Headers:
+
+```json
+{
+    "Authorization": "Bearer <User token>",
+    "Content-Type": "application/json"
+}
+```
+
+Body:
+**NONE**
+
+Response:
+
+```json
+{
+    "status": 200,
+    "message": "Earnings found ",
+    "data": {
+        "result": {
+            "2020": {
+                "11": {
+                    "sum": 3
+                },
+                "12": {
+                    "sum": 35.699999999999974
+                },
+                "sumYear": 38.699999999999974
+            },
+            "2021": {
+                "01": {
+                    "sum": 33128.1
+                },
+                "sumYear": 33128.1
+            },
+            "sumTotal": 33166.799999999996
+        }
+    }
+}
+```
