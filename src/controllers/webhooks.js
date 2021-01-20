@@ -97,27 +97,5 @@ export default class WebHooks {
     } else {
       throw new Error('Sales recording error');
     }
-    // console.log(sales, "_+_+_+_+_+_+_++_+_+_+_+_+_+_")
-    // if (sales) {
-    //   const sessions = await viewingSessions.getActiveAndSuspendedSessionsPerUser(user.email);
-    //   if (sessions.length > 0) {
-    //     // we are recording earnings since they exist meaning they watched some movies
-    //     // this month or year
-    //     const earnings = await Earnings(user.email);
-    //     if (earnings === 0) {
-    //       // check earnings for failure
-    //       throw new Error('Earnings recording error');
-    //     } else {
-    //       // earnings and sales are both created successfully
-    //       return true;
-    //     }
-    //   } else {
-    //     // we are not renewing the subscription as isNew is true i.e first time payment
-    //     return true;
-    //   }
-    // } else {
-    //   // something went wrong registering the sale
-    //   throw new Error('Sales recording error');
-    // }
   }
 }
