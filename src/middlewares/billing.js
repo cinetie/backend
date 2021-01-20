@@ -219,7 +219,7 @@ class billing {
       : await billingService.updateSubscription(user.email,
         { endDate: date.addMoreDays(30).toDateString(), });
     if (updates[1] === 1 && updatedSubscription[1] === 1) {
-      const status = await webhooks.registerSalesAndEarnings({
+      const status = await webhooks.registerSales({
         payment_type: 'spenn',
         amount: details.price
       }, details, req, res);

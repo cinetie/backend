@@ -19,7 +19,7 @@ const util = new Util();
 class earningController {
   // obtains details about the current users subscription
   static async getCurrentSubscriptionDetails(email) {
-    const details = await transactionService.getRecentTransactionsByEmail(email, 'approved')
+    const details = await subscriptionService.getCurrentSubscription(email)
     if (details) {
       return details;
     }
@@ -39,7 +39,7 @@ class earningController {
   static async calculateRatePerVideo(email) {
     const sessionDetails = await this.getCurrentViewingSessions(email);
     const subscriptionDetails = await this.getCurrentSubscriptionDetails(email);
-    const rate = (Number(subscriptionDetails.paidAmount) * 0.7) / Object.values(sessionDetails).length;
+    const rate = (Number(subscriptionDetails.price) * 0.7) / Object.values(sessionDetails).length;
     if (rate) {
       return rate;
     }
@@ -280,7 +280,7 @@ class earningController {
       const updates = await userService.updateUser(req.user, { permissionLevel: 1 });
       const currentSubscription = await billingServices.getCurrentSubscription(req.user);
       if (updates[1] === 1) {
-        const status = await webhooks.registerSalesAndEarnings({
+        const status = await webhooks.registerSales({
           payment_type: req.body.paymentMethod,
           amount: currentSubscription.price
         }, currentSubscription, req, res);

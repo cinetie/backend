@@ -470,7 +470,7 @@ describe('BILLING MIDDLEWARE', (req, res, status) => {
     });
 
     it('Test updateTransactionsAndRegisterSales Method with registered email with updates[1] and updatedSubscription[1] which is different 1', async () => {
-        const stub = sinon.stub(webhooks, 'registerSalesAndEarnings').callsFake(() =>  false)
+        const stub = sinon.stub(webhooks, 'registerSales').callsFake(() =>  false)
         var nextSpy = sinon.spy();
         var req = httpMocks.createRequest({ 
             body: {
