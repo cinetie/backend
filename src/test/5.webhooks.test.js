@@ -40,7 +40,7 @@ describe('WEBHOOKS', () => {
   });
 
   it('should return true', async () => {
-    const data = await WebHooks.registerSalesAndEarnings(
+    const data = await WebHooks.registerSales(
       response,
       user,
       emptyMock.request,

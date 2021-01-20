@@ -9,11 +9,19 @@ import path from 'path';
 import fileUpload from 'express-fileupload';
 import response from './helpers/response';
 import stopLoginSessions from "./helpers/stopLoginSessions";
+import calculateEarnings from './helpers/calculateEarning';
 import routes from './routes';
 import morgan from 'morgan'
 
 config();
 cron.schedule('0 0 0 * * *', stopLoginSessions);
+cron.schedule('0 0 * * *', () => {
+  calculateEarnings
+}, {
+  scheduled: true,
+  timezone: "Africa/Cairo"
+});
+
 const app = express();
 
 app.enable('trust proxy');
