@@ -19,7 +19,7 @@ const util = new Util();
 class earningController {
   // obtains details about the current users subscription
   static async getCurrentSubscriptionDetails(email) {
-    const details = await transactionService.getRecentTransactionsByEmail(email, 'approved')
+    const details = await billingServices.getCurrentSubscription(email);
     if (details) {
       return details;
     }
@@ -39,7 +39,7 @@ class earningController {
   static async calculateRatePerVideo(email) {
     const sessionDetails = await this.getCurrentViewingSessions(email);
     const subscriptionDetails = await this.getCurrentSubscriptionDetails(email);
-    const rate = (Number(subscriptionDetails.paidAmount) * 0.7) / Object.values(sessionDetails).length;
+    const rate = (Number(subscriptionDetails.price) * 0.7) / Object.values(sessionDetails).length;
     if (rate) {
       return rate;
     }

@@ -3,6 +3,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable consistent-return */
 import path from 'path';
+import { v4 as uuid } from 'uuid';
 import Util from '../helpers/utilities';
 import mailer from '../helpers/mailer';
 import userService from '../services/userServices';
@@ -83,7 +84,6 @@ class billing {
   }
 
   static async renewPayment(req, res, next) {
-    
     try {
       const user = await userService.getUserByMail(req.body.email);
       const pendingSubscription = await billing.fetchCurrentSubscription(req, res, 'pending');
@@ -99,18 +99,21 @@ class billing {
 
         const token = jwt.jwtSign({ role: 'main-api', user: user.email }, process.env.SECRET, 1000);
         if (endDate.getTime() <= today.getTime()) { // remember to change >= to <=
-          
           if (Number(details.paymentMethod) === 1) {
+            const txRef = uuid();
             const momoStatus = await Fetch({
               currency: 'RWF',
               amount: details.price,
               email: user.email,
               phone_number: user.phoneNumber,
+              txRef,
               fullname: `${user.firstName} ${user.lastName}`,
 
             }, { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
             `${process.env.PAY_HOST}/charge/momo`, 'POST');
             if (momoStatus.status === 200) {
+              const currentSubscription = await billingService.getCurrentSubscription(user.email);
+              await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
               util.setSuccessResponse(res,
                 'Please follow this link to renew your subscription with Mobile money',
                 200,
