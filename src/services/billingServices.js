@@ -192,5 +192,17 @@ class billingServices {
       throw error;
     }
   }
+  static async deleteSubscription(email) {
+    try {
+      return await database.subscriptions.destroy({
+        returning: true,
+        where: {
+          email
+        }
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 export default billingServices;
