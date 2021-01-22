@@ -28,6 +28,7 @@ export default class WebHooks {
         // const recentTrans = await transactions.getTransactionsByEmail(user.email, 'pending');
         const test = await transactions.updateTransaction(response.tx_ref, { statusDesc: response.status.toLowerCase() });
       const transVerification = await rave.Transaction.verify({ id: response.id });
+
       if (transVerification.status === 'success') {
         let updates = {};
         await billingService.updateSubscription(user.email, {
@@ -50,8 +51,7 @@ export default class WebHooks {
           const converted = Math.floor(rates.quotes.USDRWF * response.amount);
           response.amount = converted
         }
-      
-        const status = await WebHooks.registerSalesAndEarnings(response, user, req, res);
+        const status = await WebHooks.registerSales(response, user, req, res);
         if (status === true) {
           await billingService.updateSubscription(user.email,
             { state: 'current' });
@@ -85,32 +85,16 @@ export default class WebHooks {
     }
   }
 
-  static async registerSalesAndEarnings(response, user, req, res) {
+  static async registerSales(response, user, req, res) {
     const sales = await Sales.addRecord({
       method: response.payment_type,
       plan: user.plan,
       amount: response.amount * 0.3,
       user: user.email
     });
-    if (sales) {
-      const sessions = await viewingSessions.getActiveAndSuspendedSessionsPerUser(user.email);
-      if (sessions.length > 0) {
-        // we are recording earnings since they exist meaning they watched some movies
-        // this month or year
-        const earnings = await Earnings(user.email);
-        if (earnings === 0) {
-          // check earnings for failure
-          throw new Error('Earnings recording error');
-        } else {
-          // earnings and sales are both created successfully
-          return true;
-        }
-      } else {
-        // we are not renewing the subscription as isNew is true i.e first time payment
-        return true;
-      }
+    if(sales) {
+      return true
     } else {
-      // something went wrong registering the sale
       throw new Error('Sales recording error');
     }
   }

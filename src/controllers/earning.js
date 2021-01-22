@@ -19,7 +19,7 @@ const util = new Util();
 class earningController {
   // obtains details about the current users subscription
   static async getCurrentSubscriptionDetails(email) {
-    const details = await billingServices.getCurrentSubscription(email);
+    const details = await subscriptionService.getCurrentSubscription(email)
     if (details) {
       return details;
     }
@@ -280,7 +280,7 @@ class earningController {
       const updates = await userService.updateUser(req.user, { permissionLevel: 1 });
       const currentSubscription = await billingServices.getCurrentSubscription(req.user);
       if (updates[1] === 1) {
-        const status = await webhooks.registerSalesAndEarnings({
+        const status = await webhooks.registerSales({
           payment_type: req.body.paymentMethod,
           amount: currentSubscription.price
         }, currentSubscription, req, res);
