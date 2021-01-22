@@ -3,6 +3,7 @@ import '@babel/polyfill';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import morgan from 'morgan';
 import cron from 'node-cron';
 import { config } from 'dotenv';
 import path from 'path';
@@ -11,7 +12,7 @@ import response from './helpers/response';
 import stopLoginSessions from "./helpers/stopLoginSessions";
 import calculateEarnings from './helpers/calculateEarning';
 import routes from './routes';
-import morgan from 'morgan'
+import endSubscription from './helpers/endSubscription';
 
 config();
 cron.schedule('0 0 0 * * *', stopLoginSessions);
@@ -22,6 +23,7 @@ cron.schedule('0 0 * * *', () => {
   timezone: "Africa/Cairo"
 });
 
+cron.schedule('0 0 * * *', endSubscription);
 const app = express();
 
 app.enable('trust proxy');
