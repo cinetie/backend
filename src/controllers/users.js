@@ -43,10 +43,13 @@ class userController {
         const tokenToSave = userController.generateTokenToSave(newUser, token);
         await tokenService.createNewToken(tokenToSave, token);
         if (EmailStatus) util.setErrorResponse(res, EmailStatus, 500);
-        const userToken = jwt.jwtSign(createdUser.email, process.env.SECRET);
+        const userToken = jwt.jwtSign({
+          key: cry.crypto(),
+          email: createdUser.email
+        }, process.env.SECRET, '1d');
         createdUser.token = userToken;
         delete createdUser.password;
-        util.setSuccessResponse(res, 'Signed up successfully', 201, createdUser);
+        util.setSuccessResponse(res, 'Signed up successfully', 201, userToken);
       }
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
