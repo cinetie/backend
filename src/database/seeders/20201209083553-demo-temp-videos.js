@@ -90,6 +90,15 @@ export default {
       createdAt: new Date(),
 
     },
+    {
+      id: 166,
+      videoName: 'update video',
+      clientId: 'grtgrth1244hy-2sdf3454-45564f-fdg12f56',
+      videoUri: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2aWRlb1VyaSI6IjE0YWNmZGcwZi01NGU2LTRkMzQtODhhMS0yZWZiNDllY2FjNTgubXA0Iiwic2l6ZSI6bnVsbCwiY2xpZW50SWQiOiJncnRncnRoMTI0NGh5LTJzZGYzNDU0LTQ1NTY0Zi1mZGcxMmY1NiIsInZpZGVvSWQiOiJmMzY3ZGFmZy00ZnM0LXNzMjEtODgxOC1jMGYzNnNkLWE5ZGZyMSIsInR5cGUiOiJtb3ZpZSIsImlhdCI6MTYxMTc1NzQ3MX0.hzXEkCGPq9V067s1uHv1uQZ3IH6RE0O3-LhZpVKSXhg',
+      updatedAt: new Date(),
+      createdAt: new Date(),
+
+    },
 
   ]),
   down: (queryInterface) => queryInterface.bulkDelete('tempVideos', null, {}),

@@ -10,6 +10,17 @@ export default {
       yearlyPrice: 12,
       updatedAt: new Date(),
       createdAt: new Date(),
+    },
+    {
+      id: 246,
+      type: 'setup',
+      hasHd: true,
+      hasUltraHd: true,
+      numberOfScreens: 300,
+      monthlyPrice: 0,
+      yearlyPrice: 0,
+      updatedAt: new Date(),
+      createdAt: new Date(),
     }
 
   ]),

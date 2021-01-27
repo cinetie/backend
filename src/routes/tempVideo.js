@@ -10,5 +10,6 @@ router.get('/signed-urls', access.isAdmin, controllers.getSignedUrlTempVideos);
 router.delete('/', access.isAdmin, controllers.deleteParticularVideoController);
 router.post('/new', access.isAdmin, addVideo, controllers.createVideoController);
 router.put('/update', access.isAdmin, controllers.updateParticularVideoController);
+router.put('/update/temp', access.isAdmin, controllers.updateParticularTempVideoController);
 
 export default router;
