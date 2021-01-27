@@ -28,6 +28,8 @@ class tempVideoController {
       data.videoId = uuid.generator();
       data.clientId = req.headers.cpid;
       data.type = req.body.type;
+      data.EnSubt = req.body.EnSubt;
+      data.FrSubt = req.body.FrSubt;
       if (data.type === 'movie') {
         data.videoUri = jwt.jwtSign({
           videoUri: data.video, size: data.size, clientId: req.headers.cpid, videoId: data.videoId, type: 'movie'
@@ -137,15 +139,20 @@ class tempVideoController {
   static async getSignedUrlTempVideos(req, res) {
     try {
       const { type, extension } = req.query;
+
       const portrait = await getSignedUrl(process.env.THUMBNAIL_BUCKET, 'image/*', 'jpg');
       const landscape = await getSignedUrl(process.env.THUMBNAIL_BUCKET, 'image/*', 'jpg');
       const nameTag = await getSignedUrl(process.env.THUMBNAIL_BUCKET, 'image/*', 'png');
+      const EnSubt = await getSignedUrl(process.env.SUBTITLE_BUCKET, 'text/plain', 'srt');
+      const FrSubt = await getSignedUrl(process.env.SUBTITLE_BUCKET, 'text/plain', 'srt');
       const video = (type === 'movie') ? await getSignedUrl(process.env.TEMP_BUCKET_MOVIE, 'video/*', extension) : null;
       util.setSuccessResponse(res, 'Temporary urls', 200, {
         portrait,
         landscape,
         nameTag,
-        video
+        video,
+        EnSubt,
+        FrSubt
       });
     } catch (error) {
       util.setErrorResponse(res, `something happened ${error.message}`, 500);
