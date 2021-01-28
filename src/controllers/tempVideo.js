@@ -71,6 +71,8 @@ class tempVideoController {
         }
         const decoded = jwt.jwtVerify(videos[i].videoUri, process.env.SECRET);
         videos[i].videoUri = decoded.videoUri;
+        videos[i] = videos[i].toJSON();
+        videos[i].videoId = decoded.videoId;
       }
       if (Object.values(videos).length > 0) {
         return util.setSuccessResponse(res, 'Videos found', 200, videos);
@@ -105,8 +107,8 @@ class tempVideoController {
   static async deleteParticularVideoController(req, res) {
     try {
       const video = await services.getParticularVideo(req.query.id);
-      
-      if(!video) {
+
+      if (!video) {
         return util.setErrorResponse(res, 'No video found', 401);
       }
       const videos = await services.deleteVideos(req.query.id);
@@ -133,6 +135,43 @@ class tempVideoController {
       }
     } catch (error) {
       util.setErrorResponse(res, `something happened ${error.message}`, 503);
+    }
+  }
+
+  static async updateParticularTempVideoController(req, res) {
+    try {
+      const tempVideo = await services.getParticularVideo(req.query.id);
+      if (!tempVideo) {
+        return util.setErrorResponse(res, 'No video available', 404);
+      }
+      const tempData = jwt.jwtVerify(tempVideo.videoUri, process.env.SECRET);
+      if (req.body.videoKey || req.body.contentProvider || req.body.videoName) {
+        let newUri;
+        const jwtBody = {
+          videoId: tempData.videoId,
+          size: null,
+          videoUri: tempData.videoUri,
+          clientId: tempVideo.clientId,
+          type: 'movie'
+        };
+        if (req.body.videoKey) jwtBody.videoUri = req.body.videoKey;
+        if (req.body.contentProvider) jwtBody.clientId = req.body.contentProvider;
+        if (tempData.type === 'serie') jwtBody.type = 'serie';
+        newUri = jwt.jwtSign(jwtBody, process.env.SECRET);
+        const data = {
+          videoName: tempVideo.videoName,
+          videoUri: tempVideo.videoUri,
+          clientId: tempVideo.clientId
+        }
+        if (req.body.videoName) data.videoName = req.body.videoName;
+        if (req.body.contentProvider) data.clientId = req.body.contentProvider;
+        if (req.body.videoKey || req.body.contentProvider) data.videoUri = newUri;
+        const tempUpdate = await services.updateVideos(req.query.id, data);
+      }
+      const updated = await videoService.updateVideo(tempData.videoId, req.body);
+      return util.setSuccessResponse(res, 'Video successfully updated!', 200, updated);
+    } catch (error) {
+      return util.setErrorResponse(res, `something happened ${error.message}`, 503);
     }
   }
 
