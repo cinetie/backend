@@ -345,6 +345,12 @@ class Video {
     try {
       const video = await videoService.getVideoById(req.query.id);
       if (video) {
+        if(video.EnSubt !== null){
+          video.EnSubt = await getObject(process.env.SUBTITLE_BUCKET,video.EnSubt,20)
+        }
+        if(video.FrSubt !== null){
+          video.FrSubt = await getObject(process.env.SUBTITLE_BUCKET,video.FrSubt,20)
+        }
         util.setSuccessResponse(res, "videos Found", 200, video);
       } else {
         util.setErrorResponse(res, "Video can't be found", 404);
