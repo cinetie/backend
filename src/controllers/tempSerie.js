@@ -19,6 +19,8 @@ class tempSerieController {
       data.clientId = req.headers.cpid;
       // data.size = req.files.video.size;
       data.thumbNailUrl = req.body.thumb;
+      data.EnSubt = req.body.EnSubt;
+      data.FrSubt = req.body.FrSubt;
       const newserie = await series.createNewEpisode(data);
       data.uri = jwt.jwtSign({ uri: data.video, id: newserie.id }, process.env.SECRET);
       const tempVideo = await services.createNewSeries(data);
@@ -62,9 +64,13 @@ class tempSerieController {
       const { extension } = req.query;
       const thumb = await getSignedUrl(process.env.THUMBNAIL_BUCKET, 'image/*', 'jpg');
       const video = await getSignedUrl(process.env.TEMP_BUCKET_SERIES, 'video/*', extension);
+      const EnSubt = await getSignedUrl(process.env.SUBTITLE_BUCKET, 'text/plain', 'srt');
+      const FrSubt = await getSignedUrl(process.env.SUBTITLE_BUCKET, 'text/plain', 'srt');
       util.setSuccessResponse(res, 'Temporary urls', 200, {
         thumb,
-        video
+        video,
+        EnSubt,
+        FrSubt,
       });
     } catch (error) {
       util.setErrorResponse(res, `something happened ${error.message}`, 500);

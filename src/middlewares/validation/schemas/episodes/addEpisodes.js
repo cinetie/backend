@@ -1,3 +1,4 @@
+import Joi from '@hapi/joi';
 import joi from '@hapi/joi';
 
 export default joi.object().keys({
@@ -14,5 +15,7 @@ export default joi.object().keys({
   thumb: joi.string().required()
     .error(() => 'You have to provide a thumbnail'),
   video: joi.string().required()
-    .error(() => 'You have to provide a video')
+    .error(() => 'You have to provide a video'),
+  EnSubt: joi.string(),
+  FrSubt: joi.string(),
 }).options({ allowUnknown: false });

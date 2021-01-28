@@ -21,6 +21,9 @@ export default joi.object().keys({
     .error(() => 'You did not provide  video'),
   rate: joi.string()
     .error(() => 'You have to enter age rating'),
-  resCountries: joi.string()
+  videoClientId: joi.string(),
+  resCountries: joi.string(),
+  EnSubt: joi.string(),
+  FrSubt: joi.string(),
 }).options({ allowUnknown: false });
  

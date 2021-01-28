@@ -9,7 +9,9 @@ module.exports = (sequelize, DataTypes) => {
     suspensionState: DataTypes.BOOLEAN,
     synopsis: DataTypes.TEXT,
     clientId: DataTypes.STRING,
-    episodeNumber: DataTypes.INTEGER
+    episodeNumber: DataTypes.INTEGER,
+    EnSubt:DataTypes.STRING,
+    FrSubt:DataTypes.STRING,
   }, {});
   series.associate = function (models) {
     // associations can be defined here

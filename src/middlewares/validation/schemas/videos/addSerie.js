@@ -19,5 +19,7 @@ export default joi.object().keys({
     .error(() => 'You did not provide landscape cover'),
   rate: joi.string().required()
     .error(() => 'You have to enter age rating'),
-  resCountries: joi.string().required()
+  resCountries: joi.string().required(),
+  EnSubt: joi.string(),
+  FrSubt: joi.string()
 }).options({ allowUnknown: false });

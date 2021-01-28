@@ -1,0 +1,12 @@
+###
+GET  http://localhost:3001/temp/signed-urls?type=movie&&extension=mp4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiIiwidXNlciI6ImFkbWluQGNpbmV0aWUuY29tIiwiaWF0IjoxNjExNzQxMDEzfQ.zviUSYbJGePvBscJrK84sZ4mLrwpbxF_H31Lt3YwXUs
+
+###
+POST http://localhost:3001/auth/login
+Content-Type: application/json
+
+{
+    "email":"admin@cinetie.com",
+    "password":"03958f5f563e5bff4"
+}
