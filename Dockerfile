@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM public.ecr.aws/lts/ubuntu:20.04_stable
 LABEL Author="Alain Christian(gal1l0)"
 
 # install our dependencies and install nodejs
