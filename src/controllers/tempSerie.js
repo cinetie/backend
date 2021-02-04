@@ -19,9 +19,11 @@ class tempSerieController {
       data.clientId = req.headers.cpid;
       // data.size = req.files.video.size;
       data.thumbNailUrl = req.body.thumb;
-      data.EnSubt = req.body.EnSubt;
+      if(req.body.EnSubt !== undefined)
+      data.EnSubt = req.body.EnSubt ;
+      if(req.body.FrSubt !== undefined)
       data.FrSubt = req.body.FrSubt;
-      const newserie = await series.createNewEpisode(data);
+      const newserie = await series.createNewEpisode(data); 
       data.uri = jwt.jwtSign({ uri: data.video, id: newserie.id }, process.env.SECRET);
       const tempVideo = await services.createNewSeries(data);
       if (!tempVideo || !newserie) {
@@ -30,11 +32,12 @@ class tempSerieController {
         util.setSuccessResponse(res, 'Successfully uploaded', 201, tempVideo);
       }
     } catch (error) {
+      console.error(error);
       util.setErrorResponse(res, `Something wrong happened ${error.message}`, 500);
     }
   }
 
-  static async getAllSeries(req, res) {
+  static async getAllSeries(req, res) { 
     try {
       const episodes = await services.getAllSeries();
       if (Object.values(episodes).length > 0) {
