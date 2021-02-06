@@ -10,3 +10,4 @@ yarn.ts
 .vscode/
 coverage
 env*
+req.rest
