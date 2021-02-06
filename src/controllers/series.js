@@ -20,10 +20,7 @@ class Episodes {
       }
       const decoded = jwt.jwtVerify(tempVideo.uri, process.env.SECRET);
       await copyObjects(process.env.TEMP_BUCKET_SERIES, process.env.PERMANENT_BUCKET_SERIES, decoded.uri);
-      const createdSerie = await services.update(decoded.id, {
-        suspensionState: false,
-        episodeKey: decoded.uri
-      });
+      const createdSerie = await services.update(decoded.id, { suspensionState: false, episodeKey: decoded.uri })  
       const deleted = await temp.deleteSeries(id);
       const deletionStatus = await deleteObject(process.env.TEMP_BUCKET_SERIES, decoded.uri);
       if (createdSerie && deleted && deletionStatus) {
@@ -95,7 +92,9 @@ class Episodes {
     try {
       const videoFile = await services.getSingleEpisode(req.params.id); 
       if(!videoFile) return util.setErrorResponse(res, 'Can\'t find what you requested', 400);
-      const results = await deleteObject(process.env.TEMP_BUCKET_SERIES, videoFile.episode);
+      const results = videoFile.episode !== null ?
+       await deleteObject(process.env.TEMP_BUCKET_SERIES, videoFile.episode):
+       await deleteObject(process.env.TEMP_BUCKET_SERIES, videoFile.episodeKey);
       const deleted = await services.deleteEpisode(req.params.id);
       if (deleted && Object.values(results).length === 0) {
         util.setSuccessResponse(res, 'deleted easily', 200, deleted);
