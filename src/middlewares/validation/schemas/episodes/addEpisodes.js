@@ -16,6 +16,6 @@ export default joi.object().keys({
     .error(() => 'You have to provide a thumbnail'),
   video: joi.string().required()
     .error(() => 'You have to provide a video'),
-  EnSubt: joi.string(),
-  FrSubt: joi.string(),
+  EnSubt: joi.string().error(()=>'you english subtitle file has a problem'),
+  FrSubt: joi.string().error(()=>'you english subtitle file has a problem'),
 }).options({ allowUnknown: false });
