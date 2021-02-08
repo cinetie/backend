@@ -17,7 +17,7 @@ chai.should();
 sinonStubPromise(sinon);
 
 
-describe.only('BILLING MIDDLEWARE', (req, res, status) => {
+describe('BILLING MIDDLEWARE', (req, res, status) => {
     it('Test fetchCurrentSubscription Method with registered email should be okay', async () => {
         res = httpMocks.createResponse();
         let state = undefined

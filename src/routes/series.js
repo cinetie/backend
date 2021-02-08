@@ -7,7 +7,10 @@ const router = new Router();
 
 router.post('/create', access.isAdmin, controller.create);
 router.get('/cp', access.isProducer, controller.getVideosByClientId);
-router.get('/ep', access.isNormalUser, billing.verifyPermissionLevel, controller.getSingleEpisode);
+router.get('/ep', 
+access.isNormalUser, 
+billing.verifyPermissionLevel, 
+controller.getSingleEpisode);
 router.get('/single/season', access.isLoggedIn, controller.getSingleSeason);
 router.get('/all/seasons', access.isLoggedIn, controller.getAllSeasons);
 router.put('/update', access.isProducer, controller.updateSerie);
