@@ -77,6 +77,7 @@ class adminController {
     try {
       let sum = 0;
       const data = await earningService.getEarningsByVideo(req.query.videoId);
+
       if (Object.values(data).length > 0) {
         for (let i = 0; i < Object.values(data).length; i++) {
           const date = new Date(Number(data[i].monthYear));
