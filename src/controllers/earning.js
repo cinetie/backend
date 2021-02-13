@@ -50,6 +50,7 @@ class earningController {
   // upon failure of this method maping the numerous elements of session's array and
   // then doing a bulk create
   // would solve the issue.
+
   static async assignRateToEachVideo(email) {
     try {
       let results = [];
