@@ -23,7 +23,7 @@ cron.schedule('0 0 * * *', () => {
   timezone: "Africa/Cairo"
 });
 
-cron.schedule('0 0 * * *', endSubscription);
+cron.schedule('0 0 * * *', endSubscription, { scheduled: true, timezone: "Africa/Cairo" });
 const app = express();
 
 app.enable('trust proxy');
