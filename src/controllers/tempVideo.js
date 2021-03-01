@@ -30,6 +30,7 @@ class tempVideoController {
       data.type = req.body.type;
       data.EnSubt = req.body.EnSubt;
       data.FrSubt = req.body.FrSubt;
+      data.licenseEndDate = req.body.licenseEndDate;
       if (data.type === 'movie') {
         data.videoUri = jwt.jwtSign({
           videoUri: data.video, size: data.size, clientId: req.headers.cpid, videoId: data.videoId, type: 'movie'

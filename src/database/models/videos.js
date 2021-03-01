@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     rate: DataTypes.STRING,
     EnSubt:DataTypes.STRING,
     FrSubt:DataTypes.STRING,
+    licenseEndDate: DataTypes.STRING,
   }, {});
   // eslint-disable-next-line no-unused-vars
   videos.associate = function (models) {
