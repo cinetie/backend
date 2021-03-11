@@ -57,7 +57,6 @@ describe('GET EPISODES BY ID TEST', () => {
             .get('/series/cp')
             .set('authorization', `bearer ${loginRes.body.data}`)
         stub.restore();
-        console.log(res.body);
         expect(res.statusCode).to.equal(500)
     });
 });

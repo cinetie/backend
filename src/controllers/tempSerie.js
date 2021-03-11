@@ -32,7 +32,6 @@ class tempSerieController {
         util.setSuccessResponse(res, 'Successfully uploaded', 201, tempVideo);
       }
     } catch (error) {
-      console.error(error);
       util.setErrorResponse(res, `Something wrong happened ${error.message}`, 500);
     }
   }
