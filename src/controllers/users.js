@@ -196,7 +196,7 @@ class userController {
       const token = jwt.jwtSign(newDate.getTime(), process.env.SECRET);
       await mailer([
         {
-          link: `${process.env.FRONT_END_USER}/u/new-password?id=${user.id}&&token=${token}`,
+          link: `${process.env.FRONT_END_USER}/u/new-password/?id=${user.id}&&token=${token}`,
         },
         {
           from: "CINETIE support",
