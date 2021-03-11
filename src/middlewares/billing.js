@@ -74,7 +74,7 @@ class billing {
     const details = await userService.getUserByMail(req.body.email);
     if (details.isBilledAnnually === true) {
       today = date.addMoreDays(365).toDateString();
-      
+
     } else {
       today = date.addMoreDays(31).toDateString();
     }
@@ -110,7 +110,7 @@ class billing {
               fullname: `${user.firstName} ${user.lastName}`,
 
             }, { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-            `${process.env.PAY_HOST}/charge/momo`, 'POST');
+              `${process.env.PAY_HOST}/charge/momo`, 'POST');
             if (momoStatus.status === 200) {
               const currentSubscription = await billingService.getCurrentSubscription(user.email);
               await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
@@ -131,7 +131,7 @@ class billing {
             billing.handleFailPaymentStatus(req, next);
           } else if (Number(details.paymentMethod) === 3) {
             const recentTransactions = await transactions.getTransactionsByEmail(user.email, 'pending');
-            
+
             if (recentTransactions.length > 0) {
               await billing.checkRecentPendingSpennTransaction(
                 recentTransactions, token, user, details, req, res, next
@@ -148,7 +148,204 @@ class billing {
                 return billing.handleFailPaymentStatus(req, next);
               }
             }
+          } else if (Number(details.paymentMethod) === 5) {
+            const txRef = uuid()
+            const requestData = {
+              txRef,
+              amount: details.price,
+              email: user.email,
+              currency: 'UGX',
+
+            }
+            const data = await Fetch(
+              requestData,
+              {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              `${process.env.PAY_HOST}/charge/all?type=mobile_money_uganda`,
+              "POST"
+            );
+            if (data.status === 200) {
+              const currentSubscription = await billingService.getCurrentSubscription(user.email);
+              await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
+              util.setSuccessResponse(res,
+                'Please follow this link to renew your subscription with Mobile money',
+                200,
+                data);
+            }
+            else {
+              billing.handleFailPaymentStatus(req, next);
+            }
+          } else if (Number(details.paymentMethod) === 6) {
+            const txRef = uuid()
+            const requestData = {
+              txRef,
+              amount: details.price,
+              email: user.email,
+              currency: 'ZMW',
+              network: 'MTN'
+
+            }
+            const data = await Fetch(
+              requestData,
+              {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              `${process.env.PAY_HOST}/charge/all?type=mobile_money_zambia`,
+              "POST"
+            );
+            if (data.status === 200) {
+              const currentSubscription = await billingService.getCurrentSubscription(user.email);
+              await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
+              util.setSuccessResponse(res,
+                'Please follow this link to renew your subscription with Mobile money',
+                200,
+                data);
+            }
+            else {
+              billing.handleFailPaymentStatus(req, next);
+            }
+          } else if (Number(details.paymentMethod) === 7) {
+            const txRef = uuid()
+            const requestData = {
+              txRef,
+              amount: details.price,
+              email: user.email,
+              currency: 'ZMW',
+              network: 'ZAMTEL'
+
+            }
+            const data = await Fetch(
+              requestData,
+              {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              `${process.env.PAY_HOST}/charge/all?type=mobile_money_zambia`,
+              "POST"
+            );
+            if (data.status === 200) {
+              const currentSubscription = await billingService.getCurrentSubscription(user.email);
+              await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
+              util.setSuccessResponse(res,
+                'Please follow this link to renew your subscription with Mobile money',
+                200,
+                data);
+            }
+            else {
+              billing.handleFailPaymentStatus(req, next);
+            }
+          } else if (Number(details.paymentMethod) === 8) {
+            const txRef = uuid()
+            const requestData = {
+              txRef,
+              amount: details.price,
+              email: user.email,
+              currency: 'GHS',
+              network: 'MTN'
+
+            }
+            const data = await Fetch(
+              requestData,
+              {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              `${process.env.PAY_HOST}/charge/all?type=mobile_money_ghana`,
+              "POST"
+            );
+            if (data.status === 200) {
+              const currentSubscription = await billingService.getCurrentSubscription(user.email);
+              await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
+              util.setSuccessResponse(res,
+                'Please follow this link to renew your subscription with Mobile money',
+                200,
+                data);
+            }
+            else {
+              billing.handleFailPaymentStatus(req, next);
+            }
+          } else if (Number(details.paymentMethod) === 9) {
+            const txRef = uuid()
+            const requestData = {
+              txRef,
+              amount: details.price,
+              email: user.email,
+              currency: 'GHS',
+              network: 'VODAFONE'
+            }
+            const data = await Fetch(
+              requestData,
+              {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              `${process.env.PAY_HOST}/charge/all?type=mobile_money_ghana`,
+              "POST"
+            );
+            if (data.status === 200) {
+              const currentSubscription = await billingService.getCurrentSubscription(user.email);
+              await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
+              util.setSuccessResponse(res,
+                'Please follow this link to renew your subscription with Mobile money',
+                200,
+                data);
+            }
+            else {
+              billing.handleFailPaymentStatus(req, next);
+            }
+          } else if (Number(details.paymentMethod) === 10) {
+            const txRef = uuid()
+            const requestData = {
+              txRef,
+              amount: details.price,
+              email: user.email,
+              currency: 'GHS',
+              network: 'TIGO'
+
+            }
+            const data = await Fetch(
+              requestData,
+              {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              `${process.env.PAY_HOST}/charge/all?type=mobile_money_ghana`,
+              "POST"
+            );
+            if (data.status === 200) {
+              const currentSubscription = await billingService.getCurrentSubscription(user.email);
+              await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
+              util.setSuccessResponse(res,
+                'Please follow this link to renew your subscription with Mobile money',
+                200,
+                data);
+            }
+            else {
+              billing.handleFailPaymentStatus(req, next);
+            }
           }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         } else {
           next();
         }
@@ -187,7 +384,7 @@ class billing {
         if (details === null) {
           next();
         } else if (Number(details.paymentMethod) === 3) {
-          
+
           const recentTransactions = await transactions.getTransactionsByEmail(user.email, 'pending');
 
           if (recentTransactions.length > 0) {
@@ -268,7 +465,7 @@ class billing {
 
   static async verifyPermissionLevel(req, res, next) {
     try {
-      
+
       const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
       const data = await userService.getUserByMail(email);
       if (data.permissionLevel === -1) {
@@ -283,7 +480,7 @@ class billing {
 
   static async trial(req, res, next) {
     try {
-      
+
       const { email } = jwt.jwtVerify(
         req.headers.authorization.slice(7), process.env.SECRET
       );
@@ -291,14 +488,14 @@ class billing {
       if (data.isOnTrial === false && data.isOnExtension === false) {
         next();
       } else {
-        
+
         const today = new Date();
         const subscription = await billingService.getCurrentSubscription(email);
         const viewingSessions = await ViewingSessions.getActiveSessionsPerUser(email);
         if ((subscription.trialEnds > today.getTime()) && viewingSessions.length < 3) {
           next();
         } else {
-         
+
           const updates = await userService.updateUser(email, { permissionLevel: -1 });
           if (updates[1] > 0) {
             await mailer([{
