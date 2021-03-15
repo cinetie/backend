@@ -2,26 +2,29 @@
 /* eslint-disable no-return-await */
 /* eslint-disable no-param-reassign */
 /* eslint-disable consistent-return */
-import path from 'path';
-import { v4 as uuid } from 'uuid';
-import Util from '../helpers/utilities';
-import mailer from '../helpers/mailer';
-import userService from '../services/userServices';
-import date from '../helpers/date';
-import jwt from '../helpers/jwt';
-import Fetch from '../helpers/fetch';
-import ViewingSessions from '../services/viewingSessionsServices';
-import transactions from '../services/transactionService';
-import webhooks from '../controllers/webhooks';
-import payment from '../helpers/payment';
-import billingService from '../services/billingServices';
+import path from "path";
+import { v4 as uuid } from "uuid";
+import Util from "../helpers/utilities";
+import mailer from "../helpers/mailer";
+import userService from "../services/userServices";
+import date from "../helpers/date";
+import jwt from "../helpers/jwt";
+import Fetch from "../helpers/fetch";
+import ViewingSessions from "../services/viewingSessionsServices";
+import transactions from "../services/transactionService";
+import webhooks from "../controllers/webhooks";
+import payment from "../helpers/payment";
+import billingService from "../services/billingServices";
 
 const util = new Util();
 // middlware to perfom actual payment and registering transactions
 class billing {
   static async fetchCurrentSubscription(req, res, state) {
     try {
-      const details = await billingService.getCurrentSubscription(req.body.email, state);
+      const details = await billingService.getCurrentSubscription(
+        req.body.email,
+        state
+      );
       return details;
     } catch (error) {
       util.setErrorResponse(res, error, 500);
@@ -32,7 +35,11 @@ class billing {
     const user = await userService.getUserByMail(req.body.email);
     // if (user.isOnExtension === true) {
     await userService.updateUser(req.body.email, { permissionLevel: -1 });
-    await billing.sendBillingNotification(user, req, 'We would like you to know that your account has been put onhold . \n since your  payment didn\'t work out');
+    await billing.sendBillingNotification(
+      user,
+      req,
+      "We would like you to know that your account has been put onhold . \n since your  payment didn't work out"
+    );
     next();
     // } else {
     // Temporarily disable extensions
@@ -55,17 +62,19 @@ class billing {
   }
 
   static async sendBillingNotification(user, req, body) {
-    await mailer([{
-      body,
-      name: `${user.firstName}`
-    }, {
-      from: 'Cinetie support',
-      to: req.body.email,
-      subject: 'Cinetie subscription',
-    },
-    {
-      path: `${path.join(__dirname, '../public/templates/notification.ejs')}`
-    }
+    await mailer([
+      {
+        body,
+        name: `${user.firstName}`,
+      },
+      {
+        from: "Cinetie support",
+        to: req.body.email,
+        subject: "Cinetie subscription",
+      },
+      {
+        path: `${path.join(__dirname, "../public/templates/notification.ejs")}`,
+      },
     ]);
   }
 
@@ -74,50 +83,79 @@ class billing {
     const details = await userService.getUserByMail(req.body.email);
     if (details.isBilledAnnually === true) {
       today = date.addMoreDays(365).toDateString();
-
     } else {
       today = date.addMoreDays(31).toDateString();
     }
-    const updates = await billingService.updateSubscription(req.body.email,
-      { dueState: true, endDate: today });
+    const updates = await billingService.updateSubscription(req.body.email, {
+      dueState: true,
+      endDate: today,
+    });
     return { updates, today };
   }
 
   static async renewPayment(req, res, next) {
     try {
       const user = await userService.getUserByMail(req.body.email);
-      const pendingSubscription = await billing.fetchCurrentSubscription(req, res, 'pending');
+      const pendingSubscription = await billing.fetchCurrentSubscription(
+        req,
+        res,
+        "pending"
+      );
       const details = await billing.fetchCurrentSubscription(req, res);
 
       if (!user) {
         return util.setErrorResponse(res, "user doesn't exist", 400);
-      } else if (pendingSubscription || user.plan === 'Setup' || details === null) {
+      } else if (
+        pendingSubscription ||
+        user.plan === "Setup" ||
+        details === null
+      ) {
         next();
       } else {
         const today = new Date();
         const endDate = new Date(details.endDate);
 
-        const token = jwt.jwtSign({ role: 'main-api', user: user.email }, process.env.SECRET, 1000);
-        if (endDate.getTime() <= today.getTime()) { // remember to change >= to <=
+        const token = jwt.jwtSign(
+          { role: "main-api", user: user.email },
+          process.env.SECRET,
+          1000
+        );
+        if (endDate.getTime() <= today.getTime()) {
+          // remember to change >= to <=
           if (Number(details.paymentMethod) === 1) {
             const txRef = uuid();
-            const momoStatus = await Fetch({
-              currency: 'RWF',
-              amount: details.price,
-              email: user.email,
-              phone_number: user.phoneNumber,
-              txRef,
-              fullname: `${user.firstName} ${user.lastName}`,
-
-            }, { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-              `${process.env.PAY_HOST}/charge/momo`, 'POST');
+            const momoStatus = await Fetch(
+              {
+                currency: "RWF",
+                amount: details.price,
+                email: user.email,
+                phone_number: user.phoneNumber,
+                txRef,
+                fullname: `${user.firstName} ${user.lastName}`,
+              },
+              {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              `${process.env.PAY_HOST}/charge/momo`,
+              "POST"
+            );
             if (momoStatus.status === 200) {
-              const currentSubscription = await billingService.getCurrentSubscription(user.email);
-              await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
-              util.setSuccessResponse(res,
-                'Please follow this link to renew your subscription with Mobile money',
+              const currentSubscription = await billingService.getCurrentSubscription(
+                user.email
+              );
+              await payment.recordTransaction(
+                user,
+                currentSubscription,
+                txRef,
+                "pending"
+              );
+              util.setSuccessResponse(
+                res,
+                "Please follow this link to renew your subscription with Mobile money",
                 200,
-                momoStatus);
+                momoStatus
+              );
             } else {
               billing.handleFailPaymentStatus(req, next);
             }
@@ -130,17 +168,31 @@ class billing {
             // }, `${process.env.PAY_HOST}/charge/card-token`, 'POST');
             billing.handleFailPaymentStatus(req, next);
           } else if (Number(details.paymentMethod) === 3) {
-            const recentTransactions = await transactions.getTransactionsByEmail(user.email, 'pending');
+            const recentTransactions = await transactions.getTransactionsByEmail(
+              user.email,
+              "pending"
+            );
 
             if (recentTransactions.length > 0) {
               await billing.checkRecentPendingSpennTransaction(
-                recentTransactions, token, user, details, req, res, next
-              )
+                recentTransactions,
+                token,
+                user,
+                details,
+                req,
+                res,
+                next
+              );
             } else {
               const pay = await payment.chargeSpenn(user, details, token);
               if (pay.status === 200) {
                 // await payment.recordTransaction(user, details, pay);
-                await payment.recordTransaction(user, details, pay.data.RequestId, 'pending');
+                await payment.recordTransaction(
+                  user,
+                  details,
+                  pay.data.RequestId,
+                  "pending"
+                );
                 // await billingService.updateSubscription(user.email,
                 //   { state: 'current' });
                 util.setSuccessResponse(res, pay.message, 201, pay);
@@ -149,14 +201,13 @@ class billing {
               }
             }
           } else if (Number(details.paymentMethod) === 5) {
-            const txRef = uuid()
+            const txRef = uuid();
             const requestData = {
               txRef,
               amount: details.price,
               email: user.email,
-              currency: 'UGX',
-
-            }
+              currency: "UGX",
+            };
             const data = await Fetch(
               requestData,
               {
@@ -166,27 +217,35 @@ class billing {
               `${process.env.PAY_HOST}/charge/all?type=mobile_money_uganda`,
               "POST"
             );
+
             if (data.status === 200) {
-              const currentSubscription = await billingService.getCurrentSubscription(user.email);
-              await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
-              util.setSuccessResponse(res,
-                'Please follow this link to renew your subscription with Mobile money',
+              const currentSubscription = await billingService.getCurrentSubscription(
+                user.email
+              );
+              await payment.recordTransaction(
+                user,
+                currentSubscription,
+                txRef,
+                "pending"
+              );
+              util.setSuccessResponse(
+                res,
+                "Please follow this link to renew your subscription with Mobile money",
                 200,
-                data);
-            }
-            else {
+                data
+              );
+            } else {
               billing.handleFailPaymentStatus(req, next);
             }
           } else if (Number(details.paymentMethod) === 6) {
-            const txRef = uuid()
+            const txRef = uuid();
             const requestData = {
               txRef,
               amount: details.price,
               email: user.email,
-              currency: 'ZMW',
-              network: 'MTN'
-
-            }
+              currency: "ZMW",
+              network: "MTN",
+            };
             const data = await Fetch(
               requestData,
               {
@@ -196,27 +255,35 @@ class billing {
               `${process.env.PAY_HOST}/charge/all?type=mobile_money_zambia`,
               "POST"
             );
+
             if (data.status === 200) {
-              const currentSubscription = await billingService.getCurrentSubscription(user.email);
-              await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
-              util.setSuccessResponse(res,
-                'Please follow this link to renew your subscription with Mobile money',
+              const currentSubscription = await billingService.getCurrentSubscription(
+                user.email
+              );
+              await payment.recordTransaction(
+                user,
+                currentSubscription,
+                txRef,
+                "pending"
+              );
+              util.setSuccessResponse(
+                res,
+                "Please follow this link to renew your subscription with Mobile money",
                 200,
-                data);
-            }
-            else {
+                data
+              );
+            } else {
               billing.handleFailPaymentStatus(req, next);
             }
           } else if (Number(details.paymentMethod) === 7) {
-            const txRef = uuid()
+            const txRef = uuid();
             const requestData = {
               txRef,
               amount: details.price,
               email: user.email,
-              currency: 'ZMW',
-              network: 'ZAMTEL'
-
-            }
+              currency: "ZMW",
+              network: "ZAMTEL",
+            };
             const data = await Fetch(
               requestData,
               {
@@ -226,27 +293,35 @@ class billing {
               `${process.env.PAY_HOST}/charge/all?type=mobile_money_zambia`,
               "POST"
             );
+
             if (data.status === 200) {
-              const currentSubscription = await billingService.getCurrentSubscription(user.email);
-              await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
-              util.setSuccessResponse(res,
-                'Please follow this link to renew your subscription with Mobile money',
+              const currentSubscription = await billingService.getCurrentSubscription(
+                user.email
+              );
+              await payment.recordTransaction(
+                user,
+                currentSubscription,
+                txRef,
+                "pending"
+              );
+              util.setSuccessResponse(
+                res,
+                "Please follow this link to renew your subscription with Mobile money",
                 200,
-                data);
-            }
-            else {
+                data
+              );
+            } else {
               billing.handleFailPaymentStatus(req, next);
             }
           } else if (Number(details.paymentMethod) === 8) {
-            const txRef = uuid()
+            const txRef = uuid();
             const requestData = {
               txRef,
               amount: details.price,
               email: user.email,
-              currency: 'GHS',
-              network: 'MTN'
-
-            }
+              currency: "GHS",
+              network: "MTN",
+            };
             const data = await Fetch(
               requestData,
               {
@@ -256,26 +331,35 @@ class billing {
               `${process.env.PAY_HOST}/charge/all?type=mobile_money_ghana`,
               "POST"
             );
+
             if (data.status === 200) {
-              const currentSubscription = await billingService.getCurrentSubscription(user.email);
-              await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
-              util.setSuccessResponse(res,
-                'Please follow this link to renew your subscription with Mobile money',
+              const currentSubscription = await billingService.getCurrentSubscription(
+                user.email
+              );
+              await payment.recordTransaction(
+                user,
+                currentSubscription,
+                txRef,
+                "pending"
+              );
+              util.setSuccessResponse(
+                res,
+                "Please follow this link to renew your subscription with Mobile money",
                 200,
-                data);
-            }
-            else {
+                data
+              );
+            } else {
               billing.handleFailPaymentStatus(req, next);
             }
           } else if (Number(details.paymentMethod) === 9) {
-            const txRef = uuid()
+            const txRef = uuid();
             const requestData = {
               txRef,
               amount: details.price,
               email: user.email,
-              currency: 'GHS',
-              network: 'VODAFONE'
-            }
+              currency: "GHS",
+              network: "VODAFONE",
+            };
             const data = await Fetch(
               requestData,
               {
@@ -285,27 +369,35 @@ class billing {
               `${process.env.PAY_HOST}/charge/all?type=mobile_money_ghana`,
               "POST"
             );
+
             if (data.status === 200) {
-              const currentSubscription = await billingService.getCurrentSubscription(user.email);
-              await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
-              util.setSuccessResponse(res,
-                'Please follow this link to renew your subscription with Mobile money',
+              const currentSubscription = await billingService.getCurrentSubscription(
+                user.email
+              );
+              await payment.recordTransaction(
+                user,
+                currentSubscription,
+                txRef,
+                "pending"
+              );
+              util.setSuccessResponse(
+                res,
+                "Please follow this link to renew your subscription with Mobile money",
                 200,
-                data);
-            }
-            else {
+                data
+              );
+            } else {
               billing.handleFailPaymentStatus(req, next);
             }
           } else if (Number(details.paymentMethod) === 10) {
-            const txRef = uuid()
+            const txRef = uuid();
             const requestData = {
               txRef,
               amount: details.price,
               email: user.email,
-              currency: 'GHS',
-              network: 'TIGO'
-
-            }
+              currency: "GHS",
+              network: "TIGO",
+            };
             const data = await Fetch(
               requestData,
               {
@@ -315,37 +407,27 @@ class billing {
               `${process.env.PAY_HOST}/charge/all?type=mobile_money_ghana`,
               "POST"
             );
+
             if (data.status === 200) {
-              const currentSubscription = await billingService.getCurrentSubscription(user.email);
-              await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
-              util.setSuccessResponse(res,
-                'Please follow this link to renew your subscription with Mobile money',
+              const currentSubscription = await billingService.getCurrentSubscription(
+                user.email
+              );
+              await payment.recordTransaction(
+                user,
+                currentSubscription,
+                txRef,
+                "pending"
+              );
+              util.setSuccessResponse(
+                res,
+                "Please follow this link to renew your subscription with Mobile money",
                 200,
-                data);
-            }
-            else {
+                data
+              );
+            } else {
               billing.handleFailPaymentStatus(req, next);
             }
           }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         } else {
           next();
         }
@@ -356,19 +438,32 @@ class billing {
   }
 
   static async checkRecentPendingSpennTransaction(
-    recentTransactions, token, user, details, req, res, next
+    recentTransactions,
+    token,
+    user,
+    details,
+    req,
+    res,
+    next
   ) {
     const recentTransaction = await billing.checkSpenn(
       recentTransactions[recentTransactions.length - 1].transactionId,
       token
     );
     // eslint-disable-next-line no-console
-    if (recentTransaction.data.Status === 'Approved'
-      || recentTransaction.data.Status === 'TransactionVerified') {
+    if (
+      recentTransaction.data.Status === "Approved" ||
+      recentTransaction.data.Status === "TransactionVerified"
+    ) {
       await billing.updateTransactionsAndRegisterSales(
-        recentTransactions[0].transactionId, user, details, req, res, next
+        recentTransactions[0].transactionId,
+        user,
+        details,
+        req,
+        res,
+        next
       );
-      await billingService.updateSubscription(user.email, { state: 'current' });
+      await billingService.updateSubscription(user.email, { state: "current" });
     } else {
       billing.handleFailPaymentStatus(req, next);
     }
@@ -378,19 +473,35 @@ class billing {
     try {
       const user = await userService.getUserByMail(req.body.email);
       if (!user) {
-        return util.setErrorResponse(res, 'user doesn\'t exist', 400);
+        return util.setErrorResponse(res, "user doesn't exist", 400);
       } else {
-        const details = await billing.fetchCurrentSubscription(req, res, 'pending');
+        const details = await billing.fetchCurrentSubscription(
+          req,
+          res,
+          "pending"
+        );
         if (details === null) {
           next();
         } else if (Number(details.paymentMethod) === 3) {
-
-          const recentTransactions = await transactions.getTransactionsByEmail(user.email, 'pending');
+          const recentTransactions = await transactions.getTransactionsByEmail(
+            user.email,
+            "pending"
+          );
 
           if (recentTransactions.length > 0) {
-            const token = jwt.jwtSign({ role: 'main-api', user: user.email }, process.env.SECRET, 1000);
+            const token = jwt.jwtSign(
+              { role: "main-api", user: user.email },
+              process.env.SECRET,
+              1000
+            );
             await billing.checkRecentPendingSpennTransaction(
-              recentTransactions, token, user, details, req, res, next
+              recentTransactions,
+              token,
+              user,
+              details,
+              req,
+              res,
+              next
             );
           } else {
             next();
@@ -405,71 +516,111 @@ class billing {
     }
   }
 
-  static async updateTransactionsAndRegisterSales(recentTrans, user, details, req, res, next) {
-    const rates = await Fetch(undefined, { Accept: 'application/json' }, `https://apilayer.net/api/live?access_key=${process.env.ACCESS_KEY_CURRENCY_LAYER}&currencies=RWF&source=USD&format=1`, 'GET');
+  static async updateTransactionsAndRegisterSales(
+    recentTrans,
+    user,
+    details,
+    req,
+    res,
+    next
+  ) {
+    const rates = await Fetch(
+      undefined,
+      { Accept: "application/json" },
+      `https://apilayer.net/api/live?access_key=${process.env.ACCESS_KEY_CURRENCY_LAYER}&currencies=RWF&source=USD&format=1`,
+      "GET"
+    );
     const converted = Math.floor(rates.quotes.USDRWF * details.price);
-    details.price = converted
+    details.price = converted;
 
-
-
-    const updates = await userService.updateUser(user.email, { permissionLevel: 1 });
-    const updatedSubscription = (user.isBilledAnnually === true)
-      ? await billingService.updateSubscription(user.email,
-        { endDate: date.addMoreDays(365).toDateString(), })
-      : await billingService.updateSubscription(user.email,
-        { endDate: date.addMoreDays(30).toDateString(), });
+    const updates = await userService.updateUser(user.email, {
+      permissionLevel: 1,
+    });
+    const updatedSubscription =
+      user.isBilledAnnually === true
+        ? await billingService.updateSubscription(user.email, {
+            endDate: date.addMoreDays(365).toDateString(),
+          })
+        : await billingService.updateSubscription(user.email, {
+            endDate: date.addMoreDays(30).toDateString(),
+          });
     if (updates[1] === 1 && updatedSubscription[1] === 1) {
-      const status = await webhooks.registerSales({
-        payment_type: 'spenn',
-        amount: details.price
-      }, details, req, res);
+      const status = await webhooks.registerSales(
+        {
+          payment_type: "spenn",
+          amount: details.price,
+        },
+        details,
+        req,
+        res
+      );
       if (status === true) {
-        await transactions.updateTransaction(recentTrans, { statusDesc: 'approved' });
+        await transactions.updateTransaction(recentTrans, {
+          statusDesc: "approved",
+        });
         next();
       } else {
-        return util.setErrorResponse(res, 'Contact support Error: SPENN transaction error', 500);
+        return util.setErrorResponse(
+          res,
+          "Contact support Error: SPENN transaction error",
+          500
+        );
       }
     } else {
-      return util.setErrorResponse(res, 'Contact support Error: Subscription renewal', 500);
+      return util.setErrorResponse(
+        res,
+        "Contact support Error: Subscription renewal",
+        500
+      );
     }
   }
 
   static async chargeSpenn(user, details, token) {
-    return await Fetch({
-      phone: user.phoneNumber,
-      amount: details.price,
-    }, {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    }, `${process.env.PAY_HOST}/charge/spenn`, 'POST');
+    return await Fetch(
+      {
+        phone: user.phoneNumber,
+        amount: details.price,
+      },
+      {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      `${process.env.PAY_HOST}/charge/spenn`,
+      "POST"
+    );
   }
 
   static async checkSpenn(requestId, token) {
-    return await Fetch(undefined, {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    }, `${process.env.PAY_HOST}/charge/spenn-check?requestId=${requestId}`, 'GET');
+    return await Fetch(
+      undefined,
+      {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      `${process.env.PAY_HOST}/charge/spenn-check?requestId=${requestId}`,
+      "GET"
+    );
   }
 
   static async recordTransaction(user, details, pay) {
-    await transactions.createTransaction(
-      {
-        email: user.email,
-        statusDesc: 'pending',
-        paidAmount: details.price,
-        transactionId: pay.data.RequestId,
-        currency: 'RWF',
-      }
-    );
+    await transactions.createTransaction({
+      email: user.email,
+      statusDesc: "pending",
+      paidAmount: details.price,
+      transactionId: pay.data.RequestId,
+      currency: "RWF",
+    });
   }
 
   static async verifyPermissionLevel(req, res, next) {
     try {
-
-      const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
+      const { email } = jwt.jwtVerify(
+        req.headers.authorization.slice(7),
+        process.env.SECRET
+      );
       const data = await userService.getUserByMail(email);
       if (data.permissionLevel === -1) {
-        return util.setErrorResponse(res, 'Please set up your billing', 402);
+        return util.setErrorResponse(res, "Please set up your billing", 402);
       } else {
         next();
       }
@@ -480,38 +631,53 @@ class billing {
 
   static async trial(req, res, next) {
     try {
-
       const { email } = jwt.jwtVerify(
-        req.headers.authorization.slice(7), process.env.SECRET
+        req.headers.authorization.slice(7),
+        process.env.SECRET
       );
       const data = await userService.getUserByMail(email);
       if (data.isOnTrial === false && data.isOnExtension === false) {
         next();
       } else {
-
         const today = new Date();
         const subscription = await billingService.getCurrentSubscription(email);
-        const viewingSessions = await ViewingSessions.getActiveSessionsPerUser(email);
-        if ((subscription.trialEnds > today.getTime()) && viewingSessions.length < 3) {
+        const viewingSessions = await ViewingSessions.getActiveSessionsPerUser(
+          email
+        );
+        if (
+          subscription.trialEnds > today.getTime() &&
+          viewingSessions.length < 3
+        ) {
           next();
         } else {
-
-          const updates = await userService.updateUser(email, { permissionLevel: -1 });
+          const updates = await userService.updateUser(email, {
+            permissionLevel: -1,
+          });
           if (updates[1] > 0) {
-            await mailer([{
-              body: 'We would like you to know that your account has been put onhold. \n since your  trial just ended'
-            }, {
-              from: 'Cinetie support',
-              to: email,
-              subject: 'Update payment details',
-            },
-            {
-              path: `${path.join(__dirname, '../public/templates/notification.ejs')}`
-            }
+            await mailer([
+              {
+                body:
+                  "We would like you to know that your account has been put onhold. \n since your  trial just ended",
+              },
+              {
+                from: "Cinetie support",
+                to: email,
+                subject: "Update payment details",
+              },
+              {
+                path: `${path.join(
+                  __dirname,
+                  "../public/templates/notification.ejs"
+                )}`,
+              },
             ]);
-            util.setErrorResponse(res, 'Please activate your account as your trial just ended', 402);
+            util.setErrorResponse(
+              res,
+              "Please activate your account as your trial just ended",
+              402
+            );
           } else {
-            return util.setErrorResponse(res, 'Something went wrong ', 502);
+            return util.setErrorResponse(res, "Something went wrong ", 502);
           }
         }
       }

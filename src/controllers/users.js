@@ -570,341 +570,341 @@ class userController {
             }
           }
           break;
-        case 4: {
-          const txRef = uuid()
-          const requestData = {
-            txRef,
-            amount: price,
-            email,
-            fullName: `${user.firstName} ${user.lastName}`,
-            phoneNumber: user.phoneNumber,
-            currency: 'KES',
-
-          }
-          const data = await Fetch(
-            requestData,
-            {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            `${process.env.PAY_HOST}/charge/all?type=mpesa`,
-            "POST"
-          );
-          if (data.status === 200) {
-            const updates = await userService.updateUser(email, {
-              isOnTrial: false,
-            });
-            if (updates[1] > 0) {
-              await payment.recordTransaction(
-                user,
-                currentSubscription,
-                txRef,
-                "pending"
-              );
-              util.setSuccessResponse(
-                res,
-                "Pending subscription  activation with MoMo",
-                201,
-                data
-              );
+        case 4:
+          {
+            const txRef = uuid();
+            const requestData = {
+              txRef,
+              amount: price,
+              email,
+              fullName: `${user.firstName} ${user.lastName}`,
+              phoneNumber: user.phoneNumber,
+              currency: "KES",
+            };
+            const data = await Fetch(
+              requestData,
+              {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              `${process.env.PAY_HOST}/charge/all?type=mpesa`,
+              "POST"
+            );
+            if (data.status === 200) {
+              const updates = await userService.updateUser(email, {
+                isOnTrial: false,
+              });
+              if (updates[1] > 0) {
+                await payment.recordTransaction(
+                  user,
+                  currentSubscription,
+                  txRef,
+                  "pending"
+                );
+                util.setSuccessResponse(
+                  res,
+                  "Pending subscription  activation with MoMo",
+                  201,
+                  data
+                );
+              } else {
+                util.setErrorResponse(
+                  res,
+                  "Something went sideways creating a subscription",
+                  400
+                );
+              }
             } else {
-              util.setErrorResponse(
-                res,
-                "Something went sideways creating a subscription",
-                400
-              );
+              util.setErrorResponse(res, "Sorry payment failed", 500);
             }
-          } else {
-            util.setErrorResponse(res, "Sorry payment failed", 500);
           }
-        }
           break;
-        case 5: {
-          const txRef = uuid()
-          const requestData = {
-            txRef,
-            amount: price,
-            email,
-            currency: 'UGX',
-
-          }
-          const data = await Fetch(
-            requestData,
-            {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            `${process.env.PAY_HOST}/charge/all?type=mobile_money_uganda`,
-            "POST"
-          );
-          if (data.status === 200) {
-            const updates = await userService.updateUser(email, {
-              isOnTrial: false,
-            });
-            if (updates[1] > 0) {
-              await payment.recordTransaction(
-                user,
-                currentSubscription,
-                txRef,
-                "pending"
-              );
-              util.setSuccessResponse(
-                res,
-                "Pending subscription  activation with MoMo",
-                201,
-                data
-              );
+        case 5:
+          {
+            const txRef = uuid();
+            const requestData = {
+              txRef,
+              amount: price,
+              email,
+              currency: "UGX",
+            };
+            const data = await Fetch(
+              requestData,
+              {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              `${process.env.PAY_HOST}/charge/all?type=mobile_money_uganda`,
+              "POST"
+            );
+            if (data.status === 200) {
+              const updates = await userService.updateUser(email, {
+                isOnTrial: false,
+              });
+              if (updates[1] > 0) {
+                await payment.recordTransaction(
+                  user,
+                  currentSubscription,
+                  txRef,
+                  "pending"
+                );
+                util.setSuccessResponse(
+                  res,
+                  "Pending subscription  activation with MoMo",
+                  201,
+                  data
+                );
+              } else {
+                util.setErrorResponse(
+                  res,
+                  "Something went sideways creating a subscription",
+                  400
+                );
+              }
             } else {
-              util.setErrorResponse(
-                res,
-                "Something went sideways creating a subscription",
-                400
-              );
+              util.setErrorResponse(res, "Sorry payment failed", 500);
             }
-          } else {
-            util.setErrorResponse(res, "Sorry payment failed", 500);
           }
-        }
           break;
-        case 6: {
-          const txRef = uuid()
-          const requestData = {
-            txRef,
-            amount: price,
-            email,
-            currency: 'ZMW',
-            network: 'MTN'
-
-          }
-          const data = await Fetch(
-            requestData,
-            {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            `${process.env.PAY_HOST}/charge/all?type=mobile_money_zambia`,
-            "POST"
-          );
-          if (data.status === 200) {
-            const updates = await userService.updateUser(email, {
-              isOnTrial: false,
-            });
-            if (updates[1] > 0) {
-              await payment.recordTransaction(
-                user,
-                currentSubscription,
-                txRef,
-                "pending"
-              );
-              util.setSuccessResponse(
-                res,
-                "Pending subscription  activation with MoMo",
-                201,
-                data
-              );
+        case 6:
+          {
+            const txRef = uuid();
+            const requestData = {
+              txRef,
+              amount: price,
+              email,
+              currency: "ZMW",
+              network: "MTN",
+            };
+            const data = await Fetch(
+              requestData,
+              {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              `${process.env.PAY_HOST}/charge/all?type=mobile_money_zambia`,
+              "POST"
+            );
+            if (data.status === 200) {
+              const updates = await userService.updateUser(email, {
+                isOnTrial: false,
+              });
+              if (updates[1] > 0) {
+                await payment.recordTransaction(
+                  user,
+                  currentSubscription,
+                  txRef,
+                  "pending"
+                );
+                util.setSuccessResponse(
+                  res,
+                  "Pending subscription  activation with MoMo",
+                  201,
+                  data
+                );
+              } else {
+                util.setErrorResponse(
+                  res,
+                  "Something went sideways creating a subscription",
+                  400
+                );
+              }
             } else {
-              util.setErrorResponse(
-                res,
-                "Something went sideways creating a subscription",
-                400
-              );
+              util.setErrorResponse(res, "Sorry payment failed", 500);
             }
-          } else {
-            util.setErrorResponse(res, "Sorry payment failed", 500);
           }
-        }
           break;
-        case 7: {
-          const txRef = uuid()
-          const requestData = {
-            txRef,
-            amount: price,
-            email,
-            currency: 'ZMW',
-            network: 'ZAMTEL'
-
-          }
-          const data = await Fetch(
-            requestData,
-            {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            `${process.env.PAY_HOST}/charge/all?type=mobile_money_zambia`,
-            "POST"
-          );
-          if (data.status === 200) {
-            const updates = await userService.updateUser(email, {
-              isOnTrial: false,
-            });
-            if (updates[1] > 0) {
-              await payment.recordTransaction(
-                user,
-                currentSubscription,
-                txRef,
-                "pending"
-              );
-              util.setSuccessResponse(
-                res,
-                "Pending subscription  activation with MoMo",
-                201,
-                data
-              );
+        case 7:
+          {
+            const txRef = uuid();
+            const requestData = {
+              txRef,
+              amount: price,
+              email,
+              currency: "ZMW",
+              network: "ZAMTEL",
+            };
+            const data = await Fetch(
+              requestData,
+              {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              `${process.env.PAY_HOST}/charge/all?type=mobile_money_zambia`,
+              "POST"
+            );
+            if (data.status === 200) {
+              const updates = await userService.updateUser(email, {
+                isOnTrial: false,
+              });
+              if (updates[1] > 0) {
+                await payment.recordTransaction(
+                  user,
+                  currentSubscription,
+                  txRef,
+                  "pending"
+                );
+                util.setSuccessResponse(
+                  res,
+                  "Pending subscription  activation with MoMo",
+                  201,
+                  data
+                );
+              } else {
+                util.setErrorResponse(
+                  res,
+                  "Something went sideways creating a subscription",
+                  400
+                );
+              }
             } else {
-              util.setErrorResponse(
-                res,
-                "Something went sideways creating a subscription",
-                400
-              );
+              util.setErrorResponse(res, "Sorry payment failed", 500);
             }
-          } else {
-            util.setErrorResponse(res, "Sorry payment failed", 500);
           }
-        }
           break;
-        case 8: {
-          const txRef = uuid()
-          const requestData = {
-            txRef,
-            amount: price,
-            email,
-            currency: 'GHS',
-            network: 'MTN'
-
-          }
-          const data = await Fetch(
-            requestData,
-            {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            `${process.env.PAY_HOST}/charge/all?type=mobile_money_ghana`,
-            "POST"
-          );
-          if (data.status === 200) {
-            const updates = await userService.updateUser(email, {
-              isOnTrial: false,
-            });
-            if (updates[1] > 0) {
-              await payment.recordTransaction(
-                user,
-                currentSubscription,
-                txRef,
-                "pending"
-              );
-              util.setSuccessResponse(
-                res,
-                "Pending subscription  activation with MoMo",
-                201,
-                data
-              );
+        case 8:
+          {
+            const txRef = uuid();
+            const requestData = {
+              txRef,
+              amount: price,
+              email,
+              currency: "GHS",
+              network: "MTN",
+            };
+            const data = await Fetch(
+              requestData,
+              {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              `${process.env.PAY_HOST}/charge/all?type=mobile_money_ghana`,
+              "POST"
+            );
+            if (data.status === 200) {
+              const updates = await userService.updateUser(email, {
+                isOnTrial: false,
+              });
+              if (updates[1] > 0) {
+                await payment.recordTransaction(
+                  user,
+                  currentSubscription,
+                  txRef,
+                  "pending"
+                );
+                util.setSuccessResponse(
+                  res,
+                  "Pending subscription  activation with MoMo",
+                  201,
+                  data
+                );
+              } else {
+                util.setErrorResponse(
+                  res,
+                  "Something went sideways creating a subscription",
+                  400
+                );
+              }
             } else {
-              util.setErrorResponse(
-                res,
-                "Something went sideways creating a subscription",
-                400
-              );
+              util.setErrorResponse(res, "Sorry payment failed", 500);
             }
-          } else {
-            util.setErrorResponse(res, "Sorry payment failed", 500);
           }
-        }
           break;
-        case 9: {
-          const txRef = uuid()
-          const requestData = {
-            txRef,
-            amount: price,
-            email,
-            currency: 'GHS',
-            network: 'VODAFONE'
-
-          }
-          const data = await Fetch(
-            requestData,
-            {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            `${process.env.PAY_HOST}/charge/all?type=mobile_money_ghana`,
-            "POST"
-          );
-          if (data.status === 200) {
-            const updates = await userService.updateUser(email, {
-              isOnTrial: false,
-            });
-            if (updates[1] > 0) {
-              await payment.recordTransaction(
-                user,
-                currentSubscription,
-                txRef,
-                "pending"
-              );
-              util.setSuccessResponse(
-                res,
-                "Pending subscription  activation with MoMo",
-                201,
-                data
-              );
+        case 9:
+          {
+            const txRef = uuid();
+            const requestData = {
+              txRef,
+              amount: price,
+              email,
+              currency: "GHS",
+              network: "VODAFONE",
+            };
+            const data = await Fetch(
+              requestData,
+              {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              `${process.env.PAY_HOST}/charge/all?type=mobile_money_ghana`,
+              "POST"
+            );
+            if (data.status === 200) {
+              const updates = await userService.updateUser(email, {
+                isOnTrial: false,
+              });
+              if (updates[1] > 0) {
+                await payment.recordTransaction(
+                  user,
+                  currentSubscription,
+                  txRef,
+                  "pending"
+                );
+                util.setSuccessResponse(
+                  res,
+                  "Pending subscription  activation with MoMo",
+                  201,
+                  data
+                );
+              } else {
+                util.setErrorResponse(
+                  res,
+                  "Something went sideways creating a subscription",
+                  400
+                );
+              }
             } else {
-              util.setErrorResponse(
-                res,
-                "Something went sideways creating a subscription",
-                400
-              );
+              util.setErrorResponse(res, "Sorry payment failed", 500);
             }
-          } else {
-            util.setErrorResponse(res, "Sorry payment failed", 500);
           }
-        }
           break;
-        case 10: {
-          const txRef = uuid()
-          const requestData = {
-            txRef,
-            amount: price,
-            email,
-            currency: 'GHS',
-            network: 'TIGO'
-
-          }
-          const data = await Fetch(
-            requestData,
-            {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            `${process.env.PAY_HOST}/charge/all?type=mobile_money_ghana`,
-            "POST"
-          );
-          if (data.status === 200) {
-            const updates = await userService.updateUser(email, {
-              isOnTrial: false,
-            });
-            if (updates[1] > 0) {
-              await payment.recordTransaction(
-                user,
-                currentSubscription,
-                txRef,
-                "pending"
-              );
-              util.setSuccessResponse(
-                res,
-                "Pending subscription  activation with MoMo",
-                201,
-                data
-              );
+        case 10:
+          {
+            const txRef = uuid();
+            const requestData = {
+              txRef,
+              amount: price,
+              email,
+              currency: "GHS",
+              network: "TIGO",
+            };
+            const data = await Fetch(
+              requestData,
+              {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              `${process.env.PAY_HOST}/charge/all?type=mobile_money_ghana`,
+              "POST"
+            );
+            if (data.status === 200) {
+              const updates = await userService.updateUser(email, {
+                isOnTrial: false,
+              });
+              if (updates[1] > 0) {
+                await payment.recordTransaction(
+                  user,
+                  currentSubscription,
+                  txRef,
+                  "pending"
+                );
+                util.setSuccessResponse(
+                  res,
+                  "Pending subscription  activation with MoMo",
+                  201,
+                  data
+                );
+              } else {
+                util.setErrorResponse(
+                  res,
+                  "Something went sideways creating a subscription",
+                  400
+                );
+              }
             } else {
-              util.setErrorResponse(
-                res,
-                "Something went sideways creating a subscription",
-                400
-              );
+              util.setErrorResponse(res, "Sorry payment failed", 500);
             }
-          } else {
-            util.setErrorResponse(res, "Sorry payment failed", 500);
           }
-        }
           break;
 
         default:

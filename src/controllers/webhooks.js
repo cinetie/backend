@@ -23,7 +23,6 @@ export default class WebHooks {
   static async flutterWave(req, res) {
     try {
       const response = (req.body.data) ? req.body.data : req.body;
-      console.log(response, "++++++++++++++++++++++++++++++++++++++++++++")
       const user = await UserService.getUserByMail(response.customer.email
         || response.data.customer.email);
       // const recentTrans = await transactions.getTransactionsByEmail(user.email, 'pending');
