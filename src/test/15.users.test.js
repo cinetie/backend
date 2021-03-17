@@ -23,8 +23,8 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     const data = await userController.updateAccountAndSubscription(req, res);
-    expect(res.statusCode).to.equal(201);
     stub.restore();
+    expect(res.statusCode).to.equal(201);
   });
 
   it("Test UpdateAccountAndSubscription with mobile money RWANDA should be 400", async () => {
@@ -41,9 +41,9 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     const data = await userController.updateAccountAndSubscription(req, res);
-    expect(res.statusCode).to.equal(400);
     stub.restore();
     stub1.restore();
+    expect(res.statusCode).to.equal(400);
   });
 
   it("Test UpdateAccountAndSubscription mobile money UGANDA should be Okay", async () => {
@@ -57,8 +57,8 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     const data = await userController.updateAccountAndSubscription(req, res);
-    expect(res.statusCode).to.equal(201);
     stub.restore();
+    expect(res.statusCode).to.equal(201);
   });
 
   it("Test UpdateAccountAndSubscription with mobile money UGANDA should be 400", async () => {
@@ -75,9 +75,9 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     const data = await userController.updateAccountAndSubscription(req, res);
-    expect(res.statusCode).to.equal(400);
     stub.restore();
     stub1.restore();
+    expect(res.statusCode).to.equal(400);
   });
 
   it("Test UpdateAccountAndSubscription mobile money ZAMBIA(MTN) should be Okay", async () => {
@@ -91,8 +91,8 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     const data = await userController.updateAccountAndSubscription(req, res);
-    expect(res.statusCode).to.equal(201);
     stub.restore();
+    expect(res.statusCode).to.equal(201);
   });
 
   it("Test UpdateAccountAndSubscription with mobile money ZAMBIA(MTN) should be 400", async () => {
@@ -109,9 +109,9 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     const data = await userController.updateAccountAndSubscription(req, res);
-    expect(res.statusCode).to.equal(400);
     stub.restore();
     stub1.restore();
+    expect(res.statusCode).to.equal(400);
   });
 
   it("Test UpdateAccountAndSubscription mobile money ZAMBIA(ZAMTEL) should be Okay", async () => {
@@ -125,8 +125,8 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     const data = await userController.updateAccountAndSubscription(req, res);
-    expect(res.statusCode).to.equal(201);
     stub.restore();
+    expect(res.statusCode).to.equal(201);
   });
 
   it("Test UpdateAccountAndSubscription with mobile money ZAMBIA(ZAMTEL) should be 400", async () => {
@@ -143,9 +143,9 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     const data = await userController.updateAccountAndSubscription(req, res);
-    expect(res.statusCode).to.equal(400);
     stub.restore();
     stub1.restore();
+    expect(res.statusCode).to.equal(400);
   });
 
   it("Test UpdateAccountAndSubscription with mobile money ZAMBIA(ZAMTEL) should be 400", async () => {
@@ -160,9 +160,9 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     const data = await userController.updateAccountAndSubscription(req, res);
+    stub.restore();
+    stub1.restore();
     expect(res.statusCode).to.equal(500);
-    stub.restore();
-    stub1.restore();
   });
 
   it("Test UpdateAccountAndSubscription mobile money ZAMBIA(ZAMTEL) should be Okay", async () => {
@@ -176,8 +176,8 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     const data = await userController.updateAccountAndSubscription(req, res);
-    expect(res.statusCode).to.equal(201);
     stub.restore();
+    expect(res.statusCode).to.equal(201);
   });
 
   it("Test UpdateAccountAndSubscription with mobile money ZAMBIA(ZAMTEL) should be 400", async () => {
@@ -194,9 +194,9 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     const data = await userController.updateAccountAndSubscription(req, res);
-    expect(res.statusCode).to.equal(400);
     stub.restore();
     stub1.restore();
+    expect(res.statusCode).to.equal(400);
   });
 
   it("Test UpdateAccountAndSubscription mobile money ZAMBIA(ZAMTEL) should be Okay", async () => {
@@ -210,8 +210,8 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     const data = await userController.updateAccountAndSubscription(req, res);
-    expect(res.statusCode).to.equal(201);
     stub.restore();
+    expect(res.statusCode).to.equal(201);
   });
 
   it("Test UpdateAccountAndSubscription with mobile money ZAMBIA(ZAMTEL) should be 400", async () => {
@@ -228,9 +228,9 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     const data = await userController.updateAccountAndSubscription(req, res);
-    expect(res.statusCode).to.equal(400);
     stub.restore();
     stub1.restore();
+    expect(res.statusCode).to.equal(400);
   });
 
   it("Test UpdateAccountAndSubscription mobile money ZAMBIA(ZAMTEL) should be Okay", async () => {
@@ -244,8 +244,8 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     const data = await userController.updateAccountAndSubscription(req, res);
-    expect(res.statusCode).to.equal(201);
     stub.restore();
+    expect(res.statusCode).to.equal(201);
   });
 
   it("Test UpdateAccountAndSubscription with mobile money ZAMBIA(ZAMTEL) should be 400", async () => {
@@ -262,8 +262,8 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     const data = await userController.updateAccountAndSubscription(req, res);
-    expect(res.statusCode).to.equal(400);
     stub.restore();
     stub1.restore();
+    expect(res.statusCode).to.equal(400);
   });
 });

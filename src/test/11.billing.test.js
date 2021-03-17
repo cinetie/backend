@@ -423,8 +423,8 @@ describe("BILLING MIDDLEWARE", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     await billing.trial(req, res);
-    expect(res.statusCode).to.equal(500);
     stub.restore();
+    expect(res.statusCode).to.equal(500);
   });
 
   it("Test verifyPermissionLevel should return 500 when there is a server error", async () => {
@@ -437,8 +437,8 @@ describe("BILLING MIDDLEWARE", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     await billing.verifyPermissionLevel(req, res);
-    expect(res.statusCode).to.equal(500);
     stub.restore();
+    expect(res.statusCode).to.equal(500);
   });
 
   it("Test verifySpennTransactions Method with registered email and permissonLevel -1 Should throw 402", async () => {
