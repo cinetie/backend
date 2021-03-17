@@ -1,25 +1,25 @@
 /* eslint-disable no-console */
 /* eslint-disable no-shadow */
 /* eslint-disable consistent-return */
-import path from "path";
-import { v4 as uuid } from "uuid";
-import userService from "../services/userServices";
-import tokenService from "../services/tokenService";
-import billingServices from "../services/billingServices";
-import sessionService from "../services/loginSessionServices";
-import payment from "../helpers/payment";
-import bcrypt from "../helpers/bcrypt";
-import response from "../helpers/response";
-import jwt from "../helpers/jwt";
-import cry from "../helpers/crypto";
-import Util from "../helpers/utilities";
-import date from "../helpers/date";
-import mailer from "../helpers/mailer";
-import Rave from "../helpers/rave";
-import Fetch from "../helpers/fetch";
-import billing from "../middlewares/billing";
-import { decode } from "querystring";
-import { Console } from "console";
+import path from 'path';
+import { v4 as uuid } from 'uuid';
+import userService from '../services/userServices';
+import tokenService from '../services/tokenService';
+import billingServices from '../services/billingServices';
+import sessionService from '../services/loginSessionServices';
+import payment from '../helpers/payment';
+import bcrypt from '../helpers/bcrypt';
+import response from '../helpers/response';
+import jwt from '../helpers/jwt';
+import cry from '../helpers/crypto';
+import Util from '../helpers/utilities';
+import date from '../helpers/date';
+import mailer from '../helpers/mailer';
+import Rave from '../helpers/rave';
+import Fetch from '../helpers/fetch';
+import billing from '../middlewares/billing';
+import { decode } from 'querystring';
+import { Console } from 'console';
 
 const util = new Util();
 class userController {
@@ -28,7 +28,7 @@ class userController {
       const newUser = userController.initializeVarsForSignup(req);
       const search = await userService.getUserByMail(newUser.email);
       if (search) {
-        util.setErrorResponse(res, "user already exists", 403);
+        util.setErrorResponse(res, 'user already exists', 403);
       } else {
         // eslint-disable-next-line no-use-before-define
         const EmailStatus = await userController.sendEmail(req);
@@ -50,11 +50,11 @@ class userController {
             email: createdUser.email,
           },
           process.env.SECRET,
-          "1d"
+          '1d'
         );
         createdUser.token = userToken;
         delete createdUser.password;
-        util.setSuccessResponse(res, "Signed up successfully", 201, userToken);
+        util.setSuccessResponse(res, 'Signed up successfully', 201, userToken);
       }
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
@@ -65,7 +65,7 @@ class userController {
     return {
       email: newUser.email,
       token,
-      desc: "Login-Active",
+      desc: 'Login-Active',
     };
   }
 
@@ -89,12 +89,12 @@ class userController {
         )}`,
       },
       {
-        from: "CINETIE support",
+        from: 'CINETIE support',
         to: req.body.email,
-        subject: "Email verification",
+        subject: 'Email verification',
       },
       {
-        path: `${path.resolve("src/public/templates/VerifyEmail.ejs")}`,
+        path: `${path.resolve('src/public/templates/VerifyEmail.ejs')}`,
       },
     ]);
   }
@@ -103,7 +103,7 @@ class userController {
     const newUser = req.body;
     newUser.password = bcrypt.encrypt(newUser.password);
     newUser.isVerified = false;
-    newUser.plan = "Setup";
+    newUser.plan = 'Setup';
     newUser.permissionLevel = 1;
     newUser.isOnTrial = false;
     return newUser;
@@ -114,7 +114,7 @@ class userController {
       const { token } = req.query;
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
       const user = await userService.getUserByMail(decoded);
-      if (!user) return response.errorResponse(res, 404, "User not found");
+      if (!user) return response.errorResponse(res, 404, 'User not found');
       jwt.jwtVerify(token, process.env.SECRET);
       const newUser = {
         isVerified: true,
@@ -129,18 +129,18 @@ class userController {
         },
         {
           to: user.email,
-          from: "CINETIE support",
-          subject: "Success email has been verified",
+          from: 'CINETIE support',
+          subject: 'Success email has been verified',
         },
         {
           path: `${path.join(
             __dirname,
-            "../public/templates/EmailVerificationSuccess.ejs"
+            '../public/templates/EmailVerificationSuccess.ejs'
           )}`,
         },
       ]);
-      return res.render("redirect", {
-        url: "https://www.cinetie.com/u/signin",
+      return res.render('redirect', {
+        url: 'https://www.cinetie.com/u/signin',
       });
     } catch (error) {
       util.setErrorResponse(res, `Something went wrong ${error.message}`, 500);
@@ -152,9 +152,9 @@ class userController {
       const user = await userService.getUserByMail(req.body.email);
       const status = bcrypt.compare(req.body.password, user.password);
       if (!status || !user) {
-        util.setErrorResponse(res, "Invalid email or password!", 400);
+        util.setErrorResponse(res, 'Invalid email or password!', 400);
       } else if (!user.isVerified) {
-        util.setErrorResponse(res, "Verify your account first!", 401);
+        util.setErrorResponse(res, 'Verify your account first!', 401);
       } else {
         const token = jwt.jwtSign(
           {
@@ -162,7 +162,7 @@ class userController {
             email: req.body.email,
           },
           process.env.SECRET,
-          "1d"
+          '1d'
         );
         user.token = token;
         delete user.password;
@@ -172,12 +172,12 @@ class userController {
           date: dateSession.toDateString(),
           timeIn: dateSession.toTimeString(),
           timeOut: null,
-          state: "in",
+          state: 'in',
         };
         const addedSession = await sessionService.addSession(session);
         if (!addedSession)
           util.setErrorResponse(res, "Can't register session", 500);
-        util.setSuccessResponse(res, "Logged in successfully!", 200, token);
+        util.setSuccessResponse(res, 'Logged in successfully!', 200, token);
       }
     } catch (error) {
       util.setErrorResponse(
@@ -191,7 +191,7 @@ class userController {
   static async forgotPassword(req, res) {
     try {
       const user = await userService.getUserByMail(req.body.email);
-      if (!user) return response.errorResponse(res, 404, "User not found!");
+      if (!user) return response.errorResponse(res, 404, 'User not found!');
       // const date = new Date();
       const newDate = date.addMoreDays(1);
       const token = jwt.jwtSign(newDate.getTime(), process.env.SECRET);
@@ -200,18 +200,18 @@ class userController {
           link: `${process.env.FRONT_END_USER}/u/new-password?id=${user.id}&&token=${token}`,
         },
         {
-          from: "CINETIE support",
+          from: 'CINETIE support',
           to: req.body.email,
-          subject: "Password help",
+          subject: 'Password help',
         },
         {
-          path: `${path.resolve("src/public/templates/ForgotPassword.ejs")}`,
+          path: `${path.resolve('src/public/templates/ForgotPassword.ejs')}`,
         },
       ]);
       return response.successResponse(
         res,
         200,
-        "Reset password link sent successfully!"
+        'Reset password link sent successfully!'
       );
     } catch (error) {
       util.setErrorResponse(
@@ -228,7 +228,7 @@ class userController {
       jwt.jwtVerify(token, process.env.SECRET);
       const user_ = await userService.getUserById(id);
       if (!user_)
-        response.errorResponse(res, 404, "User not found!", "user undefined");
+        response.errorResponse(res, 404, 'User not found!', 'user undefined');
       const hash = bcrypt.encrypt(req.body.password);
       const newPass = {
         password: hash,
@@ -237,25 +237,25 @@ class userController {
       if (result[1] === 0) {
         util.setErrorResponse(
           res,
-          "Something Went wrong updating user password",
+          'Something Went wrong updating user password',
           400
         );
       } else {
         await mailer([
           {
             name: user_.firstName,
-            body: "Your password has been reset successfully",
+            body: 'Your password has been reset successfully',
           },
           {
-            from: "CINETIE support",
+            from: 'CINETIE support',
             to: user_.email,
-            subject: "Password help",
+            subject: 'Password help',
           },
           {
-            path: `${path.resolve("src/public/templates/notification.ejs")}`,
+            path: `${path.resolve('src/public/templates/notification.ejs')}`,
           },
         ]);
-        return res.render("redirect", { url: "https://cinetie.com/u/signin" });
+        return res.render('redirect', { url: 'https://cinetie.com/u/signin' });
       }
     } catch (error) {
       util.setErrorResponse(
@@ -278,14 +278,14 @@ class userController {
           email: req.user.email,
         },
         process.env.SECRET,
-        "1d"
+        '1d'
       );
       res.redirect(
         200,
         `https://cinetie-frontend.herokuapp.com/social_auth?token=${token}`
       );
     } catch (error) {
-      response.errorResponse(res, 500, "Something went wrong!", error.message);
+      response.errorResponse(res, 500, 'Something went wrong!', error.message);
     }
   }
 
@@ -299,9 +299,9 @@ class userController {
         decoded.email
       );
       if (status !== 0 && deleteSubscription !== 0) {
-        util.setSuccessResponse(res, "deleted successfully", 200, status);
+        util.setSuccessResponse(res, 'deleted successfully', 200, status);
       } else {
-        util.setErrorResponse(res, "An error occured", 400);
+        util.setErrorResponse(res, 'An error occured', 400);
       }
     } catch (error) {
       util.setErrorResponse(res, `An error occured : ${error}`, 500);
@@ -325,9 +325,9 @@ class userController {
       }
       const updated = await userService.updateUser(decoded.email, newInfo);
       if (updated[0] !== 0) {
-        util.setSuccessResponse(res, "updated successfully", 200, updated);
+        util.setSuccessResponse(res, 'updated successfully', 200, updated);
       } else {
-        util.setErrorResponse(res, "An error occured", 400);
+        util.setErrorResponse(res, 'An error occured', 400);
       }
     } catch (error) {
       util.setErrorResponse(res, error, 522);
@@ -348,7 +348,7 @@ class userController {
       );
       const getSubscription = await billingServices.getSubscription(email);
       const today = new Date();
-      const endDate = new Date(getSubscription ? getSubscription.endDate : "");
+      const endDate = new Date(getSubscription ? getSubscription.endDate : '');
 
       if (!getSubscription) {
         const user = await userService.getUserByMail(email);
@@ -366,19 +366,19 @@ class userController {
         if (subscriptionDetails) {
           util.setSuccessResponse(
             res,
-            "Completed signup process",
+            'Completed signup process',
             201,
             subscriptionDetails
           );
         } else {
           util.setErrorResponse(
             res,
-            "Something went sideways completing the signup",
+            'Something went sideways completing the signup',
             400
           );
         }
       } else if (
-        getSubscription.state === "pending" ||
+        getSubscription.state === 'pending' ||
         endDate.getTime() <= today.getTime()
       ) {
         const user = await userService.getUserByMail(email);
@@ -396,21 +396,21 @@ class userController {
         if (subscriptionDetails) {
           util.setSuccessResponse(
             res,
-            "Completed signup process and update",
+            'Completed signup process and update',
             200,
             subscriptionDetails
           );
         } else {
           util.setErrorResponse(
             res,
-            "Something went sideways completing the signup",
+            'Something went sideways completing the signup',
             400
           );
         }
       } else {
         util.setErrorResponse(
           res,
-          "You have an active current subscription",
+          'You have an active current subscription',
           400
         );
       }
@@ -438,7 +438,7 @@ class userController {
       const price = await payment.getPlanPricing(subscriptionData);
       const currentSubscription = await billingServices.getCurrentSubscription(
         email,
-        "pending"
+        'pending'
       );
       // if (user.isOnTrial === false) {
       //   util.setErrorResponse(res, 'account is already activated', 400);
@@ -450,85 +450,44 @@ class userController {
         email
       );
       const token = jwt.jwtSign(
-        { role: "main-api", user: email },
+        { role: 'main-api', user: email },
         process.env.SECRET,
         1000
       );
       switch (Number(currentSubscription.paymentMethod)) {
         case 1: {
-          const momoData = await Fetch(
-            paymentData,
-            {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            `${process.env.PAY_HOST}/charge/momo`,
-            "POST"
-          );
+          const momoData = await userController.sendPaymentRequest(paymentData, token, null, 'charge/momo');
           if (momoData.status === 200) {
-            const updates = await userService.updateUser(email, {
-              isOnTrial: false,
-            });
+            const updates = await userService.updateUser(email, { isOnTrial: false, });
             if (updates[1] > 0) {
-              await payment.recordTransaction(
-                user,
-                currentSubscription,
-                paymentData.txRef,
-                "pending"
-              );
+              await payment.recordTransaction(user, currentSubscription, paymentData.txRef, 'pending');
               util.setSuccessResponse(
-                res,
-                "Pending subscription  activation with MoMo",
-                201,
-                momoData
-              );
+                res, 'Pending subscription  activation with MoMo', 201, momoData);
             } else {
-              util.setErrorResponse(
-                res,
-                "Something went sideways creating a subscription",
-                400
-              );
+              util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
             }
           } else {
-            util.setErrorResponse(res, "Sorry payment failed", 500);
+            util.setErrorResponse(res, 'Sorry payment failed', 500);
           }
           break;
         }
 
         case 2: {
-          const pay = await Fetch(
-            paymentData,
-            {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            `${process.env.PAY_HOST}/charge/card`,
-            "POST"
-          );
+          const pay = await userController.sendPaymentRequest(paymentData, token, null, 'charge/card');
           if (pay.status !== 400) {
-            if (pay.meta.authorization.mode === "avs_noauth") {
+            if (pay.meta.authorization.mode === 'avs_noauth') {
               return util.setSuccessResponse(
                 res,
-                "Please provide these details",
+                'Please provide these details',
                 200,
-                ["city", "address", "state", "country", "zipcode"]
+                ['city', 'address', 'state', 'country', 'zipcode']
               );
             }
-            if (pay.meta.authorization.mode === "pin") {
-              return util.setSuccessResponse(
-                res,
-                "Please provide your pin",
-                200,
-                undefined
-              );
+            if (pay.meta.authorization.mode === 'pin') {
+              return util.setSuccessResponse(res, 'Please provide your pin', 200, undefined);
             }
-            if (pay.meta.authorization.mode === "otp") {
-              await payment.recordTransaction(
-                user,
-                currentSubscription,
-                paymentData.txRef,
-                "pending"
-              );
+            if (pay.meta.authorization.mode === 'otp') {
+              await payment.recordTransaction(user, currentSubscription, paymentData.txRef, 'pending');
               return util.setSuccessResponse(
                 res,
                 pay.data.processor_response,
@@ -545,22 +504,11 @@ class userController {
 
         case 3:
           {
-            const pay = await payment.chargeSpenn(
-              user,
-              currentSubscription,
-              token
-            );
+            const pay = await payment.chargeSpenn(user, currentSubscription, token);
             if (pay.status === 200) {
-              const updates = await userService.updateUser(email, {
-                isOnTrial: false,
-              });
+              const updates = await userService.updateUser(email, { isOnTrial: false, });
               if (updates[1] === 1) {
-                await payment.recordTransaction(
-                  user,
-                  currentSubscription,
-                  pay.data.RequestId,
-                  "pending"
-                );
+                await payment.recordTransaction(user, currentSubscription, pay.data.RequestId, 'pending');
                 util.setSuccessResponse(res, pay.message, 200, pay);
               } else {
                 util.setErrorResponse(res, pay.message, 400);
@@ -579,43 +527,19 @@ class userController {
               email,
               fullName: `${user.firstName} ${user.lastName}`,
               phoneNumber: user.phoneNumber,
-              currency: "KES",
+              currency: 'KES',
             };
-            const data = await Fetch(
-              requestData,
-              {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-              `${process.env.PAY_HOST}/charge/all?type=mpesa`,
-              "POST"
-            );
+            const data = await userController.sendPaymentRequest(requestData, token, 'mpesa', 'charge/all');
             if (data.status === 200) {
-              const updates = await userService.updateUser(email, {
-                isOnTrial: false,
-              });
+              const updates = await userService.updateUser(email, { isOnTrial: false, });
               if (updates[1] > 0) {
-                await payment.recordTransaction(
-                  user,
-                  currentSubscription,
-                  txRef,
-                  "pending"
-                );
-                util.setSuccessResponse(
-                  res,
-                  "Pending subscription  activation with MoMo",
-                  201,
-                  data
-                );
+                await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
+                util.setSuccessResponse(res, 'Pending subscription  activation with MoMo', 201, data);
               } else {
-                util.setErrorResponse(
-                  res,
-                  "Something went sideways creating a subscription",
-                  400
-                );
+                util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
               }
             } else {
-              util.setErrorResponse(res, "Sorry payment failed", 500);
+              util.setErrorResponse(res, 'Sorry payment failed', 500);
             }
           }
           break;
@@ -626,43 +550,19 @@ class userController {
               txRef,
               amount: price,
               email,
-              currency: "UGX",
+              currency: 'UGX',
             };
-            const data = await Fetch(
-              requestData,
-              {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-              `${process.env.PAY_HOST}/charge/all?type=mobile_money_uganda`,
-              "POST"
-            );
+            const data = await userController.sendPaymentRequest(requestData, token, 'mobile_money_uganda', 'charge/all');
             if (data.status === 200) {
-              const updates = await userService.updateUser(email, {
-                isOnTrial: false,
-              });
+              const updates = await userService.updateUser(email, { isOnTrial: false, });
               if (updates[1] > 0) {
-                await payment.recordTransaction(
-                  user,
-                  currentSubscription,
-                  txRef,
-                  "pending"
-                );
-                util.setSuccessResponse(
-                  res,
-                  "Pending subscription  activation with MoMo",
-                  201,
-                  data
-                );
+                await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
+                util.setSuccessResponse(res, 'Pending subscription  activation with MoMo', 201, data);
               } else {
-                util.setErrorResponse(
-                  res,
-                  "Something went sideways creating a subscription",
-                  400
-                );
+                util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
               }
             } else {
-              util.setErrorResponse(res, "Sorry payment failed", 500);
+              util.setErrorResponse(res, 'Sorry payment failed', 500);
             }
           }
           break;
@@ -673,44 +573,23 @@ class userController {
               txRef,
               amount: price,
               email,
-              currency: "ZMW",
-              network: "MTN",
+              currency: 'ZMW',
+              network: 'MTN',
             };
-            const data = await Fetch(
-              requestData,
-              {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-              `${process.env.PAY_HOST}/charge/all?type=mobile_money_zambia`,
-              "POST"
-            );
+            const data = await userController.sendPaymentRequest(requestData, token, 'mobile_money_zambia', 'charge/all');
             if (data.status === 200) {
               const updates = await userService.updateUser(email, {
                 isOnTrial: false,
               });
               if (updates[1] > 0) {
-                await payment.recordTransaction(
-                  user,
-                  currentSubscription,
-                  txRef,
-                  "pending"
-                );
-                util.setSuccessResponse(
-                  res,
-                  "Pending subscription  activation with MoMo",
-                  201,
-                  data
-                );
+                await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
+                util.setSuccessResponse(res, 'Pending subscription  activation with MoMo', 201, data);
               } else {
-                util.setErrorResponse(
-                  res,
-                  "Something went sideways creating a subscription",
-                  400
-                );
+                util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
               }
             } else {
-              util.setErrorResponse(res, "Sorry payment failed", 500);
+              console.log(data);
+              util.setErrorResponse(res, 'Sorry payment failed', 500);
             }
           }
           break;
@@ -721,44 +600,22 @@ class userController {
               txRef,
               amount: price,
               email,
-              currency: "ZMW",
-              network: "ZAMTEL",
+              currency: 'ZMW',
+              network: 'ZAMTEL',
             };
-            const data = await Fetch(
-              requestData,
-              {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-              `${process.env.PAY_HOST}/charge/all?type=mobile_money_zambia`,
-              "POST"
-            );
+            const data = await userController.sendPaymentRequest(requestData, token, 'mobile_money_zambia', 'charge/all');
             if (data.status === 200) {
               const updates = await userService.updateUser(email, {
                 isOnTrial: false,
               });
               if (updates[1] > 0) {
-                await payment.recordTransaction(
-                  user,
-                  currentSubscription,
-                  txRef,
-                  "pending"
-                );
-                util.setSuccessResponse(
-                  res,
-                  "Pending subscription  activation with MoMo",
-                  201,
-                  data
-                );
+                await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
+                util.setSuccessResponse(res, 'Pending subscription  activation with MoMo', 201, data);
               } else {
-                util.setErrorResponse(
-                  res,
-                  "Something went sideways creating a subscription",
-                  400
-                );
+                util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
               }
             } else {
-              util.setErrorResponse(res, "Sorry payment failed", 500);
+              util.setErrorResponse(res, 'Sorry payment failed', 500);
             }
           }
           break;
@@ -769,44 +626,20 @@ class userController {
               txRef,
               amount: price,
               email,
-              currency: "GHS",
-              network: "MTN",
+              currency: 'GHS',
+              network: 'MTN',
             };
-            const data = await Fetch(
-              requestData,
-              {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-              `${process.env.PAY_HOST}/charge/all?type=mobile_money_ghana`,
-              "POST"
-            );
+            const data = await userController.sendPaymentRequest(requestData, token, 'mobile_money_ghana', 'charge/all');
             if (data.status === 200) {
-              const updates = await userService.updateUser(email, {
-                isOnTrial: false,
-              });
+              const updates = await userService.updateUser(email, { isOnTrial: false, });
               if (updates[1] > 0) {
-                await payment.recordTransaction(
-                  user,
-                  currentSubscription,
-                  txRef,
-                  "pending"
-                );
-                util.setSuccessResponse(
-                  res,
-                  "Pending subscription  activation with MoMo",
-                  201,
-                  data
-                );
+                await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
+                util.setSuccessResponse(res, 'Pending subscription  activation with MoMo', 201, data);
               } else {
-                util.setErrorResponse(
-                  res,
-                  "Something went sideways creating a subscription",
-                  400
-                );
+                util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
               }
             } else {
-              util.setErrorResponse(res, "Sorry payment failed", 500);
+              util.setErrorResponse(res, 'Sorry payment failed', 500);
             }
           }
           break;
@@ -817,44 +650,20 @@ class userController {
               txRef,
               amount: price,
               email,
-              currency: "GHS",
-              network: "VODAFONE",
+              currency: 'GHS',
+              network: 'VODAFONE',
             };
-            const data = await Fetch(
-              requestData,
-              {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-              `${process.env.PAY_HOST}/charge/all?type=mobile_money_ghana`,
-              "POST"
-            );
+            const data = await userController.sendPaymentRequest(requestData, token, 'mobile_money_ghana', 'charge/all');
             if (data.status === 200) {
-              const updates = await userService.updateUser(email, {
-                isOnTrial: false,
-              });
+              const updates = await userService.updateUser(email, { isOnTrial: false, });
               if (updates[1] > 0) {
-                await payment.recordTransaction(
-                  user,
-                  currentSubscription,
-                  txRef,
-                  "pending"
-                );
-                util.setSuccessResponse(
-                  res,
-                  "Pending subscription  activation with MoMo",
-                  201,
-                  data
-                );
+                await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
+                util.setSuccessResponse(res, 'Pending subscription  activation with MoMo', 201, data);
               } else {
-                util.setErrorResponse(
-                  res,
-                  "Something went sideways creating a subscription",
-                  400
-                );
+                util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
               }
             } else {
-              util.setErrorResponse(res, "Sorry payment failed", 500);
+              util.setErrorResponse(res, 'Sorry payment failed', 500);
             }
           }
           break;
@@ -865,73 +674,45 @@ class userController {
               txRef,
               amount: price,
               email,
-              currency: "GHS",
-              network: "TIGO",
+              currency: 'GHS',
+              network: 'TIGO',
             };
-            const data = await Fetch(
-              requestData,
-              {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-              `${process.env.PAY_HOST}/charge/all?type=mobile_money_ghana`,
-              "POST"
-            );
+            const data = await userController.sendPaymentRequest(requestData, token, 'mobile_money_ghana', 'charge/all');
             if (data.status === 200) {
-              const updates = await userService.updateUser(email, {
-                isOnTrial: false,
-              });
+              const updates = await userService.updateUser(email, { isOnTrial: false, });
               if (updates[1] > 0) {
-                await payment.recordTransaction(
-                  user,
-                  currentSubscription,
-                  txRef,
-                  "pending"
-                );
-                util.setSuccessResponse(
-                  res,
-                  "Pending subscription  activation with MoMo",
-                  201,
-                  data
-                );
+                await payment.recordTransaction(user, currentSubscription, txRef, 'pending');
+                util.setSuccessResponse(res, 'Pending subscription  activation with MoMo', 201, data);
               } else {
-                util.setErrorResponse(
-                  res,
-                  "Something went sideways creating a subscription",
-                  400
-                );
+                util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
               }
             } else {
-              util.setErrorResponse(res, "Sorry payment failed", 500);
+              util.setErrorResponse(res, 'Sorry payment failed', 500);
             }
           }
           break;
 
         default:
-          util.setErrorResponse(res, "Sorry payment failed", 500);
+          util.setErrorResponse(res, 'Sorry payment failed', 500);
       }
       // }
     } catch (error) {
-      return response.errorResponse(
-        res,
-        500,
-        `Something wrong happened ${error.message}`,
-        error
-      );
+      console.log(error);
+      return response.errorResponse(res, 500, `Something wrong happened ${error.message}`, error);
     }
   }
 
   static async removeTrial(email, res, pay) {
     const updates = await userService.updateUser(email, { isOnTrial: false });
     if (updates[1] > 0) {
-      util.setSuccessResponse(res, "Success", 201, {
+      util.setSuccessResponse(res, 'Success', 201, {
         user: updates,
         payment: { ...pay.meta, flw_ref: pay.data.flw_ref },
       });
     } else {
       util.setErrorResponse(
         res,
-        "Something went sideways creating a subscription",
+        'Something went sideways creating a subscription',
         400
       );
     }
@@ -943,24 +724,24 @@ class userController {
         req.headers.authorization.slice(7),
         process.env.SECRET
       );
-      if (req.body.authorization.mode === "otp-verify") {
+      if (req.body.authorization.mode === 'otp-verify') {
         const otpStatus = await Rave.validateACharge({
           otp: req.body.authorization.otp,
           flw_ref: req.body.flw_ref,
         });
-        if (otpStatus.data.processor_response !== "successful") {
+        if (otpStatus.data.processor_response !== 'successful') {
           return util.setErrorResponse(
             res,
             otpStatus.message,
             400,
-            "BAD_REQUEST"
+            'BAD_REQUEST'
           );
           // eslint-disable-next-line no-else-return
         } else {
           await userController.removeTrial(email, res, otpStatus);
           return util.setSuccessResponse(
             res,
-            "OTP verified",
+            'OTP verified',
             200,
             otpStatus,
             null
@@ -972,7 +753,7 @@ class userController {
         res,
         error.message || error,
         500,
-        "SERVER_ERROR"
+        'SERVER_ERROR'
       );
     }
   }
@@ -981,7 +762,7 @@ class userController {
     return {
       ...req.body,
       amount: price,
-      currency: "RWF",
+      currency: 'RWF',
       phone_number: user.phoneNumber,
       fullname: `${user.firstName} ${user.lastName}`,
       email,
@@ -989,10 +770,23 @@ class userController {
     };
   }
 
+  static async sendPaymentRequest(data, token, type, path) {
+    const result = await Fetch(
+      data,
+      {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      `${process.env.PAY_HOST}/${path}?type=${type}`,
+      'POST'
+    );
+    return result;
+  }
+
   static async getAllAccounts(res) {
     try {
       const users = await userService.getAllUsers();
-      response.successResponse(res, 200, "List of users", users);
+      response.successResponse(res, 200, 'List of users', users);
     } catch (error) {
       util.setErrorResponse(res, error, 503);
     }
@@ -1005,12 +799,12 @@ class userController {
       const end = date.convertToTimestamp(req.query.end);
       const data = await billingServices.getMonthlySubscribers(start, end);
       if (Object.values(data).length > 0) {
-        util.setSuccessResponse(res, "Data was found", 200, {
+        util.setSuccessResponse(res, 'Data was found', 200, {
           size: Object.values(data).length,
           data,
         });
       } else {
-        util.setErrorResponse(res, "Data was not found", 400);
+        util.setErrorResponse(res, 'Data was not found', 400);
       }
     } catch (error) {
       util.setErrorResponse(
@@ -1025,7 +819,7 @@ class userController {
     try {
       const data = await sessionService.getLiveSessions();
       if (data) {
-        util.setSuccessResponse(res, "Found ", 200, {
+        util.setSuccessResponse(res, 'Found ', 200, {
           size: Object.values(data).length,
           data,
         });
@@ -1051,17 +845,17 @@ class userController {
       const subscription = await billingServices.getSubscriptionByEmail(email);
       if (user) {
         if (subscription) {
-          util.setSuccessResponse(res, "Found", 200, {
+          util.setSuccessResponse(res, 'Found', 200, {
             user,
-            paymentMethod: subscription.paymentMethod || "null",
-            price: subscription.price || "null",
+            paymentMethod: subscription.paymentMethod || 'null',
+            price: subscription.price || 'null',
             subscritption: subscription.state,
           });
         } else {
-          util.setSuccessResponse(res, "Found", 200, { user });
+          util.setSuccessResponse(res, 'Found', 200, { user });
         }
       } else {
-        util.setErrorResponse(res, "Data not found", 404);
+        util.setErrorResponse(res, 'Data not found', 404);
       }
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
@@ -1080,7 +874,7 @@ class userController {
 
       const _response = await userService.getUser(email);
       _response.paymentMethod = currentSubscription.paymentMethod;
-      util.setSuccessResponse(res, "Found", 200, _response);
+      util.setSuccessResponse(res, 'Found', 200, _response);
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
     }
@@ -1092,16 +886,16 @@ class userController {
       const email = req.user;
       const sessions = await sessionService.getParticularSession(email);
       if (sessions.length === 0) {
-        util.setErrorResponse(res, "Login to logout", 400);
+        util.setErrorResponse(res, 'Login to logout', 400);
       } else {
         const logoutStatus = await sessionService.updateSession(
           sessions[0].id,
-          { state: "out", timeOut: date.toTimeString() }
+          { state: 'out', timeOut: date.toTimeString() }
         );
         if (logoutStatus) {
-          util.setSuccessResponse(res, "Logout successfully", 200);
+          util.setSuccessResponse(res, 'Logout successfully', 200);
         } else {
-          util.setErrorResponse(res, "Something went wrong", 400);
+          util.setErrorResponse(res, 'Something went wrong', 400);
         }
       }
     } catch (error) {
@@ -1111,9 +905,9 @@ class userController {
 
   static async serveVerifyPassword(req, res) {
     try {
-      return res.render("ResetPassword", {
+      return res.render('ResetPassword', {
         host: process.env.HOST,
-        role: "auth",
+        role: 'auth',
       });
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
