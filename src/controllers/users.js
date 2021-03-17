@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable no-shadow */
 /* eslint-disable consistent-return */
-<<<<<<< HEAD
 import path from "path";
 import { v4 as uuid } from "uuid";
 import userService from "../services/userServices";
@@ -22,27 +21,6 @@ import RavePaymentRequest from "../helpers/RavePaymentRequest";
 import billing from "../middlewares/billing";
 import { decode } from "querystring";
 import { Console } from "console";
-=======
-import path from 'path';
-import { v4 as uuid } from 'uuid';
-import userService from '../services/userServices';
-import tokenService from '../services/tokenService';
-import billingServices from '../services/billingServices';
-import sessionService from '../services/loginSessionServices';
-import payment from '../helpers/payment';
-import bcrypt from '../helpers/bcrypt';
-import response from '../helpers/response';
-import jwt from '../helpers/jwt';
-import cry from '../helpers/crypto';
-import Util from '../helpers/utilities';
-import date from '../helpers/date';
-import mailer from '../helpers/mailer';
-import Rave from '../helpers/rave';
-import Fetch from '../helpers/fetch';
-import billing from '../middlewares/billing';
-import { decode } from 'querystring';
-import { Console } from 'console';
->>>>>>> d172bce1e0b5da01ff7beb43fdeaf67756adf897
 
 const util = new Util();
 class userController {
