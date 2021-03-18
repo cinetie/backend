@@ -973,3 +973,18 @@ Response:
     }
 }
 ```
+
+
+### Payment Method Code Number
+
+Payment Method
+Where:
+```
+    4: Mpesa
+    5: Mobile Money (UGANDA MTN)
+    6: Mobile Money (ZAMBIA MTN)
+    7: Mobile Money (ZAMBIA ZAMTEL)
+    8: Mobile Money (GHANA MTN)
+    9: Mobile Money (GHANA VODAFONE)
+    10: Mobile Money (GHANA TIGO)
+```
