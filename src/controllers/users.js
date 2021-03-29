@@ -1,24 +1,26 @@
 /* eslint-disable no-console */
 /* eslint-disable no-shadow */
 /* eslint-disable consistent-return */
-import path from 'path';
-import { v4 as uuid } from 'uuid';
-import userService from '../services/userServices';
-import tokenService from '../services/tokenService';
-import billingServices from '../services/billingServices';
-import sessionService from '../services/loginSessionServices';
-import payment from '../helpers/payment';
-import bcrypt from '../helpers/bcrypt';
-import response from '../helpers/response';
-import jwt from '../helpers/jwt';
-import cry from '../helpers/crypto';
-import Util from '../helpers/utilities';
-import date from '../helpers/date';
-import mailer from '../helpers/mailer';
-import Rave from '../helpers/rave';
-import Fetch from '../helpers/fetch';
-import billing from '../middlewares/billing';
-import { decode } from 'querystring';
+import path from "path";
+import { v4 as uuid } from "uuid";
+import userService from "../services/userServices";
+import tokenService from "../services/tokenService";
+import billingServices from "../services/billingServices";
+import sessionService from "../services/loginSessionServices";
+import payment from "../helpers/payment";
+import bcrypt from "../helpers/bcrypt";
+import response from "../helpers/response";
+import jwt from "../helpers/jwt";
+import cry from "../helpers/crypto";
+import Util from "../helpers/utilities";
+import date from "../helpers/date";
+import mailer from "../helpers/mailer";
+import Rave from "../helpers/rave";
+import Fetch from "../helpers/fetch";
+import RavePaymentRequest from "../helpers/RavePaymentRequest";
+import billing from "../middlewares/billing";
+import { decode } from "querystring";
+import { Console } from "console";
 
 const util = new Util();
 class userController {
@@ -36,17 +38,21 @@ class userController {
           isOnExtension: false,
           permissionLevel: -1,
           isBilledAnnually: false,
-          isVerified: true
+          isVerified: true,
         });
         const part1 = cry.crypto();
         const token = userController.signToken(part1, newUser);
         const tokenToSave = userController.generateTokenToSave(newUser, token);
         await tokenService.createNewToken(tokenToSave, token);
         if (EmailStatus) util.setErrorResponse(res, EmailStatus, 500);
-        const userToken = jwt.jwtSign({
-          key: cry.crypto(),
-          email: createdUser.email
-        }, process.env.SECRET, '1d');
+        const userToken = jwt.jwtSign(
+          {
+            key: cry.crypto(),
+            email: createdUser.email,
+          },
+          process.env.SECRET,
+          '1d'
+        );
         createdUser.token = userToken;
         delete createdUser.password;
         util.setSuccessResponse(res, 'Signed up successfully', 201, userToken);
@@ -60,29 +66,37 @@ class userController {
     return {
       email: newUser.email,
       token,
-      desc: 'Login-Active'
+      desc: 'Login-Active',
     };
   }
 
   static signToken(part1, newUser) {
-    return jwt.jwtSign({
-      key: part1,
-      email: newUser.email
-    }, process.env.SECRET);
+    return jwt.jwtSign(
+      {
+        key: part1,
+        email: newUser.email,
+      },
+      process.env.SECRET
+    );
   }
 
   static async sendEmail(req) {
     // eslint-disable-next-line no-return-await
-    return await mailer([{
-      link: `${process.env.HOST}/auth/verify?token=${jwt.jwtSign(req.body.email, process.env.SECRET)}`
-    }, {
-      from: 'CINETIE support',
-      to: req.body.email,
-      subject: 'Email verification',
-    },
-    {
-      path: `${path.resolve('src/public/templates/VerifyEmail.ejs')}`
-    }
+    return await mailer([
+      {
+        link: `${process.env.HOST}/auth/verify?token=${jwt.jwtSign(
+          req.body.email,
+          process.env.SECRET
+        )}`,
+      },
+      {
+        from: 'CINETIE support',
+        to: req.body.email,
+        subject: 'Email verification',
+      },
+      {
+        path: `${path.resolve('src/public/templates/VerifyEmail.ejs')}`,
+      },
     ]);
   }
 
@@ -98,32 +112,37 @@ class userController {
 
   static async verify(req, res) {
     try {
-      const {
-        token
-      } = req.query;
+      const { token } = req.query;
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
       const user = await userService.getUserByMail(decoded);
-      if (!user) response.errorResponse(res, 404, 'User not found');
+      if (!user) return response.errorResponse(res, 404, 'User not found');
       jwt.jwtVerify(token, process.env.SECRET);
       const newUser = {
-        isVerified: true
+        isVerified: true,
       };
       await tokenService.destroyToken(token);
       const updatedUser = await userService.updateUser(decoded, newUser);
-      if (!updatedUser) util.setErrorResponse(res, `Can't verify user ${decoded}`, 400);
-      await mailer([{
-        name: user.firstName
-      },
-      {
-        to: user.email,
-        from: 'CINETIE support',
-        subject: 'Success email has been verified',
-      },
-      {
-        path: `${path.join(__dirname, '../public/templates/EmailVerificationSuccess.ejs')}`
-      }
+      if (!updatedUser)
+        util.setErrorResponse(res, `Can't verify user ${decoded}`, 400);
+      await mailer([
+        {
+          name: user.firstName,
+        },
+        {
+          to: user.email,
+          from: 'CINETIE support',
+          subject: 'Success email has been verified',
+        },
+        {
+          path: `${path.join(
+            __dirname,
+            '../public/templates/EmailVerificationSuccess.ejs'
+          )}`,
+        },
       ]);
-      return res.render('redirect', { url: 'https://www.cinetie.com/u/signin' });
+      return res.render('redirect', {
+        url: 'https://www.cinetie.com/u/signin',
+      });
     } catch (error) {
       util.setErrorResponse(res, `Something went wrong ${error.message}`, 500);
     }
@@ -138,10 +157,14 @@ class userController {
       } else if (!user.isVerified) {
         util.setErrorResponse(res, 'Verify your account first!', 401);
       } else {
-        const token = jwt.jwtSign({
-          key: cry.crypto(),
-          email: req.body.email
-        }, process.env.SECRET, '1d');
+        const token = jwt.jwtSign(
+          {
+            key: cry.crypto(),
+            email: req.body.email,
+          },
+          process.env.SECRET,
+          '1d'
+        );
         user.token = token;
         delete user.password;
         const dateSession = new Date();
@@ -150,14 +173,19 @@ class userController {
           date: dateSession.toDateString(),
           timeIn: dateSession.toTimeString(),
           timeOut: null,
-          state: 'in'
+          state: 'in',
         };
         const addedSession = await sessionService.addSession(session);
-        if (!addedSession) util.setErrorResponse(res, 'Can\'t register session', 500);
+        if (!addedSession)
+          util.setErrorResponse(res, "Can't register session", 500);
         util.setSuccessResponse(res, 'Logged in successfully!', 200, token);
       }
     } catch (error) {
-      util.setErrorResponse(res, `Something Went wrong logging in ${error}`, 500);
+      util.setErrorResponse(
+        res,
+        `Something Went wrong logging in ${error}`,
+        500
+      );
     }
   }
 
@@ -168,20 +196,30 @@ class userController {
       // const date = new Date();
       const newDate = date.addMoreDays(1);
       const token = jwt.jwtSign(newDate.getTime(), process.env.SECRET);
-      await mailer([{
-        link: `${process.env.FRONT_END_USER}/u/new-password?id=${user.id}&&token=${token}`
-      }, {
-        from: 'CINETIE support',
-        to: req.body.email,
-        subject: 'Password help',
-      },
-      {
-        path: `${path.resolve('src/public/templates/ForgotPassword.ejs')}`
-      }
+      await mailer([
+        {
+          link: `${process.env.FRONT_END_USER}/u/new-password/?id=${user.id}&&token=${token}`,
+        },
+        {
+          from: 'CINETIE support',
+          to: req.body.email,
+          subject: 'Password help',
+        },
+        {
+          path: `${path.resolve('src/public/templates/ForgotPassword.ejs')}`,
+        },
       ]);
-      return response.successResponse(res, 200, 'Reset password link sent successfully!');
+      return response.successResponse(
+        res,
+        200,
+        'Reset password link sent successfully!'
+      );
     } catch (error) {
-      util.setErrorResponse(res, `Something Went wrong logging in ${error}`, 500);
+      util.setErrorResponse(
+        res,
+        `Something Went wrong logging in ${error}`,
+        500
+      );
     }
   }
 
@@ -190,31 +228,42 @@ class userController {
       const { token, id } = req.query;
       jwt.jwtVerify(token, process.env.SECRET);
       const user_ = await userService.getUserById(id);
-      if (!user_) response.errorResponse(res, 404, 'User not found!', 'user undefined');
+      if (!user_)
+        response.errorResponse(res, 404, 'User not found!', 'user undefined');
       const hash = bcrypt.encrypt(req.body.password);
       const newPass = {
-        password: hash
+        password: hash,
       };
       const result = await userService.updateUser(user_.email, newPass);
       if (result[1] === 0) {
-        util.setErrorResponse(res, 'Something Went wrong updating user password', 400);
+        util.setErrorResponse(
+          res,
+          'Something Went wrong updating user password',
+          400
+        );
       } else {
-        await mailer([{
-          name: user_.firstName,
-          body: 'Your password has been reset successfully'
-        }, {
-          from: 'CINETIE support',
-          to: user_.email,
-          subject: 'Password help',
-        },
-        {
-          path: `${path.resolve('src/public/templates/notification.ejs')}`
-        }
+        await mailer([
+          {
+            name: user_.firstName,
+            body: 'Your password has been reset successfully',
+          },
+          {
+            from: 'CINETIE support',
+            to: user_.email,
+            subject: 'Password help',
+          },
+          {
+            path: `${path.resolve('src/public/templates/notification.ejs')}`,
+          },
         ]);
         return res.render('redirect', { url: 'https://cinetie.com/u/signin' });
       }
     } catch (error) {
-      util.setErrorResponse(res, `Something Went wrong resetting password ${error}`, 500);
+      util.setErrorResponse(
+        res,
+        `Something Went wrong resetting password ${error}`,
+        500
+      );
     }
   }
 
@@ -224,11 +273,18 @@ class userController {
       if (!user) {
         user = await userService.createNewUser(req.user, req.user.email);
       }
-      const token = jwt.jwtSign({
-        key: cry.crypto(),
-        email: req.user.email
-      }, process.env.SECRET, '1d');
-      res.redirect(200, `https://cinetie-frontend.herokuapp.com/social_auth?token=${token}`);
+      const token = jwt.jwtSign(
+        {
+          key: cry.crypto(),
+          email: req.user.email,
+        },
+        process.env.SECRET,
+        '1d'
+      );
+      res.redirect(
+        200,
+        `https://cinetie-frontend.herokuapp.com/social_auth?token=${token}`
+      );
     } catch (error) {
       response.errorResponse(res, 500, 'Something went wrong!', error.message);
     }
@@ -240,7 +296,9 @@ class userController {
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
       const user = await userService.getUserByMail(decoded.email);
       const status = await userService.deleteUser(user.id);
-      const deleteSubscription = await billingServices.deleteSubscription(decoded.email)
+      const deleteSubscription = await billingServices.deleteSubscription(
+        decoded.email
+      );
       if (status !== 0 && deleteSubscription !== 0) {
         util.setSuccessResponse(res, 'deleted successfully', 200, status);
       } else {
@@ -253,13 +311,18 @@ class userController {
 
   static async updateAccount(req, res) {
     try {
-      const decoded = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
+      const decoded = jwt.jwtVerify(
+        req.headers.authorization.slice(7),
+        process.env.SECRET
+      );
       const user = await userService.getUserByMail(decoded.email);
       const { paymentMethod } = req.body;
-      if (!user) util.setErrorResponse(res, 'Can\'t find that user', 422);
+      if (!user) util.setErrorResponse(res, "Can't find that user", 422);
       const newInfo = req.body;
       if (paymentMethod !== undefined || paymentMethod !== null) {
-        await billingServices.updateSubscription(decoded.email, { paymentMethod });
+        await billingServices.updateSubscription(decoded.email, {
+          paymentMethod,
+        });
       }
       const updated = await userService.updateUser(decoded.email, newInfo);
       if (updated[0] !== 0) {
@@ -274,12 +337,19 @@ class userController {
 
   static async createSubcription(req, res) {
     try {
-      const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
-      const currentSubscription = await billingServices.getCurrentSubscription(email);
-      const pendingSubscription  = await billingServices.getPendingSubscription(email)
-      const getSubscription = await billingServices.getSubscription(email)
+      const { email } = jwt.jwtVerify(
+        req.headers.authorization.slice(7),
+        process.env.SECRET
+      );
+      const currentSubscription = await billingServices.getCurrentSubscription(
+        email
+      );
+      const pendingSubscription = await billingServices.getPendingSubscription(
+        email
+      );
+      const getSubscription = await billingServices.getSubscription(email);
       const today = new Date();
-      const endDate = new Date(getSubscription ? getSubscription.endDate: '');
+      const endDate = new Date(getSubscription ? getSubscription.endDate : '');
 
       if (!getSubscription) {
         const user = await userService.getUserByMail(email);
@@ -291,14 +361,27 @@ class userController {
           phoneNumber: user.phoneNumber,
           isBilledAnnually: user.isBilledAnnually,
         };
-        const subscriptionDetails = await payment.registerNewSubscription(subscriptionData);
+        const subscriptionDetails = await payment.registerNewSubscription(
+          subscriptionData
+        );
         if (subscriptionDetails) {
-          util.setSuccessResponse(res, 'Completed signup process', 201, subscriptionDetails);
+          util.setSuccessResponse(
+            res,
+            'Completed signup process',
+            201,
+            subscriptionDetails
+          );
         } else {
-          util.setErrorResponse(res, 'Something went sideways completing the signup', 400);
+          util.setErrorResponse(
+            res,
+            'Something went sideways completing the signup',
+            400
+          );
         }
-      } else if(getSubscription.state === 'pending' || endDate.getTime() <= today.getTime()) {
-
+      } else if (
+        getSubscription.state === 'pending' ||
+        endDate.getTime() <= today.getTime()
+      ) {
         const user = await userService.getUserByMail(email);
         const { paymentMethod } = req.body;
         const subscriptionData = {
@@ -308,23 +391,45 @@ class userController {
           phoneNumber: user.phoneNumber,
           isBilledAnnually: user.isBilledAnnually,
         };
-        const subscriptionDetails = await payment.updatePendingSubscription(subscriptionData);
+        const subscriptionDetails = await payment.updatePendingSubscription(
+          subscriptionData
+        );
         if (subscriptionDetails) {
-          util.setSuccessResponse(res, 'Completed signup process and update', 200, subscriptionDetails);
+          util.setSuccessResponse(
+            res,
+            'Completed signup process and update',
+            200,
+            subscriptionDetails
+          );
         } else {
-          util.setErrorResponse(res, 'Something went sideways completing the signup', 400);
+          util.setErrorResponse(
+            res,
+            'Something went sideways completing the signup',
+            400
+          );
         }
       } else {
-        util.setErrorResponse(res, 'You have an active current subscription', 400);
+        util.setErrorResponse(
+          res,
+          'You have an active current subscription',
+          400
+        );
       }
     } catch (error) {
-      util.setErrorResponse(res, `Something went sideways totally sideways contact support ${error}`, 500);
+      util.setErrorResponse(
+        res,
+        `Something went sideways totally sideways contact support ${error}`,
+        500
+      );
     }
   }
 
   static async updateAccountAndSubscription(req, res) {
     try {
-      const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
+      const { email } = jwt.jwtVerify(
+        req.headers.authorization.slice(7),
+        process.env.SECRET
+      );
       const user = await userService.getUserByMail(email);
       const subscriptionData = {
         email,
@@ -332,23 +437,33 @@ class userController {
         isBilledAnnually: user.isBilledAnnually,
       };
       const price = await payment.getPlanPricing(subscriptionData);
-      const currentSubscription = await billingServices.getCurrentSubscription(email, 'pending');
+      const currentSubscription = await billingServices.getCurrentSubscription(
+        email,
+        'pending'
+      );
       // if (user.isOnTrial === false) {
       //   util.setErrorResponse(res, 'account is already activated', 400);
       // } else {
-      const paymentData = userController.getAndSetPaymentData(req, price, user, email);
-      const token = jwt.jwtSign({ role: 'main-api', user: email }, process.env.SECRET, 1000);
+      const paymentData = userController.getAndSetPaymentData(
+        req,
+        price,
+        user,
+        email
+      );
+      const token = jwt.jwtSign(
+        { role: 'main-api', user: email },
+        process.env.SECRET,
+        1000
+      );
       switch (Number(currentSubscription.paymentMethod)) {
         case 1: {
-          const momoData = await Fetch(paymentData,
-            { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-            `${process.env.PAY_HOST}/charge/momo`, 'POST');
+          const momoData = await userController.sendPaymentRequest(paymentData, token, null, 'charge/momo');
           if (momoData.status === 200) {
-            const updates = await userService.updateUser(email,
-              { isOnTrial: false });
+            const updates = await userService.updateUser(email, { isOnTrial: false, });
             if (updates[1] > 0) {
               await payment.recordTransaction(user, currentSubscription, paymentData.txRef, 'pending');
-              util.setSuccessResponse(res, 'Pending subscription  activation with MoMo', 201, momoData);
+              util.setSuccessResponse(
+                res, 'Pending subscription  activation with MoMo', 201, momoData);
             } else {
               util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
             }
@@ -359,18 +474,26 @@ class userController {
         }
 
         case 2: {
-          const pay = await Fetch(paymentData,
-            { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-            `${process.env.PAY_HOST}/charge/card`, 'POST');
+          const pay = await userController.sendPaymentRequest(paymentData, token, null, 'charge/card');
           if (pay.status !== 400) {
             if (pay.meta.authorization.mode === 'avs_noauth') {
-              return util.setSuccessResponse(res, 'Please provide these details', 200, ['city', 'address', 'state', 'country', 'zipcode']);
-            } if (pay.meta.authorization.mode === 'pin') {
+              return util.setSuccessResponse(
+                res,
+                'Please provide these details',
+                200,
+                ['city', 'address', 'state', 'country', 'zipcode']
+              );
+            }
+            if (pay.meta.authorization.mode === 'pin') {
               return util.setSuccessResponse(res, 'Please provide your pin', 200, undefined);
-            } if (pay.meta.authorization.mode === 'otp') {
+            }
+            if (pay.meta.authorization.mode === 'otp') {
               await payment.recordTransaction(user, currentSubscription, paymentData.txRef, 'pending');
               return util.setSuccessResponse(
-                res, pay.data.processor_response, 200, { flw_ref: pay.data.flw_ref }
+                res,
+                pay.data.processor_response,
+                200,
+                { flw_ref: pay.data.flw_ref }
               );
             }
             await userController.removeTrial(email, res, pay);
@@ -380,61 +503,249 @@ class userController {
           break;
         }
 
-        case 3: {
-          const pay = await payment.chargeSpenn(user, currentSubscription, token);
-          if (pay.status === 200) {
-            const updates = await userService.updateUser(email, { isOnTrial: false });
-            if (updates[1] === 1) {
-              await payment.recordTransaction(user, currentSubscription, pay.data.RequestId, 'pending');
-              util.setSuccessResponse(res, pay.message, 200, pay);
+        case 3:
+          {
+            const pay = await payment.chargeSpenn(user, currentSubscription, token);
+            if (pay.status === 200) {
+              const updates = await userService.updateUser(email, { isOnTrial: false, });
+              if (updates[1] === 1) {
+                await payment.recordTransaction(user, currentSubscription, pay.data.RequestId, 'pending');
+                util.setSuccessResponse(res, pay.message, 200, pay);
+              } else {
+                util.setErrorResponse(res, pay.message, 400);
+              }
             } else {
               util.setErrorResponse(res, pay.message, 400);
             }
-          } else {
-            util.setErrorResponse(res, pay.message, 400);
           }
-        }
+          break;
+        case 4:
+          {
+            const txRef = uuid();
+            const paymentType = `mpesa`;
+            const requestData = {
+              txRef,
+              amount: price,
+              email,
+              phoneNumber: user.phoneNumber,
+              currency: 'KES',
+            };
+
+            await RavePaymentRequest(
+              req,
+              res,
+              requestData,
+              token,
+              paymentType,
+              email,
+              currentSubscription,
+              user
+            );
+          }
+          break;
+        case 5:
+          {
+            const txRef = uuid();
+            const paymentType = `mobile_money_uganda`;
+            const requestData = {
+              txRef,
+              amount: price,
+              email,
+              currency: 'UGX',
+            };
+
+            await RavePaymentRequest(
+              req,
+              res,
+              requestData,
+              token,
+              paymentType,
+              email,
+              currentSubscription,
+              user
+            );
+          }
+          break;
+        case 6:
+          {
+            const txRef = uuid();
+            const paymentType = `mobile_money_zambia`;
+            const requestData = {
+              txRef,
+              amount: price,
+              email,
+              currency: 'ZMW',
+              network: 'MTN',
+            };
+
+            await RavePaymentRequest(
+              req,
+              res,
+              requestData,
+              token,
+              paymentType,
+              email,
+              currentSubscription,
+              user
+            );
+          }
+          break;
+        case 7:
+          {
+            const txRef = uuid();
+            const paymentType = `mobile_money_zambia`;
+            const requestData = {
+              txRef,
+              amount: price,
+              email,
+              currency: 'ZMW',
+              network: 'ZAMTEL',
+            };
+            await RavePaymentRequest(
+              req,
+              res,
+              requestData,
+              token,
+              paymentType,
+              email,
+              currentSubscription,
+              user
+            );
+          }
+          break;
+        case 8:
+          {
+            const txRef = uuid();
+            const paymentType = `mobile_money_ghana`;
+            const requestData = {
+              txRef,
+              amount: price,
+              email,
+              currency: 'GHS',
+              network: 'MTN',
+            };
+            await RavePaymentRequest(
+              req,
+              res,
+              requestData,
+              token,
+              paymentType,
+              email,
+              currentSubscription,
+              user
+            );
+          }
+          break;
+        case 9:
+          {
+            const txRef = uuid();
+            const paymentType = `mobile_money_ghana`;
+            const requestData = {
+              txRef,
+              amount: price,
+              email,
+              currency: 'GHS',
+              network: 'VODAFONE',
+            };
+            await RavePaymentRequest(
+              req,
+              res,
+              requestData,
+              token,
+              paymentType,
+              email,
+              currentSubscription,
+              user
+            );
+          }
+          break;
+        case 10:
+          {
+            const txRef = uuid();
+            const paymentType = `mobile_money_ghana`;
+            const requestData = {
+              txRef,
+              amount: price,
+              email,
+              currency: 'GHS',
+              network: 'TIGO',
+            };
+
+            await RavePaymentRequest(
+              req,
+              res,
+              requestData,
+              token,
+              paymentType,
+              email,
+              currentSubscription,
+              user
+            );
+          }
           break;
 
         default:
           util.setErrorResponse(res, 'Sorry payment failed', 500);
       }
-      // }
     } catch (error) {
+      console.log(error);
       return response.errorResponse(res, 500, `Something wrong happened ${error.message}`, error);
     }
   }
 
   static async removeTrial(email, res, pay) {
-    const updates = await userService.updateUser(email,
-      { isOnTrial: false });
+    const updates = await userService.updateUser(email, { isOnTrial: false });
     if (updates[1] > 0) {
-      util.setSuccessResponse(res, 'Success', 201, { user: updates, payment: { ...pay.meta, flw_ref: pay.data.flw_ref } });
+      util.setSuccessResponse(res, 'Success', 201, {
+        user: updates,
+        payment: { ...pay.meta, flw_ref: pay.data.flw_ref },
+      });
     } else {
-      util.setErrorResponse(res, 'Something went sideways creating a subscription', 400);
+      util.setErrorResponse(
+        res,
+        'Something went sideways creating a subscription',
+        400
+      );
     }
   }
 
   static async verifyOTP(req, res) {
     try {
-      const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
+      const { email } = jwt.jwtVerify(
+        req.headers.authorization.slice(7),
+        process.env.SECRET
+      );
       if (req.body.authorization.mode === 'otp-verify') {
-        const otpStatus = await Rave.validateACharge(
-          {
-            otp: req.body.authorization.otp,
-            flw_ref: req.body.flw_ref
-          }
-        );
+        const otpStatus = await Rave.validateACharge({
+          otp: req.body.authorization.otp,
+          flw_ref: req.body.flw_ref,
+        });
         if (otpStatus.data.processor_response !== 'successful') {
-          return util.setErrorResponse(res, otpStatus.message, 400, 'BAD_REQUEST');
-        // eslint-disable-next-line no-else-return
+          return util.setErrorResponse(
+            res,
+            otpStatus.message,
+            400,
+            'BAD_REQUEST'
+          );
+          // eslint-disable-next-line no-else-return
         } else {
           await userController.removeTrial(email, res, otpStatus);
-          return util.setSuccessResponse(res, 'OTP verified', 200, otpStatus, null);
+          return util.setSuccessResponse(
+            res,
+            'OTP verified',
+            200,
+            otpStatus,
+            null
+          );
         }
       }
     } catch (error) {
-      return util.setErrorResponse(res, error.message || error, 500, 'SERVER_ERROR');
+      return util.setErrorResponse(
+        res,
+        error.message || error,
+        500,
+        'SERVER_ERROR'
+      );
     }
   }
 
@@ -446,8 +757,21 @@ class userController {
       phone_number: user.phoneNumber,
       fullname: `${user.firstName} ${user.lastName}`,
       email,
-      txRef: uuid()
+      txRef: uuid(),
     };
+  }
+
+  static async sendPaymentRequest(data, token, type, path) {
+    const result = await Fetch(
+      data,
+      {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      `${process.env.PAY_HOST}/${path}?type=${type}`,
+      'POST'
+    );
+    return result;
   }
 
   static async getAllAccounts(res) {
@@ -468,13 +792,17 @@ class userController {
       if (Object.values(data).length > 0) {
         util.setSuccessResponse(res, 'Data was found', 200, {
           size: Object.values(data).length,
-          data
+          data,
         });
       } else {
         util.setErrorResponse(res, 'Data was not found', 400);
       }
     } catch (error) {
-      util.setErrorResponse(res, `Something Went wrong logging in ${error}`, 500);
+      util.setErrorResponse(
+        res,
+        `Something Went wrong logging in ${error}`,
+        500
+      );
     }
   }
 
@@ -484,10 +812,14 @@ class userController {
       if (data) {
         util.setSuccessResponse(res, 'Found ', 200, {
           size: Object.values(data).length,
-          data
+          data,
         });
       } else {
-        util.setErrorResponse(res, `Can't find Live users ${JSON.stringify(data)}`, 404);
+        util.setErrorResponse(
+          res,
+          `Can't find Live users ${JSON.stringify(data)}`,
+          404
+        );
       }
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
@@ -496,7 +828,10 @@ class userController {
 
   static async getUserByEmail(req, res) {
     try {
-      const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
+      const { email } = jwt.jwtVerify(
+        req.headers.authorization.slice(7),
+        process.env.SECRET
+      );
       const user = await userService.getUserByMail(email);
       const subscription = await billingServices.getSubscriptionByEmail(email);
       if (user) {
@@ -505,7 +840,7 @@ class userController {
             user,
             paymentMethod: subscription.paymentMethod || 'null',
             price: subscription.price || 'null',
-            subscritption: subscription.state
+            subscritption: subscription.state,
           });
         } else {
           util.setSuccessResponse(res, 'Found', 200, { user });
@@ -520,8 +855,13 @@ class userController {
 
   static async getUserProfile(req, res) {
     try {
-      const { email } = jwt.jwtVerify(req.headers.authorization.slice(7), process.env.SECRET);
-      const currentSubscription = await billingServices.getCurrentSubscription(email);
+      const { email } = jwt.jwtVerify(
+        req.headers.authorization.slice(7),
+        process.env.SECRET
+      );
+      const currentSubscription = await billingServices.getCurrentSubscription(
+        email
+      );
 
       const _response = await userService.getUser(email);
       _response.paymentMethod = currentSubscription.paymentMethod;
@@ -539,7 +879,10 @@ class userController {
       if (sessions.length === 0) {
         util.setErrorResponse(res, 'Login to logout', 400);
       } else {
-        const logoutStatus = await sessionService.updateSession(sessions[0].id, { state: 'out', timeOut: date.toTimeString() },);
+        const logoutStatus = await sessionService.updateSession(
+          sessions[0].id,
+          { state: 'out', timeOut: date.toTimeString() }
+        );
         if (logoutStatus) {
           util.setSuccessResponse(res, 'Logout successfully', 200);
         } else {
@@ -553,7 +896,10 @@ class userController {
 
   static async serveVerifyPassword(req, res) {
     try {
-      return res.render('ResetPassword', { host: process.env.HOST, role: 'auth' });
+      return res.render('ResetPassword', {
+        host: process.env.HOST,
+        role: 'auth',
+      });
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
     }

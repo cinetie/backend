@@ -8,31 +8,103 @@ const util = new Util();
 class viewingSessionController {
   static async getSpecificSessions(req, res) {
     try {
+      let viewsUpdate = []
       const {
         videoId
       } = req.query;
-      const raw = await viewingSessions.getSessionsPerVideo(videoId);
-      const cities = [];
-      for (let i = 0; i < raw.length; i++) {
-        let count = 0;
-        for (let j = 0; j < raw.length; j++) {
-          var { location } = raw[i];
-          if (raw[i].location == raw[j].location) {
-            count += 1;
+      const views = await viewingSessions.getSessionsPerVideo(videoId);
+
+      if (Object.values(views).length > 0) {
+        //For Grouping Views by moths and year they created from
+
+        for(let i = 0; i < views.length; i++) {
+  
+          const date = new Date(Number(views[i].dataValues.time))
+          
+          const dateFormat = new Intl.DateTimeFormat('nl-BE', {
+            month: '2-digit',
+            day: '2-digit',
+            year: 'numeric'
+          });
+
+          if(Number(views[i].dataValues.time)) {
+            views[i].dataValues.time = dateFormat.format(date)
+            viewsUpdate.push(views[i].dataValues)
           }
         }
-        const obj = {
-          city: location,
-          count
-        };
-        cities.push(obj);
-      }
-      const formattedArray = util.getUnique(cities, 'city');
 
-      if (Object.values(raw).length > 0) {
-        return response.successResponse(res, 200, 'Found details', { formattedData: formattedArray, totalCount: cities.length });
-      }
+        let resp = {};
+        let fn = (year, month, o = resp, array = viewsUpdate) => {
+          o[year][month] = {
+            [month]: array.filter(({time: d}) => {
+              return `${month}/${year}` === (`${d.slice(0, 2)}/${d.slice(6, 10)}`)})
+          }
+        }
 
+        for (let {time} of viewsUpdate) {
+          let [month, day, year] = time.match(/\d+/g);
+          if (!resp[year]) resp[year] = {};
+          
+          fn(year, month)
+        }
+
+        for (var key in resp) {
+          if (resp.hasOwnProperty(key)) {
+            for(var key1 in resp[key]) {
+              resp[key][key1]['sum'] = 0;
+              for(let i = 0; i < resp[key][key1][key1].length; i++) {
+                resp[key][key1]['sum'] ++
+              }
+            }
+          }
+        }
+
+        for (var key in resp) {
+          if (resp.hasOwnProperty(key)) {
+            
+            for(var key1 in resp[key]) {
+              if(!resp[key]['sumYear']){
+                 resp[key]['sumYear'] = 0 
+              }
+              resp[key]['sumYear'] += resp[key][key1]['sum'];
+            }
+          }
+        }
+        for(var key in resp){
+          if(!resp['sumTotal']){
+              resp['sumTotal'] = 0 
+           }
+          if (resp.hasOwnProperty(key)) {
+            resp['sumTotal'] += resp[key]['sumYear']
+          }
+        }
+
+        for (var key in resp) {
+          if (resp.hasOwnProperty(key)) {
+            for(var key1 in resp[key]) {
+              delete resp[key][key1][key1]
+            }
+          }
+        }
+
+        const cities = [];
+        for (let i = 0; i < views.length; i++) {
+          let count = 0;
+          for (let j = 0; j < views.length; j++) {
+            var { location } = views[i];
+            if (views[i].location == views[j].location) {
+              count += 1;
+            }
+          }
+          const obj = {
+            city: location,
+            views : count
+          };
+          cities.push(obj);
+        }
+        const byCity = util.getUnique(cities, 'city');
+        return res.status(200).json({status: 200, message: "Found details", data: resp, city: byCity})
+      }
       return response.errorResponse(res, 404, 'something went wrong', 'NotFoundError ');
     } catch (error) {
       return response.errorResponse(res, 503, 'something went wrong', 'ServerError');

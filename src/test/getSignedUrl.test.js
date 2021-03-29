@@ -18,7 +18,6 @@ describe('GET SIGNED URL TEST', () => {
             .request(app)
             .get('/temp/signed-urls')
             .set('authorization', `bearer ${token}`)
-        console.log(res.body);
         expect(res.statusCode).to.equal(200)
         expect(res.body).to.have.property('message', 'Temporary urls');
         expect(res.body.data).to.be.an('object');

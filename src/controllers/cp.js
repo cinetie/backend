@@ -158,8 +158,9 @@ class cpController {
       if (!user) return util.setErrorResponse(res, 'can\'t find user', 404);
       const exp = date.addMoreDays(2);
       const token = jwt.jwtSign({ exp: exp.getTime() }, process.env.SECRET, '1d');
+      console.log(`${process.env.FRONTEND_CP}/newPassword/?id=${user.id}&token=${token}`);
       await mailer([{
-        link: `${process.env.FRONT_END_USER}/newPassword?id=${user.id}&&token=${token}`
+        link: `${process.env.FRONTEND_CP}/newPassword/?id=${user.id}&token=${token}`
       }, {
         from: 'CINETIE support',
         to: req.body.email,

@@ -50,6 +50,7 @@ class earningController {
   // upon failure of this method maping the numerous elements of session's array and
   // then doing a bulk create
   // would solve the issue.
+
   static async assignRateToEachVideo(email) {
     try {
       let results = [];
@@ -163,35 +164,87 @@ class earningController {
   // get earnings per video
   static async getAllEarningsPerVideo(req, res) {
     try {
+      let dataUpdate = []
       let sum = 0;
       const data = await earningService.getEarningsByVideo(req.query.videoId);
-      if (Object.values(data).length > 0) {
-        for (let i = 0; i < Object.values(data).length; i++) {
-          const date = new Date(Number(data[i].monthYear));
-          data[i].monthYear = `${date.toDateString().slice(4, 7)}/${date.getFullYear()}`;
-          sum += Number(data[i].amount);
-        }
-        const formattedData = [];
+      if (data.length > 0) {
+        // convert earning date to a day, month and year format
         for (let i = 0; i < data.length; i++) {
-          let count = 0;
-          for (let j = 0; j < data.length; j++) {
-            var { monthYear } = data[i];
-            if (data[i].monthYear === data[j].monthYear) {
-              count += Number(data[j].amount);
+          const date = new Date(data[i].dataValues.monthYear)
+          const dateFormat = new Intl.DateTimeFormat('nl-BE', {
+            month: '2-digit',
+            day: '2-digit',
+            year: 'numeric'
+          });
+          if (data[i].dataValues.monthYear) {
+            data[i].dataValues.monthYear = dateFormat.format(date)
+            dataUpdate.push(data[i].dataValues)
+          }
+        }
+        let resp = {};
+        // add month earnings(in an array) to the month property 
+        let fn = (year, month, o = resp, array = dataUpdate) => {
+          o[year][month] = {
+            [month]: array.filter(({ monthYear: d }) => {
+              return `${month}/${year}` === (`${d.slice(0, 2)}/${d.slice(6, 10)}`)
+            })
+          };
+        }
+        // add nested month property and year property 
+        for (let { monthYear } of dataUpdate) {
+          let [month, day, year] = monthYear.match(/\d+/g);
+          if (!resp[year]) resp[year] = {};
+
+          fn(year, month)
+        }
+        // calculate monthly total earnings
+        for (var key in resp) {
+          if (resp.hasOwnProperty(key)) {
+            for (var key1 in resp[key]) {
+              resp[key][key1]['sum'] = 0;
+              for (let i = 0; i < resp[key][key1][key1].length; i++) {
+                resp[key][key1]['sum'] += resp[key][key1][key1][i].amount
+              }
             }
           }
-          const obj = {
-            amount: Number(count.toFixed(2)),
-            period: monthYear
-          };
-          formattedData.push(obj);
         }
-        // remove duplicates
-        const uniqueValues = util.getUnique(formattedData, 'monthYear');
-        return response.successResponse(res, 200, 'Earnings found ', {
-          sum: Number(sum.toFixed(2)),
-          data: uniqueValues
-        });
+        // calculate annual total earnings
+        for (var key in resp) {
+          for (let i = 0; i < data.length; i++) {
+            let count = 0; 
+            if (resp.hasOwnProperty(key)) {
+              for (let j = 0; j < data.length; j++) {
+                var { monthYear } = data[i]; 
+                for (var key1 in resp[key]) {
+                  if (data[i].monthYear == data[j].monthYear) {
+                    if (!resp[key]['sumYear']) {
+                      count += Number(data[j].amount); resp[key]['sumYear'] = 0
+                    }
+                    resp[key]['sumYear'] += resp[key][key1]['sum'];
+                  }
+                }
+              }
+            }
+          }
+        }
+        // calculate the video total earning
+        for(var key in resp){
+          if(!resp['sumTotal']){
+              resp['sumTotal'] = 0 
+           }
+          if (resp.hasOwnProperty(key)) {
+            resp['sumTotal'] += resp[key]['sumYear']
+          }
+        }
+        // remove the earning arrays
+        for (var key in resp) {
+          if (resp.hasOwnProperty(key)) {
+            for(var key1 in resp[key]) {
+              delete resp[key][key1][key1]
+            }	            
+          }
+        }
+        return response.successResponse(res, 200, 'earnings found', resp);
       }
       return response.successResponse(res, 404, 'Data Not found', 0);
     } catch (error) {

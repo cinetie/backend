@@ -1,7 +1,7 @@
-import jwt from '../helpers/jwt';
-import userService from '../services/userServices';
-import Util from '../helpers/utilities';
-import cpService from '../services/cpServices';
+import jwt from "../helpers/jwt";
+import userService from "../services/userServices";
+import Util from "../helpers/utilities";
+import cpService from "../services/cpServices";
 
 const util = new Util();
 class Access {
@@ -14,16 +14,16 @@ class Access {
   static async isAdmin(req, res, next) {
     try {
       if (!req.headers.authorization) {
-        return util.setErrorResponse(res, 'Invalid access token', 400);
+        return util.setErrorResponse(res, "Invalid access token", 400);
       } else {
         const token = req.headers.authorization.slice(7);
         const decoded = jwt.jwtVerify(token, process.env.SECRET);
         const { user } = decoded;
         if (!user) {
-         return util.setErrorResponse(res, 'Invalid access token', 400);
+          return util.setErrorResponse(res, "Invalid access token", 400);
         }
         if (user !== process.env.ADMIN_USER) {
-          return util.setErrorResponse(res, 'Access denied  ', 403);
+          return util.setErrorResponse(res, "Access denied  ", 403);
         } else {
           return next();
         }
@@ -41,7 +41,7 @@ class Access {
       const { email, clientId } = decoded;
       const user = await cpService.getCpByMail(email);
       if (!user) {
-        util.setErrorResponse(res, 'Access denied', 403);
+        util.setErrorResponse(res, "Access denied", 403);
       } else {
         req.user = clientId;
         next();
@@ -59,10 +59,10 @@ class Access {
       const { email } = decoded;
       const user = await userService.getUserByMail(email);
       if (!user) {
-        util.setErrorResponse(res, 'Invalid Token', 400);
+        return util.setErrorResponse(res, "Invalid Token", 400);
       }
       if (user.permissionLevel === 0) {
-        util.setErrorResponse(res, 'Access denied ', 403);
+        util.setErrorResponse(res, "Access denied ", 403);
       } else {
         req.user = email;
         req.fullUser = user;
@@ -82,7 +82,7 @@ class Access {
         req.user = email;
         next();
       } else {
-        util.setErrorResponse(res, 'Access denied', 403);
+        util.setErrorResponse(res, "Access denied", 403);
       }
     } catch (error) {
       util.setErrorResponse(res, error.message, 500);
@@ -91,9 +91,12 @@ class Access {
 
   static async isRave(req, res, next) {
     try {
-      const hash = req.headers['verif-hash'] || req.headers['verify-hash'] || req.headers['Verif-Hash'];
+      const hash =
+        req.headers["verif-hash"] ||
+        req.headers["verify-hash"] ||
+        req.headers["Verif-Hash"];
       if (hash !== process.env.RAVE_SECRET) {
-        util.setErrorResponse(res, 'Access denied', 403);
+        util.setErrorResponse(res, "Access denied", 403);
       } else {
         next();
       }
@@ -106,10 +109,10 @@ class Access {
     try {
       const token = req.headers.authorization.slice(7);
       const user = jwt.jwtVerify(token, process.env.SECRET);
-      if (user.role === 'payment-api') {
+      if (user.role === "payment-api") {
         next();
       } else {
-        util.setErrorResponse(res, 'Access denied', 403);
+        util.setErrorResponse(res, "Access denied", 403);
       }
     } catch (error) {
       util.setErrorResponse(res, error.message || error, 500);

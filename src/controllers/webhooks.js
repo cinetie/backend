@@ -21,12 +21,12 @@ const rave = new Flutterwave(
 export default class WebHooks {
   // eslint-disable-next-line consistent-return
   static async flutterWave(req, res) {
-        try {
+    try {
       const response = (req.body.data) ? req.body.data : req.body;
       const user = await UserService.getUserByMail(response.customer.email
         || response.data.customer.email);
-        // const recentTrans = await transactions.getTransactionsByEmail(user.email, 'pending');
-        const test = await transactions.updateTransaction(response.tx_ref, { statusDesc: response.status.toLowerCase() });
+      // const recentTrans = await transactions.getTransactionsByEmail(user.email, 'pending');
+      const test = await transactions.updateTransaction(response.tx_ref, { statusDesc: response.status.toLowerCase() });
       const transVerification = await rave.Transaction.verify({ id: response.id });
 
       if (transVerification.status === 'success') {
@@ -46,7 +46,7 @@ export default class WebHooks {
         // eslint-disable-next-line no-console
         // creating sales
 
-        if(response.currency === 'USD') {
+        if (response.currency === 'USD') {
           const rates = await Fetch(undefined, { Accept: 'application/json' }, `https://apilayer.net/api/live?access_key=${process.env.ACCESS_KEY_CURRENCY_LAYER}&currencies=RWF&source=USD&format=1`, 'GET');
           const converted = Math.floor(rates.quotes.USDRWF * response.amount);
           response.amount = converted
@@ -80,7 +80,6 @@ export default class WebHooks {
         return util.setErrorResponse(res, 'Server Error: can\'t update subscription', 400);
       }
     } catch (error) {
-      console.log(error)
       return util.setErrorResponse(res, `Server Error ${error || error.message}`, 500);
     }
   }
@@ -92,7 +91,7 @@ export default class WebHooks {
       amount: response.amount * 0.3,
       user: user.email
     });
-    if(sales) {
+    if (sales) {
       return true
     } else {
       throw new Error('Sales recording error');
