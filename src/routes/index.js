@@ -15,6 +15,7 @@ import series from './series';
 import tempSeries from './tempSerie';
 import webhooks from './webhooks';
 import earnings from './earnings';
+import staff from './staff';
 
 const router = Router();
 
@@ -33,4 +34,5 @@ router.use('/series', series);
 router.use('/temp/series', tempSeries);
 router.use('/webhooks', webhooks);
 router.use('/earnings', earnings);
+router.use('/staff', staff);
 export default router;
