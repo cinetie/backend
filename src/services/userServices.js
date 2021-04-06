@@ -1,16 +1,17 @@
 /* eslint-disable no-useless-catch */
-import database from '../database/models';
+import Subscriptions from "flutterwave-node-v3/lib/rave.subscriptions";
+import database from "../database/models";
 
 class userService {
   static async getUserByMail(email) {
     try {
       const user = await database.User.findOne({
         attributes: {
-          exclude: ['createdAt', 'updatedAt']
+          exclude: ["createdAt", "updatedAt"],
         },
         where: {
-          email
-        }
+          email,
+        },
       });
       if (user) {
         return user;
@@ -25,11 +26,11 @@ class userService {
     try {
       return await database.User.findOne({
         attributes: {
-          exclude: ['createdAt', 'updatedAt']
+          exclude: ["createdAt", "updatedAt"],
         },
         where: {
-          id
-        }
+          id,
+        },
       });
     } catch (error) {
       throw error;
@@ -60,8 +61,8 @@ class userService {
       return await database.User.destroy({
         returning: true,
         where: {
-          id
-        }
+          id,
+        },
       });
     } catch (error) {
       throw error;
@@ -76,12 +77,23 @@ class userService {
     }
   }
 
+  static async getUserEmailByQuery(query) {
+    try {
+      return await database.User.findAll({
+        attributes: ["email"],
+        where: query,
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static async getUser(email) {
     try {
       return await database.User.findOne({
         where: {
-          email
-        }
+          email,
+        },
       });
     } catch (error) {
       throw error;

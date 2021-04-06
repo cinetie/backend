@@ -956,12 +956,6 @@ Response:
 }
 ```
 
-
-
-
-
-
-
 ### 20. Get All Views Per video: GET Request
 
 Endpoint
@@ -986,51 +980,51 @@ Response:
 
 ```json
 {
-    "status": 200,
-    "message": "Found details",
-    "data": {
-        "2020": {
-            "10": {
-                "sum": 2
-            },
-            "11": {
-                "sum": 3
-            },
-            "12": {
-                "sum": 2
-            },
-            "sumYear": 7
-        },
-        "2021": {
-            "01": {
-                "sum": 15
-            },
-            "sumYear": 15
-        },
-        "sumTotal": 22
+  "status": 200,
+  "message": "Found details",
+  "data": {
+    "2020": {
+      "10": {
+        "sum": 2
+      },
+      "11": {
+        "sum": 3
+      },
+      "12": {
+        "sum": 2
+      },
+      "sumYear": 7
     },
-    "city": [
-        {
-            "city": "Rwanda",
-            "views": 19
-        },
-        {
-            "city": "Tanzania",
-            "views": 1
-        },
-        {
-            "city": "Uganda",
-            "views": 2
-        }
-    ]
+    "2021": {
+      "01": {
+        "sum": 15
+      },
+      "sumYear": 15
+    },
+    "sumTotal": 22
+  },
+  "city": [
+    {
+      "city": "Rwanda",
+      "views": 19
+    },
+    {
+      "city": "Tanzania",
+      "views": 1
+    },
+    {
+      "city": "Uganda",
+      "views": 2
+    }
+  ]
 }
 ```
-
 
 ### Payment Method Code Number
 
 Payment Method
 Where:
+
 ```
     4: Mpesa
     5: Mobile Money (UGANDA MTN)
@@ -1039,4 +1033,61 @@ Where:
     8: Mobile Money (GHANA MTN)
     9: Mobile Money (GHANA VODAFONE)
     10: Mobile Money (GHANA TIGO)
+```
+
+### 21. Get All Users Email by query
+
+Endpoint
+
+```text
+/admin/users/all?permissionLevel=-1&isVerified=true&plan=Setup
+```
+Allowed Queries:
+```text
+permissionLevel,
+isVerified,
+plan,
+isBilledAnnually,
+nationality,
+cityOfResidence,
+card_brand,
+isOnTrial,
+```
+
+Headers:
+
+```json
+{
+  "Authorization": "Bearer <User token>",
+  "Content-Type": "application/json"
+}
+```
+
+Body:
+**NONE**
+
+Response:
+
+```json
+{
+  "status": 200,
+  "message": "List of users",
+  "data": [
+    {
+      "email": "parzunakku@yevme.com"
+    },
+    {
+      "email": "hafajo11286@soowz.com"
+    },
+    {
+      "email": "star_kpy47@yahoo.com"
+    },
+    {
+      "email": "cajetanboy@mail.com"
+    },
+    {
+      "email": "michelleomullo@gmail.com"
+    }
+  ]
+}
 ```
