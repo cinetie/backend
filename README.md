@@ -1042,7 +1042,9 @@ Endpoint
 ```text
 /admin/users/all?permissionLevel=-1&isVerified=true&plan=Setup
 ```
+
 Allowed Queries:
+
 ```text
 permissionLevel,
 isVerified,
@@ -1089,5 +1091,51 @@ Response:
       "email": "michelleomullo@gmail.com"
     }
   ]
+}
+```
+
+### 22. Send Mass Mail
+
+Endpoint
+
+```text
+/admin/mail
+```
+
+Headers:
+
+```json
+{
+  "Authorization": "Bearer <User token>",
+  "Content-Type": "application/json"
+}
+```
+
+Body:
+
+```json
+{
+  "mails": [
+    {
+      "to": "walterolivier4@gmail.com",
+      "body": "<h1> Hello Mass Mailer test 201 </h1>",
+      "subject": "Mass Mail Test"
+    },
+    {
+      "to": "walterolivier4@gmail.com",
+      "body": "<h1> Hello Mass Mailer test 202 </h1>",
+      "subject": "Mass Mail Test"
+    }
+  ]
+}
+```
+
+Response:
+
+```json
+{
+  "statusCode": 200,
+  "status": "success",
+  "message": "2 Emails has send"
 }
 ```
