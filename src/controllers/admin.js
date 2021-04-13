@@ -149,28 +149,6 @@ class adminController {
     }
   }
 
-  static async sendMail(req, res) {
-    try {
-      const EmailStatus = await massMailer([
-        {
-          to: req.body.to,
-          from: "CINETIE support",
-          subject: req.body.subject,
-        },
-        {
-          body: req.body.body,
-        },
-      ]);
-      util.setSuccessResponse(res, "Email send", 200, EmailStatus);
-    } catch (error) {
-      util.setErrorResponse(
-        res,
-        `Something Went wrong logging in ${error}`,
-        500
-      );
-    }
-  }
-
   static async addMessage(req, res) {
     try {
       for (var i = 0; i < req.body.mails.length; i++) {
