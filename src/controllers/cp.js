@@ -27,40 +27,38 @@ class cpController {
       const checkUser = await cp.getCpByMail(newUser.email);
       if (checkUser != null) {
         return util.setErrorResponse(res, 'cp already exists', 422);
-      } else {
-        const createdUser = await cp.createNewCp(newUser);
-        const part1 = cry.crypto();
-        const token = jwt.jwtSign(`${part1}${newUser.email}`, process.env.SECRET, '1d');
-        const tokenToSave = {
-          email: newUser.email,
-          token
-
-        };
-
-        await tokenService.createNewToken(tokenToSave, token);
-        const { id } = createdUser;
-        const EmailStatus = await mailer([{
-          link: `${process.env.HOST}/cp/verify?id=${id}&&token=${jwt.jwtSign(req.body.email, process.env.SECRET)}`
-        }, {
-          from: 'CINETIE support',
-          to: req.body.email,
-          subject: 'Email verification',
-        },
-        {
-          path: `${path.join(__dirname, '../public/templates/VerifyEmail.ejs')}`
-        }
-        ]);
-        if (EmailStatus) {
-          util.setErrorResponse(res, 'can\'t send email', 500);
-        } else {
-          const userToken = jwt.jwtSign(createdUser.email, process.env.SECRET, '1d');
-          createdUser.token = userToken;
-          createdUser.password = undefined;
-          util.setSuccessResponse(res, 'Signed up successfully', 201, createdUser);
-        }
       }
+      const createdUser = await cp.createNewCp(newUser);
+      const part1 = cry.crypto();
+      const token = jwt.jwtSign(`${part1}${newUser.email}`, process.env.SECRET, '1d');
+      const tokenToSave = {
+        email: newUser.email,
+        token
+
+      };
+
+      await tokenService.createNewToken(tokenToSave, token);
+      const { id } = createdUser;
+      const EmailStatus = await mailer([{
+        link: `${process.env.HOST}/cp/verify?id=${id}&&token=${jwt.jwtSign(req.body.email, process.env.SECRET)}`
+      }, {
+        from: 'CINETIE support',
+        to: req.body.email,
+        subject: 'Email verification',
+      },
+      {
+        path: `${path.join(__dirname, '../public/templates/VerifyEmail.ejs')}`
+      }
+      ]);
+      if (EmailStatus) {
+        return util.setErrorResponse(res, 'can\'t send email', 500);
+      }
+      const userToken = jwt.jwtSign(createdUser.email, process.env.SECRET, '1d');
+      createdUser.token = userToken;
+      createdUser.password = undefined;
+      return util.setSuccessResponse(res, 'Signed up successfully', 201, createdUser);
     } catch (error) {
-      util.setErrorResponse(res, `Something went wrong ${error.message}`, 500);
+      return util.setErrorResponse(res, `Something went wrong ${error.message}`, 500);
     }
   }
 

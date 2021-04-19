@@ -2,9 +2,11 @@ name: Node.js CI
 
 on:
   push:
-    branches: '*'
+    paths: 
+    - '**.js'
   pull_request:
-    branches: '*'
+    paths:
+      - '**.js'
 
 jobs:
   build:
@@ -14,7 +16,7 @@ jobs:
       mysql-service:
         image: mysql:5.7
         env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_PASSWORD: ${{secrets.MYSQL_PASS}}
           MYSQL_DATABASE: cinetie_test
         ports:
             - 33306:3306
@@ -24,7 +26,7 @@ jobs:
           --health-timeout=5s
           --health-retries=3
     env:
-      TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+      TEST_DATABASE_URL: msql://root:${{secrets.MYSQL_PASS}}@localhost:3306/cinetie-test
       SECRET: ${{ secrets.SECRET }}
       JWT_EXPIRATION: 10000
       EMAIL_USER: app146030787@heroku.com
@@ -74,12 +76,9 @@ jobs:
       THUMBNAIL_BUCKET: vod-pipeline-3-thumbnails
       TRAILERS_BUCKET: vod-pipeline-3-trailers
       SUBTITLE_BUCKET: cinetie-subtitles
-    container-job:
-      runs-on: ubuntu-latest
-      container: node:12.x
     strategy:
       matrix:
-        node-version: '12.x'
+        node-version: [14.x]
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
