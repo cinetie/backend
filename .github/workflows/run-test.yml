@@ -10,30 +10,16 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    services:
-      mysql-service:
-        image: mysql:5.7
-        env:
-          MYSQL_PASSWORD: ${{secrets.MYSQL_PASS}}
-          MYSQL_DATABASE: cinetie_test
-        ports:
-            - 33306:3306
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
     env:
-      TEST_DATABASE_URL: msql://root:${{secrets.MYSQL_PASS}}@localhost:3306/cinetie-test
+      TEST_DATABASE_URL: msql://tester:${{secrets.MYSQL_PASS}}@localhost:3306/test
       SECRET: ${{ secrets.SECRET }}
       JWT_EXPIRATION: 10000
       EMAIL_USER: app146030787@heroku.com
       GOOGLE_CLIENT_ID: 616250925098-e3vfflufc0c1137nmjpie91ue27k05ig.apps.googleusercontent.com
       GOOGLE_CLIENT_SECRET: mBBWJGRFUNu5hMjMj9Do29G8
       FB_CLIENT_ID: 2444690765807653
-      FB_CLIENT_SECRET: e6b96b52903958f5f563e5bff37e1f61
+      FB_CLIENT_SECRET: e6b96b5290394458f5f563e5bff37e1f61
       DIALECT: mysql
       TRENDING_WATCH_COUNT: 0
       ADMIN_USER: ${{ secrets.ADMIN_USER }}
@@ -80,6 +66,10 @@ jobs:
       matrix:
         node-version: [14.x]
     steps:
+    - uses: mirromutth/mysql-action@v1.1
+      with:
+        mysql user: 'tester'
+        mysql password: ${{secrets.MYSQL_PASS}}
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1

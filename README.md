@@ -1,8 +1,9 @@
 # Description
 
 API documentation for CINETIE main api
-
+ [![GitHub CI](https://github.com/cinetie/backend/actions/workflows/run-test.yml/badge.svg)](https://github.com/cinetie/backend/actions/workflows/run-test.yml)
  ![BUILD_MASTER](https://codefactory-eu-west-1-prod-default-build-badges.s3-eu-west-1.amazonaws.com/passing.svg)
+
 ## Installation
 
 > npm install
