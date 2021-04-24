@@ -1,4 +1,4 @@
-FROM ubuntu:groovy-20210325
+FROM ubuntu:20.10
 LABEL Author="Alain Christian(gal1l0)"
 
 # install our dependencies and install nodejs
