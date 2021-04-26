@@ -4,6 +4,7 @@
 /* eslint-disable no-var */
 import earningService from "../services/earningServices";
 import videoService from "../services/videoServices";
+import emailTemplateService from "../services/emailTemplateService";
 import Util from "../helpers/utilities";
 import JWT from "../helpers/jwt";
 import cry from "../helpers/crypto";
@@ -180,6 +181,50 @@ class adminController {
         body: email.body,
       },
     ]);
+  }
+
+  static async addTemplate(req, res) {
+    try {
+      const template = await emailTemplateService.saveMailTemplate(req.body);
+      util.setSuccessResponse(res, template, 200);
+    } catch (error) {
+      util.setErrorResponse(
+        res,
+        `Something Went wrong logging in ${error}`,
+        500
+      );
+    }
+  }
+
+  static async getTemplateByid(req, res) {
+    console.log("++++++++++++++ TEMPLATE");
+    try {
+      const template = await emailTemplateService.getMailTemplateById(
+        req.params.id
+      );
+      util.setSuccessResponse(res, template, 200);
+    } catch (error) {
+      util.setErrorResponse(
+        res,
+        `Something Went wrong logging in ${error}`,
+        500
+      );
+    }
+  }
+
+  static async getAllTemplate(req, res) {
+    console.log("++++++++++++++ TEMPLATE");
+    try {
+      const template = await emailTemplateService.getAllMailTemplate();
+
+      util.setSuccessResponse(res, template, 200);
+    } catch (error) {
+      util.setErrorResponse(
+        res,
+        `Something Went wrong logging in ${error}`,
+        500
+      );
+    }
   }
 }
 
