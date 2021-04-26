@@ -8,9 +8,11 @@ import Util from "../helpers/utilities";
 import jwt from "../helpers/jwt";
 import trailerServices from "../services/trailerService";
 import tempService from "../services/tempVideoServices";
+import watchedMovieServices from "../services/watchedMovieServices";
 import { getObject, deleteObject, copyObjects } from "../helpers/aws";
 import { getAttachedThumbsMultiple } from "../helpers/video";
 import videoService from "../services/videoServices";
+import serieService from '../services/serieServices';
 import viewingSessions from "../services/viewingSessionsServices";
 import userService from "../services/userServices";
 
@@ -288,7 +290,7 @@ class Video {
       }
       getAttachedThumbsMultiple(video);
       const trailer = await trailerServices.getAllTrailers(video[0].videoId);
-      if(!trailer[0]) return util.setErrorResponse(res, "Video can't be found", 404);
+      if (!trailer[0]) return util.setErrorResponse(res, "Video can't be found", 404);
       const data = {
         video,
         trailer: Video.attachThumbnails(
@@ -345,11 +347,11 @@ class Video {
     try {
       const video = await videoService.getVideoById(req.query.id);
       if (video) {
-        if(video.EnSubt !== null){
-          video.EnSubt = await getObject(process.env.SUBTITLE_BUCKET,video.EnSubt,20)
+        if (video.EnSubt !== null) {
+          video.EnSubt = await getObject(process.env.SUBTITLE_BUCKET, video.EnSubt, 20)
         }
-        if(video.FrSubt !== null){
-          video.FrSubt = await getObject(process.env.SUBTITLE_BUCKET,video.FrSubt,20)
+        if (video.FrSubt !== null) {
+          video.FrSubt = await getObject(process.env.SUBTITLE_BUCKET, video.FrSubt, 20)
         }
         util.setSuccessResponse(res, "videos Found", 200, video);
       } else {
@@ -494,6 +496,52 @@ class Video {
         error.message
       );
     }
+  }
+
+  static async saveWatchedTime(req, res) {
+    try {
+      console.log('got here');
+      const { type, watchedTime } = req.body;
+      const { id } = req.fullUser;
+      const { videoId } = req.query;
+      let video;
+      if (type === 'movie') {
+        video = await videoService.getVideoById(videoId);
+      } else {
+        video = await serieService.getSingleEpisode(videoId)
+      }
+      console.log(video, '======== video ============')
+      if (!video) {
+        return util.setErrorResponse(
+          res,
+          "video not found",
+          404
+        );
+      }
+      const watchedTimeEntry = await watchedMovieServices.findWatchedTime(videoId, id);
+      let result;
+      if (!watchedTimeEntry) {
+        result = await watchedMovieServices.add({
+          videoId,
+          type,
+          watchedTime,
+          userId: id,
+        });
+      } else {
+        result = await watchedMovieServices.update(watchedTime, watchedTimeEntry.id);
+      }
+      util.setSuccessResponse(res, "time saved successfully", 201, {
+        status: "done",
+      });
+    } catch (error) {
+      return response.errorResponse(
+        res,
+        500,
+        "Something went wrong",
+        error.message
+      );
+    }
+
   }
 }
 

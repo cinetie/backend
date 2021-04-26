@@ -3,6 +3,7 @@ import video from '../controllers/video';
 import access from '../middlewares/access';
 import earnings from '../controllers/earning';
 import billing from '../middlewares/billing';
+import timeValidator from '../middlewares/validation/watchedTime';
 import { updateVideo } from '../middlewares/validation/video';
 // import imageValidation from '../middlewares/validators/imageValidator'
 const router = new Router();
@@ -24,5 +25,6 @@ router.get('/sort/type', access.isProducer, video.getAllVideosByType);
 router.put('/', access.isAdmin,updateVideo, video.updateVideos);
 router.put('/set-featured', access.isAdmin, video.featureVideo);
 router.delete('/', access.isAdmin, video.deleteAvideo);
+router.post('/time', access.isNormalUser, timeValidator, video.saveWatchedTime);
 
 export default router;

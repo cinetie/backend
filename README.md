@@ -1026,6 +1026,39 @@ Response:
 }
 ```
 
+### 21. save video watched time: POST Request
+
+Endpoint
+
+```text
+/video/time?videoId=cfc051b3-8633-4f81-a38e-7e1b3208ddf0
+```
+
+Headers:
+
+```json
+{
+  "Authorization": "Bearer <User token>",
+  "Content-Type": "application/json"
+}
+```
+
+Body:
+```json
+{
+  "watchedTime": "20",
+  "type": "movie"
+}
+```
+
+Response:
+
+```json
+{
+    "status": 201,
+    "message": "time saved successfully",
+}
+```
 
 ### Payment Method Code Number
 
