@@ -28,6 +28,20 @@ class emailTemplateService {
     }
   }
 
+  static async updateMailTemplateById(id, updates) {
+    try {
+      return await database.TemplateMail.update(
+        updates,{
+        returning: true,
+        where: {
+          id
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static async getAllMailTemplate(id) {
     try {
       return await database.TemplateMail.findAll();

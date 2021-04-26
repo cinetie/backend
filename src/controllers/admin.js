@@ -197,7 +197,6 @@ class adminController {
   }
 
   static async getTemplateByid(req, res) {
-    console.log("++++++++++++++ TEMPLATE");
     try {
       const template = await emailTemplateService.getMailTemplateById(
         req.params.id
@@ -212,8 +211,24 @@ class adminController {
     }
   }
 
+  static async updateTemplateByid(req, res) {
+    
+    try {
+      const template = await emailTemplateService.updateMailTemplateById(
+        req.params.id,
+        req.body
+      );
+      util.setSucczzzzessResponse(res, template, 200);
+    } catch (error) {
+      util.setErrorResponse(
+        res,
+        `Something Went wrong logging in ${error}`,
+        500
+      );
+    }
+  }
+
   static async getAllTemplate(req, res) {
-    console.log("++++++++++++++ TEMPLATE");
     try {
       const template = await emailTemplateService.getAllMailTemplate();
 
