@@ -26,5 +26,6 @@ router.put('/', access.isAdmin,updateVideo, video.updateVideos);
 router.put('/set-featured', access.isAdmin, video.featureVideo);
 router.delete('/', access.isAdmin, video.deleteAvideo);
 router.post('/time', access.isNormalUser, timeValidator, video.saveWatchedTime);
+router.get('/time', access.isNormalUser, video.getWatchedTime);
 
 export default router;

@@ -1,11 +1,8 @@
 import chai, { expect } from 'chai';
 import { config } from 'dotenv';
 import chaiHttp from 'chai-http';
-import sinon from 'sinon';
 import { describe, it } from 'mocha';
 import app from '../index';
-import jwt from '../helpers/jwt';
-import services from '../services/tempVideoServices';
 
 config();
 chai.use(chaiHttp);
@@ -106,3 +103,39 @@ describe('WATCHED MOVIE TIME TEST', () => {
         expect(res.body).to.have.property('message', 'video not found');
     });
 });
+
+describe('GET WATCHED MOVIE TIME TEST', () => {
+    it('should return an error if the user hasn\'t watched the movie', async () => {
+        const loginRes = await chai
+            .request(app)
+            .post('/auth/login')
+            .send({
+                email: 'user345679xde@example.com',
+                password: 'izzeddin'
+            });
+        const res = await chai
+            .request(app)
+            .get('/video/time?videoId=10000234')
+            .set('authorization', `bearer ${loginRes.body.data}`);
+        expect(res.statusCode).to.equal(404);
+        expect(res.body).to.have.property('message', 'The video has been watched yet');
+        
+    });
+    it('should return the watched time if the user has seen the movie before', async () => {
+        const loginRes = await chai
+            .request(app)
+            .post('/auth/login')
+            .send({
+                email: 'user345679xde@example.com',
+                password: 'izzeddin'
+            });
+        const res = await chai
+            .request(app)
+            .get('/video/time?videoId=100')
+            .set('authorization', `bearer ${loginRes.body.data}`);
+        expect(res.statusCode).to.equal(200);
+        expect(res.body).to.have.property('message', 'watch session retrieved successfully');
+        
+    });
+});
+

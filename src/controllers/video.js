@@ -543,6 +543,29 @@ class Video {
     }
 
   }
+
+  static async getWatchedTime(req, res) {
+    try {
+      const { id } = req.fullUser;
+      const { videoId } = req.query;
+      const result = await watchedMovieServices.findWatchedTime(videoId, id);
+      if (!result) {
+        return util.setErrorResponse(
+          res,
+          "The video has been watched yet",
+          404
+        );
+      }
+      util.setSuccessResponse(res, "watch session retrieved successfully", 200, result);
+    } catch (error) {
+      return response.errorResponse(
+        res,
+        500,
+        "Something went wrong",
+        error.message
+      );
+    }
+  }
 }
 
 export default Video;
