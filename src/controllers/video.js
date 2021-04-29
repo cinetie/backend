@@ -500,17 +500,10 @@ class Video {
 
   static async saveWatchedTime(req, res) {
     try {
-      console.log('got here');
       const { type, watchedTime } = req.body;
       const { id } = req.fullUser;
       const { videoId } = req.query;
-      let video;
-      if (type === 'movie') {
-        video = await videoService.getVideoById(videoId);
-      } else {
-        video = await serieService.getSingleEpisode(videoId)
-      }
-      console.log(video, '======== video ============')
+      const video = await videoService.getVideoById(videoId);
       if (!video) {
         return util.setErrorResponse(
           res,
@@ -552,7 +545,7 @@ class Video {
       if (!result) {
         return util.setErrorResponse(
           res,
-          "The video has been watched yet",
+          "The video has not been watched yet",
           404
         );
       }
