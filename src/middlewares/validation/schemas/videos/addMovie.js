@@ -7,7 +7,7 @@ export default joi.object().keys({
     .error(() => 'You have to enter a cast'),
   videoSynopsis: joi.string().max(250).required()
     .error(() => 'You have to provide a synopsis less than 250 characters'),
-  licenseEndDate:  joi.string().max(10).regex(/^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/)
+  licenseEndDate: joi.string().max(10).regex(/^\d{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])$/)
     .error(() => 'You have to provide invalid date, make sure the date is in the yyy-mm-dd format'),
   category: joi.string().required()
     .error(() => 'You have to provide a valid category'),
@@ -27,4 +27,3 @@ export default joi.object().keys({
   EnSubt: joi.string(),
   FrSubt: joi.string()
 }).options({ allowUnknown: false });
- 
