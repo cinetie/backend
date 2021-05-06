@@ -21,9 +21,10 @@ export default joi.object().keys({
     .error(() => 'You did not provide  video'),
   rate: joi.string()
     .error(() => 'You have to enter age rating'),
+  licenseEndDate: joi.string().max(10).regex(/^\d{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])$/)
+    .error(() => 'You have to provide invalid date, make sure the date is in the yyy-mm-dd format'),
   videoClientId: joi.string(),
   resCountries: joi.string(),
   EnSubt: joi.string(),
   FrSubt: joi.string(),
 }).options({ allowUnknown: false });
- 
