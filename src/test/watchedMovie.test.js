@@ -55,11 +55,12 @@ describe('WATCHED MOVIE TIME TEST', () => {
             });
         const res = await chai
             .request(app)
-            .post('/video/time?videoId=101')
+            .post('/video/time?videoId=b467da83-4f0d-4421-7765-c0f364ca93ws')
             .set('authorization', `bearer ${loginRes.body.data}`)
             .send({
                 watchedTime: 20,
-                type: 'episode'
+                type: 'serie',
+                episodeId: '101'
             })
         expect(res.statusCode).to.equal(201);
         expect(res.body).to.have.property('message', 'time saved successfully');
@@ -74,14 +75,54 @@ describe('WATCHED MOVIE TIME TEST', () => {
             });
         const res = await chai
             .request(app)
-            .post('/video/time?videoId=101')
+            .post('/video/time?videoId=b467da83-4f0d-4421-7765-c0f364ca93ws')
             .set('authorization', `bearer ${loginRes.body.data}`)
             .send({
                 watchedTime: 20,
-                type: 'episode'
+                type: 'serie',
+                episodeId: '101'
             })
         expect(res.statusCode).to.equal(201);
         expect(res.body).to.have.property('message', 'time saved successfully');
+    });
+    it('should return an error if the episode doesn\'t exist', async () => {
+        const loginRes = await chai
+            .request(app)
+            .post('/auth/login')
+            .send({
+                email: 'user345679xde@example.com',
+                password: 'izzeddin'
+            });
+        const res = await chai
+            .request(app)
+            .post('/video/time?videoId=b467da83-4f0d-4421-7765-c0f364ca93ws')
+            .set('authorization', `bearer ${loginRes.body.data}`)
+            .send({
+                watchedTime: 20,
+                type: 'serie',
+                episodeId: '10101011'
+            })
+        expect(res.statusCode).to.equal(404);
+        expect(res.body).to.have.property('message', 'episode not found');
+    });
+    it('should return an error if the episodeId is not given for series', async () => {
+        const loginRes = await chai
+            .request(app)
+            .post('/auth/login')
+            .send({
+                email: 'user345679xde@example.com',
+                password: 'izzeddin'
+            });
+        const res = await chai
+            .request(app)
+            .post('/video/time?videoId=b467da83-4f0d-4421-7765-c0f364ca93ws')
+            .set('authorization', `bearer ${loginRes.body.data}`)
+            .send({
+                watchedTime: 20,
+                type: 'serie',
+            })
+        expect(res.statusCode).to.equal(400);
+        expect(res.body).to.have.property('message', 'episodeId is required to save an episode');
     });
     it('should return an error message if the video doesn\'t exist', async () => {
         const loginRes = await chai
@@ -97,7 +138,7 @@ describe('WATCHED MOVIE TIME TEST', () => {
             .set('authorization', `bearer ${loginRes.body.data}`)
             .send({
                 watchedTime: 20,
-                type: 'episode'
+                type: 'movie'
             })
         expect(res.statusCode).to.equal(404);
         expect(res.body).to.have.property('message', 'video not found');
@@ -118,7 +159,7 @@ describe('GET WATCHED MOVIE TIME TEST', () => {
             .get('/video/time?videoId=10000234')
             .set('authorization', `bearer ${loginRes.body.data}`);
         expect(res.statusCode).to.equal(404);
-        expect(res.body).to.have.property('message', 'The video has been watched yet');
+        expect(res.body).to.have.property('message', 'The video has not been watched yet');
         
     });
     it('should return the watched time if the user has seen the movie before', async () => {

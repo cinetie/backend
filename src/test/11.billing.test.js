@@ -222,10 +222,9 @@ describe("BILLING MIDDLEWARE", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     await billing.renewPayment(req, res, nextSpy);
+    stub.restore();
     expect(res.statusCode).to.equal(200);
     expect(nextSpy.calledOnce).to.be.true;
-
-    stub.restore();
   });
 
   // it.only('Test renewPayment Method with registered email and no active subscription and momo payment should be okay', async () => {
@@ -379,8 +378,8 @@ describe("BILLING MIDDLEWARE", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     await billing.verifySpennTransactions(req, res);
-    expect(res.statusCode).to.equal(500);
     stub.restore();
+    expect(res.statusCode).to.equal(500);
   });
 
   it("Test renewPayment should return 500 when there is a server error", async () => {
@@ -393,8 +392,8 @@ describe("BILLING MIDDLEWARE", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     await billing.renewPayment(req, res);
-    expect(res.statusCode).to.equal(500);
     stub.restore();
+    expect(res.statusCode).to.equal(500);
   });
 
   it("Test renewPayment should return 500 when there is a server error", async () => {
@@ -409,8 +408,8 @@ describe("BILLING MIDDLEWARE", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     await billing.fetchCurrentSubscription(req, res);
-    expect(res.statusCode).to.equal(500);
     stub.restore();
+    expect(res.statusCode).to.equal(500);
   });
 
   it("Test trial should return 500 when there is a server error", async () => {
@@ -515,9 +514,9 @@ describe("BILLING MIDDLEWARE", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     const data = await billing.trial(req, res, nextSpy);
+    stub.restore();
     expect(data.statusCode).to.equal(502);
     expect(nextSpy.calledOnce).to.be.false;
-    stub.restore();
   });
 
   it("Test updateTransactionsAndRegisterSales Method with registered email with updates[1] and updatedSubscription[1] which is different 1", async () => {
@@ -548,9 +547,9 @@ describe("BILLING MIDDLEWARE", (req, res, status) => {
       res,
       nextSpy
     );
+    stub.restore();
     expect(data.statusCode).to.equal(500);
     expect(nextSpy.calledOnce).to.be.false;
-    stub.restore();
   });
 
   it("Test updateTransactionsAndRegisterSales Method with registered email with updates[1] and updatedSubscription[1] which is different 1", async () => {
@@ -578,8 +577,8 @@ describe("BILLING MIDDLEWARE", (req, res, status) => {
       res,
       nextSpy
     );
+    stub.restore();
     expect(data.statusCode).to.equal(500);
     expect(nextSpy.calledOnce).to.be.false;
-    stub.restore();
   });
 });

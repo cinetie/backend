@@ -8,7 +8,7 @@ import jwt from '../helpers/jwt';
 dotenv.config();
 chai.use(chaiHttp);
 
-describe.only('STAFF SIGN IN', () => {
+describe('STAFF SIGN IN', () => {
   it('should return error if staff gives invalid data', (done) => {
     chai
       .request(app)
@@ -65,7 +65,7 @@ describe.only('STAFF SIGN IN', () => {
   });
 });
 
-describe.only('ADD NEW STAFF', () => {
+describe('ADD NEW STAFF', () => {
   const token = jwt.jwtSign({ user: process.env.ADMIN_USER, role: 'admin' }, process.env.SECRET);
   it('should return an error if invalid data', (done) => {
     chai
@@ -113,7 +113,7 @@ describe.only('ADD NEW STAFF', () => {
   });
 });
 
-describe.only('CHANGE STAFF MEMBER PASSWORD', () => {
+describe('CHANGE STAFF MEMBER PASSWORD', () => {
   const token = jwt.jwtSign({ email: 'staff4@example.com', role: 'staff' }, process.env.SECRET);
   const expiredToken = jwt.jwtSign({ email: 'staff46898@example.com', role: 'staff' }, process.env.SECRET);
   it('should return an error if the staff doesn\'t exist exist', (done) => {

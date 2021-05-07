@@ -500,9 +500,26 @@ class Video {
 
   static async saveWatchedTime(req, res) {
     try {
-      const { type, watchedTime } = req.body;
+      const { type, watchedTime, episodeId } = req.body;
       const { id } = req.fullUser;
       const { videoId } = req.query;
+      if(!episodeId && type === 'serie') {
+        return util.setErrorResponse(
+          res,
+          "episodeId is required to save an episode",
+          400
+        );
+      }
+      if(episodeId && type === 'serie') {
+        const episode = await serieService.getSingleEpisode(episodeId);
+        if(!episode) {
+          return util.setErrorResponse(
+            res,
+            "episode not found",
+            404
+          );
+        }
+      }
       const video = await videoService.getVideoById(videoId);
       if (!video) {
         return util.setErrorResponse(
@@ -512,6 +529,10 @@ class Video {
         );
       }
       const watchedTimeEntry = await watchedMovieServices.findWatchedTime(videoId, id);
+      let episodeWatchedTimeEntry;
+      if(type === 'serie') {
+        episodeWatchedTimeEntry = await watchedMovieServices.findWatchedTime(episodeId, id);
+      }
       let result;
       if (!watchedTimeEntry) {
         result = await watchedMovieServices.add({
@@ -520,8 +541,26 @@ class Video {
           watchedTime,
           userId: id,
         });
+      if(type === 'serie') {
+        await watchedMovieServices.add({
+          videoId: episodeId,
+          type: 'episode',
+          watchedTime,
+          userId: id,
+        });
+      }
       } else {
         result = await watchedMovieServices.update(watchedTime, watchedTimeEntry.id);
+        if(episodeWatchedTimeEntry && type === 'serie') {
+          await watchedMovieServices.update(watchedTime, episodeWatchedTimeEntry.id);
+        } else {
+          await watchedMovieServices.add({
+            videoId: episodeId,
+            type: 'episode',
+            watchedTime,
+            userId: id,
+          });
+        }
       }
       util.setSuccessResponse(res, "time saved successfully", 201, {
         status: "done",

@@ -35,8 +35,8 @@ describe('SALES CONTROLLER', (req, res, status) => {
         });
         var res = httpMocks.createResponse();
         await sales.getSalesInTimeRange(req, res)
-        expect(res.statusCode).to.equal(400);
         stub.restore()
+        expect(res.statusCode).to.equal(400);
     });
 
     it('Test getSalesInTimeRange should return 500 when there is a server error', async () => {
@@ -49,8 +49,8 @@ describe('SALES CONTROLLER', (req, res, status) => {
         });
         var res = httpMocks.createResponse();
         await sales.getSalesInTimeRange(req, res)
-        expect(res.statusCode).to.equal(503);
         stub.restore()
+        expect(res.statusCode).to.equal(503);
     });
 
     it('Test getSalesByModeOfPayment by Get Sales by Mode of Payment', async () => {
@@ -75,8 +75,8 @@ describe('SALES CONTROLLER', (req, res, status) => {
         });
         var res = httpMocks.createResponse();
         await sales.getSalesByModeOfPayment(req, res);
-        expect(res.statusCode).to.equal(400)
         stub.restore()
+        expect(res.statusCode).to.equal(400)
     });
 
     it('Test getSalesInTimeRange should return 500 when there is a server error', async () => {
@@ -88,8 +88,8 @@ describe('SALES CONTROLLER', (req, res, status) => {
         });
         var res = httpMocks.createResponse();
         await sales.getSalesByModeOfPayment(req, res);
-        expect(res.statusCode).to.equal(503);
         stub.restore()
+        expect(res.statusCode).to.equal(503);
     });
 
     it('Test getAllSales should Get all Sales Should be OK', async () => {
@@ -113,8 +113,8 @@ describe('SALES CONTROLLER', (req, res, status) => {
         });
         var res = httpMocks.createResponse();
         const data = await sales.getAllSales(req, res);
-        expect(data.statusCode).to.equal(400)
         stub.restore()
+        expect(data.statusCode).to.equal(400)
     });
 
     it('Test getAllSales should return 500 when there is a server error', async () => {
@@ -126,7 +126,7 @@ describe('SALES CONTROLLER', (req, res, status) => {
         });
         var res = httpMocks.createResponse();
         await sales.getAllSales(req, res);
-        expect(res.statusCode).to.equal(503)
         stub.restore()
+        expect(res.statusCode).to.equal(503)
     });
 })
