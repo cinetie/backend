@@ -100,9 +100,9 @@ describe('VIEWING SESSION MIDDLEWARE', (req, res, status) => {
         });
         var res = httpMocks.createResponse();
         await viewingSession.createNewWatchCount(req, res, nextSpy);
+        stub.restore()
         expect(res.statusCode).to.equal(200)
         expect(nextSpy.calledOnce).to.be.true;
-        stub.restore()
     });
 
     it(`Test createNewWatchCount to create session when there isn't throw error because Can't get location`, async () => {
@@ -124,9 +124,9 @@ describe('VIEWING SESSION MIDDLEWARE', (req, res, status) => {
         });
         var res = httpMocks.createResponse();
         await viewingSession.createNewWatchCount(req, res, nextSpy);
+        stub.restore()
         expect(res.statusCode).to.equal(400)
         expect(nextSpy.calledOnce).to.be.false;
-        stub.restore()
     });
 
     it('Test createNewWatchCount', async () => {
@@ -147,8 +147,8 @@ describe('VIEWING SESSION MIDDLEWARE', (req, res, status) => {
         });
         var res = httpMocks.createResponse();
         await viewingSession.createNewWatchCount(req, res, nextSpy);
-        expect(res.statusCode).to.equal(500);
         stub.restore()
+        expect(res.statusCode).to.equal(500);
     });
 
 })
