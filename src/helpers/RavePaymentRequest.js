@@ -37,7 +37,7 @@ export default async (
       );
       util.setSuccessResponse(
         res,
-        "Pending subscription  activation with MoMo",
+        paymentType === 'mpesa' ? 'Pending subscription  activation with mpesa' : "Pending subscription  activation with MoMo",
         201,
         data
       );
