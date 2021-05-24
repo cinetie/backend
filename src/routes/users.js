@@ -7,6 +7,7 @@ import billing from '../middlewares/billing';
 import isAdmin from '../middlewares/isAdmin';
 import screenValidator from '../middlewares/screenValidation';
 import * as validation from '../middlewares/validation/user';
+import checkCredentials from '../middlewares/checkCredentials';
 
 const router = new Router();
 
@@ -16,8 +17,9 @@ router.use(passport.session());
 router.post('/signup', validation.signup, auth.signupUser);
 router.get('/particular', auth.getUserByEmail);
 router.post('/login',
-  isAdmin.verifyAdmin, 
-  validation.login, 
+  isAdmin.verifyAdmin,
+  validation.login,
+  checkCredentials,
   billing.verifySpennTransactions,
   billing.renewPayment,
   screenValidator.validateNumberOfScreens,
