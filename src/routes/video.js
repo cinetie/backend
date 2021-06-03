@@ -27,5 +27,6 @@ router.put('/set-featured', access.isAdmin, video.featureVideo);
 router.delete('/', access.isAdmin, video.deleteAvideo);
 router.post('/time', access.isNormalUser, timeValidator, video.saveWatchedTime);
 router.get('/time', access.isNormalUser, video.getWatchedTime);
+router.get('/sharable/:id',video.SharableVideo)
 
 export default router;
