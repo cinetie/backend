@@ -77,21 +77,6 @@ describe('CP LOGIN TEST', () => {
             done();
         });
     });
-
-    it('should return an error message if the cp hasn\'t verified their account', (done) => {
-        chai
-        .request(app)
-        .post('/cp/login')
-        .send({
-            email: 'cp003@example.com',
-            password: 'izzeddin'
-        })
-        .end((err, res) => {
-            expect(res).to.have.status(401);
-            expect(res.body).to.have.property('message', 'Verify your account first!');
-            done();
-        });
-    });
     it('should return 200 when the cp successfully login', (done) => {
         chai
         .request(app)

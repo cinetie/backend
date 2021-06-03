@@ -109,8 +109,6 @@ class cpController {
         const status = bcrypt.compare(req.body.password, user.password);
         if (!status) {
           util.setErrorResponse(res, 'Passwords don\'t match', 400);
-        } else if (!user.isVerified) {
-          util.setErrorResponse(res, 'Verify your account first!', 401);
         } else {
           const token = jwt.jwtSign({ key: cry.crypto(), email: user.email, clientId: user.clientId }, process.env.SECRET, '1d');
           user.token = token;
