@@ -18,6 +18,7 @@ import mailer from "../helpers/mailer";
 import Rave from "../helpers/rave";
 import Fetch from "../helpers/fetch";
 import RavePaymentRequest from "../helpers/RavePaymentRequest";
+import MailingServices from '../services/mailingServices';
 import billing from "../middlewares/billing";
 import { decode } from "querystring";
 import { Console } from "console";
@@ -55,9 +56,11 @@ class userController {
         );
         createdUser.token = userToken;
         delete createdUser.password;
+        await MailingServices.addToMailingList(createdUser.email);
         util.setSuccessResponse(res, 'Signed up successfully', 201, userToken);
       }
     } catch (error) {
+      console.log(error);
       util.setErrorResponse(res, error.message, 500);
     }
   }
