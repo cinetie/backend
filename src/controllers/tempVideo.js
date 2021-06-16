@@ -177,19 +177,17 @@ class tempVideoController {
   }
 
   static async getSignedUrlTempVideos(req, res) {
+    console.log(
+      process.env.THUMBNAIL_BUCKET,
+      process.env.THUMBNAIL_BUCKET,
+      process.env.THUMBNAIL_BUCKET,
+      process.env.THUMBNAIL_BUCKET,
+      process.env.SUBTITLE_BUCKET,
+      process.env.TEMP_BUCKET_MOVIE,
+      "===========================BUCKETS==================="
+      )
     try {
       const { type, extension } = req.query;
-
-      console.log(
-        process.env.THUMBNAIL_BUCKET,
-        process.env.THUMBNAIL_BUCKET,
-        process.env.THUMBNAIL_BUCKET,
-        process.env.THUMBNAIL_BUCKET,
-        process.env.SUBTITLE_BUCKET,
-        process.env.TEMP_BUCKET_MOVIE,
-        "===========================BUCKETS==================="
-        )
-
       const portrait = await getSignedUrl(process.env.THUMBNAIL_BUCKET, 'image/*', 'jpg');
       const landscape = await getSignedUrl(process.env.THUMBNAIL_BUCKET, 'image/*', 'jpg');
       const nameTag = await getSignedUrl(process.env.THUMBNAIL_BUCKET, 'image/*', 'png');
