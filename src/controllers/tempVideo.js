@@ -180,6 +180,16 @@ class tempVideoController {
     try {
       const { type, extension } = req.query;
 
+      console.log(
+        process.env.THUMBNAIL_BUCKET,
+        process.env.THUMBNAIL_BUCKET,
+        process.env.THUMBNAIL_BUCKET,
+        process.env.THUMBNAIL_BUCKET,
+        process.env.SUBTITLE_BUCKET,
+        process.env.TEMP_BUCKET_MOVIE,
+        "===========================BUCKETS==================="
+        )
+
       const portrait = await getSignedUrl(process.env.THUMBNAIL_BUCKET, 'image/*', 'jpg');
       const landscape = await getSignedUrl(process.env.THUMBNAIL_BUCKET, 'image/*', 'jpg');
       const nameTag = await getSignedUrl(process.env.THUMBNAIL_BUCKET, 'image/*', 'png');
@@ -195,6 +205,7 @@ class tempVideoController {
         FrSubt
       });
     } catch (error) {
+      console.log(error, "==================== ERROR=====================")
       util.setErrorResponse(res, `something happened ${error.message}`, 500);
     }
   }
