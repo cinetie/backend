@@ -6,7 +6,6 @@ import access from '../middlewares/access';
 import earningCalculator from '../helpers/calculateEarning'
 
 const router = Router();
-
 router.get('/earnings', access.isAdmin, controller.getAllEarnings);
 router.get('/earnings/active', access.isAdmin, controller.getAllActiveEarnings);
 router.get('/earnings/cp', access.isAdmin, adminController.getEarningsPerClient);
