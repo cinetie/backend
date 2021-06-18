@@ -24,6 +24,6 @@ export default joi.object().keys({
   rate: joi.string().required()
     .error(() => 'You have to enter age rating'),
   resCountries: joi.string().required(),
-  EnSubt: joi.string(),
-  FrSubt: joi.string()
+  EnSubt: joi.string().allow(''),
+  FrSubt: joi.string().allow('')
 }).options({ allowUnknown: false });
