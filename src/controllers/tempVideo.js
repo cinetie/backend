@@ -179,7 +179,6 @@ class tempVideoController {
   static async getSignedUrlTempVideos(req, res) {
     try {
       const { type, extension } = req.query;
-
       const portrait = await getSignedUrl(process.env.THUMBNAIL_BUCKET, 'image/*', 'jpg');
       const landscape = await getSignedUrl(process.env.THUMBNAIL_BUCKET, 'image/*', 'jpg');
       const nameTag = await getSignedUrl(process.env.THUMBNAIL_BUCKET, 'image/*', 'png');
