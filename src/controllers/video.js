@@ -349,10 +349,10 @@ class Video {
       console.log(process.env.SUBTITLE_BUCKET);
       console.log(video.EnSubt, video.EnSubt !== null);
       if (video) {
-        if (video.EnSubt !== '') {
+        if (video.EnSubt) {
           video.EnSubt = await getObject(process.env.SUBTITLE_BUCKET, video.EnSubt, 20);
         }
-        if (video.FrSubt !== '') {
+        if (video.FrSubt) {
           video.FrSubt = await getObject(process.env.SUBTITLE_BUCKET, video.FrSubt, 20);
         }
         util.setSuccessResponse(res, 'videos Found', 200, video);
