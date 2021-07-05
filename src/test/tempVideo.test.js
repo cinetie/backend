@@ -164,11 +164,11 @@ describe("TEMP VIDEO TESTS", () => {
     //       id: 157,
     //     },
     //   });
-      const res = httpMock.createResponse();
-      await TempVideoController.getParticularVideoController(req, res);
+    //   const res = httpMock.createResponse();
+    //   await TempVideoController.getParticularVideoController(req, res);
 
-      expect(res.statusCode).to.equal(200);
-    });
+    //   expect(res.statusCode).to.equal(200);
+    // });
     // it("should return a 401 status code if the video uri is not found", async () => {
     //   const stub = sinon.stub(aws, "getObject").callsFake(() => {
     //     return null;
