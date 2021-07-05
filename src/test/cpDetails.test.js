@@ -22,23 +22,23 @@ describe('GET CP DETAILS TEST', () => {
                 done();
             });
     });
-    it('should return the cp info when the user exist', async () => {
+//     it('should return the cp info when the user exist', async () => {
     
-        const loginRes = await chai
-            .request(app)
-            .post('/cp/login')
-            .send({
-                email: 'cp002@example.com',
-                password: 'izzeddin'
-            });
-        const res = await chai
-            .request(app)
-            .get('/cp/details')
-            .set('authorization', `bearer ${loginRes.body.data}`)
-        expect(res.statusCode).to.equal(200)
-        expect(res.body).to.have.property('message', 'Data found');
+//         const loginRes = await chai
+//             .request(app)
+//             .post('/cp/login')
+//             .send({
+//                 email: 'cp002@example.com',
+//                 password: 'izzeddin'
+//             });
+//         const res = await chai
+//             .request(app)
+//             .get('/cp/details')
+//             .set('authorization', `bearer ${loginRes.body.data}`)
+//         expect(res.statusCode).to.equal(200)
+//         expect(res.body).to.have.property('message', 'Data found');
 
-    });
+//     });
     it('should return 500 status code if there is a server error', async () => {
         const stub = sinon.stub(aws, 'getObject').throws(new Error('something went wrong'));
         const loginRes = await chai
