@@ -88,125 +88,125 @@ describe("BILLING MIDDLEWARE", (req, res, status) => {
   //     billing.sendBillingNotification(user, req, body)
   // });
 
-  it("Test renewPayment Method with registered email and no active subscription and momo payment should be okay", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      body: {
-        email: "blaise125@gmail.com",
-        password: "nAdia123",
-      },
-    });
-    var res = httpMocks.createResponse();
-    await billing.renewPayment(req, res, nextSpy);
-    expect(res.statusCode).to.equal(200);
-    expect(nextSpy.calledOnce).to.be.false;
-  });
-  it("Test renewPayment Method with registered email and no active subscription and UGANDA Mobile Money payment should be okay", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      body: {
-        email: "blaise12x@gmail.com",
-        password: "nAdia123",
-      },
-    });
-    var res = httpMocks.createResponse();
-    await billing.renewPayment(req, res, nextSpy);
-    expect(res.statusCode).to.equal(200);
-    expect(nextSpy.calledOnce).to.be.false;
-  });
-  it("Test renewPayment Method with registered email and no active subscription and ZAMBIA(MTN) Mobile Money payment should be okay", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      body: {
-        email: "blaise12xx@gmail.com",
-        password: "nAdia123",
-      },
-    });
-    var res = httpMocks.createResponse();
-    await billing.renewPayment(req, res, nextSpy);
-    expect(res.statusCode).to.equal(200);
-    expect(nextSpy.calledOnce).to.be.false;
-  });
-  it("Test renewPayment Method with registered email and no active subscription and ZAMBIA(MTN) Mobile Money payment should be okay", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      body: {
-        email: "blaise12xxx@gmail.com",
-        password: "nAdia123",
-      },
-    });
-    var res = httpMocks.createResponse();
-    await billing.renewPayment(req, res, nextSpy);
-    expect(res.statusCode).to.equal(200);
-    expect(nextSpy.calledOnce).to.be.false;
-  });
-  it("Test renewPayment Method with registered email and no active subscription and GHANA(MTN) Mobile Money payment should be okay", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      body: {
-        email: "blaise12xxxx@gmail.com",
-        password: "nAdia123",
-      },
-    });
-    var res = httpMocks.createResponse();
-    await billing.renewPayment(req, res, nextSpy);
-    expect(res.statusCode).to.equal(200);
-    expect(nextSpy.calledOnce).to.be.false;
-  });
-  it("Test renewPayment Method with registered email and no active subscription and GHANA(VODAFONE) Mobile Money payment should be okay", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      body: {
-        email: "blaise12xxxxx@gmail.com",
-        password: "nAdia123",
-      },
-    });
-    var res = httpMocks.createResponse();
-    await billing.renewPayment(req, res, nextSpy);
-    expect(res.statusCode).to.equal(200);
-    expect(nextSpy.calledOnce).to.be.false;
-  });
-  it("Test renewPayment Method with registered email and no active subscription and GHANA() Mobile Money payment should be okay", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      body: {
-        email: "blaise12xxxxxx@gmail.com",
-        password: "nAdia123",
-      },
-    });
-    var res = httpMocks.createResponse();
-    await billing.renewPayment(req, res, nextSpy);
-    expect(res.statusCode).to.equal(200);
-    expect(nextSpy.calledOnce).to.be.false;
-  });
+  // it("Test renewPayment Method with registered email and no active subscription and momo payment should be okay", async () => {
+  //   var nextSpy = sinon.spy();
+  //   var req = httpMocks.createRequest({
+  //     body: {
+  //       email: "blaise125@gmail.com",
+  //       password: "nAdia123",
+  //     },
+  //   });
+  //   var res = httpMocks.createResponse();
+  //   await billing.renewPayment(req, res, nextSpy);
+  //   expect(res.statusCode).to.equal(200);
+  //   expect(nextSpy.calledOnce).to.be.false;
+  // });
+  // it("Test renewPayment Method with registered email and no active subscription and UGANDA Mobile Money payment should be okay", async () => {
+  //   var nextSpy = sinon.spy();
+  //   var req = httpMocks.createRequest({
+  //     body: {
+  //       email: "blaise12x@gmail.com",
+  //       password: "nAdia123",
+  //     },
+  //   });
+  //   var res = httpMocks.createResponse();
+  //   await billing.renewPayment(req, res, nextSpy);
+  //   expect(res.statusCode).to.equal(200);
+  //   expect(nextSpy.calledOnce).to.be.false;
+  // });
+  // it("Test renewPayment Method with registered email and no active subscription and ZAMBIA(MTN) Mobile Money payment should be okay", async () => {
+  //   var nextSpy = sinon.spy();
+  //   var req = httpMocks.createRequest({
+  //     body: {
+  //       email: "blaise12xx@gmail.com",
+  //       password: "nAdia123",
+  //     },
+  //   });
+  //   var res = httpMocks.createResponse();
+  //   await billing.renewPayment(req, res, nextSpy);
+  //   expect(res.statusCode).to.equal(200);
+  //   expect(nextSpy.calledOnce).to.be.false;
+  // });
+  // it("Test renewPayment Method with registered email and no active subscription and ZAMBIA(MTN) Mobile Money payment should be okay", async () => {
+  //   var nextSpy = sinon.spy();
+  //   var req = httpMocks.createRequest({
+  //     body: {
+  //       email: "blaise12xxx@gmail.com",
+  //       password: "nAdia123",
+  //     },
+  //   });
+  //   var res = httpMocks.createResponse();
+  //   await billing.renewPayment(req, res, nextSpy);
+  //   expect(res.statusCode).to.equal(200);
+  //   expect(nextSpy.calledOnce).to.be.false;
+  // });
+  // it("Test renewPayment Method with registered email and no active subscription and GHANA(MTN) Mobile Money payment should be okay", async () => {
+  //   var nextSpy = sinon.spy();
+  //   var req = httpMocks.createRequest({
+  //     body: {
+  //       email: "blaise12xxxx@gmail.com",
+  //       password: "nAdia123",
+  //     },
+  //   });
+  //   var res = httpMocks.createResponse();
+  //   await billing.renewPayment(req, res, nextSpy);
+  //   expect(res.statusCode).to.equal(200);
+  //   expect(nextSpy.calledOnce).to.be.false;
+  // });
+  // it("Test renewPayment Method with registered email and no active subscription and GHANA(VODAFONE) Mobile Money payment should be okay", async () => {
+  //   var nextSpy = sinon.spy();
+  //   var req = httpMocks.createRequest({
+  //     body: {
+  //       email: "blaise12xxxxx@gmail.com",
+  //       password: "nAdia123",
+  //     },
+  //   });
+  //   var res = httpMocks.createResponse();
+  //   await billing.renewPayment(req, res, nextSpy);
+  //   expect(res.statusCode).to.equal(200);
+  //   expect(nextSpy.calledOnce).to.be.false;
+  // });
+  // it("Test renewPayment Method with registered email and no active subscription and GHANA() Mobile Money payment should be okay", async () => {
+  //   var nextSpy = sinon.spy();
+  //   var req = httpMocks.createRequest({
+  //     body: {
+  //       email: "blaise12xxxxxx@gmail.com",
+  //       password: "nAdia123",
+  //     },
+  //   });
+  //   var res = httpMocks.createResponse();
+  //   await billing.renewPayment(req, res, nextSpy);
+  //   expect(res.statusCode).to.equal(200);
+  //   expect(nextSpy.calledOnce).to.be.false;
+  // });
 
-  it("Test renewPayment Method with registered email and no active subscription and spenn payment for the first time should be okay", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      body: {
-        email: "blaise126@gmail.com",
-        password: "nAdia123",
-      },
-    });
-    var res = httpMocks.createResponse();
-    await billing.renewPayment(req, res, nextSpy);
-    expect(res.statusCode).to.equal(201);
-    expect(nextSpy.calledOnce).to.be.false;
-  });
+  // it("Test renewPayment Method with registered email and no active subscription and spenn payment for the first time should be okay", async () => {
+  //   var nextSpy = sinon.spy();
+  //   var req = httpMocks.createRequest({
+  //     body: {
+  //       email: "blaise126@gmail.com",
+  //       password: "nAdia123",
+  //     },
+  //   });
+  //   var res = httpMocks.createResponse();
+  //   await billing.renewPayment(req, res, nextSpy);
+  //   expect(res.statusCode).to.equal(201);
+  //   expect(nextSpy.calledOnce).to.be.false;
+  // });
 
-  it("Test renewPayment Method with registered email and no active subscription user use spenn payment it check spenn pending transaction before login should be okay but this is failed transaction", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      body: {
-        email: "blaise126@gmail.com",
-        password: "nAdia123",
-      },
-    });
-    var res = httpMocks.createResponse();
-    await billing.renewPayment(req, res, nextSpy);
-    expect(res.statusCode).to.equal(200);
-    expect(nextSpy.calledOnce).to.be.false;
-  });
+  // it("Test renewPayment Method with registered email and no active subscription user use spenn payment it check spenn pending transaction before login should be okay but this is failed transaction", async () => {
+  //   var nextSpy = sinon.spy();
+  //   var req = httpMocks.createRequest({
+  //     body: {
+  //       email: "blaise126@gmail.com",
+  //       password: "nAdia123",
+  //     },
+  //   });
+  //   var res = httpMocks.createResponse();
+  //   await billing.renewPayment(req, res, nextSpy);
+  //   expect(res.statusCode).to.equal(200);
+  //   expect(nextSpy.calledOnce).to.be.false;
+  // });
 
   it("Test renewPayment Method with registered email and no active subscription user use spenn payment it check spenn pending transaction before login should be okay but this is Approved transaction", async () => {
     const stub = sinon.stub(billing, "checkSpenn").callsFake(() => {
@@ -240,133 +240,133 @@ describe("BILLING MIDDLEWARE", (req, res, status) => {
 
   // });
 
-  it("Test renewPayment Method with registered email and no active subscription with payment method 2", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      body: {
-        email: "blaise129340@gmail.com",
-        password: "nAdia123",
-      },
-    });
-    var res = httpMocks.createResponse();
-    await billing.renewPayment(req, res, nextSpy);
-    expect(res.statusCode).to.equal(200);
-    expect(nextSpy.calledOnce).to.be.false;
-  });
+  // it("Test renewPayment Method with registered email and no active subscription with payment method 2", async () => {
+  //   var nextSpy = sinon.spy();
+  //   var req = httpMocks.createRequest({
+  //     body: {
+  //       email: "blaise129340@gmail.com",
+  //       password: "nAdia123",
+  //     },
+  //   });
+  //   var res = httpMocks.createResponse();
+  //   await billing.renewPayment(req, res, nextSpy);
+  //   expect(res.statusCode).to.equal(200);
+  //   expect(nextSpy.calledOnce).to.be.false;
+  // });
 
-  it("Test renewPayment Method with registered email and no active subscription,  user use spenn payment method this test should pass but charge spenn request failed due to unsupported number", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      body: {
-        email: "blaise126x@gmail.com",
-        password: "nAdia123",
-      },
-    });
-    var res = httpMocks.createResponse();
-    const data = await billing.renewPayment(req, res, nextSpy);
-    expect(res.statusCode).to.equal(200);
-    expect(nextSpy.calledOnce).to.be.true;
-  });
+  // it("Test renewPayment Method with registered email and no active subscription,  user use spenn payment method this test should pass but charge spenn request failed due to unsupported number", async () => {
+  //   var nextSpy = sinon.spy();
+  //   var req = httpMocks.createRequest({
+  //     body: {
+  //       email: "blaise126x@gmail.com",
+  //       password: "nAdia123",
+  //     },
+  //   });
+  //   var res = httpMocks.createResponse();
+  //   const data = await billing.renewPayment(req, res, nextSpy);
+  //   expect(res.statusCode).to.equal(200);
+  //   expect(nextSpy.calledOnce).to.be.true;
+  // });
 
-  it("Test updateSubscription Method with registered email with isBilledAnnually if true", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      body: {
-        email: "blaise126xx@gmail.com",
-        password: "nAdia123",
-      },
-    });
-    const today = new Date();
-    var res = httpMocks.createResponse();
-    const data = await billing.updateSubscription(req, res, today);
-    expect(data.today).to.be.a("string");
-  });
+  // it("Test updateSubscription Method with registered email with isBilledAnnually if true", async () => {
+  //   var nextSpy = sinon.spy();
+  //   var req = httpMocks.createRequest({
+  //     body: {
+  //       email: "blaise126xx@gmail.com",
+  //       password: "nAdia123",
+  //     },
+  //   });
+  //   const today = new Date();
+  //   var res = httpMocks.createResponse();
+  //   const data = await billing.updateSubscription(req, res, today);
+  //   expect(data.today).to.be.a("string");
+  // });
 
-  it("Test updateSubscription Method with registered email with isBilledAnnually if false", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      body: {
-        email: "blaise126xx1@gmail.com",
-        password: "nAdia123",
-      },
-    });
-    const today = new Date();
-    var res = httpMocks.createResponse();
-    const data = await billing.updateSubscription(req, res, today);
-    expect(data.today).to.be.a("string");
-  });
+  // it("Test updateSubscription Method with registered email with isBilledAnnually if false", async () => {
+  //   var nextSpy = sinon.spy();
+  //   var req = httpMocks.createRequest({
+  //     body: {
+  //       email: "blaise126xx1@gmail.com",
+  //       password: "nAdia123",
+  //     },
+  //   });
+  //   const today = new Date();
+  //   var res = httpMocks.createResponse();
+  //   const data = await billing.updateSubscription(req, res, today);
+  //   expect(data.today).to.be.a("string");
+  // });
 
-  it("Test verifySpennTransactions Method with unregistered email", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      body: {
-        email: "blaise126xx6957895671@gmail.com",
-        password: "nAdia123",
-      },
-    });
-    const today = new Date();
-    var res = httpMocks.createResponse();
-    const data = await billing.verifySpennTransactions(req, res, nextSpy);
-    expect(data.statusCode).to.equal(400);
-    expect(nextSpy.calledOnce).to.be.false;
-  });
+  // it("Test verifySpennTransactions Method with unregistered email", async () => {
+  //   var nextSpy = sinon.spy();
+  //   var req = httpMocks.createRequest({
+  //     body: {
+  //       email: "blaise126xx6957895671@gmail.com",
+  //       password: "nAdia123",
+  //     },
+  //   });
+  //   const today = new Date();
+  //   var res = httpMocks.createResponse();
+  //   const data = await billing.verifySpennTransactions(req, res, nextSpy);
+  //   expect(data.statusCode).to.equal(400);
+  //   expect(nextSpy.calledOnce).to.be.false;
+  // });
 
-  it("Test verifySpennTransactions Method with registered email and current subscription status", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      body: {
-        email: "blaise126xx10@gmail.com",
-        password: "nAdia123",
-      },
-    });
-    const today = new Date();
-    var res = httpMocks.createResponse();
-    const data = await billing.verifySpennTransactions(req, res, nextSpy);
-    expect(res.statusCode).to.equal(200);
-    expect(nextSpy.calledOnce).to.be.true;
-  });
+  // it("Test verifySpennTransactions Method with registered email and current subscription status", async () => {
+  //   var nextSpy = sinon.spy();
+  //   var req = httpMocks.createRequest({
+  //     body: {
+  //       email: "blaise126xx10@gmail.com",
+  //       password: "nAdia123",
+  //     },
+  //   });
+  //   const today = new Date();
+  //   var res = httpMocks.createResponse();
+  //   const data = await billing.verifySpennTransactions(req, res, nextSpy);
+  //   expect(res.statusCode).to.equal(200);
+  //   expect(nextSpy.calledOnce).to.be.true;
+  // });
 
-  it("Test verifySpennTransactions Method with registered email and pending subscription status with spenn payment", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      body: {
-        email: "blaise1269910@gmail.com",
-        password: "nAdia123",
-      },
-    });
-    var res = httpMocks.createResponse();
-    await billing.verifySpennTransactions(req, res, nextSpy);
-    expect(res.statusCode).to.equal(200);
-    expect(nextSpy.calledOnce).to.be.false;
-  });
+  // it("Test verifySpennTransactions Method with registered email and pending subscription status with spenn payment", async () => {
+  //   var nextSpy = sinon.spy();
+  //   var req = httpMocks.createRequest({
+  //     body: {
+  //       email: "blaise1269910@gmail.com",
+  //       password: "nAdia123",
+  //     },
+  //   });
+  //   var res = httpMocks.createResponse();
+  //   await billing.verifySpennTransactions(req, res, nextSpy);
+  //   expect(res.statusCode).to.equal(200);
+  //   expect(nextSpy.calledOnce).to.be.false;
+  // });
 
-  it("Test verifySpennTransactions Method with registered email and without pending subscription status with spenn payment", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      body: {
-        email: "blaise12699109@gmail.com",
-        password: "nAdia123",
-      },
-    });
-    var res = httpMocks.createResponse();
-    await billing.verifySpennTransactions(req, res, nextSpy);
-    expect(res.statusCode).to.equal(200);
-    expect(nextSpy.calledOnce).to.be.true;
-  });
+  // it("Test verifySpennTransactions Method with registered email and without pending subscription status with spenn payment", async () => {
+  //   var nextSpy = sinon.spy();
+  //   var req = httpMocks.createRequest({
+  //     body: {
+  //       email: "blaise12699109@gmail.com",
+  //       password: "nAdia123",
+  //     },
+  //   });
+  //   var res = httpMocks.createResponse();
+  //   await billing.verifySpennTransactions(req, res, nextSpy);
+  //   expect(res.statusCode).to.equal(200);
+  //   expect(nextSpy.calledOnce).to.be.true;
+  // });
 
-  it("Test verifySpennTransactions Method with registered email and with pending subscription status with payment method other than spenn payment", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      body: {
-        email: "blaise126991078@gmail.com",
-        password: "nAdia123",
-      },
-    });
-    var res = httpMocks.createResponse();
-    await billing.verifySpennTransactions(req, res, nextSpy);
-    expect(res.statusCode).to.equal(200);
-    expect(nextSpy.calledOnce).to.be.true;
-  });
+  // it("Test verifySpennTransactions Method with registered email and with pending subscription status with payment method other than spenn payment", async () => {
+  //   var nextSpy = sinon.spy();
+  //   var req = httpMocks.createRequest({
+  //     body: {
+  //       email: "blaise126991078@gmail.com",
+  //       password: "nAdia123",
+  //     },
+  //   });
+  //   var res = httpMocks.createResponse();
+  //   await billing.verifySpennTransactions(req, res, nextSpy);
+  //   expect(res.statusCode).to.equal(200);
+  //   expect(nextSpy.calledOnce).to.be.true;
+  // });
 
   it("Test verifySpennTransactions should return 500 when there is a server error", async () => {
     const stub = sinon.stub(userService, "getUserByMail").throws(new Error());
