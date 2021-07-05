@@ -57,8 +57,8 @@ jobs:
       AWS_S3_ROLE_ARN: arn:aws:iam::246341951723:user/uploader
       AWS_UPLOAD_ACCESS_KEY: ${{ secrets.AWS_UPLOAD_ACCESS_KEY }}
       AWS_UPLOAD_ID: ${{ secrets.AWS_UPLOAD_ID }}
-      RAVE_PUBLIC: FLWPUBK_TEST-f655ce723351e84b0f30821497c76f0c-X
-      RAVE_SECRET: ${{ secrets.RAVE_SECRET }}
+      RAVE_PUBLIC: FLWPUBK_TEST-550ad2ee64c0cdd85e36c328fdea2e2a-X
+      RAVE_SECRET: FLWSECK_TEST-d6517fb7cd876aedd88c21e0ac0c9734-X
       PAY_HOST: https://b8bkbct7m7.execute-api.eu-west-1.amazonaws.com/uat
       NODE_ENV: test
       PORT: 3004
