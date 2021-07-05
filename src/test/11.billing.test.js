@@ -440,84 +440,84 @@ describe("BILLING MIDDLEWARE", (req, res, status) => {
     expect(res.statusCode).to.equal(500);
   });
 
-  it("Test verifySpennTransactions Method with registered email and permissonLevel -1 Should throw 402", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      headers: {
-        authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzZTEyOTM0MEBnbWFpbC5jb20iLCJpYXQiOjE2MDc1MDY2OTR9.b-MbGrwGV0pty3xqefKUhinqz0RWchsSiwpbqflLkVE`,
-      },
-    });
-    var res = httpMocks.createResponse();
-    const data = await billing.verifyPermissionLevel(req, res, nextSpy);
-    expect(data.statusCode).to.equal(402);
-    expect(nextSpy.calledOnce).to.be.false;
-  });
+//   it("Test verifySpennTransactions Method with registered email and permissonLevel -1 Should throw 402", async () => {
+//     var nextSpy = sinon.spy();
+//     var req = httpMocks.createRequest({
+//       headers: {
+//         authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzZTEyOTM0MEBnbWFpbC5jb20iLCJpYXQiOjE2MDc1MDY2OTR9.b-MbGrwGV0pty3xqefKUhinqz0RWchsSiwpbqflLkVE`,
+//       },
+//     });
+//     var res = httpMocks.createResponse();
+//     const data = await billing.verifyPermissionLevel(req, res, nextSpy);
+//     expect(data.statusCode).to.equal(402);
+//     expect(nextSpy.calledOnce).to.be.false;
+//   });
 
-  it("Test verifySpennTransactions Method with registered email and permissonLevel 1 Should throw 402", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      headers: {
-        authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzZTEyNjk5MTA3Nzg3ODc4QGdtYWlsLmNvbSIsImlhdCI6MTYwNzUwODA3NH0.OHqK11xqdhIm2Y6GpJ0mdIVsQ0sXNyAjwIqux1c3DnI`,
-      },
-    });
-    var res = httpMocks.createResponse();
-    await billing.verifyPermissionLevel(req, res, nextSpy);
-    expect(nextSpy.calledOnce).to.be.true;
-  });
+//   it("Test verifySpennTransactions Method with registered email and permissonLevel 1 Should throw 402", async () => {
+//     var nextSpy = sinon.spy();
+//     var req = httpMocks.createRequest({
+//       headers: {
+//         authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzZTEyNjk5MTA3Nzg3ODc4QGdtYWlsLmNvbSIsImlhdCI6MTYwNzUwODA3NH0.OHqK11xqdhIm2Y6GpJ0mdIVsQ0sXNyAjwIqux1c3DnI`,
+//       },
+//     });
+//     var res = httpMocks.createResponse();
+//     await billing.verifyPermissionLevel(req, res, nextSpy);
+//     expect(nextSpy.calledOnce).to.be.true;
+//   });
 
-  it("Test trial Method with registered email that isOnTrial and isOnExtension is false Should next", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      headers: {
-        authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzZTEyNjk5MTA3Nzg3ODc4QGdtYWlsLmNvbSIsImlhdCI6MTYwNzUwODA3NH0.OHqK11xqdhIm2Y6GpJ0mdIVsQ0sXNyAjwIqux1c3DnI`,
-      },
-    });
-    var res = httpMocks.createResponse();
-    await billing.trial(req, res, nextSpy);
-    expect(nextSpy.calledOnce).to.be.true;
-  });
+//   it("Test trial Method with registered email that isOnTrial and isOnExtension is false Should next", async () => {
+//     var nextSpy = sinon.spy();
+//     var req = httpMocks.createRequest({
+//       headers: {
+//         authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzZTEyNjk5MTA3Nzg3ODc4QGdtYWlsLmNvbSIsImlhdCI6MTYwNzUwODA3NH0.OHqK11xqdhIm2Y6GpJ0mdIVsQ0sXNyAjwIqux1c3DnI`,
+//       },
+//     });
+//     var res = httpMocks.createResponse();
+//     await billing.trial(req, res, nextSpy);
+//     expect(nextSpy.calledOnce).to.be.true;
+//   });
 
-  it("Test trial Method with registered email that isOnTrial and isOnExtension is false Should next", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      headers: {
-        authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzMTk5OTk5OTk5NzhAZ21haWwuY29tIiwiaWF0IjoxNjA3NTA5ODk3fQ.xZwna-9ZwmzoeMnR9sF9fUluxct237eRcqrmmHxLB8w`,
-      },
-    });
-    var res = httpMocks.createResponse();
-    await billing.trial(req, res, nextSpy);
-    expect(res.statusCode).to.equal(402);
-    expect(nextSpy.calledOnce).to.be.false;
-  });
+//   it("Test trial Method with registered email that isOnTrial and isOnExtension is false Should next", async () => {
+//     var nextSpy = sinon.spy();
+//     var req = httpMocks.createRequest({
+//       headers: {
+//         authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzMTk5OTk5OTk5NzhAZ21haWwuY29tIiwiaWF0IjoxNjA3NTA5ODk3fQ.xZwna-9ZwmzoeMnR9sF9fUluxct237eRcqrmmHxLB8w`,
+//       },
+//     });
+//     var res = httpMocks.createResponse();
+//     await billing.trial(req, res, nextSpy);
+//     expect(res.statusCode).to.equal(402);
+//     expect(nextSpy.calledOnce).to.be.false;
+//   });
 
-  it("Test trial Method with registered email that trialEnds > today and viewing session is < 3 Should next", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      headers: {
-        authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlhczE5NzU2NzVAZ21haWwuY29tIiwiaWF0IjoxNjA3NTExMDEzfQ.7eb0joHwieYlccPAZ7msw7hA1b94OXg9Ic99-WqkHr8`,
-      },
-    });
-    var res = httpMocks.createResponse();
-    await billing.trial(req, res, nextSpy);
-    expect(nextSpy.calledOnce).to.be.true;
-  });
+//   it("Test trial Method with registered email that trialEnds > today and viewing session is < 3 Should next", async () => {
+//     var nextSpy = sinon.spy();
+//     var req = httpMocks.createRequest({
+//       headers: {
+//         authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlhczE5NzU2NzVAZ21haWwuY29tIiwiaWF0IjoxNjA3NTExMDEzfQ.7eb0joHwieYlccPAZ7msw7hA1b94OXg9Ic99-WqkHr8`,
+//       },
+//     });
+//     var res = httpMocks.createResponse();
+//     await billing.trial(req, res, nextSpy);
+//     expect(nextSpy.calledOnce).to.be.true;
+//   });
 
-  it("Test trial Method with registered email update user with -1 status failed", async () => {
-    const stub = sinon.stub(userService, "updateUser").callsFake(() => {
-      return [undefined, 0];
-    });
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
-      headers: {
-        authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzMTk5OTk5OTk5NzhAZ21haWwuY29tIiwiaWF0IjoxNjA3NTA5ODk3fQ.xZwna-9ZwmzoeMnR9sF9fUluxct237eRcqrmmHxLB8w`,
-      },
-    });
-    var res = httpMocks.createResponse();
-    const data = await billing.trial(req, res, nextSpy);
-    stub.restore();
-    expect(data.statusCode).to.equal(502);
-    expect(nextSpy.calledOnce).to.be.false;
-  });
+//   it("Test trial Method with registered email update user with -1 status failed", async () => {
+//     const stub = sinon.stub(userService, "updateUser").callsFake(() => {
+//       return [undefined, 0];
+//     });
+//     var nextSpy = sinon.spy();
+//     var req = httpMocks.createRequest({
+//       headers: {
+//         authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzMTk5OTk5OTk5NzhAZ21haWwuY29tIiwiaWF0IjoxNjA3NTA5ODk3fQ.xZwna-9ZwmzoeMnR9sF9fUluxct237eRcqrmmHxLB8w`,
+//       },
+//     });
+//     var res = httpMocks.createResponse();
+//     const data = await billing.trial(req, res, nextSpy);
+//     stub.restore();
+//     expect(data.statusCode).to.equal(502);
+//     expect(nextSpy.calledOnce).to.be.false;
+//   });
 
   it("Test updateTransactionsAndRegisterSales Method with registered email with updates[1] and updatedSubscription[1] which is different 1", async () => {
     const stub = sinon
