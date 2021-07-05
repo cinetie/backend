@@ -22,6 +22,55 @@ jobs:
           --health-retries=3    
     env:
       TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+      SECRET: ${{ secrets.SECRET }}
+      JWT_EXPIRATION: 10000
+      EMAIL_USER: app146030787@heroku.com
+      GOOGLE_CLIENT_ID: 616250925098-e3vfflufc0c1137nmjpie91ue27k05ig.apps.googleusercontent.com
+      GOOGLE_CLIENT_SECRET: mBBWJGRFUNu5hMjMj9Do29G8
+      FB_CLIENT_ID: 2444690765807653
+      FB_CLIENT_SECRET: e6b96b52903958f5f563e5bff37e1f61
+      DIALECT: mysql
+      TRENDING_WATCH_COUNT: 0
+      ADMIN_USER: ${{ secrets.ADMIN_USER }}
+      ADMIN_PASS: ${{ secrets.ADMIN_PASS }}
+      SMTP_HOST: ${{ secrets.SMTP_HOST }}
+      SMTP_PORT: 587
+      SENDGRID_USER: ${{ secrets.SENDGRID_USER }}
+      SENDGRID_PASS: ${{ secrets.SENDGRID_PASS }}
+      HOST: http://localhost:3004
+      DAX_PAY_URL: https://dax-pay-demo.herokuapp.com
+      MIN_CASHOUT: 0
+      DB_URL: postgres://cinetie:nAdia123@postgresql-6081-0.cloudclusters.net:10001/cinetie
+      IP_STACK_ACCESS_TOKEN: ${{ secrets.IP_STACK_ACCESS_TOKEN }}
+      ClOUDINARY_URI: http://res.cloudinary.com/n3m3sis/video/upload/v1584347284/
+      AWS_ID: ${{ secrets.AWS_ID }}
+      AWS_REGION: us-east-2
+      AWS_SECRET: ${{ secrets.AWS_SECRET }}
+      STAGING_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+      CA_LOCATION: ca-certificate.crt
+      LOGGLY_TOKEN: ${{ secrets.LOGGLY_TOKEN }}
+      HOST_USER_SERVICE: http://127.0.0.1:3002/user-service/v1
+      ADMIN_TEST_TOKEN: ${{ secrets.ADMIN_TEST_TOKEN }}
+      VALID_ADMIN_TOKEN: ${{ secrets.VALID_ADMIN_TOKEN }}
+      USER_TEST_TOKEN: ${{ secrets.USER_TEST_TOKEN }}
+      RAVE_PRODUCTION: true
+      AWS_S3_ROLE_ARN: arn:aws:iam::246341951723:user/uploader
+      AWS_UPLOAD_ACCESS_KEY: ${{ secrets.AWS_UPLOAD_ACCESS_KEY }}
+      AWS_UPLOAD_ID: ${{ secrets.AWS_UPLOAD_ID }}
+      RAVE_PUBLIC: FLWPUBK_TEST-f655ce723351e84b0f30821497c76f0c-X
+      RAVE_SECRET: ${{ secrets.RAVE_SECRET }}
+      PAY_HOST: https://b8bkbct7m7.execute-api.eu-west-1.amazonaws.com/uat
+      NODE_ENV: development
+      PORT: 3004
+      FRONT_END_USER: http://localhost:3000
+      ACCESS_KEY_CURRENCY_LAYER: "7db6dcd429ea065b315b014b7700143d"
+      TEMP_BUCKET_SERIES: vod-pipeline-3-source-2dowgj6lsflq-temp
+      TEMP_BUCKET_MOVIE: vod-pipeline-3-source-2dowgj6lsflq-temp
+      PERMANENT_BUCKET_SERIES: vod-pipeline-3-source-2dowgj6lsflq
+      PERMANENT_BUCKET_MOVIE: vod-pipeline-3-source-2dowgj6lsflq
+      THUMBNAIL_BUCKET: vod-pipeline-3-thumbnails
+      TRAILERS_BUCKET: vod-pipeline-3-trailers
+      SUBTITLE_BUCKET: cinetie-subtitles
 
     steps:
       - uses: actions/checkout@v2
@@ -29,3 +78,4 @@ jobs:
         with:
           node-version: '14.x'
       - run: npm install
+      - run: npm run migrate:test
