@@ -60,7 +60,7 @@ jobs:
       RAVE_PUBLIC: FLWPUBK_TEST-f655ce723351e84b0f30821497c76f0c-X
       RAVE_SECRET: ${{ secrets.RAVE_SECRET }}
       PAY_HOST: https://b8bkbct7m7.execute-api.eu-west-1.amazonaws.com/uat
-      NODE_ENV: development
+      NODE_ENV: test
       PORT: 3004
       FRONT_END_USER: http://localhost:3000
       ACCESS_KEY_CURRENCY_LAYER: "7db6dcd429ea065b315b014b7700143d"
