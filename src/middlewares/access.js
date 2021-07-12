@@ -1,5 +1,6 @@
 import jwt from "../helpers/jwt";
 import userService from "../services/userServices";
+import staffService from '../services/staffServices';
 import Util from "../helpers/utilities";
 import cpService from "../services/cpServices";
 
@@ -22,7 +23,8 @@ class Access {
         if (!user) {
           return util.setErrorResponse(res, "Invalid access token", 400);
         }
-        if (user !== process.env.ADMIN_USER) {
+        const admin = await staffService.getStaffByMail(user);
+        if (!admin || admin.role !== 'admin') {
           return util.setErrorResponse(res, "Access denied  ", 403);
         } else {
           return next();
