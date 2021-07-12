@@ -52,10 +52,10 @@ describe("PAYMENT HELPER", () => {
     expect(Number(results.price)).to.be.equal(3);
   });
 
-  it("should return pay chargeSpenn", async () => {
-    const results = await payment.chargeSpenn(user, details, token);
-    expect(results.status).to.be.equal(403);
-  });
+  // it("should return pay chargeSpenn", async () => {
+  //   const results = await payment.chargeSpenn(user, details, token);
+  //   expect(results.status).to.be.equal(403);
+  // });
 
   it("should return pay recordTransaction", async () => {
     // const results = await payment.recordTransaction(user, details, pay);
