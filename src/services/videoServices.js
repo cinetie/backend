@@ -85,7 +85,7 @@ class videoService {
                 [op.gte]: process.env.TRENDING_WATCH_COUNT,
               },
               creationTime: {
-                [op.gte]: date.removeDays(180),
+                [op.gte]: date.removeDays(365),
               },
               type,
               videoSuspensionState: "0",
