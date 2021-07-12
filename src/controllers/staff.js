@@ -17,13 +17,13 @@ class StaffController {
       if (!status) return util.setErrorResponse(res, 'Invalid email or password!', 400);
       const token = jwt.jwtSign(
         {
-          email: req.body.email,
+          user: req.body.email,
           role: staff.role
         },
         process.env.SECRET,
         '1d'
       );
-      return util.setSuccessResponse(res, 'Logged in successfully!', 200, token);
+      return util.setSuccessResponse(res, 'Logged in successfully!', 200, { token, role: staff.role });
     } catch (error) {
       return util.setErrorResponse(
         res,

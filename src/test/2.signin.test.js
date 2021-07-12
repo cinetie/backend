@@ -20,7 +20,7 @@ describe('SIGN IN', () => {
       .send(UserInNo)
       .end((err, res) => {
         expect(res).to.have.status(400);
-        expect(res.body).to.have.property('message', 'user doesn\'t exist');
+        expect(res.body).to.have.property('message', 'Invalid email or password!');
         done();
       });
   });
