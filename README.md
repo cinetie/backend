@@ -59,6 +59,9 @@ TEMP_BUCKET_SERIES=
 TEMP_BUCKET_MOVIE=
 PERMANENT_BUCKET_SERIES=
 PERMANENT_BUCKET_MOVIE=
+MAILCHIMP_API_KEY=
+MAILCHIMP_SERVER_PREFIX=
+MAILCHIMP_AUDIENCE_ID=
 
 ```
 
@@ -1023,6 +1026,163 @@ Response:
             "views": 2
         }
     ]
+}
+```
+
+### 21. save video watched time: POST Request
+
+Endpoint
+
+```text
+/video/time?videoId=cfc051b3-8633-4f81-a38e-7e1b3208ddf0
+```
+
+Headers:
+
+```json
+{
+  "Authorization": "Bearer <User token>",
+  "Content-Type": "application/json"
+}
+```
+
+Body:
+```json
+{
+  "watchedTime": "20",
+  "type": "movie"
+}
+```
+
+Response:
+
+```json
+{
+    "status": 201,
+    "message": "time saved successfully",
+}
+```
+
+### 22. Get video watched time: GET Request
+
+Endpoint
+
+```text
+/video/time?videoId=cfc051b3-8633-4f81-a38e-7e1b3208ddf0
+```
+
+Headers:
+
+```json
+{
+  "Authorization": "Bearer <User token>",
+  "Content-Type": "application/json"
+}
+```
+
+Body:
+**NONE**
+
+Response:
+
+```json
+{
+    "status": 200,
+    "message": "watch session retrieved successfully",
+}
+```
+
+### 22. Add a new staff: POST Request
+
+Endpoint
+
+```text
+/staff/add
+```
+
+Headers:
+
+```json
+{
+  "Authorization": "Bearer <User token>",
+  "Content-Type": "application/json"
+}
+```
+
+Body:
+{
+  "email": "user@exampele.com",
+  "role": "admin"
+}
+
+Response:
+
+```json
+{
+  "status": 201,
+  "message": "Staff added successfully!",
+}
+```
+
+### 23. Staff login: POST Request
+
+Endpoint
+
+```text
+/staff/login
+```
+
+Headers:
+
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+Body:
+{
+  "email": "user@exampele.com",
+  "password": "password1234"
+}
+
+Response:
+
+```json
+{
+  "status": 200,
+  "message": "Logged in successfully!",
+}
+```
+
+### 24. Change staff password: PUT Request
+
+Endpoint
+
+```text
+/staff/password
+```
+
+Headers:
+
+```json
+{
+  "Authorization": "Bearer <User token>",
+  "Content-Type": "application/json"
+}
+```
+
+Body:
+{
+  "newPassword": "newpassword1234"
+}
+
+Response:
+
+```json
+{
+  "status": 200,
+  "message": "password changed successfully!",
 }
 ```
 

@@ -45,8 +45,9 @@ describe("ADMIN CONTROLLER", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     await admin.getEarningsPerClient(req, res);
-    expect(res.statusCode).to.equal(404);
     stub.restore();
+    expect(res.statusCode).to.equal(404);
+    
   });
 
   it("Test getEarningsPerClient should return 500 when there is a server error", async () => {
@@ -64,8 +65,9 @@ describe("ADMIN CONTROLLER", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     await admin.getEarningsPerClient(req, res);
-    expect(res.statusCode).to.equal(500);
     stub.restore();
+    expect(res.statusCode).to.equal(500);
+    
   });
 
   it("Test getVideosPerCp should be Okay", async () => {
@@ -98,8 +100,9 @@ describe("ADMIN CONTROLLER", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     await admin.getVideosPerCp(req, res);
-    expect(res.statusCode).to.equal(400);
     stub.restore();
+    expect(res.statusCode).to.equal(400);
+    
   });
 
   it("Test getAllVideos should be Okay", async () => {
@@ -134,8 +137,9 @@ describe("ADMIN CONTROLLER", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     await admin.getAllVideos(req, res);
-    expect(res.statusCode).to.equal(400);
     stub.restore();
+    expect(res.statusCode).to.equal(400);
+    
   });
 
   it("Test getAllEarningsPerVideo should be Okay", async () => {
@@ -162,8 +166,9 @@ describe("ADMIN CONTROLLER", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     await admin.getAllEarningsPerVideo(req, res);
-    expect(res.statusCode).to.equal(404);
     stub.restore();
+    expect(res.statusCode).to.equal(404);
+    
   });
 
   it("Test getAllEarningsPerVideo should return 500 when there is a server error", async () => {
@@ -177,8 +182,9 @@ describe("ADMIN CONTROLLER", (req, res, status) => {
     });
     var res = httpMocks.createResponse();
     await admin.getAllEarningsPerVideo(req, res);
-    expect(res.statusCode).to.equal(500);
     stub.restore();
+    expect(res.statusCode).to.equal(500);
+    
   });
 
   it("Test gainAccess should be Okay", async () => {
@@ -198,8 +204,9 @@ describe("ADMIN CONTROLLER", (req, res, status) => {
     var req = httpMocks.createRequest({});
     var res = httpMocks.createResponse();
     await admin.gainAccess(req, res);
-    expect(res.statusCode).to.equal(500);
     stub.restore();
+    expect(res.statusCode).to.equal(500);
+    
   });
 
   it("Test gainAccess should return 400", async () => {
@@ -209,7 +216,8 @@ describe("ADMIN CONTROLLER", (req, res, status) => {
     var req = httpMocks.createRequest({});
     var res = httpMocks.createResponse();
     await admin.gainAccess(req, res);
-    expect(res.statusCode).to.equal(400);
     stub.restore();
+    expect(res.statusCode).to.equal(400);
+    
   });
 });

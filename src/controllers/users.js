@@ -18,6 +18,7 @@ import mailer from "../helpers/mailer";
 import Rave from "../helpers/rave";
 import Fetch from "../helpers/fetch";
 import RavePaymentRequest from "../helpers/RavePaymentRequest";
+import MailingServices from '../services/mailingServices';
 import billing from "../middlewares/billing";
 import { decode } from "querystring";
 import { Console } from "console";
@@ -55,9 +56,11 @@ class userController {
         );
         createdUser.token = userToken;
         delete createdUser.password;
+        await MailingServices.addToMailingList(createdUser.email);
         util.setSuccessResponse(res, 'Signed up successfully', 201, userToken);
       }
     } catch (error) {
+      console.log(error);
       util.setErrorResponse(res, error.message, 500);
     }
   }
@@ -150,36 +153,29 @@ class userController {
 
   static async loginUser(req, res) {
     try {
-      const user = await userService.getUserByMail(req.body.email);
-      const status = bcrypt.compare(req.body.password, user.password);
-      if (!status || !user) {
-        util.setErrorResponse(res, 'Invalid email or password!', 400);
-      } else if (!user.isVerified) {
-        util.setErrorResponse(res, 'Verify your account first!', 401);
-      } else {
-        const token = jwt.jwtSign(
-          {
-            key: cry.crypto(),
-            email: req.body.email,
-          },
-          process.env.SECRET,
-          '1d'
-        );
-        user.token = token;
-        delete user.password;
-        const dateSession = new Date();
-        const session = {
-          email: user.email,
-          date: dateSession.toDateString(),
-          timeIn: dateSession.toTimeString(),
-          timeOut: null,
-          state: 'in',
-        };
-        const addedSession = await sessionService.addSession(session);
-        if (!addedSession)
-          util.setErrorResponse(res, "Can't register session", 500);
-        util.setSuccessResponse(res, 'Logged in successfully!', 200, token);
-      }
+      const { user } = req;
+      console.log(user);
+      const token = jwt.jwtSign(
+        {
+          key: cry.crypto(),
+          email: req.body.email,
+        },
+        process.env.SECRET,
+        '1d'
+      );
+      user.token = token;
+      delete user.password;
+      const dateSession = new Date();
+      const session = {
+        email: user.email,
+        date: dateSession.toDateString(),
+        timeIn: dateSession.toTimeString(),
+        timeOut: null,
+        state: 'in',
+      };
+      const addedSession = await sessionService.addSession(session);
+      if (!addedSession) return util.setErrorResponse(res, "Can't register session", 500);
+      return util.setSuccessResponse(res, 'Logged in successfully!', 200, token);
     } catch (error) {
       util.setErrorResponse(
         res,

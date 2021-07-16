@@ -12,6 +12,7 @@ describe('TEST CRON JOB', () => {
         const start = new Date();
         const date = new Date(start.getTime());
         await stopLogin();
+        
         expect(stub.calledOnce).to.be.true;
         sinon.assert.calledWith(stub, { state: 'out',timeOut: sinon.match.string }, {
             where: {

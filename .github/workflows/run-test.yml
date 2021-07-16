@@ -1,28 +1,25 @@
-name: Node.js CI
-
-on:
-  push:
-    branches: '*'
-  pull_request:
-    branches: '*'
+name: Cinetie Test
+on: push
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
+    # Service containers to run with `container-job`
     services:
-      mysql-service:
+      # Label used to access the service container
+      mysql-master:
         image: mysql:5.7
+        ports:
+          - 3306/tcp
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: cinetie_test
-        ports:
-            - 33306:3306
         options: >-
+          --name=mysql-master
           --health-cmd="mysqladmin ping"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=3
+          --health-retries=3    
     env:
       TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
       SECRET: ${{ secrets.SECRET }}
@@ -60,10 +57,10 @@ jobs:
       AWS_S3_ROLE_ARN: arn:aws:iam::246341951723:user/uploader
       AWS_UPLOAD_ACCESS_KEY: ${{ secrets.AWS_UPLOAD_ACCESS_KEY }}
       AWS_UPLOAD_ID: ${{ secrets.AWS_UPLOAD_ID }}
-      RAVE_PUBLIC: FLWPUBK_TEST-f655ce723351e84b0f30821497c76f0c-X
-      RAVE_SECRET: ${{ secrets.RAVE_SECRET }}
+      RAVE_PUBLIC: FLWPUBK_TEST-550ad2ee64c0cdd85e36c328fdea2e2a-X
+      RAVE_SECRET: FLWSECK_TEST-d6517fb7cd876aedd88c21e0ac0c9734-X
       PAY_HOST: https://b8bkbct7m7.execute-api.eu-west-1.amazonaws.com/uat
-      NODE_ENV: development
+      NODE_ENV: test
       PORT: 3004
       FRONT_END_USER: http://localhost:3000
       ACCESS_KEY_CURRENCY_LAYER: "7db6dcd429ea065b315b014b7700143d"
@@ -74,17 +71,11 @@ jobs:
       THUMBNAIL_BUCKET: vod-pipeline-3-thumbnails
       TRAILERS_BUCKET: vod-pipeline-3-trailers
       SUBTITLE_BUCKET: cinetie-subtitles
-    container-job:
-      runs-on: ubuntu-latest
-      container: node:12.x
-    strategy:
-      matrix:
-        node-version: '12.x'
+
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm ci
-    - run: npm test
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+      - run: npm install
+      - run: npm test
