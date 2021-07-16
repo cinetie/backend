@@ -11,6 +11,17 @@ config();
 chai.use(chaiHttp);
 
 describe('GET ALL CP ACCOUNTS', () => {
+  let adminToken;
+  before(async () => {
+    const loginRes = await chai
+      .request(app)
+      .post('/staff/login')
+      .send({
+        email: 'staff@example.com',
+        password: 'izzeddin'
+      });
+    adminToken = loginRes.body.data.token;
+  });
     it('should return an error message if the user is not an admin', async () => {
         const token = jwt.jwtSign({ user: 'cp0005@example.com', }, process.env.SECRET, '1d');
         const res = await chai
@@ -40,11 +51,10 @@ describe('GET ALL CP ACCOUNTS', () => {
         const stub = sinon.stub(aws, 'getObject').callsFake(() => {
             return 'fergegergeerg.jpg'
         })
-        const token = jwt.jwtSign({ user: process.env.ADMIN_USER, }, process.env.SECRET, '1d');
         const res = await chai
             .request(app)
             .get('/cp/all')
-            .set('authorization', `bearer ${token}`)
+            .set('authorization', `bearer ${adminToken}`)
         stub.restore();
         expect(res.statusCode).to.equal(200)
         expect(res.body).to.have.property('message', 'success');
@@ -52,11 +62,10 @@ describe('GET ALL CP ACCOUNTS', () => {
     });
     it('should return 500 status code if there is a server error', async () => {
         const stub = sinon.stub(aws, 'getObject').throws(new Error('something went wrong'))
-        const token = jwt.jwtSign({ user: process.env.ADMIN_USER, }, process.env.SECRET, '1d');
         const res = await chai
             .request(app)
             .get('/cp/all')
-            .set('authorization', `bearer ${token}`)
+            .set('authorization', `bearer ${adminToken}`)
         stub.restore()
         expect(res.statusCode).to.equal(503)
     });

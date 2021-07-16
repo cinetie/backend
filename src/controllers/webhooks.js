@@ -44,7 +44,6 @@ export default class WebHooks {
 
         if (response.currency === 'USD') {
           const rates = await Fetch(undefined, { Accept: 'application/json' }, `https://apilayer.net/api/live?access_key=${process.env.ACCESS_KEY_CURRENCY_LAYER}&currencies=RWF&source=USD&format=1`, 'GET');
-          console.log(rates);
           const converted = Math.floor(rates.quotes.USDRWF * response.amount);
           response.amount = converted
         }

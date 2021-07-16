@@ -11,12 +11,22 @@ config();
 chai.use(chaiHttp);
 
 describe('UPDATE TEMP VIDEO TEST', () => {
+  let adminToken;
+  before(async () => {
+    const loginRes = await chai
+      .request(app)
+      .post('/staff/login')
+      .send({
+        email: 'staff@example.com',
+        password: 'izzeddin'
+      });
+    adminToken = loginRes.body.data.token;
+  });
     it('should update temp video', async () => {
-        const token = jwt.jwtSign({ user: process.env.ADMIN_USER, }, process.env.SECRET, '1d');
         const res = await chai
             .request(app)
             .put('/temp/update')
-            .set('authorization', `bearer ${token}`)
+            .set('authorization', `bearer ${adminToken}`)
             .query({
                 id: 165
             })
@@ -27,11 +37,10 @@ describe('UPDATE TEMP VIDEO TEST', () => {
         expect(res.body).to.have.property('message', 'Video updated');
     });
     it('should return 401 if there temp video is not found', async () => {
-        const token = jwt.jwtSign({ user: process.env.ADMIN_USER, }, process.env.SECRET, '1d');
         const res = await chai
             .request(app)
             .put('/temp/update')
-            .set('authorization', `bearer ${token}`)
+            .set('authorization', `bearer ${adminToken}`)
             .query({
                 id: 1650000
             })
@@ -43,11 +52,10 @@ describe('UPDATE TEMP VIDEO TEST', () => {
     });
     it('should return 503 if there is a server error', async () => {
         const stub = sinon.stub(services, 'updateVideos').throws(new Error('Something went wrong'));
-        const token = jwt.jwtSign({ user: process.env.ADMIN_USER, }, process.env.SECRET, '1d');
         const res = await chai
             .request(app)
             .put('/temp/update')
-            .set('authorization', `bearer ${token}`)
+            .set('authorization', `bearer ${adminToken}`)
             .query({
                 id: 1650000
             })

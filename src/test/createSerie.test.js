@@ -12,6 +12,17 @@ config();
 chai.use(chaiHttp);
 
 describe('CREATE EPISODE TEST', () => {
+  let adminToken;
+  before(async () => {
+    const loginRes = await chai
+      .request(app)
+      .post('/staff/login')
+      .send({
+        email: 'staff@example.com',
+        password: 'izzeddin'
+      });
+    adminToken = loginRes.body.data.token;
+  });
 //     it('should add a new episode', async () => {
 //         const stub = sinon.stub(aws, 'copyObjects').callsFake(() => {
 //             return { status: 'success' }
@@ -29,11 +40,10 @@ describe('CREATE EPISODE TEST', () => {
 
     it('should return 404 if the serie is not found', async () => {
         const stub = sinon.stub(aws, 'copyObjects').throws(new Error('something went wrong'));
-        const token = jwt.jwtSign({ user: process.env.ADMIN_USER, }, process.env.SECRET, '1d');
         const res = await chai
             .request(app)
             .post('/series/create')
-            .set('authorization', `bearer ${token}`)
+            .set('authorization', `bearer ${adminToken}`)
             .query({ id: 1610 });
         stub.restore();
         expect(res.statusCode).to.equal(404)
@@ -41,12 +51,11 @@ describe('CREATE EPISODE TEST', () => {
     });
     it('should return 500 if there is a server error', async () => {
 
-        const token = jwt.jwtSign({ user: process.env.ADMIN_USER, }, process.env.SECRET, '1d');
         const stub = sinon.stub(jwt, 'jwtVerify').throws(new Error('something went wrong'));
         const res = await chai
             .request(app)
             .post('/series/create')
-            .set('authorization', `bearer ${token}`)
+            .set('authorization', `bearer ${adminToken}`)
             .query({ id: 162 });
         stub.restore();
         expect(res.statusCode).to.equal(500)

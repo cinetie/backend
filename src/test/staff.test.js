@@ -66,12 +66,23 @@ describe('STAFF SIGN IN', () => {
 });
 
 describe('ADD NEW STAFF', () => {
-  const token = jwt.jwtSign({ user: process.env.ADMIN_USER, role: 'admin' }, process.env.SECRET);
+  let adminToken;
+  before(async () => {
+    const loginRes = await chai
+      .request(app)
+      .post('/staff/login')
+      .send({
+        email: 'staff@example.com',
+        password: 'izzeddin'
+      });
+    adminToken = loginRes.body.data.token;
+  });
+
   it('should return an error if invalid data', (done) => {
     chai
       .request(app)
       .post('/staff/add')
-      .set('authorization', `bearer ${token}`)
+      .set('authorization', `bearer ${adminToken}`)
       .send({
         email: 'staff123@example.com',
         role: 'president'
@@ -85,7 +96,7 @@ describe('ADD NEW STAFF', () => {
     chai
       .request(app)
       .post('/staff/add')
-      .set('authorization', `bearer ${token}`)
+      .set('authorization', `bearer ${adminToken}`)
       .send({
         email: 'staff3@example.com',
         role: 'marketing agent'
@@ -100,7 +111,7 @@ describe('ADD NEW STAFF', () => {
     chai
       .request(app)
       .post('/staff/add')
-      .set('authorization', `bearer ${token}`)
+      .set('authorization', `bearer ${adminToken}`)
       .send({
         email: 'staff3786@example.com',
         role: 'admin'

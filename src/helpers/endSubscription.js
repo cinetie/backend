@@ -9,9 +9,7 @@ const stopLoginSessions = async () => {
   });
   subscription.forEach(async (sub) => {
     if (new Date(sub.endDate).getTime() < new Date().getTime()) {
-      console.log('UPDATED SUBSCRIPTION ' + new Date() +  ' ' +sub.email + '\n');
       await db.User.update({ permissionLevel: -1 }, { where: { email: sub.email } });
-      console.log(`SUBSCRIPTION UPDATE : ${sub.email} ${new Date()}`)
       sub.state === 'pending' && await db.subscriptions.update({state: 'canceled' }, {
         returning: true,
         where: { id: sub.id }

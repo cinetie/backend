@@ -5,7 +5,6 @@ import Sequelize from "sequelize";
 import configFile from "../config";
 
 const basename = path.basename(__filename);
-console.log(process.env.NODE_ENV);
 const env = process.env.NODE_ENV.trim() || "development";
 const config = configFile[env];
 const db = {};

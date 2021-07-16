@@ -346,8 +346,6 @@ class Video {
   static async getVideoById(req, res) {
     try {
       const video = await videoService.getVideoById(req.query.id);
-      console.log(process.env.SUBTITLE_BUCKET);
-      console.log(video.EnSubt, video.EnSubt !== null);
       if (video) {
         if (video.EnSubt) {
           video.EnSubt = await getObject(process.env.SUBTITLE_BUCKET, video.EnSubt, 20);
