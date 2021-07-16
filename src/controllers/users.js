@@ -154,7 +154,6 @@ class userController {
   static async loginUser(req, res) {
     try {
       const { user } = req;
-      console.log(user);
       const token = jwt.jwtSign(
         {
           key: cry.crypto(),

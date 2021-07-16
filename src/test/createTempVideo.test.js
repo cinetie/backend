@@ -12,13 +12,23 @@ config();
 chai.use(chaiHttp);
 
 describe('POST TEMP VIDEO TEST', () => {
+  let adminToken;
+  before(async () => {
+    const loginRes = await chai
+      .request(app)
+      .post('/staff/login')
+      .send({
+        email: 'staff@example.com',
+        password: 'izzeddin'
+      });
+    adminToken = loginRes.body.data.token;
+  });
     it('should create a temp video(movie)', async () => {
-        const token = jwt.jwtSign({ user: process.env.ADMIN_USER, }, process.env.SECRET, '1d');
         const res = await chai
             .request(app)
             .post('/temp/new')
             .set('cpid', '31978540-8bdf-41cc-81d7-26200b847c0a')
-            .set('authorization', `bearer ${token}`)
+            .set('authorization', `bearer ${adminToken}`)
             .send({
                 videoName: 'integration',
                 videoCast: 'ggrtgrtg',
@@ -36,12 +46,11 @@ describe('POST TEMP VIDEO TEST', () => {
         expect(res.body).to.have.property('message', 'video uploaded successfully');
     });
     it('should create a temp video(serie)', async () => {
-        const token = jwt.jwtSign({ user: process.env.ADMIN_USER, }, process.env.SECRET, '1d');
         const res = await chai
             .request(app)
             .post('/temp/new')
             .set('cpid', '31978540-8bdf-41cc-81d7-26200b847c0a')
-            .set('authorization', `bearer ${token}`)
+            .set('authorization', `bearer ${adminToken}`)
             .send({
                 videoName: 'integration serie',
                 videoCast: 'ggrtgrtg',
@@ -60,12 +69,11 @@ describe('POST TEMP VIDEO TEST', () => {
     });
     it('should return 401 if the video can\'t be saved(movie)', async () => {
         const stub = sinon.stub(services, 'createNewVideos').returns(null);
-        const token = jwt.jwtSign({ user: process.env.ADMIN_USER, }, process.env.SECRET, '1d');
         const res = await chai
             .request(app)
             .post('/temp/new')
             .set('cpid', '31978540-8bdf-41cc-81d7-26200b847c0a')
-            .set('authorization', `bearer ${token}`)
+            .set('authorization', `bearer ${adminToken}`)
             .send({
                 videoName: 'integration',
                 videoCast: 'ggrtgrtg',
@@ -85,12 +93,11 @@ describe('POST TEMP VIDEO TEST', () => {
     });
     it('should return 401 if the video can\'t be saved(serie)', async () => {
         const stub = sinon.stub(services, 'createNewVideos').returns(null);
-        const token = jwt.jwtSign({ user: process.env.ADMIN_USER, }, process.env.SECRET, '1d');
         const res = await chai
             .request(app)
             .post('/temp/new')
             .set('cpid', '31978540-8bdf-41cc-81d7-26200b847c0a')
-            .set('authorization', `bearer ${token}`)
+            .set('authorization', `bearer ${adminToken}`)
             .send({
                 videoName: 'integration',
                 videoCast: 'ggrtgrtg',
@@ -110,12 +117,11 @@ describe('POST TEMP VIDEO TEST', () => {
     });
     it('should return 401 if the video can\'t be asaved', async () => {
         const stub = sinon.stub(services, 'createNewVideos').throws(new Error('Something went wrong'));
-        const token = jwt.jwtSign({ user: process.env.ADMIN_USER, }, process.env.SECRET, '1d');
         const res = await chai
             .request(app)
             .post('/temp/new')
             .set('cpid', '31978540-8bdf-41cc-81d7-26200b847c0a')
-            .set('authorization', `bearer ${token}`)
+            .set('authorization', `bearer ${adminToken}`)
             .send({
                 videoName: 'integration',
                 videoCast: 'ggrtgrtg',

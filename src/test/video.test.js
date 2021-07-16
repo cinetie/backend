@@ -78,7 +78,7 @@ describe("VIDEO TEST", () => {
     it("should get a 500 statu code when there is a server error", async () => {
       const req = httpMock.createRequest({
         query: {
-          id: 159,
+          id: 1600000000000,
         },
       });
       const res = httpMock.createResponse();

@@ -12,15 +12,25 @@ config();
 chai.use(chaiHttp);
 
 describe('DELETE AN EPISODE TEST', () => {
+  let adminToken;
+  before(async () => {
+    const loginRes = await chai
+      .request(app)
+      .post('/staff/login')
+      .send({
+        email: 'staff@example.com',
+        password: 'izzeddin'
+      });
+    adminToken = loginRes.body.data.token;
+  });
     it('should delete an episode', async () => {
         const stub = sinon.stub(aws, 'deleteObject').callsFake(() => {
             return []
         })
-        const token = jwt.jwtSign({ user: process.env.ADMIN_USER, }, process.env.SECRET, '1d');
         const res = await chai
             .request(app)
             .delete('/series/delete/151')
-            .set('authorization', `bearer ${token}`)
+            .set('authorization', `bearer ${adminToken}`)
         stub.restore();
         expect(res.statusCode).to.equal(200);
         expect(res.body).to.have.property('message', 'deleted easily')
@@ -29,31 +39,28 @@ describe('DELETE AN EPISODE TEST', () => {
         const stub = sinon.stub(aws, 'deleteObject').callsFake(() => {
             return [1]
         })
-        const token = jwt.jwtSign({ user: process.env.ADMIN_USER, }, process.env.SECRET, '1d');
         const res = await chai
             .request(app)
             .delete('/series/delete/151')
-            .set('authorization', `bearer ${token}`)
+            .set('authorization', `bearer ${adminToken}`)
         stub.restore();
         expect(res.statusCode).to.equal(400);
         expect(res.body).to.have.property('message', 'Can\'t find what you requested')
     });
     it('should return 400 status code if the user can\'t delete an episode', async () => {
-        const token = jwt.jwtSign({ user: process.env.ADMIN_USER, }, process.env.SECRET, '1d');
         const res = await chai
             .request(app)
             .delete('/series/delete/15154')
-            .set('authorization', `bearer ${token}`)
+            .set('authorization', `bearer ${adminToken}`)
         expect(res.statusCode).to.equal(400);
         expect(res.body).to.have.property('message', 'Can\'t find what you requested')
     });
     it('should return 500 status code if there is a  server error', async () => {
         const stub = sinon.stub(services, 'getSingleEpisode').throws('Something went wrong')
-        const token = jwt.jwtSign({ user: process.env.ADMIN_USER, }, process.env.SECRET, '1d');
         const res = await chai
             .request(app)
             .delete('/series/delete/15156')
-            .set('authorization', `bearer ${token}`)
+            .set('authorization', `bearer ${adminToken}`)
         stub.restore();
         expect(res.statusCode).to.equal(500);
     });

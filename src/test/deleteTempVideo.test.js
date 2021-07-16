@@ -12,6 +12,17 @@ config();
 chai.use(chaiHttp);
 
 describe("DELETE TEMP VIDEOS TEST", () => {
+  let adminToken;
+  before(async () => {
+    const loginRes = await chai
+      .request(app)
+      .post('/staff/login')
+      .send({
+        email: 'staff@example.com',
+        password: 'izzeddin'
+      });
+    adminToken = loginRes.body.data.token;
+  });
   //     it('should delete the temp video', async () => {
   //         const stub = sinon.stub(aws, 'deleteObject').callsFake(() => ({ status: 'success' }))
   //         const token = jwt.jwtSign({ user: process.env.ADMIN_USER, }, process.env.SECRET, '1d');
@@ -37,15 +48,10 @@ describe("DELETE TEMP VIDEOS TEST", () => {
   //     expect(res.body).to.have.property('message', 'No video found');
   // });
   it("should return 404 if not video is found", async () => {
-    const token = jwt.jwtSign(
-      { user: process.env.ADMIN_USER },
-      process.env.SECRET,
-      "1d"
-    );
     const res = await chai
       .request(app)
       .delete("/temp/")
-      .set("authorization", `bearer ${token}`)
+      .set("authorization", `bearer ${adminToken}`)
       .query({ id: 16400 });
     expect(res.statusCode).to.equal(401);
     expect(res.body).to.have.property("message", "No video found");
@@ -54,15 +60,10 @@ describe("DELETE TEMP VIDEOS TEST", () => {
     const stub = sinon
       .stub(services, "getParticularVideo")
       .throws(new Error("Something went wrong"));
-    const token = jwt.jwtSign(
-      { user: process.env.ADMIN_USER },
-      process.env.SECRET,
-      "1d"
-    );
     const res = await chai
       .request(app)
       .delete("/temp/")
-      .set("authorization", `bearer ${token}`)
+      .set("authorization", `bearer ${adminToken}`)
       .query({ id: 164000 });
     stub.restore();
     expect(res.statusCode).to.equal(503);

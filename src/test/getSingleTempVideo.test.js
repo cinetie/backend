@@ -12,6 +12,17 @@ config();
 chai.use(chaiHttp);
 
 describe("GET SINGLE TEMP VIDEO TEST", () => {
+  let adminToken;
+  before(async () => {
+    const loginRes = await chai
+      .request(app)
+      .post('/staff/login')
+      .send({
+        email: 'staff@example.com',
+        password: 'izzeddin'
+      });
+    adminToken = loginRes.body.data.token;
+  });
   // it('should return the tempVideo', async () => {
   //     const stub = sinon.stub(aws, 'getObject').callsFake(() => 'ferferfregrg.com/greger.mp4');
   //     const token = jwt.jwtSign({ user: process.env.ADMIN_USER, }, process.env.SECRET, '1d');
@@ -44,15 +55,11 @@ describe("GET SINGLE TEMP VIDEO TEST", () => {
     const stub = sinon
       .stub(aws, "getObject")
       .callsFake(() => "ferferfregrg.com/greger.mp4");
-    const token = jwt.jwtSign(
-      { user: process.env.ADMIN_USER },
-      process.env.SECRET,
-      "1d"
-    );
+
     const res = await chai
       .request(app)
       .get("/temp/")
-      .set("authorization", `bearer ${token}`)
+      .set("authorization", `bearer ${adminToken}`)
       .query({ id: 163000 });
     stub.restore();
     expect(res.statusCode).to.equal(404);
@@ -62,15 +69,10 @@ describe("GET SINGLE TEMP VIDEO TEST", () => {
     const stub = sinon
       .stub(services, "getParticularVideo")
       .throws(new Error("Something went wrong"));
-    const token = jwt.jwtSign(
-      { user: process.env.ADMIN_USER },
-      process.env.SECRET,
-      "1d"
-    );
     const res = await chai
       .request(app)
       .get("/temp/")
-      .set("authorization", `bearer ${token}`)
+      .set("authorization", `bearer ${adminToken}`)
       .query({ id: 163 });
     stub.restore();
     expect(res.statusCode).to.equal(503);
