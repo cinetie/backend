@@ -77,6 +77,17 @@ export default class WebHooks {
       }
     } catch (error) {
       console.log(error)
+      if (req) {
+        const response = (req.body.data) ? req.body.data : req.body;
+        const user = await UserService.getUserByMail(response.customer.email
+        || response.data.customer.email);
+        const updates = await UserService.updateUser(
+          user.email,
+          { permissionLevel: -1 });
+
+        await billingService.updateSubscription(user.email,
+          { state: 'ended' });
+      }
       return util.setErrorResponse(res, `Server Error ${error || error.message}`, 500);
     }
   }

@@ -9,7 +9,7 @@ import app from '../index';
 config();
 chai.use(chaiHttp);
 
-describe.only('GET ALL SERIE SEASONS TEST', () => {
+describe('GET ALL SERIE SEASONS TEST', () => {
     it('should return the seasons', async () => {
         const loginRes = await chai
             .request(app)

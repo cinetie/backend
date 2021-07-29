@@ -9,8 +9,8 @@ import app from "../index";
 config();
 chai.use(chaiHttp);
 
-describe.only("GET A SINGLE SERIE SEASONS TEST", () => {
-  it.only("should return the season", async () => {
+describe("GET A SINGLE SERIE SEASONS TEST", () => {
+  it("should return the season", async () => {
     const loginRes = await chai
       .request(app)
       .post("/staff/login")
@@ -31,7 +31,7 @@ describe.only("GET A SINGLE SERIE SEASONS TEST", () => {
     expect(res.statusCode).to.equal(200);
     expect(res.body.data).to.an("array");
   });
-  it.only("should return 400 if there is not season found", async () => {
+  it("should return 400 if there is not season found", async () => {
     const loginRes = await chai
       .request(app)
       .post("/staff/login")
