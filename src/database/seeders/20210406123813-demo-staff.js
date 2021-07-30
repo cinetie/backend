@@ -40,6 +40,14 @@ export default {
       updatedAt: new Date(),
       createdAt: new Date(),
     },
+    {
+      id: 505,
+      email: 'staff4000@example.com',
+      role: 'admin',
+      password: '$2b$10$XCCEIBq8tdcefxoHvzUwne7HDH6WAuI.ACv7UeBWUGaCOAiMOApae',
+      updatedAt: new Date(),
+      createdAt: new Date(),
+    },
   ]),
   down: (queryInterface) => queryInterface.bulkDelete('Staffs', null, {}),
 };
