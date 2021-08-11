@@ -79,6 +79,40 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
   //   stub1.restore();
   //   expect(res.statusCode).to.equal(400);
   // });
+  // it("Test UpdateAccountAndSubscription mobile mpesa should be Okay", async () => {
+  //   const stub = sinon.stub(jwt, "jwtVerify").callsFake(() => {
+  //     return { email: "blaise12xxxxxx12333new@gmail.com" };
+  //   });
+  //   var req = httpMocks.createRequest({
+  //     headers: {
+  //       authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzZTEyOTM0MEBnbWFpbC5jb20iLCJpYXQiOjE2MDc1MDY2OTR9.b-MbGrwGV0pty3xqefKUhinqz0RWchsSiwpbqflLkVE`,
+  //     },
+  //   });
+  //   var res = httpMocks.createResponse();
+  //   const data = await userController.updateAccountAndSubscription(req, res);
+  //   stub.restore();
+  //   expect(res.statusCode).to.equal(201);
+  // });
+
+  // it("Test UpdateAccountAndSubscription mobile mpesa should be 400", async () => {
+  //   const stub = sinon.stub(jwt, "jwtVerify").callsFake(() => {
+  //     return { email: "blaise12xxxxxx12333new@gmail.com" };
+  //   });
+  //   const stub1 = sinon.stub(userService, "updateUser").callsFake(() => {
+  //     return 5;
+  //   });
+  //   var req = httpMocks.createRequest({
+  //     headers: {
+  //       authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzZTEyOTM0MEBnbWFpbC5jb20iLCJpYXQiOjE2MDc1MDY2OTR9.b-MbGrwGV0pty3xqefKUhinqz0RWchsSiwpbqflLkVE`,
+  //     },
+  //   });
+  //   var res = httpMocks.createResponse();
+  //   const data = await userController.updateAccountAndSubscription(req, res);
+  //   stub.restore();
+  //   stub1.restore();
+  //   expect(res.statusCode).to.equal(400);
+  // });
+
 
   // it("Test UpdateAccountAndSubscription mobile money ZAMBIA(MTN) should be Okay", async () => {
   //   const stub = sinon.stub(jwt, "jwtVerify").callsFake(() => {
