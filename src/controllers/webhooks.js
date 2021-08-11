@@ -29,6 +29,7 @@ export default class WebHooks {
       // const recentTrans = await transactions.getTransactionsByEmail(user.email, 'pending');
       const test = await transactions.updateTransaction(response.tx_ref, { statusDesc: response.status.toLowerCase() });
       const transVerification = await Transaction.verify({ id: response.id });
+      console.log(`[Rave]: ${transVerification}`);
       if (transVerification.status === 'success') {
         let updates = {};
         await billingService.updateSubscription(user.email, {
