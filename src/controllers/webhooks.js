@@ -18,7 +18,7 @@ const rave = new Flutterwave(
   process.env.RAVE_SECRET,
   Boolean(process.env.RAVE_PRODUCTION)
 );
-export const { Transaction } = rave; 
+export const { Transaction } = rave;
 export default class WebHooks {
   // eslint-disable-next-line consistent-return
   static async flutterWave(req, res) {
@@ -29,24 +29,28 @@ export default class WebHooks {
       // const recentTrans = await transactions.getTransactionsByEmail(user.email, 'pending');
       const test = await transactions.updateTransaction(response.tx_ref, { statusDesc: response.status.toLowerCase() });
       const transVerification = await Transaction.verify({ id: response.id });
-      console.log(`[Rave]: ${transVerification}`);
+      console.log(`[Rave]: ${transVerification.status}`);
+      console.log(`[Rave]: ${{ ...transVerification }}`);
       if (transVerification.status === 'success') {
         let updates = {};
         await billingService.updateSubscription(user.email, {
-          endDate: !user.isBilledAnnually 
-          ? date.addMoreDays(30).toDateString() 
-          : date.addMoreDays(365).toDateString(), state: 'current'
+          endDate: !user.isBilledAnnually
+            ? date.addMoreDays(30).toDateString()
+            : date.addMoreDays(365).toDateString(),
+          state: 'current'
         });
-        const userUpdates = response['event.type'] === 'CARD_TRANSACTION' 
-        ? { permissionLevel: 1, card_nonce: transVerification.data.card.token }
-        : { permissionLevel: 1 }
-        updates = await UserService.updateUser( user.email, userUpdates );
+        const userUpdates = response['event.type'] === 'CARD_TRANSACTION'
+          ? { permissionLevel: 1, card_nonce: transVerification.data.card.token }
+          : {
+            permissionLevel: 1
+          }
+        updates = await UserService.updateUser(user.email, userUpdates);
         // creating sales
 
         if (response.currency === 'USD') {
           const rates = await Fetch(undefined, { Accept: 'application/json' }, `https://apilayer.net/api/live?access_key=${process.env.ACCESS_KEY_CURRENCY_LAYER}&currencies=RWF&source=USD&format=1`, 'GET');
           const converted = Math.floor(rates.quotes.USDRWF * response.amount);
-          response.amount = converted
+          response.amount = converted;
         }
         const status = await WebHooks.registerSales(response, user, req, res);
         if (status === true) {
@@ -81,10 +85,11 @@ export default class WebHooks {
       if (req) {
         const response = (req.body.data) ? req.body.data : req.body;
         const user = await UserService.getUserByMail(response.customer.email
-        || response.data.customer.email);
+          || response.data.customer.email);
         const updates = await UserService.updateUser(
           user.email,
-          { permissionLevel: -1 });
+          { permissionLevel: -1 }
+        );
 
         await billingService.updateSubscription(user.email,
           { state: 'ended' });
@@ -101,9 +106,8 @@ export default class WebHooks {
       user: user.email
     });
     if (sales) {
-      return true
-    } else {
-      throw new Error('Sales recording error');
+      return true;
     }
+    throw new Error('Sales recording error');
   }
 }
