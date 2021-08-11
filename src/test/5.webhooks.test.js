@@ -2,9 +2,10 @@ import chai, { expect } from "chai";
 import chaiHttp from "chai-http";
 import { describe, it } from "mocha";
 import WebHooks, { Transaction } from "../controllers/webhooks";
+import transactions from '../services/transactionService';
 import emptyMock from "./mock/empty.mock";
 import sinon from "sinon";
-import { FlutterMocksEmpty, FlutterMocks } from "./mock/flutterwave.mock";
+import { FlutterMocksEmpty, FlutterMocks, FlutterMocksError } from "./mock/flutterwave.mock";
 
 chai.use(chaiHttp);
 
@@ -45,10 +46,12 @@ const transFailFake = {
 }
 describe("WEBHOOKS", () => {
   it("should return 500 if no body is provided", async () => {
+    const stub = sinon.stub(transactions, 'updateTransaction').throws(new Error());
     const data = await WebHooks.flutterWave(
-      FlutterMocksEmpty.request,
-      FlutterMocksEmpty.response
+      FlutterMocksError.request,
+      FlutterMocksError.response
     );
+    stub.restore();
     expect(data.statusCode).to.be.equal(500);
     return 0;
   });
