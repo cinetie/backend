@@ -32,17 +32,10 @@ export default class WebHooks {
       const test = await transactions.updateTransaction(response.tx_ref, {
         statusDesc: response.status.toLowerCase(),
       });
-      const transVerification = await axios.get(
-        `https://api.flutterwave.com/v3/transactions/${response.id}/verify`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.RAVE_SECRET}`,
-          },
-        }
-      );
-      
-      if (transVerification.data.status === "success") {
+
+      const transVerification = await WebHooks.transVerification(response.id);
+
+      if (transVerification.status === "success") {
         let updates = {};
         await billingService.updateSubscription(user.email, {
           endDate: !user.isBilledAnnually
@@ -54,7 +47,7 @@ export default class WebHooks {
           response["event.type"] === "CARD_TRANSACTION"
             ? {
                 permissionLevel: 1,
-                card_nonce: transVerification.data.data.card.token,
+                card_nonce: transVerification.data.card.token,
               }
             : { permissionLevel: 1 };
         updates = await UserService.updateUser(user.email, userUpdates);
@@ -129,6 +122,19 @@ export default class WebHooks {
         500
       );
     }
+  }
+  static async transVerification(id) {
+    const transVerification = await axios.get(
+      `https://api.flutterwave.com/v3/transactions/${id}/verify`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.RAVE_SECRET}`,
+        },
+      }
+    );
+
+    return transVerification.data;
   }
 
   static async registerSales(response, user, req, res) {
