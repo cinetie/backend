@@ -2,10 +2,16 @@ import chai, { expect } from "chai";
 import chaiHttp from "chai-http";
 import { describe, it } from "mocha";
 import WebHooks, { Transaction } from "../controllers/webhooks";
-import transactions from '../services/transactionService';
+import transactions from "../services/transactionService";
 import emptyMock from "./mock/empty.mock";
 import sinon from "sinon";
-import { FlutterMocksEmpty, FlutterMocks, FlutterMocksError } from "./mock/flutterwave.mock";
+import {
+  FlutterMocksEmpty,
+  FlutterMocks,
+  FlutterMocksError,
+  verifyTransResponse,
+  verifyTransResponseFailed,
+} from "./mock/flutterwave.mock";
 
 chai.use(chaiHttp);
 
@@ -23,30 +29,33 @@ const userFake = {
 };
 const transPassFake = {
   // Faking a successful transaction
-  status : "success",
+  status: "success",
   statusCode: 200,
-  data : {
+  data: {
     card: {
-      token: "nuornuonoenfoenoenonn"
+      token: "nuornuonoenfoenoenonn",
     },
-    amount: 250
-  }
-}
+    amount: 250,
+  },
+};
 
 const transFailFake = {
   // Faking a successful transaction
-  status : "fail",
+  status: "fail",
   statusCode: 200,
-  data : {
+  data: {
     card: {
-      token: "nuornuonoenfoenoenonn"
+      token: "nuornuonoenfoenoenonn",
     },
-    amount: 250
-  }
-}
+    amount: 250,
+  },
+};
+
 describe("WEBHOOKS", () => {
   it("should return 500 if no body is provided", async () => {
-    const stub = sinon.stub(transactions, 'updateTransaction').throws(new Error());
+    const stub = sinon
+      .stub(transactions, "updateTransaction")
+      .throws(new Error());
     const data = await WebHooks.flutterWave(
       FlutterMocksError.request,
       FlutterMocksError.response
@@ -57,25 +66,30 @@ describe("WEBHOOKS", () => {
   });
 
   it("should return 200 if body is provided", async () => {
-    const stub = sinon.stub(Transaction, "verify").callsFake(() => transPassFake)
+    const stub = sinon.stub(WebHooks, "transVerification").callsFake(() => {
+      return verifyTransResponse;
+    });
     const data = await WebHooks.flutterWave(
       FlutterMocks.request,
       FlutterMocks.response
     );
     stub.restore();
+
     expect(data.statusCode).to.be.equal(200);
     return 0;
   });
 
   it("should return 400 if transaction verification returned a failed status", async () => {
-    const stub = sinon.stub(Transaction, "verify").callsFake(() => transFailFake)
+    const stub = sinon.stub(WebHooks, "transVerification").callsFake(() => {
+      return verifyTransResponseFailed;
+    });
     const data = await WebHooks.flutterWave(
       FlutterMocks.request,
       FlutterMocks.response
     );
-    stub.restore()
-    expect(data.statusCode).to.be.equal(400)
-  })
+    stub.restore();
+    expect(data.statusCode).to.be.equal(400);
+  });
 
   it("should return true", async () => {
     const data = await WebHooks.registerSales(
