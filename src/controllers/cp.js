@@ -10,7 +10,7 @@ import mailer from '../helpers/mailer';
 import Util from '../helpers/utilities';
 import uuid from '../helpers/uuid';
 import date from '../helpers/date';
-import { upload, getObject } from '../helpers/aws';
+import { getObject } from '../helpers/aws';
 
 const util = new Util();
 // add an isVerified column to cp
@@ -18,12 +18,9 @@ class cpController {
   static async signupCp(req, res) {
     try {
       const newUser = req.body;
-      newUser.password = await bcrypt.encrypt(newUser.password);
+      newUser.password = bcrypt.encrypt(newUser.password);
       newUser.isVerified = false;
       newUser.clientId = uuid.generator();
-      const { image } = req.files;
-      const uploadedThumb = await upload('contentproviderids', image);
-      newUser.idLink = uploadedThumb.data.Key;
       const checkUser = await cp.getCpByMail(newUser.email);
       if (checkUser != null) {
         return util.setErrorResponse(res, 'cp already exists', 422);

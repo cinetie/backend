@@ -9,7 +9,6 @@ export default {
       cityOfResidence: 'Muhima',
       isVerified: true,
       phoneLine: '+240799887212',
-      idLink: null,
       updatedAt: new Date(),
       createdAt: new Date(),
     },

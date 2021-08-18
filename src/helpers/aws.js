@@ -26,27 +26,6 @@ const getObject = async (Bucket, Key, Expires) => {
   return uri;
 };
 
-const upload = async (bucket, file) => {
-  config({
-    AWS_SECRET: process.env.AWS_UPLOAD_ACCESS_KEY,
-    AWS_ID: process.env.AWS_UPLOAD_ID
-  });
-  const readFileAsync = promisify(fs.readFile);
-  const S3Upload = new AWS.S3({ apiVersion: '2006-03-01' });
-  const extension = file.name.split('.').pop();
-  const fileToUpload = await readFileAsync(file.tempFilePath);
-  const params = {
-    Bucket: bucket,
-    Key: `${V4()}.${extension}`,
-    Body: fileToUpload
-  };
-  const data = await S3Upload.upload(params).promise();
-  return {
-    file: fileToUpload,
-    data
-  };
-};
-
 const deleteObject = async (Bucket, Key) => {
   config({
     AWS_SECRET: process.env.AWS_UPLOAD_ACCESS_KEY,
@@ -100,5 +79,5 @@ const getSignedUrl = async (Bucket, ContentType, extension) => {
 };
 
 export {
-  getObject, deleteObject, copyObjects, getSignedUrl, upload
+  getObject, deleteObject, copyObjects, getSignedUrl
 };
