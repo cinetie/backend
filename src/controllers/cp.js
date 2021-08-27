@@ -253,7 +253,6 @@ class cpController {
       const cps = await cp.getAllCps();
       for (let i = 0; i < cps.length; i += 1) {
         // eslint-disable-next-line no-await-in-loop
-        cps[i].idLink = await getObject('contentproviderids', cps[i].idLink, 5000);
         cps[i].password = undefined;
       }
       util.setSuccessResponse(res, 'success', 200, cps);

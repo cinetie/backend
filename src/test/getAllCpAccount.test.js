@@ -6,6 +6,7 @@ import { describe, it } from 'mocha';
 import app from '../index';
 import jwt from '../helpers/jwt';
 import * as aws from '../helpers/aws';
+import cp from "../services/cpServices"
 
 config();
 chai.use(chaiHttp);
@@ -61,7 +62,7 @@ describe('GET ALL CP ACCOUNTS', () => {
         expect(res.body.data).to.be.an('array')
     });
     it('should return 500 status code if there is a server error', async () => {
-        const stub = sinon.stub(aws, 'getObject').throws(new Error('something went wrong'))
+        const stub = sinon.stub(cp, 'getAllCps').throws(new Error('something went wrong'))
         const res = await chai
             .request(app)
             .get('/cp/all')
