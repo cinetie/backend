@@ -16,8 +16,8 @@ import endSubscription from './helpers/endSubscription';
 
 config();
 cron.schedule('0 0 0 * * *', stopLoginSessions);
-cron.schedule('0 0 * * *', () => {
-  calculateEarnings
+cron.schedule('0 0 * * *', async () => {
+  await calculateEarnings();
 }, {
   scheduled: true,
   timezone: "Africa/Cairo"
