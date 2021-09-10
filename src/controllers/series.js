@@ -106,6 +106,28 @@ class Episodes {
     }
   }
 
+  static async deleteTemp(req, res) {
+    try {
+      const tempEpisode = await temp.getParticularVideo(req.params.id); 
+      if (!tempEpisode) return util.setErrorResponse(res, 'Can\'t find what you requested', 400);
+      const decodeUri = jwt.jwtVerify(tempEpisode.uri, process.env.SECRET);
+      const videoFile = await services.getSingleEpisode(decodeUri.id); 
+      if (!videoFile) return util.setErrorResponse(res, 'Can\'t find what you requested', 400);
+      const results = videoFile.episode !== null ?
+        await deleteObject(process.env.TEMP_BUCKET_SERIES, decodeUri.uri) :
+        await deleteObject(process.env.TEMP_BUCKET_SERIES, decodeUri.uri);
+      const deleted = await services.deleteEpisode(decodeUri.id);
+      const tempDelete = await temp.deleteSeries(req.params.id);
+      if (deleted && tempDelete && Object.values(results).length === 0) {
+        return util.setSuccessResponse(res, 'deleted easily', 200, deleted);
+      }
+      return util.setErrorResponse(res, 'Can\'t find what you requested', 400);
+    } catch (error) {
+      console.log(error);
+      return util.setErrorResponse(res, `Something happened ${error.message}`, 500);
+    }
+  }
+
   static async getVideosByClientId(req, res) {
     try {
       const token = req.headers.authorization.slice(7);
