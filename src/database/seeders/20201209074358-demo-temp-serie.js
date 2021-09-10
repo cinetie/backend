@@ -62,6 +62,24 @@ export default {
       updatedAt: new Date(),
       createdAt: new Date(),
 
+    },
+    {
+      id: 163,
+      videoId: '3844f4a5-0b9a-493c-af0c-20967fee9407',
+      uri: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmkiOiJkMzBmMGQ3NC1mOTM3LTQzZTUtYjA5NC03M2I5MTA1MmIwNWQubXA0IiwiaWQiOjgzLCJpYXQiOjE2MzEyMDI4MTJ9.GCTbceAOBHNSbMbJ0ki0FTY04U7J2AX2IkKYD2n83o4',
+      size: null,
+      updatedAt: new Date(),
+      createdAt: new Date(),
+
+    },
+    {
+      id: 164,
+      videoId: '3844f4a5-0b9a-493c-af0c-20967fee9407',
+      uri: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmkiOiJjYjdhMWI1ZC0xYTFlLTQ4MTktODhkNi01MGI5ODQ5YjFkMjkubXA0IiwiaWQiOjg0LCJpYXQiOjE2MzEyMDQwMDd9.-9JpxWAuXQqO2CKljc1k_rnOGAY3gx0pLyUFzU2HJbw',
+      size: null,
+      updatedAt: new Date(),
+      createdAt: new Date(),
+
     }
   ]),
   down: (queryInterface) => queryInterface.bulkDelete('tempSeries', null, {}),
