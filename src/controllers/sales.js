@@ -107,7 +107,7 @@ class salesController {
             }
           }
         }
-        return response.successResponse(res, 200, 'Earnings found ', {
+        return response.successResponse(res, 200, 'Sales found ', {
           data: resp
         });
       }
