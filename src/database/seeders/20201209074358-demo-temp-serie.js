@@ -1,3 +1,7 @@
+import dotenv from 'dotenv';
+import jwt from '../../helpers/jwt';
+
+dotenv.config();
 export default {
   up: (queryInterface) => queryInterface.bulkInsert('tempSeries', [
     {
@@ -66,7 +70,7 @@ export default {
     {
       id: 163,
       videoId: '3844f4a5-0b9a-493c-af0c-20967fee9407',
-      uri: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmkiOiJkMzBmMGQ3NC1mOTM3LTQzZTUtYjA5NC03M2I5MTA1MmIwNWQubXA0IiwiaWQiOjgzLCJpYXQiOjE2MzEyMDI4MTJ9.GCTbceAOBHNSbMbJ0ki0FTY04U7J2AX2IkKYD2n83o4',
+      uri: jwt.jwtSign({ uri: '14acd40f-54e6-4d41fg-88a1-2efbdf49dfgcac59.mp4', id: 83 }, process.env.SECRET),
       size: null,
       updatedAt: new Date(),
       createdAt: new Date(),
@@ -75,7 +79,7 @@ export default {
     {
       id: 164,
       videoId: '3844f4a5-0b9a-493c-af0c-20967fee9407',
-      uri: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmkiOiJjYjdhMWI1ZC0xYTFlLTQ4MTktODhkNi01MGI5ODQ5YjFkMjkubXA0IiwiaWQiOjg0LCJpYXQiOjE2MzEyMDQwMDd9.-9JpxWAuXQqO2CKljc1k_rnOGAY3gx0pLyUFzU2HJbw',
+      uri: jwt.jwtSign({ uri: '14acd40f-54e6-4d41fg-88a1-2efbdf49dfgcac59.mp4', id: 84 }, process.env.SECRET),
       size: null,
       updatedAt: new Date(),
       createdAt: new Date(),
