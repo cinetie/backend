@@ -9,21 +9,32 @@ import { config } from 'dotenv';
 import path from 'path';
 import fileUpload from 'express-fileupload';
 import response from './helpers/response';
-import stopLoginSessions from "./helpers/stopLoginSessions";
+import stopLoginSessions from './helpers/stopLoginSessions';
 import calculateEarnings from './helpers/calculateEarning';
 import routes from './routes';
 import endSubscription from './helpers/endSubscription';
 
 config();
-cron.schedule('0 0 0 * * *', stopLoginSessions);
-cron.schedule('0 0 * * *', () => {
-  calculateEarnings
+cron.schedule('0 0 0 * * *', async () => {
+  await stopLoginSessions();
+});
+cron.schedule(
+  '0 0 * * *',
+  async () => {
+    await calculateEarnings();
+  },
+  {
+    scheduled: true,
+    timezone: 'Africa/Cairo',
+  },
+);
+
+cron.schedule('0 0 * * *', async () => {
+  await endSubscription();
 }, {
   scheduled: true,
-  timezone: "Africa/Cairo"
+  timezone: 'Africa/Cairo',
 });
-
-cron.schedule('0 0 * * *', endSubscription, { scheduled: true, timezone: "Africa/Cairo" });
 const app = express();
 
 app.enable('trust proxy');
@@ -31,18 +42,26 @@ app.enable('trust proxy');
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(fileUpload({
-  useTempFiles: true,
-  tempFileDir: '/tmp/',
-  limits: { fileSize: 5000 * 1024 * 1024 }
-}));
-app.use(morgan('dev'))
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: '/tmp/',
+    limits: { fileSize: 5000 * 1024 * 1024 },
+  }),
+);
+app.use(morgan('dev'));
 
 app.get('/', (req, res) => response.successResponse(res, 200, 'Welcome to Cinetie'));
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, OPTIONS, DELETE');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header(
+    'Access-Control-Allow-Methods',
+    'GET, POST, PUT, PATCH, OPTIONS, DELETE',
+  );
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept',
+  );
   next();
 });
 app.use('/', routes);

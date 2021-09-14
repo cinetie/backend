@@ -80,14 +80,21 @@ class Access {
       const token = req.headers.authorization.slice(7);
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
       const { email } = decoded;
-      if (email || decoded.user === process.env.ADMIN_USER) {
+      if (email) {
         req.user = email;
         next();
+      } else if (!email && decoded) {
+        const { user } = decoded;
+        const admin = await staffService.getStaffByMail(user);
+        if (!admin || admin.role !== 'admin') {
+          return util.setErrorResponse(res, "Access denied", 403);
+        }
+        next();
       } else {
-        util.setErrorResponse(res, "Access denied", 403);
+        return util.setErrorResponse(res, "Access denied", 403);
       }
     } catch (error) {
-      util.setErrorResponse(res, error.message, 500);
+      return util.setErrorResponse(res, error.message, 500);
     }
   }
 
