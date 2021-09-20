@@ -1,81 +1,18 @@
-import chai, { expect } from "chai";
+import { expect } from "chai";
 import sinon from "sinon";
-import fs from "fs";
 import httpMock from "node-mocks-http";
 import dotenv from "dotenv";
 import nock from "nock";
-import fetch from "node-fetch";
-import path from "path";
 import trailerServices from "../services/trailerService";
 import videoController from "../controllers/video";
-import { deleteObject } from "../helpers/aws";
-import uploader from "../helpers/videoUploader";
-import services from "../services/tempVideoServices";
 import videoService from "../services/videoServices";
-import * as videoHelper from "../helpers/video";
 import jwt from "../helpers/jwt";
 import * as aws from "../helpers/aws";
-import videoUploader from "../helpers/videoUploader";
+
 
 dotenv.config();
 describe("VIDEO TEST", () => {
   describe("ADD VIDEO", () => {
-    // it('Should save the video and return 201 status code(serie)', async () => {
-    //     const req = httpMock.createRequest({
-    //         query: {
-    //             id: 159
-    //         }
-    //     });
-    //     const res = httpMock.createResponse();
-    //     await videoController.addVideo(req, res);
-    //     expect(res.statusCode).to.equal(201);
-    // });
-    // it("Should save the video and return 201 status code(movie)", async () => {
-    //   const stub = sinon.stub(aws, "copyObjects").callsFake(() => {
-    //     return [{ status: "success" }];
-    //   });
-    //   const stub2 = sinon.stub(aws, "deleteObject").callsFake(() => {
-    //     return [{ status: "success" }];
-    //   });
-    //   const req = httpMock.createRequest({
-    //     query: {
-    //       id: 162,
-    //     },
-    //   });
-    //   const res = httpMock.createResponse();
-    //   await videoController.addVideo(req, res);
-    //   stub.restore();
-    //   stub2.restore();
-    //   expect(res.statusCode).to.equal(201);
-    // });
-    // it("Should return 503 status code(movie) when the video wasn't saved in movie-cinetie", async () => {
-    //   const stub = sinon.stub(aws, "copyObjects").callsFake(() => {
-    //     return null;
-    //   });
-    //   const req = httpMock.createRequest({
-    //     query: {
-    //       id: 161,
-    //     },
-    //   });
-    //   const res = httpMock.createResponse();
-    //   await videoController.addVideo(req, res);
-    //   stub.restore();
-    //   expect(res.statusCode).to.equal(503);
-    // });
-    // it("Should return 503 when the video is not updated or deleted(serie)", async () => {
-    //   const stub = sinon.stub(videoService, "updateVideo").callsFake(() => {
-    //     return [0];
-    //   });
-    //   const req = httpMock.createRequest({
-    //     query: {
-    //       id: 160,
-    //     },
-    //   });
-    //   const res = httpMock.createResponse();
-    //   await videoController.addVideo(req, res);
-    //   stub.restore();
-    //   expect(res.statusCode).to.equal(503);
-    // });
     it("should get a 500 statu code when there is a server error", async () => {
       const req = httpMock.createRequest({
         query: {
