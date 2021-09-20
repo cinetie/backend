@@ -1,5 +1,5 @@
-import sequelize from 'sequelize';
-import database from '../database/models';
+import sequelize from "sequelize";
+import database from "../database/models";
 
 const op = sequelize.Op;
 
@@ -20,8 +20,8 @@ class loginSessionServices {
     try {
       const session = await database.loginSessions.findAll({
         where: {
-          [op.and]: [{ email }, { state: 'in' }]
-        }
+          [op.and]: [{ email }, { state: "in" }],
+        },
       });
       if (session) {
         return session;
@@ -36,8 +36,8 @@ class loginSessionServices {
     try {
       const session = await database.loginSessions.findAll({
         where: {
-          state: 'in'
-        }
+          state: "in",
+        },
       });
       if (session) {
         return session;
@@ -64,8 +64,8 @@ class loginSessionServices {
     try {
       const updated = await database.loginSessions.update(session, {
         where: {
-          id
-        }
+          id,
+        },
       });
       if (updated) {
         return updated;

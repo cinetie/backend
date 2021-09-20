@@ -1,5 +1,5 @@
-import SalesService from '../services/salesService';
-import uuid from './uuid';
+import SalesService from "../services/salesService";
+import uuid from "./uuid";
 
 const addRecord = async (details) => {
   try {
@@ -7,7 +7,7 @@ const addRecord = async (details) => {
     const data = {
       ...details,
       transactionId: uuid.generator(),
-      creationTime: dates.getTime()
+      creationTime: dates.getTime(),
     };
     const status = await SalesService.createNewSales(data);
     if (status) return 1;

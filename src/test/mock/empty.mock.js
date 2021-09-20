@@ -1,13 +1,10 @@
-import mocks from 'node-mocks-http';
+import mocks from "node-mocks-http";
 
 const response = mocks.createResponse();
 
 const emptyMock = {
   response,
-    request: {
-
-  }
+  request: {},
 };
-
 
 export default emptyMock;

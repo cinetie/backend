@@ -1,5 +1,5 @@
 /* eslint-disable no-useless-catch */
-import database from '../database/models';
+import database from "../database/models";
 
 class trailerServices {
   static async createNewTrailers(data) {
@@ -17,7 +17,7 @@ class trailerServices {
   static async getParticularTrailer(id) {
     try {
       const video = await database.trailers.findOne({
-        where: { id }
+        where: { id },
       });
       if (video) {
         return video;
@@ -31,7 +31,7 @@ class trailerServices {
   static async getAllTrailers(videoId) {
     try {
       const videos = await database.trailers.findAll({
-        where: { videoId }
+        where: { videoId },
       });
       if (videos) {
         return videos;
@@ -46,7 +46,7 @@ class trailerServices {
     try {
       const result = await database.trailers.destroy({
         returning: true,
-        where: { id }
+        where: { id },
       });
       if (result) {
         return result;
@@ -60,7 +60,7 @@ class trailerServices {
   static async updateTrailers(id, data) {
     try {
       const result = await database.trailers.update(data, {
-        where: { id }
+        where: { id },
       });
       if (result) {
         return result;

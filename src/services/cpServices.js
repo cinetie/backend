@@ -1,14 +1,14 @@
 /* eslint-disable no-useless-catch */
-import database from '../database/models';
+import database from "../database/models";
 
 class cpService {
   static async getCpByMail(email) {
     try {
       const user = await database.contentProviders.findOne({
         attributes: {
-          exclude: ['createdAt', 'updatedAt']
+          exclude: ["createdAt", "updatedAt"],
         },
-        where: { email }
+        where: { email },
       });
       if (user) {
         return user;
@@ -23,9 +23,9 @@ class cpService {
     try {
       const user = await database.contentProviders.findOne({
         attributes: {
-          exclude: ['createdAt', 'updatedAt']
+          exclude: ["createdAt", "updatedAt"],
         },
-        where: { id }
+        where: { id },
       });
       if (user) {
         return user;
@@ -40,9 +40,9 @@ class cpService {
     try {
       const user = await database.contentProviders.findOne({
         attributes: {
-          exclude: ['createdAt', 'updatedAt']
+          exclude: ["createdAt", "updatedAt"],
         },
-        where: { clientId }
+        where: { clientId },
       });
       if (user) {
         return user;
@@ -65,7 +65,7 @@ class cpService {
     try {
       return await database.contentProviders.update(oldCp, {
         returning: true,
-        where: { email }
+        where: { email },
       });
     } catch (error) {
       throw error;
@@ -77,8 +77,8 @@ class cpService {
       return await database.contentProviders.destroy({
         returning: true,
         where: {
-          email
-        }
+          email,
+        },
       });
     } catch (error) {
       throw error;
@@ -89,7 +89,14 @@ class cpService {
     try {
       const cps = await database.contentProviders.findAll({
         attributes: {
-          exclude: ['createdAt', 'updatedAt', 'password', 'id', 'isVerified', 'cityOfResidence']
+          exclude: [
+            "createdAt",
+            "updatedAt",
+            "password",
+            "id",
+            "isVerified",
+            "cityOfResidence",
+          ],
         },
       });
       if (!cps) return null;

@@ -1,10 +1,10 @@
-import crypt from 'crypto';
+import crypt from "crypto";
 
 const crypto = () => {
   try {
-    let payload = '';
+    let payload = "";
     crypt.randomBytes(20, (err, buffer) => {
-      payload = buffer.toString('hex');
+      payload = buffer.toString("hex");
     });
     return payload;
   } catch (error) {

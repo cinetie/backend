@@ -27,7 +27,7 @@ class videoService {
     }
   }
 
-  static async getNewVideos(limitValue, offsetValue, type,country) {
+  static async getNewVideos(limitValue, offsetValue, type, country) {
     try {
       const videos = await database.videos.findAll({
         offset: Number(offsetValue),
@@ -73,7 +73,7 @@ class videoService {
     }
   }
 
-  static async getTrendingVideos(offsetValue, limit, type,country) {
+  static async getTrendingVideos(offsetValue, limit, type, country) {
     try {
       const videos = await database.videos.findAll({
         offset: Number(offsetValue),
@@ -103,9 +103,8 @@ class videoService {
     }
   }
 
-  static async search(query, offset,country) {
+  static async search(query, offset, country) {
     try {
-      
       const data = await database.videos.findAll({
         order: [["id", "DESC"]],
         offset: Number(offset),
@@ -178,7 +177,7 @@ class videoService {
     }
   }
 
-  static async getVideosByCategory(category,country) {
+  static async getVideosByCategory(category, country) {
     try {
       const data = await database.videos.findAll({
         where: {
@@ -323,7 +322,7 @@ class videoService {
     }
   }
 
-  static async getMainFeaturedVideo(type,country) {
+  static async getMainFeaturedVideo(type, country) {
     try {
       const videos = await database.videos.findAll({
         order: [["id", "DESC"]],
@@ -362,7 +361,7 @@ class videoService {
     }
   }
 
-  static async getSecondFeaturedVideo(type,country) {
+  static async getSecondFeaturedVideo(type, country) {
     try {
       const videos = await database.videos.findAll({
         order: [["id", "DESC"]],

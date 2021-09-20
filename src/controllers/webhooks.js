@@ -79,8 +79,7 @@ export default class WebHooks {
         if (updates) {
           await mailer([
             {
-              body:
-                "We would like you to know that your account has been put onhold. \n since your  payment didn't work out",
+              body: "We would like you to know that your account has been put onhold. \n since your  payment didn't work out",
               name: `${user.firstName}`,
             },
             {
@@ -123,6 +122,7 @@ export default class WebHooks {
       );
     }
   }
+
   static async transVerification(id) {
     const transVerification = await axios.get(
       `https://api.flutterwave.com/v3/transactions/${id}/verify`,
@@ -146,9 +146,9 @@ export default class WebHooks {
     });
     if (sales) {
       return true;
-    } else {
-      throw new Error("Sales recording error");
     }
-    throw new Error('Sales recording error');
+    throw new Error("Sales recording error");
+
+    throw new Error("Sales recording error");
   }
 }

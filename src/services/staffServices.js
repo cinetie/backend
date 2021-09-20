@@ -1,15 +1,15 @@
-import database from '../database/models';
+import database from "../database/models";
 
 class staffServices {
   static async getStaffByMail(email) {
     try {
       const staff = await database.Staffs.findOne({
         attributes: {
-          exclude: ['createdAt', 'updatedAt']
+          exclude: ["createdAt", "updatedAt"],
         },
         where: {
-          email
-        }
+          email,
+        },
       });
       if (staff) {
         return staff;

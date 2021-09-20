@@ -1,5 +1,5 @@
-import sequelize from 'sequelize';
-import database from '../database/models';
+import sequelize from "sequelize";
+import database from "../database/models";
 
 const op = sequelize.Op;
 class profileServices {
@@ -15,8 +15,8 @@ class profileServices {
     try {
       return await database.profiles.destroy({
         where: {
-          id
-        }
+          id,
+        },
       });
     } catch (error) {
       throw error;
@@ -27,11 +27,8 @@ class profileServices {
     try {
       return await database.profiles.findOne({
         where: {
-          [op.and]: [
-            { name },
-            { email }
-          ]
-        }
+          [op.and]: [{ name }, { email }],
+        },
       });
     } catch (error) {
       return error;
@@ -43,8 +40,8 @@ class profileServices {
       return await database.profiles.update(profile, {
         returning: true,
         where: {
-          id
-        }
+          id,
+        },
       });
     } catch (error) {
       throw error;
@@ -55,8 +52,8 @@ class profileServices {
     try {
       return await database.profiles.findOne({
         where: {
-          id
-        }
+          id,
+        },
       });
     } catch (error) {
       throw error;
@@ -67,8 +64,8 @@ class profileServices {
     try {
       return await database.profiles.findAndCountAll({
         where: {
-          id
-        }
+          id,
+        },
       });
     } catch (error) {
       throw error;

@@ -14,13 +14,10 @@ chai.use(chaiHttp);
 describe("GET SINGLE TEMP VIDEO TEST", () => {
   let adminToken;
   before(async () => {
-    const loginRes = await chai
-      .request(app)
-      .post('/staff/login')
-      .send({
-        email: 'staff@example.com',
-        password: 'izzeddin'
-      });
+    const loginRes = await chai.request(app).post("/staff/login").send({
+      email: "staff@example.com",
+      password: "izzeddin",
+    });
     adminToken = loginRes.body.data.token;
   });
   // it('should return the tempVideo', async () => {

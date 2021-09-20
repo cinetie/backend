@@ -1,9 +1,9 @@
 import chai, { expect } from "chai";
 import { config } from "dotenv";
 import chaiHttp from "chai-http";
-import services from "../services/serieServices";
 import sinon from "sinon";
 import { describe, it } from "mocha";
+import services from "../services/serieServices";
 import app from "../index";
 
 config();
@@ -11,13 +11,10 @@ chai.use(chaiHttp);
 
 describe("GET A SINGLE SERIE SEASONS TEST", () => {
   it("should return the season", async () => {
-    const loginRes = await chai
-      .request(app)
-      .post("/auth/login")
-      .send({
-        email: "yyufmrieoewirq@workingtall.com",
-        password: "123456789",
-      });
+    const loginRes = await chai.request(app).post("/auth/login").send({
+      email: "yyufmrieoewirq@workingtall.com",
+      password: "123456789",
+    });
     const res = await chai
       .request(app)
       .get("/series/single/season")
@@ -32,13 +29,10 @@ describe("GET A SINGLE SERIE SEASONS TEST", () => {
     expect(res.body.data).to.an("array");
   });
   it("should return 400 if there is not season found", async () => {
-    const loginRes = await chai
-      .request(app)
-      .post("/auth/login")
-      .send({
-        email: "yyufmrieoewirq@workingtall.com",
-        password: "123456789",
-      });
+    const loginRes = await chai.request(app).post("/auth/login").send({
+      email: "yyufmrieoewirq@workingtall.com",
+      password: "123456789",
+    });
     const res = await chai
       .request(app)
       .get("/series/single/season")
@@ -59,13 +53,10 @@ describe("GET A SINGLE SERIE SEASONS TEST", () => {
     const stub = sinon
       .stub(services, "getSingleSeason")
       .throws(new Error("Something went wrong"));
-    const loginRes = await chai
-      .request(app)
-      .post("/auth/login")
-      .send({
-        email: "yyufmrieoewirq@workingtall.com",
-        password: "123456789",
-      });
+    const loginRes = await chai.request(app).post("/auth/login").send({
+      email: "yyufmrieoewirq@workingtall.com",
+      password: "123456789",
+    });
     const res = await chai
       .request(app)
       .get("/series/single/season")

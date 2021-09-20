@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
 
 export default class Util {
   constructor() {
@@ -12,29 +12,38 @@ export default class Util {
     this.statusCode = statusCode;
     this.message = message;
     this.data = data;
-    this.type = 'success';
+    this.type = "success";
   }
 
   setSuccessPost(message, statusCode) {
     this.statusCode = statusCode;
     this.message = message;
-    this.type = 'success';
+    this.type = "success";
   }
 
   setError(statusCode, message) {
     this.statusCode = statusCode;
     this.message = message;
-    this.type = 'Error';
+    this.type = "Error";
   }
 
   encrypt(plainPassword) {
-    const newPass = bcrypt.hashSync(plainPassword, bcrypt.genSaltSync(10), null);
+    const newPass = bcrypt.hashSync(
+      plainPassword,
+      bcrypt.genSaltSync(10),
+      null
+    );
     return newPass;
   }
 
   compare(plainPassword, encrypted) {
-    if (plainPassword == null || plainPassword == undefined || encrypted == null || encrypted == undefined) {
-      return 'password is null';
+    if (
+      plainPassword == null ||
+      plainPassword == undefined ||
+      encrypted == null ||
+      encrypted == undefined
+    ) {
+      return "password is null";
     }
     const status = bcrypt.compareSync(plainPassword, encrypted);
     if (status) {
@@ -48,9 +57,9 @@ export default class Util {
       statusCode: this.statusCode,
       status: this.type,
       message: this.message,
-      data: this.data
+      data: this.data,
     };
-    if (this.type === 'success') {
+    if (this.type === "success") {
       return res.status(this.statusCode).json(result);
     }
     return res.status(this.statusCode).json({
@@ -65,9 +74,8 @@ export default class Util {
       statusCode: this.statusCode,
       status: this.type,
       message: this.message,
-
     };
-    if (this.type === 'success') {
+    if (this.type === "success") {
       return res.status(this.statusCode).json(result);
     }
     return res.status(this.statusCode).json({
@@ -91,11 +99,12 @@ export default class Util {
     const unique = arr
       .map((e) => e[comp])
 
-    // store the keys of the unique objects
+      // store the keys of the unique objects
       .map((e, i, final) => final.indexOf(e) === i && i)
 
-    // eliminate the dead keys & store unique objects
-      .filter((e) => arr[e]).map((e) => arr[e]);
+      // eliminate the dead keys & store unique objects
+      .filter((e) => arr[e])
+      .map((e) => arr[e]);
 
     return unique;
   }

@@ -1,26 +1,26 @@
-import chai, { expect } from 'chai';
-import chaiHttp from 'chai-http';
-import { describe, it } from 'mocha';
-import app from '../index';
+import chai, { expect } from "chai";
+import chaiHttp from "chai-http";
+import { describe, it } from "mocha";
+import app from "../index";
 
-import {
-  UserIn,
-  UserInNo,
-} from './mock/users.in.mock';
+import { UserIn, UserInNo } from "./mock/users.in.mock";
 
 chai.use(chaiHttp);
 
-const prefix = '/auth/login';
+const prefix = "/auth/login";
 
-describe('SIGN IN', () => {
-  it('should return error if user doesn\'t exists', (done) => {
+describe("SIGN IN", () => {
+  it("should return error if user doesn't exists", (done) => {
     chai
       .request(app)
       .post(`${prefix}`)
       .send(UserInNo)
       .end((err, res) => {
         expect(res).to.have.status(400);
-        expect(res.body).to.have.property('message', 'Invalid email or password!');
+        expect(res.body).to.have.property(
+          "message",
+          "Invalid email or password!"
+        );
         done();
       });
   });
