@@ -3,6 +3,7 @@ import Ioredis from "ioredis";
 const redis = new Ioredis();
 
 export const get = async (key) => {
+  console.log(key);
   const result = await redis.get(key);
   return result ? JSON.parse(result): null;
 };
