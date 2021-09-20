@@ -1,8 +1,8 @@
 /* eslint-disable no-useless-catch */
 /* eslint-disable no-console */
-import dotenv from 'dotenv';
-import ejs from 'ejs';
-import nodemailer from 'nodemailer';
+import dotenv from "dotenv";
+import ejs from "ejs";
+import nodemailer from "nodemailer";
 
 dotenv.config();
 
@@ -13,8 +13,8 @@ const mailer = async (emailToSend) => {
       port: process.env.SMTP_PORT,
       auth: {
         user: process.env.SENDGRID_USER,
-        pass: process.env.SENDGRID_PASS
-      }
+        pass: process.env.SENDGRID_PASS,
+      },
     });
     const { path } = emailToSend[2];
     return ejs.renderFile(path, emailToSend[0], (error, data) => {
@@ -24,11 +24,14 @@ const mailer = async (emailToSend) => {
           from: '"Cinetie Support" <support@cinetie.com>',
           to: emailToSend[1].to,
           subject: emailToSend[1].subject,
-          html: data
+          html: data,
         };
-        transporter.sendMail(emailOptions)
+        transporter
+          .sendMail(emailOptions)
           .then((success) => success)
-          .catch((err) => {throw error});
+          .catch((err) => {
+            throw error;
+          });
       }
     });
   } catch (error) {

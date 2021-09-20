@@ -1,20 +1,21 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-plusplus */
 /* eslint-disable max-len */
-import fetch from 'node-fetch';
-import { config } from 'dotenv';
-import response from '../helpers/response';
-import Util from '../helpers/utilities';
-import jwt from '../helpers/jwt';
-import trailerServices from '../services/trailerService';
-import tempService from '../services/tempVideoServices';
-import watchedMovieServices from '../services/watchedMovieServices';
-import { getObject, deleteObject, copyObjects } from '../helpers/aws';
-import { getAttachedThumbsMultiple } from '../helpers/video';
-import videoService from '../services/videoServices';
-import serieService from '../services/serieServices';
-import viewingSessions from '../services/viewingSessionsServices';
-import userService from '../services/userServices';
+import fetch from "node-fetch";
+import { config } from "dotenv";
+import response from "../helpers/response";
+import Util from "../helpers/utilities";
+import jwt from "../helpers/jwt";
+import trailerServices from "../services/trailerService";
+import tempService from "../services/tempVideoServices";
+import watchedMovieServices from "../services/watchedMovieServices";
+import { getObject, deleteObject, copyObjects } from "../helpers/aws";
+import { getAttachedThumbsMultiple } from "../helpers/video";
+import videoService from "../services/videoServices";
+import serieService from "../services/serieServices";
+import viewingSessions from "../services/viewingSessionsServices";
+import userService from "../services/userServices";
+import { set, get } from "../helpers/redis";
 
 config();
 
@@ -27,7 +28,7 @@ class Video {
       );
       const decoded = jwt.jwtVerify(tempVideo.videoUri, process.env.SECRET);
       const data = decoded;
-      if (data.type === 'movie') {
+      if (data.type === "movie") {
         data.videoClientId = decoded.clientId;
         data.videoSuspensionState = false;
         data.size = decoded.size;
@@ -39,7 +40,7 @@ class Video {
         if (!copyFile) {
           util.setErrorResponse(
             res,
-            'something went wrong while uploading',
+            "something went wrong while uploading",
             503
           );
         } else {
@@ -47,7 +48,7 @@ class Video {
           // delete the object in temp
           data.videoClientId = decoded.clientId;
           data.videoKey = decoded.videoUri;
-          data.videoIdVimeo = '0000';
+          data.videoIdVimeo = "0000";
           const updatedVideo = await videoService.updateVideo(
             decoded.videoId,
             data
@@ -60,11 +61,11 @@ class Video {
           if (!updatedVideo[0] || !deleted || !deleteAWS) {
             util.setErrorResponse(
               res,
-              'something went wrong while approving video',
+              "something went wrong while approving video",
               503
             );
           } else {
-            util.setSuccessResponse(res, 'Video uploaded', 201, updatedVideo);
+            util.setSuccessResponse(res, "Video uploaded", 201, updatedVideo);
           }
         }
       } else {
@@ -76,15 +77,19 @@ class Video {
         if (!updatedVideo[0] || !deleted) {
           util.setErrorResponse(
             res,
-            'Something went wrong approving video',
+            "Something went wrong approving video",
             503
           );
         } else {
-          util.setSuccessResponse(res, 'Video approved', 201, updatedVideo);
+          util.setSuccessResponse(res, "Video approved", 201, updatedVideo);
         }
       }
     } catch (error) {
-      util.setErrorResponse(res, `Something went wrong : ${error.message}`, 500);
+      util.setErrorResponse(
+        res,
+        `Something went wrong : ${error.message}`,
+        500
+      );
     }
   }
 
@@ -102,43 +107,43 @@ class Video {
             return response.successResponse(
               res,
               200,
-              'Video successfully deleted!',
+              "Video successfully deleted!",
               deletedVideo
             );
           }
           return response.errorResponse(
             res,
             500,
-            'Video could not be deleted',
-            'SERVER_ERROR'
+            "Video could not be deleted",
+            "SERVER_ERROR"
           );
         }
         if (deletedVideo) {
           return response.successResponse(
             res,
             200,
-            'Video successfully deleted!',
+            "Video successfully deleted!",
             deletedVideo
           );
         }
         return response.errorResponse(
           res,
           500,
-          'Video could not be deleted',
-          'SERVER_ERROR'
+          "Video could not be deleted",
+          "SERVER_ERROR"
         );
       }
       return response.errorResponse(
         res,
         400,
-        'Video was not found or access to it was denied',
-        'BAD_REQUEST'
+        "Video was not found or access to it was denied",
+        "BAD_REQUEST"
       );
     } catch (error) {
       return response.errorResponse(
         res,
         500,
-        'Something went wrong',
+        "Something went wrong",
         error.message
       );
     }
@@ -148,6 +153,11 @@ class Video {
     try {
       const { type } = req.query;
       const { country } = req.headers;
+      console.log(`pop-${type}-${country}`);
+      const cachedVideos = await get(`pop-${type}-${country}`);
+      if (cachedVideos) {
+        return util.setSuccessResponse(res, "videos found", 200, cachedVideos);
+      }
       const videos = await videoService.getPopularVideos(
         req.query.offset,
         req.query.limit,
@@ -157,12 +167,12 @@ class Video {
       getAttachedThumbsMultiple(videos);
 
       if (Object.values(videos).length > 0) {
-        util.setSuccessResponse(res, 'videos found', 200, videos);
-      } else {
-        util.setErrorResponse(res, 'Data not found', 404);
+        await set(`pop-${type}-${country}`, videos);
+        return util.setSuccessResponse(res, "videos found", 200, videos);
       }
+      return util.setErrorResponse(res, "Data not found", 404);
     } catch (error) {
-      util.setErrorResponse(res, error.message, 500);
+      return util.setErrorResponse(res, error.message, 500);
     }
   }
 
@@ -170,6 +180,10 @@ class Video {
     try {
       const { type } = req.query;
       const { country } = req.headers;
+      const cached = await get(`trend-${type}-${country}`);
+      if (cached) {
+        return util.setSuccessResponse(res, "videos found", 200, cached);
+      }
       const videos = await videoService.getTrendingVideos(
         req.query.offset,
         req.query.limit,
@@ -179,35 +193,45 @@ class Video {
       getAttachedThumbsMultiple(videos);
 
       if (Object.values(videos).length > 0) {
-        util.setSuccessResponse(res, 'videos found', 200, videos);
-      } else {
-        util.setErrorResponse(res, 'Data not found', 404);
+        await set(`trend-${type}-${country}`, videos);
+        return util.setSuccessResponse(res, "videos found", 200, videos);
       }
+      return util.setErrorResponse(res, "Data not found", 404);
     } catch (error) {
-      util.setErrorResponse(res, error.message, 500);
+      return util.setErrorResponse(res, error.message, 500);
     }
   }
 
   static async getVideosByCategory(req, res) {
     try {
       const { country } = req.headers;
+      const { q } = req.query;
+      const cached = await get(`cat-${q}-${country}`);
+      if (cached) {
+        return util.setSuccessResponse(
+          res,
+          `${req.query.q} videos found`,
+          200,
+          cached
+        );
+      }
       const videos = await videoService.getVideosByCategory(
         req.query.q,
         country
       );
       getAttachedThumbsMultiple(videos);
       if (Object.values(videos).length > 0) {
-        util.setSuccessResponse(
+        await set(`cat-${q}-${country}`);
+        return util.setSuccessResponse(
           res,
           `${req.query.q} videos found`,
           200,
           videos
         );
-      } else {
-        util.setErrorResponse(res, 'Data not found', 404);
       }
+      return util.setErrorResponse(res, "Data not found", 404);
     } catch (error) {
-      util.setErrorResponse(res, error.message, 500);
+      return util.setErrorResponse(res, error.message, 500);
     }
   }
 
@@ -215,13 +239,18 @@ class Video {
     try {
       const { q, offset } = req.query;
       const { country } = req.headers;
+      const cached = await get(`search-${q}-${country}`);
+      if (cached) {
+        util.setSuccessResponse(res, "Videos found", 200, cached);
+      }
       const videos = await videoService.search(q, offset, country);
       getAttachedThumbsMultiple(videos);
 
       if (Object.values(videos).length > 0) {
-        util.setSuccessResponse(res, 'Videos found', 200, videos);
+        await set(`search-${q}-${country}`);
+        util.setSuccessResponse(res, "Videos found", 200, videos);
       } else {
-        util.setErrorResponse(res, 'Data not found', 404);
+        util.setErrorResponse(res, "Data not found", 404);
       }
     } catch (error) {
       util.setErrorResponse(res, `somethin went wrong : ${error.message}`, 503);
@@ -232,9 +261,9 @@ class Video {
     const videos = await videoService.getAllVideosForAdmin();
     getAttachedThumbsMultiple(videos);
     if (Object.values(videos).length > 0) {
-      util.setSuccessResponse(res, 'Data found', 200, videos);
+      util.setSuccessResponse(res, "Data found", 200, videos);
     } else {
-      util.setErrorResponse(res, 'Data not found', 404);
+      util.setErrorResponse(res, "Data not found", 404);
     }
   }
 
@@ -260,7 +289,7 @@ class Video {
       const { type } = req.query;
       const video = await videoService.getMainFeaturedVideo(type);
       if (!video.length) {
-        return util.setErrorResponse(res, 'Video can\'t be found', 404);
+        return util.setErrorResponse(res, "Video can't be found", 404);
       }
       getAttachedThumbsMultiple(video);
       const trailer = await trailerServices.getAllTrailers(video[0].videoId);
@@ -272,7 +301,7 @@ class Video {
             process.env.TRAILERS_BUCKET
           ),
         };
-        util.setSuccessResponse(res, 'Video Found', 200, data);
+        util.setSuccessResponse(res, "Video Found", 200, data);
       } else {
         util.setErrorResponse(res, "Video can't be found", 404);
       }
@@ -286,11 +315,12 @@ class Video {
       const { type } = req.query;
       const video = await videoService.getSecondFeaturedVideo(type);
       if (!video.length) {
-        return util.setErrorResponse(res, 'Video can\'t be found', 404);
+        return util.setErrorResponse(res, "Video can't be found", 404);
       }
       getAttachedThumbsMultiple(video);
       const trailer = await trailerServices.getAllTrailers(video[0].videoId);
-      if (!trailer[0]) return util.setErrorResponse(res, "Video can't be found", 404);
+      if (!trailer[0])
+        return util.setErrorResponse(res, "Video can't be found", 404);
       const data = {
         video,
         trailer: Video.attachThumbnails(
@@ -299,7 +329,7 @@ class Video {
         ),
       };
       if (data) {
-        util.setSuccessResponse(res, 'videos Found', 200, data);
+        util.setSuccessResponse(res, "videos Found", 200, data);
       } else {
         util.setErrorResponse(res, "Video can't be found", 404);
       }
@@ -317,7 +347,7 @@ class Video {
       );
       getAttachedThumbsMultiple(videos);
       if (Object.values(videos).length >= 1) {
-        util.setSuccessResponse(res, 'videos Found', 200, videos);
+        util.setSuccessResponse(res, "videos Found", 200, videos);
       } else {
         util.setErrorResponse(res, "Video can't be found", 404);
       }
@@ -334,7 +364,7 @@ class Video {
       const videos = await videoService.getVideosByType(clientId, type);
       getAttachedThumbsMultiple(videos);
       if (Object.values(videos).length > 0) {
-        util.setSuccessResponse(res, 'Videos Found', 200, videos);
+        util.setSuccessResponse(res, "Videos Found", 200, videos);
       } else {
         util.setErrorResponse(res, "videos can't be found", 404);
       }
@@ -348,12 +378,20 @@ class Video {
       const video = await videoService.getVideoById(req.query.id);
       if (video) {
         if (video.EnSubt) {
-          video.EnSubt = await getObject(process.env.SUBTITLE_BUCKET, video.EnSubt, 20);
+          video.EnSubt = await getObject(
+            process.env.SUBTITLE_BUCKET,
+            video.EnSubt,
+            20
+          );
         }
         if (video.FrSubt) {
-          video.FrSubt = await getObject(process.env.SUBTITLE_BUCKET, video.FrSubt, 20);
+          video.FrSubt = await getObject(
+            process.env.SUBTITLE_BUCKET,
+            video.FrSubt,
+            20
+          );
         }
-        util.setSuccessResponse(res, 'videos Found', 200, video);
+        util.setSuccessResponse(res, "videos Found", 200, video);
       } else {
         util.setErrorResponse(res, "Video can't be found", 404);
       }
@@ -366,9 +404,9 @@ class Video {
     try {
       const video = await videoService.getVideoById(req.params.id);
       if (video) {
-        video.videoLink = '';
-        video.videoKey = '';
-        util.setSuccessResponse(res, 'videos Found', 200, video);
+        video.videoLink = "";
+        video.videoKey = "";
+        util.setSuccessResponse(res, "videos Found", 200, video);
       } else {
         util.setErrorResponse(res, "Video can't be found", 404);
       }
@@ -382,18 +420,18 @@ class Video {
     try {
       const returned = await videoService.getVideoById(req.query.id);
       if (!returned) {
-        return response.errorResponse(res, 404, 'Video not updated');
+        return response.errorResponse(res, 404, "Video not updated");
       }
       const toUpdate = req.body;
       const updated = await videoService.updateVideo(req.query.id, toUpdate);
       return response.successResponse(
         res,
         200,
-        'Video successfully updated!',
+        "Video successfully updated!",
         updated
       );
     } catch (error) {
-      response.errorResponse(res, 500, 'Something went wrong', error.message);
+      response.errorResponse(res, 500, "Something went wrong", error.message);
     }
   }
 
@@ -403,7 +441,7 @@ class Video {
       const { featureType, isFeatured, type } = req.body;
       const returned = await videoService.getVideoById(req.query.id);
       if (!returned) {
-        return response.errorResponse(res, 404, 'Video not updated');
+        return response.errorResponse(res, 404, "Video not updated");
       }
       const resetFeatured = await videoService.resetFeaturedVideo(
         featureType,
@@ -414,7 +452,7 @@ class Video {
         return response.errorResponse(
           res,
           500,
-          'Something went wrong resetting featured ',
+          "Something went wrong resetting featured ",
           undefined
         );
       }
@@ -422,11 +460,11 @@ class Video {
       return response.successResponse(
         res,
         200,
-        'Video successfully updated!',
+        "Video successfully updated!",
         updated
       );
     } catch (error) {
-      response.errorResponse(res, 500, 'Something went wrong', error.message);
+      response.errorResponse(res, 500, "Something went wrong", error.message);
     }
   }
 
@@ -450,8 +488,8 @@ class Video {
         return response.errorResponse(
           res,
           400,
-          'Something went wrong',
-          'missingParameterError'
+          "Something went wrong",
+          "missingParameterError"
         );
       }
       if (!videoData) {
@@ -459,13 +497,13 @@ class Video {
           res,
           404,
           "Can't find the video you're looking for",
-          'NotFoundError'
+          "NotFoundError"
         );
       }
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
 
       const data = req.body;
-      data.sessionState = 'Active';
+      data.sessionState = "Active";
       data.userId = decoded.email;
       data.time = new Date().getTime();
       const locationServiceData = await fetch(
@@ -473,17 +511,20 @@ class Video {
       );
       const JsonlocationData = await locationServiceData.json();
       // check if there is an exact session before same like the provided one
-      const sessions = await viewingSessions.getSesssionPerVideoUser(decoded.email, videoId);
+      const sessions = await viewingSessions.getSesssionPerVideoUser(
+        decoded.email,
+        videoId
+      );
       const user = await userService.getUserByMail(decoded.email);
       if (Object.values(sessions).length >= 1 || user.isOnTrial === true) {
         util.setErrorResponse(
           res,
-          'user already watched video or trial is still active',
+          "user already watched video or trial is still active",
           400
         );
       } else {
         const results = await viewingSessions.registerViewingSessions({
-          sessionState: 'Active',
+          sessionState: "Active",
           userId: decoded.email,
           time: new Date().getTime(),
           location: JsonlocationData.country_name,
@@ -493,14 +534,14 @@ class Video {
         });
         const updates = await videoService.incrementWatchCountService(videoId);
         if (results && updates) {
-          util.setSuccessResponse(res, 'Registered the watch session', 201, {
-            status: 'done',
+          util.setSuccessResponse(res, "Registered the watch session", 201, {
+            status: "done",
           });
         } else {
           return response.errorResponse(
             res,
             400,
-            'something went wrong',
+            "something went wrong",
             "Can't get location"
           );
         }
@@ -509,7 +550,7 @@ class Video {
       return response.errorResponse(
         res,
         500,
-        'Something went wrong',
+        "Something went wrong",
         error.message
       );
     }
@@ -520,35 +561,33 @@ class Video {
       const { type, watchedTime, episodeId } = req.body;
       const { id } = req.fullUser;
       const { videoId } = req.query;
-      if (!episodeId && type === 'serie') {
+      if (!episodeId && type === "serie") {
         return util.setErrorResponse(
           res,
-          'episodeId is required to save an episode',
+          "episodeId is required to save an episode",
           400
         );
       }
-      if (episodeId && type === 'serie') {
+      if (episodeId && type === "serie") {
         const episode = await serieService.getSingleEpisode(episodeId);
         if (!episode) {
-          return util.setErrorResponse(
-            res,
-            'episode not found',
-            404
-          );
+          return util.setErrorResponse(res, "episode not found", 404);
         }
       }
       const video = await videoService.getVideoById(videoId);
       if (!video) {
-        return util.setErrorResponse(
-          res,
-          'video not found',
-          404
-        );
+        return util.setErrorResponse(res, "video not found", 404);
       }
-      const watchedTimeEntry = await watchedMovieServices.findWatchedTime(videoId, id);
+      const watchedTimeEntry = await watchedMovieServices.findWatchedTime(
+        videoId,
+        id
+      );
       let episodeWatchedTimeEntry;
-      if (type === 'serie') {
-        episodeWatchedTimeEntry = await watchedMovieServices.findWatchedTime(episodeId, id);
+      if (type === "serie") {
+        episodeWatchedTimeEntry = await watchedMovieServices.findWatchedTime(
+          episodeId,
+          id
+        );
       }
       let result;
       if (!watchedTimeEntry) {
@@ -558,35 +597,41 @@ class Video {
           watchedTime,
           userId: id,
         });
-        if (type === 'serie') {
+        if (type === "serie") {
           await watchedMovieServices.add({
             videoId: episodeId,
-            type: 'episode',
+            type: "episode",
             watchedTime,
             userId: id,
           });
         }
       } else {
-        result = await watchedMovieServices.update(watchedTime, watchedTimeEntry.id);
-        if (episodeWatchedTimeEntry && type === 'serie') {
-          await watchedMovieServices.update(watchedTime, episodeWatchedTimeEntry.id);
+        result = await watchedMovieServices.update(
+          watchedTime,
+          watchedTimeEntry.id
+        );
+        if (episodeWatchedTimeEntry && type === "serie") {
+          await watchedMovieServices.update(
+            watchedTime,
+            episodeWatchedTimeEntry.id
+          );
         } else {
           await watchedMovieServices.add({
             videoId: episodeId,
-            type: 'episode',
+            type: "episode",
             watchedTime,
             userId: id,
           });
         }
       }
-      util.setSuccessResponse(res, 'time saved successfully', 201, {
-        status: 'done',
+      util.setSuccessResponse(res, "time saved successfully", 201, {
+        status: "done",
       });
     } catch (error) {
       return response.errorResponse(
         res,
         500,
-        'Something went wrong',
+        "Something went wrong",
         error.message
       );
     }
@@ -600,16 +645,21 @@ class Video {
       if (!result) {
         return util.setErrorResponse(
           res,
-          'The video has not been watched yet',
+          "The video has not been watched yet",
           404
         );
       }
-      util.setSuccessResponse(res, 'watch session retrieved successfully', 200, result);
+      util.setSuccessResponse(
+        res,
+        "watch session retrieved successfully",
+        200,
+        result
+      );
     } catch (error) {
       return response.errorResponse(
         res,
         500,
-        'Something went wrong',
+        "Something went wrong",
         error.message
       );
     }

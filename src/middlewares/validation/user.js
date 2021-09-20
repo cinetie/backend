@@ -1,7 +1,7 @@
-import SignupSchema from './schemas/users/signup';
-import LoginSchema from './schemas/users/login';
-import SignupContSchema from './schemas/users/signup-cont';
-import validator from '../../helpers/validator';
+import SignupSchema from "./schemas/users/signup";
+import LoginSchema from "./schemas/users/login";
+import SignupContSchema from "./schemas/users/signup-cont";
+import validator from "../../helpers/validator";
 
 export const signup = (req, res, next) => {
   validator(SignupSchema, req.body, res, next);

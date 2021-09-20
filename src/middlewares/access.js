@@ -1,6 +1,6 @@
 import jwt from "../helpers/jwt";
 import userService from "../services/userServices";
-import staffService from '../services/staffServices';
+import staffService from "../services/staffServices";
 import Util from "../helpers/utilities";
 import cpService from "../services/cpServices";
 
@@ -16,20 +16,18 @@ class Access {
     try {
       if (!req.headers.authorization) {
         return util.setErrorResponse(res, "Invalid access token", 400);
-      } else {
-        const token = req.headers.authorization.slice(7);
-        const decoded = jwt.jwtVerify(token, process.env.SECRET);
-        const { user } = decoded;
-        if (!user) {
-          return util.setErrorResponse(res, "Invalid access token", 400);
-        }
-        const admin = await staffService.getStaffByMail(user);
-        if (!admin || admin.role !== 'admin') {
-          return util.setErrorResponse(res, "Access denied  ", 403);
-        } else {
-          return next();
-        }
       }
+      const token = req.headers.authorization.slice(7);
+      const decoded = jwt.jwtVerify(token, process.env.SECRET);
+      const { user } = decoded;
+      if (!user) {
+        return util.setErrorResponse(res, "Invalid access token", 400);
+      }
+      const admin = await staffService.getStaffByMail(user);
+      if (!admin || admin.role !== "admin") {
+        return util.setErrorResponse(res, "Access denied  ", 403);
+      }
+      return next();
     } catch (error) {
       return util.setErrorResponse(res, error.message, 500);
     }
@@ -86,7 +84,7 @@ class Access {
       } else if (!email && decoded) {
         const { user } = decoded;
         const admin = await staffService.getStaffByMail(user);
-        if (!admin || admin.role !== 'admin') {
+        if (!admin || admin.role !== "admin") {
           return util.setErrorResponse(res, "Access denied", 403);
         }
         next();

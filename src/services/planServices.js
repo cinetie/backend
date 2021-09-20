@@ -1,5 +1,5 @@
-import Sequelize from 'sequelize';
-import database from '../database/models';
+import Sequelize from "sequelize";
+import database from "../database/models";
 
 const op = Sequelize.Op;
 class planServices {
@@ -14,7 +14,7 @@ class planServices {
   static async deletePlan(id) {
     try {
       return await database.plans.destroy({
-        where: { id }
+        where: { id },
       });
     } catch (error) {
       throw error;
@@ -25,7 +25,7 @@ class planServices {
     try {
       return await database.plans.update(plan, {
         returning: true,
-        where: { id }
+        where: { id },
       });
     } catch (error) {
       throw error;
@@ -35,7 +35,7 @@ class planServices {
   static async getParticalPlan(type) {
     try {
       return await database.plans.findOne({
-        where: { type }
+        where: { type },
       });
     } catch (error) {
       throw error;
@@ -47,9 +47,9 @@ class planServices {
       return await database.plans.findAll({
         where: {
           type: {
-            [op.not]: 'Setup'
-          }
-        }
+            [op.not]: "Setup",
+          },
+        },
       });
     } catch (error) {
       throw error;

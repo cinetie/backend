@@ -35,16 +35,16 @@ describe("VERIFY EMAIL", () => {
       });
   });
 
-//   it("should be able to provide an error with fake token", (done) => {
-//     chai
-//       .request(app)
-//       .get(
-//         "/auth/verify/?token=eyJhbGciOiJIUzI1NiJ9.ZmFrZUBnbWFpbC5jb20.Fm0mt8gdnR2hLBB_c16JhDBhyJuJR7iBYF1TIlqeOKo"
-//       )
-//       .end((err, res) => {
-//         expect(res).to.have.status(404);
-//         expect(res.body).to.have.property("message", "User not found");
-//         done();
-//       });
-//   });
+  //   it("should be able to provide an error with fake token", (done) => {
+  //     chai
+  //       .request(app)
+  //       .get(
+  //         "/auth/verify/?token=eyJhbGciOiJIUzI1NiJ9.ZmFrZUBnbWFpbC5jb20.Fm0mt8gdnR2hLBB_c16JhDBhyJuJR7iBYF1TIlqeOKo"
+  //       )
+  //       .end((err, res) => {
+  //         expect(res).to.have.status(404);
+  //         expect(res.body).to.have.property("message", "User not found");
+  //         done();
+  //       });
+  //   });
 });

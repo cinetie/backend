@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-catch */
-import sequelize from 'sequelize';
-import database from '../database/models';
-import checker from '../helpers/If';
+import sequelize from "sequelize";
+import database from "../database/models";
+import checker from "../helpers/If";
 
 const op = sequelize.Op;
 // Services for  handling Content providers cash transactions like withdrawals and invoicing
@@ -31,7 +31,7 @@ class cpTransServices {
   static async getTransById(clientId) {
     try {
       const data = await database.cpTransactions.findAll({
-        where: { clientId }
+        where: { clientId },
       });
       if (data) {
         return data;
@@ -46,11 +46,8 @@ class cpTransServices {
     try {
       const data = await database.cpTransactions.update(updates, {
         where: {
-          [op.and]: [
-            { id },
-            { state: 'Not Approved' }
-          ]
-        }
+          [op.and]: [{ id }, { state: "Not Approved" }],
+        },
       });
       if (data) {
         return data;

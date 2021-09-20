@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-catch */
-import sequelize from 'sequelize';
-import database from '../database/models';
-import date from '../helpers/date';
+import sequelize from "sequelize";
+import database from "../database/models";
+import date from "../helpers/date";
 
 const op = sequelize.Op;
 class earningsService {
@@ -9,11 +9,11 @@ class earningsService {
     try {
       const user = await database.earnings.findAll({
         attributes: {
-          exclude: ['createdAt', 'updatedAt']
+          exclude: ["createdAt", "updatedAt"],
         },
         where: {
-          videoId
-        }
+          videoId,
+        },
       });
       if (user) {
         return user;
@@ -28,11 +28,11 @@ class earningsService {
     try {
       const user = await database.earnings.findAll({
         attributes: {
-          exclude: ['createdAt', 'updatedAt']
+          exclude: ["createdAt", "updatedAt"],
         },
         where: {
-          clientId
-        }
+          clientId,
+        },
       });
       if (user) {
         return user;
@@ -47,14 +47,11 @@ class earningsService {
     try {
       const user = await database.earnings.findAll({
         attributes: {
-          exclude: ['createdAt', 'updatedAt']
+          exclude: ["createdAt", "updatedAt"],
         },
         where: {
-          [op.and]: [
-            { clientId },
-            { state: 'inActive' }
-          ]
-        }
+          [op.and]: [{ clientId }, { state: "inActive" }],
+        },
       });
       if (user) {
         return user;
@@ -69,14 +66,11 @@ class earningsService {
     try {
       const user = await database.earnings.findAll({
         attributes: {
-          exclude: ['createdAt', 'updatedAt']
+          exclude: ["createdAt", "updatedAt"],
         },
         where: {
-          [op.and]: [
-            { clientId },
-            { state: 'Active' }
-          ]
-        }
+          [op.and]: [{ clientId }, { state: "Active" }],
+        },
       });
       if (user) {
         return user;
@@ -91,15 +85,11 @@ class earningsService {
     try {
       const user = await database.earnings.findAll({
         attributes: {
-          exclude: ['createdAt', 'updatedAt']
+          exclude: ["createdAt", "updatedAt"],
         },
         where: {
-          [op.and]: [
-            { videoId },
-            { clientId },
-            { state: 'Active' }
-          ]
-        }
+          [op.and]: [{ videoId }, { clientId }, { state: "Active" }],
+        },
       });
       if (user) {
         return user;
@@ -114,11 +104,11 @@ class earningsService {
     try {
       return await database.earnings.findOne({
         attributes: {
-          exclude: ['createdAt', 'updatedAt']
+          exclude: ["createdAt", "updatedAt"],
         },
         where: {
-          id
-        }
+          id,
+        },
       });
     } catch (error) {
       throw error;
@@ -135,15 +125,15 @@ class earningsService {
 
   static async setEarningsToInactive(clientId) {
     try {
-      return await database.earnings.update({ state: 'inActive' }, {
-        returning: true,
-        where: {
-          [op.and]: [
-            { clientId },
-            { state: 'Active' }
-          ]
+      return await database.earnings.update(
+        { state: "inActive" },
+        {
+          returning: true,
+          where: {
+            [op.and]: [{ clientId }, { state: "Active" }],
+          },
         }
-      });
+      );
     } catch (error) {
       throw error;
     }
@@ -154,8 +144,8 @@ class earningsService {
       return await database.earnings.destroy({
         returning: true,
         where: {
-          id
-        }
+          id,
+        },
       });
     } catch (error) {
       throw error;
@@ -173,7 +163,7 @@ class earningsService {
   static async getAllActiveEarnings() {
     try {
       return await database.earnings.findAll({
-        where: { state: 'Active' }
+        where: { state: "Active" },
       });
     } catch (error) {
       throw error;
@@ -186,18 +176,19 @@ class earningsService {
       const origin = date.removeDays(180);
       const data = await database.earnings.findAll({
         where: {
-          [op.and]: [{
-            monthYear: {
-              [op.gte]: origin
-
+          [op.and]: [
+            {
+              monthYear: {
+                [op.gte]: origin,
+              },
+              state: "Active",
+              amount: {
+                [op.gte]: min,
+              },
+              clientId,
             },
-            state: 'Active',
-            amount: {
-              [op.gte]: min
-            },
-            clientId
-          }]
-        }
+          ],
+        },
       });
 
       if (data) {

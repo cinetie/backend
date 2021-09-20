@@ -1,43 +1,47 @@
 /* eslint-disable no-console */
-import '@babel/polyfill';
-import express from 'express';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import morgan from 'morgan';
-import cron from 'node-cron';
-import { config } from 'dotenv';
-import path from 'path';
-import fileUpload from 'express-fileupload';
-import response from './helpers/response';
-import stopLoginSessions from './helpers/stopLoginSessions';
-import calculateEarnings from './helpers/calculateEarning';
-import routes from './routes';
-import endSubscription from './helpers/endSubscription';
+import "@babel/polyfill";
+import express from "express";
+import bodyParser from "body-parser";
+import cors from "cors";
+import morgan from "morgan";
+import cron from "node-cron";
+import { config } from "dotenv";
+import path from "path";
+import fileUpload from "express-fileupload";
+import response from "./helpers/response";
+import stopLoginSessions from "./helpers/stopLoginSessions";
+import calculateEarnings from "./helpers/calculateEarning";
+import routes from "./routes";
+import endSubscription from "./helpers/endSubscription";
 
 config();
-cron.schedule('0 0 0 * * *', async () => {
+cron.schedule("0 0 0 * * *", async () => {
   await stopLoginSessions();
 });
 cron.schedule(
-  '0 0 * * *',
+  "0 0 * * *",
   async () => {
     await calculateEarnings();
   },
   {
     scheduled: true,
-    timezone: 'Africa/Cairo',
-  },
+    timezone: "Africa/Cairo",
+  }
 );
 
-cron.schedule('0 0 * * *', async () => {
-  await endSubscription();
-}, {
-  scheduled: true,
-  timezone: 'Africa/Cairo',
-});
+cron.schedule(
+  "0 0 * * *",
+  async () => {
+    await endSubscription();
+  },
+  {
+    scheduled: true,
+    timezone: "Africa/Cairo",
+  }
+);
 const app = express();
 
-app.enable('trust proxy');
+app.enable("trust proxy");
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -45,32 +49,38 @@ app.use(bodyParser.json());
 app.use(
   fileUpload({
     useTempFiles: true,
-    tempFileDir: '/tmp/',
+    tempFileDir: "/tmp/",
     limits: { fileSize: 5000 * 1024 * 1024 },
-  }),
+  })
 );
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 
-app.get('/', (req, res) => response.successResponse(res, 200, 'Welcome to Cinetie'));
+app.get("/", (req, res) =>
+  response.successResponse(res, 200, "Welcome to Cinetie")
+);
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  res.header("Access-Control-Allow-Origin", "*");
   res.header(
-    'Access-Control-Allow-Methods',
-    'GET, POST, PUT, PATCH, OPTIONS, DELETE',
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, PATCH, OPTIONS, DELETE"
   );
   res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept',
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
   );
   next();
 });
-app.use('/', routes);
+app.use("/", routes);
 
-app.use((req, res) => response.errorResponse(res, 404, 'Not found', 'Undefined URL'));
-app.set('views', path.join(__dirname, '/public/templates'));
-app.set('view engine', 'ejs');
+app.use((req, res) =>
+  response.errorResponse(res, 404, "Not found", "Undefined URL")
+);
+app.set("views", path.join(__dirname, "/public/templates"));
+app.set("view engine", "ejs");
 const PORT = process.env.PORT || 3001;
 if (!module.parent) {
-  app.listen(PORT, () => console.log(`Up and running on port ${PORT} ${process.env.HOST}`));
+  app.listen(PORT, () =>
+    console.log(`Up and running on port ${PORT} ${process.env.HOST}`)
+  );
 }
 module.exports = app;

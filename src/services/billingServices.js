@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-catch */
-import sequelize from 'sequelize';
-import database from '../database/models';
+import sequelize from "sequelize";
+import database from "../database/models";
 
 const op = sequelize.Op;
 // services for implementing the billing service
@@ -29,7 +29,7 @@ class billingServices {
               email,
             },
             {
-              state: 'current',
+              state: "current",
             },
             {
               endDate: date.toDateString().toString(),
@@ -55,7 +55,7 @@ class billingServices {
               email,
             },
             {
-              state: state || 'current',
+              state: state || "current",
             },
           ],
         },
@@ -78,7 +78,7 @@ class billingServices {
               email,
             },
             {
-              state: 'pending',
+              state: "pending",
             },
           ],
         },
@@ -99,7 +99,7 @@ class billingServices {
           [op.and]: [
             {
               email,
-            }
+            },
           ],
         },
       });
@@ -159,7 +159,7 @@ class billingServices {
     try {
       const status = await database.subscriptions.update(updated, {
         where: {
-          [op.and]: [{ email }, { state: 'current' }],
+          [op.and]: [{ email }, { state: "current" }],
         },
       });
       if (status) {
@@ -186,19 +186,20 @@ class billingServices {
       }
       return {
         status: 400,
-        message: 'Parameter email is not provided',
+        message: "Parameter email is not provided",
       };
     } catch (error) {
       throw error;
     }
   }
+
   static async deleteSubscription(email) {
     try {
       return await database.subscriptions.destroy({
         returning: true,
         where: {
-          email
-        }
+          email,
+        },
       });
     } catch (error) {
       throw error;

@@ -1,10 +1,10 @@
 import chai, { expect } from "chai";
 import chaiHttp from "chai-http";
 import { describe, it } from "mocha";
+import sinon from "sinon";
 import WebHooks, { Transaction } from "../controllers/webhooks";
 import transactions from "../services/transactionService";
 import emptyMock from "./mock/empty.mock";
-import sinon from "sinon";
 import {
   FlutterMocksEmpty,
   FlutterMocks,

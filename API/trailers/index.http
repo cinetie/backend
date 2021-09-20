@@ -1,0 +1,4 @@
+@host = http://localhost:3001/trailer
+GET {{host}}/sort/video?id=960d44f5-5878-4a7c-af7d-3fc786642272
+Accept: application/json
+Authorization: Bearer {{liveTokenAdmin}}

@@ -823,7 +823,8 @@ export default {
         firstName: "user",
         lastName: "test124",
         email: "user345679xd@example.com",
-        password: "$2b$10$RmPivehHP9QltuG/R02SLu0uMvYtwfZj1fHPqHjCCIk7f6hpGTsHu",
+        password:
+          "$2b$10$RmPivehHP9QltuG/R02SLu0uMvYtwfZj1fHPqHjCCIk7f6hpGTsHu",
         nationality: "Rwandan",
         cityOfResidence: "Muhima",
         isVerified: true,
@@ -844,7 +845,8 @@ export default {
         firstName: "user",
         lastName: "test124",
         email: "user345679xde@example.com",
-        password: "$2b$10$RmPivehHP9QltuG/R02SLu0uMvYtwfZj1fHPqHjCCIk7f6hpGTsHu",
+        password:
+          "$2b$10$RmPivehHP9QltuG/R02SLu0uMvYtwfZj1fHPqHjCCIk7f6hpGTsHu",
         nationality: "Rwandan",
         cityOfResidence: "Muhima",
         isVerified: true,
@@ -887,7 +889,8 @@ export default {
         firstName: "user",
         lastName: "test1246",
         email: "user345679xde7@example.com",
-        password: "$2b$10$RmPivehHP9QltuG/R02SLu0uMvYtwfZj1fHPqHjCCIk7f6hpGTsHu",
+        password:
+          "$2b$10$RmPivehHP9QltuG/R02SLu0uMvYtwfZj1fHPqHjCCIk7f6hpGTsHu",
         nationality: "Rwandan",
         cityOfResidence: "Muhima",
         isVerified: true,
@@ -908,7 +911,8 @@ export default {
         firstName: "user",
         lastName: "test1246",
         email: "yyufmq@workingtall.com",
-        password: "$2b$10$RmPivehHP9QltuG/R02SLu0uMvYtwfZj1fHPqHjCCIk7f6hpGTsHu",
+        password:
+          "$2b$10$RmPivehHP9QltuG/R02SLu0uMvYtwfZj1fHPqHjCCIk7f6hpGTsHu",
         nationality: "Rwandan",
         cityOfResidence: "Muhima",
         isVerified: true,
@@ -929,7 +933,8 @@ export default {
         firstName: "user",
         lastName: "test1246",
         email: "yyufmrieoewirq@workingtall.com",
-        password: "$2b$10$XCCEIBq8tdcefxoHvzUwne7HDH6WAuI.ACv7UeBWUGaCOAiMOApae",
+        password:
+          "$2b$10$XCCEIBq8tdcefxoHvzUwne7HDH6WAuI.ACv7UeBWUGaCOAiMOApae",
         nationality: "Rwandan",
         cityOfResidence: "Muhima",
         isVerified: true,

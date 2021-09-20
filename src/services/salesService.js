@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-catch */
-import sequelize from 'sequelize';
-import database from '../database/models';
+import sequelize from "sequelize";
+import database from "../database/models";
 
 const op = sequelize.Op;
 
@@ -9,9 +9,9 @@ class saleService {
     try {
       const user = await database.sales.findOne({
         attributes: {
-          exclude: ['createdAt', 'updatedAt', 'id']
+          exclude: ["createdAt", "updatedAt", "id"],
         },
-        where: { method }
+        where: { method },
       });
       if (user) {
         return user;
@@ -26,22 +26,22 @@ class saleService {
     try {
       const data = await database.sales.findAll({
         attributes: {
-          exclude: ['createdAt', 'updatedAt', 'id']
+          exclude: ["createdAt", "updatedAt", "id"],
         },
         where: {
           [op.and]: [
             {
               creationTime: {
-                [op.gte]: start
-              }
+                [op.gte]: start,
+              },
             },
             {
               creationTime: {
-                [op.lte]: end
-              }
-            }
-          ]
-        }
+                [op.lte]: end,
+              },
+            },
+          ],
+        },
       });
       if (data) return data;
       return null;
@@ -54,9 +54,9 @@ class saleService {
     try {
       const user = await database.sales.findOne({
         attributes: {
-          exclude: ['createdAt', 'updatedAt']
+          exclude: ["createdAt", "updatedAt"],
         },
-        where: { id }
+        where: { id },
       });
       if (user) {
         return user;
@@ -79,7 +79,7 @@ class saleService {
     try {
       const sales = await database.sales.findAll({
         attributes: {
-          exclude: ['createdAt', 'updatedAt', 'id']
+          exclude: ["createdAt", "updatedAt", "id"],
         },
       });
       if (!sales) return null;

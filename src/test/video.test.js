@@ -16,6 +16,7 @@ import * as videoHelper from "../helpers/video";
 import jwt from "../helpers/jwt";
 import * as aws from "../helpers/aws";
 import videoUploader from "../helpers/videoUploader";
+
 dotenv.config();
 describe("VIDEO TEST", () => {
   describe("ADD VIDEO", () => {

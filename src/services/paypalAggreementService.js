@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-catch */
-import sequelize from 'sequelize';
-import database from '../database/models';
+import sequelize from "sequelize";
+import database from "../database/models";
 
 const op = sequelize.Op;
 class paypalAggreementServices {
@@ -20,11 +20,8 @@ class paypalAggreementServices {
     try {
       const data = await database.paypalSubscription.findOne({
         where: {
-          [op.and]: [
-            { email },
-            { state: 'alive' }
-          ]
-        }
+          [op.and]: [{ email }, { state: "alive" }],
+        },
       });
       if (data) {
         return data;
@@ -39,7 +36,7 @@ class paypalAggreementServices {
     try {
       const data = await database.paypalSubscription.update(aggreement, {
         return: true,
-        where: { aggreementId }
+        where: { aggreementId },
       });
       if (data) {
         return data;
