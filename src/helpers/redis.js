@@ -4,7 +4,7 @@ const redis = new Ioredis();
 
 export const get = async (key) => {
   const result = await redis.get(key);
-  return JSON.parse(result);
+  return result ? JSON.parse(result): null;
 };
 
 export const set = async (key, value) => {

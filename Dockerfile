@@ -22,4 +22,4 @@ ADD . /opt/app
 
 EXPOSE 3001
 
-CMD ["npm", "run", "start-prod"]
+CMD ["sh","start.sh"]
