@@ -1,6 +1,6 @@
 /* eslint-disable quotes */
-import sequelize from 'sequelize';
-import database from '../database/models';
+import sequelize from "sequelize";
+import database from "../database/models";
 
 const op = sequelize.Op;
 class serieServices {
@@ -19,7 +19,7 @@ class serieServices {
   static async getSingleEpisode(id) {
     try {
       const episode = await database.series.findOne({
-        where: { id }
+        where: { id },
       });
       if (episode) {
         return episode;
@@ -32,7 +32,7 @@ class serieServices {
 
   static async getEpisodesByClientId(clientId) {
     const episode = await database.series.findAll({
-      where: { clientId }
+      where: { clientId },
     });
     if (episode) {
       return episode;
@@ -49,9 +49,9 @@ class serieServices {
           [op.and]: [
             { videoId },
             { season: Number(season) },
-            { suspensionState: false }
-          ]
-        }
+            { suspensionState: false },
+          ],
+        },
       });
       if (Object.values(data).length > 0) {
         return data;
@@ -65,12 +65,10 @@ class serieServices {
   static async getAllSeasons(videoId) {
     try {
       const data = await database.series.findAll({
-        attributes: [[sequelize.fn('max', sequelize.col('season')), 'seasons']],
+        attributes: [[sequelize.fn("max", sequelize.col("season")), "seasons"]],
         where: { [op.and]: [{ videoId }, { suspensionState: false }] },
-        order: [
-          ['id', 'DESC']
-        ],
-        group: ['id', 'season']
+        order: [["id", "DESC"]],
+        group: ["id", "season"],
       });
       if (Object.values(data).length > 0) {
         return data;
@@ -84,7 +82,7 @@ class serieServices {
   static async update(id, updates) {
     try {
       const updated = await database.series.update(updates, {
-        where: { id }
+        where: { id },
       });
       if (updated) {
         return updated;
@@ -99,7 +97,7 @@ class serieServices {
     try {
       const deleted = await database.series.destroy({
         returning: true,
-        where: { id }
+        where: { id },
       });
       if (deleted) {
         return deleted;

@@ -1,5 +1,5 @@
-import Util from './utilities';
-import '@hapi/joi';
+import Util from "./utilities";
+import "@hapi/joi";
 
 const util = new Util();
 export default (schema, toValidate, res, next) => {

@@ -2,19 +2,19 @@
 /* eslint-disable no-return-await */
 /* eslint-disable no-param-reassign */
 /* eslint-disable consistent-return */
-import path from 'path';
-import { v4 as uuid } from 'uuid';
-import Util from '../helpers/utilities';
-import mailer from '../helpers/mailer';
-import userService from '../services/userServices';
-import date from '../helpers/date';
-import jwt from '../helpers/jwt';
-import Fetch from '../helpers/fetch';
-import ViewingSessions from '../services/viewingSessionsServices';
-import transactions from '../services/transactionService';
-import webhooks from '../controllers/webhooks';
-import payment from '../helpers/payment';
-import billingService from '../services/billingServices';
+import path from "path";
+import { v4 as uuid } from "uuid";
+import Util from "../helpers/utilities";
+import mailer from "../helpers/mailer";
+import userService from "../services/userServices";
+import date from "../helpers/date";
+import jwt from "../helpers/jwt";
+import Fetch from "../helpers/fetch";
+import ViewingSessions from "../services/viewingSessionsServices";
+import transactions from "../services/transactionService";
+import webhooks from "../controllers/webhooks";
+import payment from "../helpers/payment";
+import billingService from "../services/billingServices";
 
 const util = new Util();
 // middlware to perfom actual payment and registering transactions
@@ -68,12 +68,12 @@ class billing {
         name: `${user.firstName}`,
       },
       {
-        from: 'Cinetie support',
+        from: "Cinetie support",
         to: req.body.email,
-        subject: 'Cinetie subscription',
+        subject: "Cinetie subscription",
       },
       {
-        path: `${path.join(__dirname, '../public/templates/notification.ejs')}`,
+        path: `${path.join(__dirname, "../public/templates/notification.ejs")}`,
       },
     ]);
   }
@@ -99,24 +99,21 @@ class billing {
       const pendingSubscription = await billing.fetchCurrentSubscription(
         req,
         res,
-        'pending'
+        "pending"
       );
       const details = await billing.fetchCurrentSubscription(req, res);
 
       if (!user) {
         return util.setErrorResponse(res, "user doesn't exist", 400);
-      } if (
-        pendingSubscription
-        || user.plan === 'Setup'
-        || details === null
-      ) {
+      }
+      if (pendingSubscription || user.plan === "Setup" || details === null) {
         next();
       } else {
         const today = new Date();
         const endDate = new Date(details.endDate);
 
         const token = jwt.jwtSign(
-          { role: 'main-api', user: user.email },
+          { role: "main-api", user: user.email },
           process.env.SECRET,
           1000
         );
@@ -126,7 +123,7 @@ class billing {
             const txRef = uuid();
             const momoStatus = await Fetch(
               {
-                currency: 'RWF',
+                currency: "RWF",
                 amount: details.price,
                 email: user.email,
                 phone_number: user.phoneNumber,
@@ -135,24 +132,23 @@ class billing {
               },
               {
                 Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
               },
               `${process.env.PAY_HOST}/charge/momo`,
-              'POST'
+              "POST"
             );
             if (momoStatus.status === 200) {
-              const currentSubscription = await billingService.getCurrentSubscription(
-                user.email
-              );
+              const currentSubscription =
+                await billingService.getCurrentSubscription(user.email);
               await payment.recordTransaction(
                 user,
                 currentSubscription,
                 txRef,
-                'pending'
+                "pending"
               );
               util.setSuccessResponse(
                 res,
-                'Please follow this link to renew your subscription with Mobile money',
+                "Please follow this link to renew your subscription with Mobile money",
                 200,
                 momoStatus
               );
@@ -168,10 +164,8 @@ class billing {
             // }, `${process.env.PAY_HOST}/charge/card-token`, 'POST');
             billing.handleFailPaymentStatus(req, next);
           } else if (Number(details.paymentMethod) === 3) {
-            const recentTransactions = await transactions.getTransactionsByEmail(
-              user.email,
-              'pending'
-            );
+            const recentTransactions =
+              await transactions.getTransactionsByEmail(user.email, "pending");
 
             if (recentTransactions.length > 0) {
               await billing.checkRecentPendingSpennTransaction(
@@ -191,7 +185,7 @@ class billing {
                   user,
                   details,
                   pay.data.RequestId,
-                  'pending'
+                  "pending"
                 );
                 // await billingService.updateSubscription(user.email,
                 //   { state: 'current' });
@@ -206,31 +200,30 @@ class billing {
               txRef,
               amount: details.price,
               email: user.email,
-              currency: 'KES',
+              currency: "KES",
             };
             const data = await Fetch(
               requestData,
               {
                 Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
               },
               `${process.env.PAY_HOST}/charge/all?type=mpesa`,
-              'POST'
+              "POST"
             );
 
             if (data.status === 200) {
-              const currentSubscription = await billingService.getCurrentSubscription(
-                user.email
-              );
+              const currentSubscription =
+                await billingService.getCurrentSubscription(user.email);
               await payment.recordTransaction(
                 user,
                 currentSubscription,
                 txRef,
-                'pending'
+                "pending"
               );
               util.setSuccessResponse(
                 res,
-                'Confirm your Payment with mpesa',
+                "Confirm your Payment with mpesa",
                 200,
                 data
               );
@@ -243,31 +236,30 @@ class billing {
               txRef,
               amount: details.price,
               email: user.email,
-              currency: 'UGX',
+              currency: "UGX",
             };
             const data = await Fetch(
               requestData,
               {
                 Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
               },
               `${process.env.PAY_HOST}/charge/all?type=mobile_money_uganda`,
-              'POST'
+              "POST"
             );
 
             if (data.status === 200) {
-              const currentSubscription = await billingService.getCurrentSubscription(
-                user.email
-              );
+              const currentSubscription =
+                await billingService.getCurrentSubscription(user.email);
               await payment.recordTransaction(
                 user,
                 currentSubscription,
                 txRef,
-                'pending'
+                "pending"
               );
               util.setSuccessResponse(
                 res,
-                'Please follow this link to renew your subscription with Mobile money',
+                "Please follow this link to renew your subscription with Mobile money",
                 200,
                 data
               );
@@ -280,32 +272,31 @@ class billing {
               txRef,
               amount: details.price,
               email: user.email,
-              currency: 'ZMW',
-              network: 'MTN',
+              currency: "ZMW",
+              network: "MTN",
             };
             const data = await Fetch(
               requestData,
               {
                 Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
               },
               `${process.env.PAY_HOST}/charge/all?type=mobile_money_zambia`,
-              'POST'
+              "POST"
             );
 
             if (data.status === 200) {
-              const currentSubscription = await billingService.getCurrentSubscription(
-                user.email
-              );
+              const currentSubscription =
+                await billingService.getCurrentSubscription(user.email);
               await payment.recordTransaction(
                 user,
                 currentSubscription,
                 txRef,
-                'pending'
+                "pending"
               );
               util.setSuccessResponse(
                 res,
-                'Please follow this link to renew your subscription with Mobile money',
+                "Please follow this link to renew your subscription with Mobile money",
                 200,
                 data
               );
@@ -318,32 +309,31 @@ class billing {
               txRef,
               amount: details.price,
               email: user.email,
-              currency: 'ZMW',
-              network: 'ZAMTEL',
+              currency: "ZMW",
+              network: "ZAMTEL",
             };
             const data = await Fetch(
               requestData,
               {
                 Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
               },
               `${process.env.PAY_HOST}/charge/all?type=mobile_money_zambia`,
-              'POST'
+              "POST"
             );
 
             if (data.status === 200) {
-              const currentSubscription = await billingService.getCurrentSubscription(
-                user.email
-              );
+              const currentSubscription =
+                await billingService.getCurrentSubscription(user.email);
               await payment.recordTransaction(
                 user,
                 currentSubscription,
                 txRef,
-                'pending'
+                "pending"
               );
               util.setSuccessResponse(
                 res,
-                'Please follow this link to renew your subscription with Mobile money',
+                "Please follow this link to renew your subscription with Mobile money",
                 200,
                 data
               );
@@ -356,32 +346,31 @@ class billing {
               txRef,
               amount: details.price,
               email: user.email,
-              currency: 'GHS',
-              network: 'MTN',
+              currency: "GHS",
+              network: "MTN",
             };
             const data = await Fetch(
               requestData,
               {
                 Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
               },
               `${process.env.PAY_HOST}/charge/all?type=mobile_money_ghana`,
-              'POST'
+              "POST"
             );
 
             if (data.status === 200) {
-              const currentSubscription = await billingService.getCurrentSubscription(
-                user.email
-              );
+              const currentSubscription =
+                await billingService.getCurrentSubscription(user.email);
               await payment.recordTransaction(
                 user,
                 currentSubscription,
                 txRef,
-                'pending'
+                "pending"
               );
               util.setSuccessResponse(
                 res,
-                'Please follow this link to renew your subscription with Mobile money',
+                "Please follow this link to renew your subscription with Mobile money",
                 200,
                 data
               );
@@ -394,32 +383,31 @@ class billing {
               txRef,
               amount: details.price,
               email: user.email,
-              currency: 'GHS',
-              network: 'VODAFONE',
+              currency: "GHS",
+              network: "VODAFONE",
             };
             const data = await Fetch(
               requestData,
               {
                 Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
               },
               `${process.env.PAY_HOST}/charge/all?type=mobile_money_ghana`,
-              'POST'
+              "POST"
             );
 
             if (data.status === 200) {
-              const currentSubscription = await billingService.getCurrentSubscription(
-                user.email
-              );
+              const currentSubscription =
+                await billingService.getCurrentSubscription(user.email);
               await payment.recordTransaction(
                 user,
                 currentSubscription,
                 txRef,
-                'pending'
+                "pending"
               );
               util.setSuccessResponse(
                 res,
-                'Please follow this link to renew your subscription with Mobile money',
+                "Please follow this link to renew your subscription with Mobile money",
                 200,
                 data
               );
@@ -432,32 +420,31 @@ class billing {
               txRef,
               amount: details.price,
               email: user.email,
-              currency: 'GHS',
-              network: 'TIGO',
+              currency: "GHS",
+              network: "TIGO",
             };
             const data = await Fetch(
               requestData,
               {
                 Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
               },
               `${process.env.PAY_HOST}/charge/all?type=mobile_money_ghana`,
-              'POST'
+              "POST"
             );
 
             if (data.status === 200) {
-              const currentSubscription = await billingService.getCurrentSubscription(
-                user.email
-              );
+              const currentSubscription =
+                await billingService.getCurrentSubscription(user.email);
               await payment.recordTransaction(
                 user,
                 currentSubscription,
                 txRef,
-                'pending'
+                "pending"
               );
               util.setSuccessResponse(
                 res,
-                'Please follow this link to renew your subscription with Mobile money',
+                "Please follow this link to renew your subscription with Mobile money",
                 200,
                 data
               );
@@ -489,8 +476,8 @@ class billing {
     );
     // eslint-disable-next-line no-console
     if (
-      recentTransaction.data.Status === 'Approved'
-      || recentTransaction.data.Status === 'TransactionVerified'
+      recentTransaction.data.Status === "Approved" ||
+      recentTransaction.data.Status === "TransactionVerified"
     ) {
       await billing.updateTransactionsAndRegisterSales(
         recentTransactions[0].transactionId,
@@ -500,7 +487,7 @@ class billing {
         res,
         next
       );
-      await billingService.updateSubscription(user.email, { state: 'current' });
+      await billingService.updateSubscription(user.email, { state: "current" });
     } else {
       billing.handleFailPaymentStatus(req, next);
     }
@@ -515,19 +502,19 @@ class billing {
       const details = await billing.fetchCurrentSubscription(
         req,
         res,
-        'pending'
+        "pending"
       );
       if (details === null) {
         next();
       } else if (Number(details.paymentMethod) === 3) {
         const recentTransactions = await transactions.getTransactionsByEmail(
           user.email,
-          'pending'
+          "pending"
         );
 
         if (recentTransactions.length > 0) {
           const token = jwt.jwtSign(
-            { role: 'main-api', user: user.email },
+            { role: "main-api", user: user.email },
             process.env.SECRET,
             1000
           );
@@ -562,9 +549,9 @@ class billing {
   ) {
     const rates = await Fetch(
       undefined,
-      { Accept: 'application/json' },
+      { Accept: "application/json" },
       `https://apilayer.net/api/live?access_key=${process.env.ACCESS_KEY_CURRENCY_LAYER}&currencies=RWF&source=USD&format=1`,
-      'GET'
+      "GET"
     );
     const converted = Math.floor(rates.quotes.USDRWF * details.price);
     details.price = converted;
@@ -572,17 +559,18 @@ class billing {
     const updates = await userService.updateUser(user.email, {
       permissionLevel: 1,
     });
-    const updatedSubscription = user.isBilledAnnually === true
-      ? await billingService.updateSubscription(user.email, {
-        endDate: date.addMoreDays(365).toDateString(),
-      })
-      : await billingService.updateSubscription(user.email, {
-        endDate: date.addMoreDays(30).toDateString(),
-      });
+    const updatedSubscription =
+      user.isBilledAnnually === true
+        ? await billingService.updateSubscription(user.email, {
+            endDate: date.addMoreDays(365).toDateString(),
+          })
+        : await billingService.updateSubscription(user.email, {
+            endDate: date.addMoreDays(30).toDateString(),
+          });
     if (updates[1] === 1 && updatedSubscription[1] === 1) {
       const status = await webhooks.registerSales(
         {
-          payment_type: 'spenn',
+          payment_type: "spenn",
           amount: details.price,
         },
         details,
@@ -591,20 +579,20 @@ class billing {
       );
       if (status === true) {
         await transactions.updateTransaction(recentTrans, {
-          statusDesc: 'approved',
+          statusDesc: "approved",
         });
         next();
       } else {
         return util.setErrorResponse(
           res,
-          'Contact support Error: SPENN transaction error',
+          "Contact support Error: SPENN transaction error",
           500
         );
       }
     } else {
       return util.setErrorResponse(
         res,
-        'Contact support Error: Subscription renewal',
+        "Contact support Error: Subscription renewal",
         500
       );
     }
@@ -618,10 +606,10 @@ class billing {
       },
       {
         Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       `${process.env.PAY_HOST}/charge/spenn`,
-      'POST'
+      "POST"
     );
   }
 
@@ -630,20 +618,20 @@ class billing {
       undefined,
       {
         Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       `${process.env.PAY_HOST}/charge/spenn-check?requestId=${requestId}`,
-      'GET'
+      "GET"
     );
   }
 
   static async recordTransaction(user, details, pay) {
     await transactions.createTransaction({
       email: user.email,
-      statusDesc: 'pending',
+      statusDesc: "pending",
       paidAmount: details.price,
       transactionId: pay.data.RequestId,
-      currency: 'RWF',
+      currency: "RWF",
     });
   }
 
@@ -655,7 +643,7 @@ class billing {
       );
       const data = await userService.getUserByMail(email);
       if (data.permissionLevel === -1) {
-        return util.setErrorResponse(res, 'Please set up your billing', 402);
+        return util.setErrorResponse(res, "Please set up your billing", 402);
       }
       next();
     } catch (error) {
@@ -679,8 +667,8 @@ class billing {
           email
         );
         if (
-          subscription.trialEnds > today.getTime()
-          && viewingSessions.length < 3
+          subscription.trialEnds > today.getTime() &&
+          viewingSessions.length < 3
         ) {
           next();
         } else {
@@ -690,28 +678,27 @@ class billing {
           if (updates[1] > 0) {
             await mailer([
               {
-                body:
-                  'We would like you to know that your account has been put onhold. \n since your  trial just ended',
+                body: "We would like you to know that your account has been put onhold. \n since your  trial just ended",
               },
               {
-                from: 'Cinetie support',
+                from: "Cinetie support",
                 to: email,
-                subject: 'Update payment details',
+                subject: "Update payment details",
               },
               {
                 path: `${path.join(
                   __dirname,
-                  '../public/templates/notification.ejs'
+                  "../public/templates/notification.ejs"
                 )}`,
               },
             ]);
             util.setErrorResponse(
               res,
-              'Please activate your account as your trial just ended',
+              "Please activate your account as your trial just ended",
               402
             );
           } else {
-            return util.setErrorResponse(res, 'Something went wrong ', 502);
+            return util.setErrorResponse(res, "Something went wrong ", 502);
           }
         }
       }

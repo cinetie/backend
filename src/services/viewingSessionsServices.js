@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-catch */
-import sequelize from 'sequelize';
-import database from '../database/models';
+import sequelize from "sequelize";
+import database from "../database/models";
 
 const op = sequelize.Op;
 // services for implementing the billing service
@@ -23,18 +23,19 @@ class viewingSessionservices {
       const sessions = await database.viewingSessions.findAll({
         attributes: {
           include: [
-            [sequelize.fn('count', sequelize.col('videoId')), 'userCount']
-          ]
+            [sequelize.fn("count", sequelize.col("videoId")), "userCount"],
+          ],
         },
         where: {
-          [op.and]: [{
-            videoId
-          },
-          {
-            sessionState: 'Active'
-          }
-          ]
-        }
+          [op.and]: [
+            {
+              videoId,
+            },
+            {
+              sessionState: "Active",
+            },
+          ],
+        },
       });
       if (sessions) {
         return sessions;
@@ -49,13 +50,9 @@ class viewingSessionservices {
   static async getActiveSessionsPerUser(userId) {
     try {
       const sessions = await database.viewingSessions.findAll({
-
         where: {
-          [op.and]: [
-            { userId },
-            { sessionState: 'Active' }
-          ]
-        }
+          [op.and]: [{ userId }, { sessionState: "Active" }],
+        },
       });
       if (sessions) {
         return sessions;
@@ -71,13 +68,9 @@ class viewingSessionservices {
   static async getActiveAndSuspendedSessionsPerUser(userId) {
     try {
       const sessions = await database.viewingSessions.findAll({
-
         where: {
-          [op.and]: [
-            { userId },
-            { sessionState: { [op.not]: 'inActive' } }
-          ]
-        }
+          [op.and]: [{ userId }, { sessionState: { [op.not]: "inActive" } }],
+        },
       });
       if (sessions) {
         return sessions;
@@ -92,8 +85,8 @@ class viewingSessionservices {
     try {
       const sessions = await database.viewingSessions.findAll({
         where: {
-          videoId
-        }
+          videoId,
+        },
       });
       if (sessions) {
         return sessions;
@@ -108,14 +101,15 @@ class viewingSessionservices {
     try {
       const sessions = await database.viewingSessions.findAll({
         where: {
-          [op.and]: [{
-            userId
-          },
-          {
-            videoId
-          }
-          ]
-        }
+          [op.and]: [
+            {
+              userId,
+            },
+            {
+              videoId,
+            },
+          ],
+        },
       });
       if (sessions) {
         return sessions;
@@ -131,12 +125,12 @@ class viewingSessionservices {
       const sessions = await database.viewingSessions.findAll({
         attributes: {
           attributes: [
-            [sequelize.fn('count', sequelize.col('userId')), 'watchCount']
-          ]
+            [sequelize.fn("count", sequelize.col("userId")), "watchCount"],
+          ],
         },
         where: {
-          userId
-        }
+          userId,
+        },
       });
       if (sessions) {
         return sessions;
@@ -151,8 +145,8 @@ class viewingSessionservices {
     try {
       const status = await database.viewingSessions.update(updated, {
         where: {
-          id
-        }
+          id,
+        },
       });
       if (status) {
         return status;

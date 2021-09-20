@@ -1,12 +1,12 @@
 /* eslint-disable import/prefer-default-export */
-import AddMovie from './schemas/videos/addMovie';
-import addSerie from './schemas/videos/addSerie';
-import ApproveVideoSchema from './schemas/videos/approveVideo';
-import UpdateVideoSchema from './schemas/videos/updateVideo';
-import validator from '../../helpers/validator';
+import AddMovie from "./schemas/videos/addMovie";
+import addSerie from "./schemas/videos/addSerie";
+import ApproveVideoSchema from "./schemas/videos/approveVideo";
+import UpdateVideoSchema from "./schemas/videos/updateVideo";
+import validator from "../../helpers/validator";
 
 export const addVideo = (req, res, next) => {
-  if (req.body.type === 'serie') {
+  if (req.body.type === "serie") {
     delete req.body.video;
     delete req.body.EnSubt;
     delete req.body.FrSubt;
@@ -22,4 +22,4 @@ export const approveVideo = (req, res, next) => {
 
 export const updateVideo = (req, res, next) => {
   validator(UpdateVideoSchema, req.body, res, next);
-}
+};

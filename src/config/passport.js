@@ -1,12 +1,12 @@
 /* eslint-disable global-require */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-unused-vars */
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
-const FacebookStrategy = require('passport-facebook').Strategy;
-const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+const FacebookStrategy = require("passport-facebook").Strategy;
+const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
 
-const passport = require('passport');
+const passport = require("passport");
 
 dotenv.config();
 
@@ -17,10 +17,10 @@ passport.serializeUser((user, done) => {
 passport.use(
   new GoogleStrategy(
     {
-      name: 'google',
+      name: "google",
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: '/auth/google/redirect'
+      callbackURL: "/auth/google/redirect",
     },
     (accessToken, refreshToken, profile, done) => {
       try {
@@ -39,11 +39,11 @@ passport.use(
 passport.use(
   new FacebookStrategy(
     {
-      name: 'facebook',
+      name: "facebook",
       clientID: process.env.FB_CLIENT_ID,
       clientSecret: process.env.FB_CLIENT_SECRET,
-      callbackURL: '/auth/facebook/redirect',
-      profileFields: ['emails', 'name']
+      callbackURL: "/auth/facebook/redirect",
+      profileFields: ["emails", "name"],
     },
     (accessToken, refreshToken, profile, done) => {
       try {

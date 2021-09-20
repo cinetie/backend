@@ -1,12 +1,24 @@
-import { Router } from 'express';
-import controller from '../controllers/transations';
-import access from '../middlewares/access';
+import { Router } from "express";
+import controller from "../controllers/transations";
+import access from "../middlewares/access";
 
 const route = new Router();
-route.post('/new', access.isNormalUser, controller.createNewTrans);
-route.get('/get-session-id', access.isNormalUser, controller.getNewSessionId);
-route.get('/rave-standard', access.isNormalUser, controller.getRaveStandardLink);
-route.put('/cancel-subscription', access.isNormalUser, controller.cancelSubscription);
-route.put('/reactivate-subscription', access.isNormalUser, controller.reactivateSubscription);
+route.post("/new", access.isNormalUser, controller.createNewTrans);
+route.get("/get-session-id", access.isNormalUser, controller.getNewSessionId);
+route.get(
+  "/rave-standard",
+  access.isNormalUser,
+  controller.getRaveStandardLink
+);
+route.put(
+  "/cancel-subscription",
+  access.isNormalUser,
+  controller.cancelSubscription
+);
+route.put(
+  "/reactivate-subscription",
+  access.isNormalUser,
+  controller.reactivateSubscription
+);
 
 export default route;

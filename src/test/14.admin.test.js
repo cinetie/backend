@@ -14,7 +14,7 @@ sinonStubPromise(sinon);
 
 describe("ADMIN CONTROLLER", (req, res, status) => {
   it("Test getEarningsPerClient should be Okay", async () => {
-    var req = httpMocks.createRequest({
+    const req = httpMocks.createRequest({
       query: {
         clientId: "f9a02384-d04a-4ef6-aaee-afb745630474",
       },
@@ -23,7 +23,7 @@ describe("ADMIN CONTROLLER", (req, res, status) => {
         end: "2021-12-14",
       },
     });
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     const data = await admin.getEarningsPerClient(req, res);
     expect(data.statusCode).to.equal(200);
   });
@@ -34,7 +34,7 @@ describe("ADMIN CONTROLLER", (req, res, status) => {
       .callsFake(() => {
         return [];
       });
-    var req = httpMocks.createRequest({
+    const req = httpMocks.createRequest({
       query: {
         clientId: "f9a02384-d04a-4ef6-aaee-afb745630474",
       },
@@ -43,18 +43,17 @@ describe("ADMIN CONTROLLER", (req, res, status) => {
         end: "2021-12-14",
       },
     });
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     await admin.getEarningsPerClient(req, res);
     stub.restore();
     expect(res.statusCode).to.equal(404);
-    
   });
 
   it("Test getEarningsPerClient should return 500 when there is a server error", async () => {
     const stub = sinon
       .stub(earningService, "getEarningsByClientId")
       .throws(new Error());
-    var req = httpMocks.createRequest({
+    const req = httpMocks.createRequest({
       query: {
         clientId: "f9a02384-d04a-4ef6-aaee-afb745630474",
       },
@@ -63,15 +62,14 @@ describe("ADMIN CONTROLLER", (req, res, status) => {
         end: "2021-12-14",
       },
     });
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     await admin.getEarningsPerClient(req, res);
     stub.restore();
     expect(res.statusCode).to.equal(500);
-    
   });
 
   it("Test getVideosPerCp should be Okay", async () => {
-    var req = httpMocks.createRequest({
+    const req = httpMocks.createRequest({
       query: {
         clientId: "67b6c3a8-884f-48af-8e8f-1a60b15824de",
       },
@@ -80,7 +78,7 @@ describe("ADMIN CONTROLLER", (req, res, status) => {
         end: "2021-12-14",
       },
     });
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     await admin.getVideosPerCp(req, res);
     expect(res.statusCode).to.equal(200);
   });
@@ -89,7 +87,7 @@ describe("ADMIN CONTROLLER", (req, res, status) => {
     const stub = sinon.stub(videoService, "getAllVideos").callsFake(() => {
       return undefined;
     });
-    var req = httpMocks.createRequest({
+    const req = httpMocks.createRequest({
       query: {
         clientId: "67b6c3a8-884f-48af-8e8f-1a60b15824de",
       },
@@ -98,15 +96,14 @@ describe("ADMIN CONTROLLER", (req, res, status) => {
         end: "2021-12-14",
       },
     });
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     await admin.getVideosPerCp(req, res);
     stub.restore();
     expect(res.statusCode).to.equal(400);
-    
   });
 
   it("Test getAllVideos should be Okay", async () => {
-    var req = httpMocks.createRequest({
+    const req = httpMocks.createRequest({
       query: {
         clientId: "f9a02384-d04a-4ef6-aaee-afb745630474",
       },
@@ -115,7 +112,7 @@ describe("ADMIN CONTROLLER", (req, res, status) => {
         end: "2021-12-14",
       },
     });
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     await admin.getAllVideos(req, res);
     expect(res.statusCode).to.equal(200);
   });
@@ -126,7 +123,7 @@ describe("ADMIN CONTROLLER", (req, res, status) => {
       .callsFake(() => {
         return undefined;
       });
-    var req = httpMocks.createRequest({
+    const req = httpMocks.createRequest({
       query: {
         clientId: "67b6c3a8-884f-48af-8e8f-1a60b15824de",
       },
@@ -135,20 +132,19 @@ describe("ADMIN CONTROLLER", (req, res, status) => {
         end: "2021-12-14",
       },
     });
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     await admin.getAllVideos(req, res);
     stub.restore();
     expect(res.statusCode).to.equal(400);
-    
   });
 
   it("Test getAllEarningsPerVideo should be Okay", async () => {
-    var req = httpMocks.createRequest({
+    const req = httpMocks.createRequest({
       query: {
         videoId: "67404feb-f743-481c-bb19-9841324188a3",
       },
     });
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     await admin.getAllEarningsPerVideo(req, res);
     expect(res.statusCode).to.equal(200);
   });
@@ -159,65 +155,61 @@ describe("ADMIN CONTROLLER", (req, res, status) => {
       .callsFake(() => {
         return [];
       });
-    var req = httpMocks.createRequest({
+    const req = httpMocks.createRequest({
       query: {
         videoId: "67404feb-f743-481c-bb19-9841324188a3",
       },
     });
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     await admin.getAllEarningsPerVideo(req, res);
     stub.restore();
     expect(res.statusCode).to.equal(404);
-    
   });
 
   it("Test getAllEarningsPerVideo should return 500 when there is a server error", async () => {
     const stub = sinon
       .stub(earningService, "getEarningsByVideo")
       .throws(new Error());
-    var req = httpMocks.createRequest({
+    const req = httpMocks.createRequest({
       query: {
         videoId: "67404feb-f743-481c-bb19-9841324188a3",
       },
     });
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     await admin.getAllEarningsPerVideo(req, res);
     stub.restore();
     expect(res.statusCode).to.equal(500);
-    
   });
 
   it("Test gainAccess should be Okay", async () => {
-    var req = httpMocks.createRequest({
+    const req = httpMocks.createRequest({
       body: {
         clientId: "67404feb-f743-481c-bb19-9841324188a3",
         email: "test@gmail.com",
       },
     });
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     await admin.gainAccess(req, res);
     expect(res.statusCode).to.equal(200);
   });
 
   it("Test gainAccess should return 500 when there is a server error", async () => {
     const stub = sinon.stub(JWT, "jwtSign").throws(new Error());
-    var req = httpMocks.createRequest({});
-    var res = httpMocks.createResponse();
+    const req = httpMocks.createRequest({});
+    const res = httpMocks.createResponse();
     await admin.gainAccess(req, res);
     stub.restore();
     expect(res.statusCode).to.equal(500);
-    
   });
 
   it("Test gainAccess should return 400", async () => {
     const stub = sinon.stub(JWT, "jwtSign").callsFake(() => {
       return null;
     });
-    var req = httpMocks.createRequest({});
-    var res = httpMocks.createResponse();
+    const req = httpMocks.createRequest({});
+    const res = httpMocks.createResponse();
     await admin.gainAccess(req, res);
     stub.restore();
     expect(res.statusCode).to.equal(400);
-    
   });
 });

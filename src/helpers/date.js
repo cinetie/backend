@@ -18,7 +18,8 @@ const isEndOfMonth = () => {
       return 0;
     }
     return 1;
-  } if (now.getDate() === 31) {
+  }
+  if (now.getDate() === 31) {
     return 1;
   }
   return 0;
@@ -47,9 +48,13 @@ const convertToISO = (date) => {
 };
 
 const compareDates = (date1, date2) => {
-  const sysDate = `${date1.getFullYear()}-${date1.getMonth() + 1}-${date1.getDate()}`;
-  const raveDate = `${date2.getFullYear()}-${date2.getMonth() + 1}-${date2.getDate()}`;
-  const result = (sysDate === raveDate) ? 1 : 0;
+  const sysDate = `${date1.getFullYear()}-${
+    date1.getMonth() + 1
+  }-${date1.getDate()}`;
+  const raveDate = `${date2.getFullYear()}-${
+    date2.getMonth() + 1
+  }-${date2.getDate()}`;
+  const result = sysDate === raveDate ? 1 : 0;
   return result;
 };
 
@@ -61,5 +66,5 @@ export default {
   convertToTimestamp,
   removeDays,
   convertToISO,
-  compareDates
+  compareDates,
 };

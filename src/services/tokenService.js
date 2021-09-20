@@ -1,5 +1,5 @@
-import sequelize from 'sequelize';
-import database from '../database/models';
+import sequelize from "sequelize";
+import database from "../database/models";
 
 const op = sequelize.Op;
 class tokenService {
@@ -15,11 +15,11 @@ class tokenService {
     try {
       return await database.token.findOne({
         attributes: {
-          exclude: ['createdAt', 'updatedAt', 'lastName']
+          exclude: ["createdAt", "updatedAt", "lastName"],
         },
         where: {
-          email
-        }
+          email,
+        },
       });
     } catch (error) {
       throw error;
@@ -30,14 +30,11 @@ class tokenService {
     try {
       return await database.token.findOne({
         attributes: {
-          exclude: ['createdAt', 'updatedAt', 'lastName']
+          exclude: ["createdAt", "updatedAt", "lastName"],
         },
         where: {
-          [op.and]: [
-            { token },
-            { desc: 'PayPal-Active' }
-          ]
-        }
+          [op.and]: [{ token }, { desc: "PayPal-Active" }],
+        },
       });
     } catch (error) {
       throw error;
@@ -48,8 +45,8 @@ class tokenService {
     try {
       return await database.token.destroy({
         where: {
-          token
-        }
+          token,
+        },
       });
     } catch (error) {
       throw error;

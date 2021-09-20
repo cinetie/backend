@@ -1,12 +1,12 @@
 import chai, { expect } from "chai";
 import chaiHttp from "chai-http";
+import sinon from "sinon";
+import httpMocks from "node-mocks-http";
+import sinonStubPromise from "sinon-stub-promise";
 import app from "../index";
 import billing from "../middlewares/billing";
 import userService from "../services/userServices";
-import sinon from "sinon";
-import httpMocks from "node-mocks-http";
 import approvedTransaction from "./mock/chackSpennTransaction.mock";
-import sinonStubPromise from "sinon-stub-promise";
 import billingService from "../services/billingServices";
 import jwt from "../helpers/jwt";
 import webhooks from "../controllers/webhooks";
@@ -19,8 +19,8 @@ sinonStubPromise(sinon);
 describe("BILLING MIDDLEWARE", (req, res, status) => {
   it("Test fetchCurrentSubscription Method with registered email should be okay", async () => {
     res = httpMocks.createResponse();
-    let state = undefined;
-    let req = {
+    const state = undefined;
+    const req = {
       body: {
         email: "blaise145@gmail.com",
         password: "nAdia123",
@@ -33,41 +33,41 @@ describe("BILLING MIDDLEWARE", (req, res, status) => {
   });
 
   it("Test renewPayment Method with un-registered email should be error with status 404", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
+    const nextSpy = sinon.spy();
+    const req = httpMocks.createRequest({
       body: {
         email: "blaise1200@gmail.com",
         password: "nAdia123",
       },
     });
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     const data = await billing.renewPayment(req, res, nextSpy);
     expect(data.statusCode).to.equal(400);
     expect(data.finished).to.be.true;
   });
 
   it("Test renewPayment Method with registered email have subscription with pending status or user.plan = Setup or  details === null should next()", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
+    const nextSpy = sinon.spy();
+    const req = httpMocks.createRequest({
       body: {
         email: "blaise1290@gmail.com",
         password: "nAdia123",
       },
     });
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     await billing.renewPayment(req, res, nextSpy);
     expect(nextSpy.calledOnce).to.be.true;
   });
 
   it("Test renewPayment Method with registered email and subscription with current status should be okay", async () => {
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
+    const nextSpy = sinon.spy();
+    const req = httpMocks.createRequest({
       body: {
         email: "blaise12@gmail.com",
         password: "nAdia123",
       },
     });
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     await billing.renewPayment(req, res, nextSpy);
     expect(nextSpy.calledOnce).to.be.true;
   });
@@ -213,14 +213,14 @@ describe("BILLING MIDDLEWARE", (req, res, status) => {
       return approvedTransaction;
     });
 
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
+    const nextSpy = sinon.spy();
+    const req = httpMocks.createRequest({
       body: {
         email: "blaise127@gmail.com",
         password: "nAdia123",
       },
     });
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     await billing.renewPayment(req, res, nextSpy);
     stub.restore();
     expect(res.statusCode).to.equal(200);
@@ -370,13 +370,13 @@ describe("BILLING MIDDLEWARE", (req, res, status) => {
 
   it("Test verifySpennTransactions should return 500 when there is a server error", async () => {
     const stub = sinon.stub(userService, "getUserByMail").throws(new Error());
-    var req = httpMocks.createRequest({
+    const req = httpMocks.createRequest({
       body: {
         email: "blaise126991078@gmail.com",
         password: "nAdia123",
       },
     });
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     await billing.verifySpennTransactions(req, res);
     stub.restore();
     expect(res.statusCode).to.equal(500);
@@ -384,13 +384,13 @@ describe("BILLING MIDDLEWARE", (req, res, status) => {
 
   it("Test renewPayment should return 500 when there is a server error", async () => {
     const stub = sinon.stub(userService, "getUserByMail").throws(new Error());
-    var req = httpMocks.createRequest({
+    const req = httpMocks.createRequest({
       body: {
         email: "blaise126991078@gmail.com",
         password: "nAdia123",
       },
     });
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     await billing.renewPayment(req, res);
     stub.restore();
     expect(res.statusCode).to.equal(500);
@@ -400,13 +400,13 @@ describe("BILLING MIDDLEWARE", (req, res, status) => {
     const stub = sinon
       .stub(billingService, "getCurrentSubscription")
       .throws(new Error());
-    var req = httpMocks.createRequest({
+    const req = httpMocks.createRequest({
       body: {
         email: "blaise126991078@gmail.com",
         password: "nAdia123",
       },
     });
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     await billing.fetchCurrentSubscription(req, res);
     stub.restore();
     expect(res.statusCode).to.equal(500);
@@ -414,13 +414,13 @@ describe("BILLING MIDDLEWARE", (req, res, status) => {
 
   it("Test trial should return 500 when there is a server error", async () => {
     const stub = sinon.stub(jwt, "jwtVerify").throws(new Error());
-    var req = httpMocks.createRequest({
+    const req = httpMocks.createRequest({
       body: {
         email: "blaise126991078@gmail.com",
         password: "nAdia123",
       },
     });
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     await billing.trial(req, res);
     stub.restore();
     expect(res.statusCode).to.equal(500);
@@ -428,117 +428,117 @@ describe("BILLING MIDDLEWARE", (req, res, status) => {
 
   it("Test verifyPermissionLevel should return 500 when there is a server error", async () => {
     const stub = sinon.stub(jwt, "jwtVerify").throws(new Error());
-    var req = httpMocks.createRequest({
+    const req = httpMocks.createRequest({
       body: {
         email: "blaise126991078@gmail.com",
         password: "nAdia123",
       },
     });
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     await billing.verifyPermissionLevel(req, res);
     stub.restore();
     expect(res.statusCode).to.equal(500);
   });
 
-//   it("Test verifySpennTransactions Method with registered email and permissonLevel -1 Should throw 402", async () => {
-//     var nextSpy = sinon.spy();
-//     var req = httpMocks.createRequest({
-//       headers: {
-//         authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzZTEyOTM0MEBnbWFpbC5jb20iLCJpYXQiOjE2MDc1MDY2OTR9.b-MbGrwGV0pty3xqefKUhinqz0RWchsSiwpbqflLkVE`,
-//       },
-//     });
-//     var res = httpMocks.createResponse();
-//     const data = await billing.verifyPermissionLevel(req, res, nextSpy);
-//     expect(data.statusCode).to.equal(402);
-//     expect(nextSpy.calledOnce).to.be.false;
-//   });
+  //   it("Test verifySpennTransactions Method with registered email and permissonLevel -1 Should throw 402", async () => {
+  //     var nextSpy = sinon.spy();
+  //     var req = httpMocks.createRequest({
+  //       headers: {
+  //         authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzZTEyOTM0MEBnbWFpbC5jb20iLCJpYXQiOjE2MDc1MDY2OTR9.b-MbGrwGV0pty3xqefKUhinqz0RWchsSiwpbqflLkVE`,
+  //       },
+  //     });
+  //     var res = httpMocks.createResponse();
+  //     const data = await billing.verifyPermissionLevel(req, res, nextSpy);
+  //     expect(data.statusCode).to.equal(402);
+  //     expect(nextSpy.calledOnce).to.be.false;
+  //   });
 
-//   it("Test verifySpennTransactions Method with registered email and permissonLevel 1 Should throw 402", async () => {
-//     var nextSpy = sinon.spy();
-//     var req = httpMocks.createRequest({
-//       headers: {
-//         authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzZTEyNjk5MTA3Nzg3ODc4QGdtYWlsLmNvbSIsImlhdCI6MTYwNzUwODA3NH0.OHqK11xqdhIm2Y6GpJ0mdIVsQ0sXNyAjwIqux1c3DnI`,
-//       },
-//     });
-//     var res = httpMocks.createResponse();
-//     await billing.verifyPermissionLevel(req, res, nextSpy);
-//     expect(nextSpy.calledOnce).to.be.true;
-//   });
+  //   it("Test verifySpennTransactions Method with registered email and permissonLevel 1 Should throw 402", async () => {
+  //     var nextSpy = sinon.spy();
+  //     var req = httpMocks.createRequest({
+  //       headers: {
+  //         authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzZTEyNjk5MTA3Nzg3ODc4QGdtYWlsLmNvbSIsImlhdCI6MTYwNzUwODA3NH0.OHqK11xqdhIm2Y6GpJ0mdIVsQ0sXNyAjwIqux1c3DnI`,
+  //       },
+  //     });
+  //     var res = httpMocks.createResponse();
+  //     await billing.verifyPermissionLevel(req, res, nextSpy);
+  //     expect(nextSpy.calledOnce).to.be.true;
+  //   });
 
-//   it("Test trial Method with registered email that isOnTrial and isOnExtension is false Should next", async () => {
-//     var nextSpy = sinon.spy();
-//     var req = httpMocks.createRequest({
-//       headers: {
-//         authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzZTEyNjk5MTA3Nzg3ODc4QGdtYWlsLmNvbSIsImlhdCI6MTYwNzUwODA3NH0.OHqK11xqdhIm2Y6GpJ0mdIVsQ0sXNyAjwIqux1c3DnI`,
-//       },
-//     });
-//     var res = httpMocks.createResponse();
-//     await billing.trial(req, res, nextSpy);
-//     expect(nextSpy.calledOnce).to.be.true;
-//   });
+  //   it("Test trial Method with registered email that isOnTrial and isOnExtension is false Should next", async () => {
+  //     var nextSpy = sinon.spy();
+  //     var req = httpMocks.createRequest({
+  //       headers: {
+  //         authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzZTEyNjk5MTA3Nzg3ODc4QGdtYWlsLmNvbSIsImlhdCI6MTYwNzUwODA3NH0.OHqK11xqdhIm2Y6GpJ0mdIVsQ0sXNyAjwIqux1c3DnI`,
+  //       },
+  //     });
+  //     var res = httpMocks.createResponse();
+  //     await billing.trial(req, res, nextSpy);
+  //     expect(nextSpy.calledOnce).to.be.true;
+  //   });
 
-//   it("Test trial Method with registered email that isOnTrial and isOnExtension is false Should next", async () => {
-//     var nextSpy = sinon.spy();
-//     var req = httpMocks.createRequest({
-//       headers: {
-//         authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzMTk5OTk5OTk5NzhAZ21haWwuY29tIiwiaWF0IjoxNjA3NTA5ODk3fQ.xZwna-9ZwmzoeMnR9sF9fUluxct237eRcqrmmHxLB8w`,
-//       },
-//     });
-//     var res = httpMocks.createResponse();
-//     await billing.trial(req, res, nextSpy);
-//     expect(res.statusCode).to.equal(402);
-//     expect(nextSpy.calledOnce).to.be.false;
-//   });
+  //   it("Test trial Method with registered email that isOnTrial and isOnExtension is false Should next", async () => {
+  //     var nextSpy = sinon.spy();
+  //     var req = httpMocks.createRequest({
+  //       headers: {
+  //         authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzMTk5OTk5OTk5NzhAZ21haWwuY29tIiwiaWF0IjoxNjA3NTA5ODk3fQ.xZwna-9ZwmzoeMnR9sF9fUluxct237eRcqrmmHxLB8w`,
+  //       },
+  //     });
+  //     var res = httpMocks.createResponse();
+  //     await billing.trial(req, res, nextSpy);
+  //     expect(res.statusCode).to.equal(402);
+  //     expect(nextSpy.calledOnce).to.be.false;
+  //   });
 
-//   it("Test trial Method with registered email that trialEnds > today and viewing session is < 3 Should next", async () => {
-//     var nextSpy = sinon.spy();
-//     var req = httpMocks.createRequest({
-//       headers: {
-//         authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlhczE5NzU2NzVAZ21haWwuY29tIiwiaWF0IjoxNjA3NTExMDEzfQ.7eb0joHwieYlccPAZ7msw7hA1b94OXg9Ic99-WqkHr8`,
-//       },
-//     });
-//     var res = httpMocks.createResponse();
-//     await billing.trial(req, res, nextSpy);
-//     expect(nextSpy.calledOnce).to.be.true;
-//   });
+  //   it("Test trial Method with registered email that trialEnds > today and viewing session is < 3 Should next", async () => {
+  //     var nextSpy = sinon.spy();
+  //     var req = httpMocks.createRequest({
+  //       headers: {
+  //         authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlhczE5NzU2NzVAZ21haWwuY29tIiwiaWF0IjoxNjA3NTExMDEzfQ.7eb0joHwieYlccPAZ7msw7hA1b94OXg9Ic99-WqkHr8`,
+  //       },
+  //     });
+  //     var res = httpMocks.createResponse();
+  //     await billing.trial(req, res, nextSpy);
+  //     expect(nextSpy.calledOnce).to.be.true;
+  //   });
 
-//   it("Test trial Method with registered email update user with -1 status failed", async () => {
-//     const stub = sinon.stub(userService, "updateUser").callsFake(() => {
-//       return [undefined, 0];
-//     });
-//     var nextSpy = sinon.spy();
-//     var req = httpMocks.createRequest({
-//       headers: {
-//         authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzMTk5OTk5OTk5NzhAZ21haWwuY29tIiwiaWF0IjoxNjA3NTA5ODk3fQ.xZwna-9ZwmzoeMnR9sF9fUluxct237eRcqrmmHxLB8w`,
-//       },
-//     });
-//     var res = httpMocks.createResponse();
-//     const data = await billing.trial(req, res, nextSpy);
-//     stub.restore();
-//     expect(data.statusCode).to.equal(502);
-//     expect(nextSpy.calledOnce).to.be.false;
-//   });
+  //   it("Test trial Method with registered email update user with -1 status failed", async () => {
+  //     const stub = sinon.stub(userService, "updateUser").callsFake(() => {
+  //       return [undefined, 0];
+  //     });
+  //     var nextSpy = sinon.spy();
+  //     var req = httpMocks.createRequest({
+  //       headers: {
+  //         authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImJsYWlzMTk5OTk5OTk5NzhAZ21haWwuY29tIiwiaWF0IjoxNjA3NTA5ODk3fQ.xZwna-9ZwmzoeMnR9sF9fUluxct237eRcqrmmHxLB8w`,
+  //       },
+  //     });
+  //     var res = httpMocks.createResponse();
+  //     const data = await billing.trial(req, res, nextSpy);
+  //     stub.restore();
+  //     expect(data.statusCode).to.equal(502);
+  //     expect(nextSpy.calledOnce).to.be.false;
+  //   });
 
   it("Test updateTransactionsAndRegisterSales Method with registered email with updates[1] and updatedSubscription[1] which is different 1", async () => {
     const stub = sinon
       .stub(userService, "updateUser")
       .callsFake(() => [undefined, 0]);
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
+    const nextSpy = sinon.spy();
+    const req = httpMocks.createRequest({
       body: {
         email: "blaise126991078@gmail.com",
         password: "nAdia123",
       },
     });
     let recentTrans;
-    let user = {
+    const user = {
       email: "blaise126991078@gmail.com",
     };
 
-    let details = {
+    const details = {
       price: 3,
     };
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     const data = await billing.updateTransactionsAndRegisterSales(
       recentTrans,
       user,
@@ -554,21 +554,21 @@ describe("BILLING MIDDLEWARE", (req, res, status) => {
 
   it("Test updateTransactionsAndRegisterSales Method with registered email with updates[1] and updatedSubscription[1] which is different 1", async () => {
     const stub = sinon.stub(webhooks, "registerSales").callsFake(() => false);
-    var nextSpy = sinon.spy();
-    var req = httpMocks.createRequest({
+    const nextSpy = sinon.spy();
+    const req = httpMocks.createRequest({
       body: {
         email: "blaise126991078@gmail.com",
         password: "nAdia123",
       },
     });
     let recentTrans;
-    let user = {
+    const user = {
       email: "blaise126991078@gmail.com",
     };
-    let details = {
+    const details = {
       price: 3,
     };
-    var res = httpMocks.createResponse();
+    const res = httpMocks.createResponse();
     const data = await billing.updateTransactionsAndRegisterSales(
       recentTrans,
       user,

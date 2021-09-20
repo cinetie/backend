@@ -1,24 +1,24 @@
 /* eslint-disable no-useless-catch */
-import fetch from 'node-fetch';
+import fetch from "node-fetch";
 
 class vimeo {
   static async viemoUpload(data) {
     try {
       const raw = {
         upload: {
-          approach: 'pull',
+          approach: "pull",
           size: String(data.size),
-          link: String(data.videoUrl)
-        }
+          link: String(data.videoUrl),
+        },
       };
-      const videoData = await fetch('https://api.vimeo.com/me/videos', {
+      const videoData = await fetch("https://api.vimeo.com/me/videos", {
         headers: {
           Authorization: `bearer ${process.env.VIMEO_ACCESS_TOKEN}`,
-          'Content-Type': 'application/json',
-          Accept: 'application/vnd.vimeo.*+json;version=3.4',
+          "Content-Type": "application/json",
+          Accept: "application/vnd.vimeo.*+json;version=3.4",
         },
-        method: 'POST',
-        body: JSON.stringify(raw)
+        method: "POST",
+        body: JSON.stringify(raw),
       });
       const videoDataJson = await videoData.json();
       if (videoDataJson) {

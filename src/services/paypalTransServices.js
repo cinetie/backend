@@ -1,10 +1,10 @@
-import database from '../database/models';
+import database from "../database/models";
 
 class transactionService {
   static async createTransaction(data) {
     try {
       const newTrans = await database.paypalTransactions.create(data);
-      (newTrans) || null;
+      newTrans || null;
     } catch (error) {
       throw error;
     }
@@ -14,10 +14,10 @@ class transactionService {
     try {
       const data = await database.paypalTransactions.findOne({
         where: {
-          transactionId: id
-        }
+          transactionId: id,
+        },
       });
-      (data) || null;
+      data || null;
     } catch (error) {
       throw error;
     }
@@ -27,10 +27,10 @@ class transactionService {
     try {
       const data = await database.paypalTransactions.findAll({
         where: {
-          email
-        }
+          email,
+        },
       });
-      (data) || null;
+      data || null;
     } catch (error) {
       throw error;
     }
@@ -40,10 +40,10 @@ class transactionService {
     try {
       const deleted = await database.paypalTransactions.destroy({
         where: {
-          transactionId: id
-        }
+          transactionId: id,
+        },
       });
-      (deleted) || null;
+      deleted || null;
     } catch (error) {
       throw error;
     }
@@ -53,10 +53,10 @@ class transactionService {
     try {
       const data = await database.paypalTransactions.update(updates, {
         where: {
-          transactionId: id
-        }
+          transactionId: id,
+        },
       });
-      (data) || null;
+      data || null;
     } catch (error) {
       throw error;
     }

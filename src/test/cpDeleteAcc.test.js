@@ -1,10 +1,10 @@
-import chai, { expect } from 'chai';
-import { config } from 'dotenv';
-import chaiHttp from 'chai-http';
-import sinon from 'sinon';
-import { describe, it } from 'mocha';
-import app from '../index';
-import cp from '../services/cpServices';
+import chai, { expect } from "chai";
+import { config } from "dotenv";
+import chaiHttp from "chai-http";
+import sinon from "sinon";
+import { describe, it } from "mocha";
+import app from "../index";
+import cp from "../services/cpServices";
 
 chai.use(chaiHttp);
 

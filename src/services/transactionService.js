@@ -1,5 +1,5 @@
-import sequelize from 'sequelize';
-import database from '../database/models';
+import sequelize from "sequelize";
+import database from "../database/models";
 
 const op = sequelize.Op;
 class transactionService {
@@ -16,8 +16,8 @@ class transactionService {
     try {
       const data = await database.transactions.findOne({
         where: {
-          transactionId: id
-        }
+          transactionId: id,
+        },
       });
       return data;
     } catch (error) {
@@ -28,7 +28,7 @@ class transactionService {
   static async getTransactionsByEmail(email, statusDesc) {
     try {
       const data = await database.transactions.findAll({
-        where: { [op.and]: [{ email }, { statusDesc }] }
+        where: { [op.and]: [{ email }, { statusDesc }] },
       });
       return data;
     } catch (error) {
@@ -36,16 +36,13 @@ class transactionService {
     }
   }
 
-  static async getRecentTransactionsByEmail(email, statusDesc)  {
+  static async getRecentTransactionsByEmail(email, statusDesc) {
     try {
       const data = await database.transactions.findOne({
         where: {
-          [op.and]: [
-            { email },
-            { statusDesc },
-          ],
+          [op.and]: [{ email }, { statusDesc }],
         },
-        order: [ [ 'createdAt', 'DESC' ]],
+        order: [["createdAt", "DESC"]],
       });
       return data;
     } catch (error) {
@@ -57,8 +54,8 @@ class transactionService {
     try {
       const deleted = await database.transactions.destroy({
         where: {
-          transactionId: id
-        }
+          transactionId: id,
+        },
       });
       return deleted;
     } catch (error) {
@@ -70,8 +67,8 @@ class transactionService {
     try {
       const data = await database.transactions.update(updates, {
         where: {
-          transactionId: id
-        }
+          transactionId: id,
+        },
       });
       return data;
     } catch (error) {

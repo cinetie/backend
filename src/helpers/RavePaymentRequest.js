@@ -2,6 +2,7 @@ import Fetch from "./fetch";
 import Util from "./utilities";
 import payment from "./payment";
 import userService from "../services/userServices";
+
 const util = new Util();
 
 export default async (
@@ -37,7 +38,9 @@ export default async (
       );
       util.setSuccessResponse(
         res,
-        paymentType === 'mpesa' ? 'Pending subscription  activation with mpesa' : "Pending subscription  activation with MoMo",
+        paymentType === "mpesa"
+          ? "Pending subscription  activation with mpesa"
+          : "Pending subscription  activation with MoMo",
         201,
         data
       );

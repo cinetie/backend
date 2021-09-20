@@ -26,7 +26,6 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
   //   stub.restore();
   //   expect(res.statusCode).to.equal(201);
   // });
-
   // it("Test UpdateAccountAndSubscription with mobile money RWANDA should be 400", async () => {
   //   const stub = sinon.stub(jwt, "jwtVerify").callsFake(() => {
   //     return { email: "blaise12xxxxxx1@gmail.com" };
@@ -45,7 +44,6 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
   //   stub1.restore();
   //   expect(res.statusCode).to.equal(400);
   // });
-
   // it("Test UpdateAccountAndSubscription mobile money UGANDA should be Okay", async () => {
   //   const stub = sinon.stub(jwt, "jwtVerify").callsFake(() => {
   //     return { email: "blaise12xxxxxx12@gmail.com" };
@@ -60,7 +58,6 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
   //   stub.restore();
   //   expect(res.statusCode).to.equal(201);
   // });
-
   // it("Test UpdateAccountAndSubscription with mobile money UGANDA should be 400", async () => {
   //   const stub = sinon.stub(jwt, "jwtVerify").callsFake(() => {
   //     return { email: "blaise12xxxxxx12@gmail.com" };
@@ -93,7 +90,6 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
   //   stub.restore();
   //   expect(res.statusCode).to.equal(201);
   // });
-
   // it("Test UpdateAccountAndSubscription mobile mpesa should be 400", async () => {
   //   const stub = sinon.stub(jwt, "jwtVerify").callsFake(() => {
   //     return { email: "blaise12xxxxxx12333new@gmail.com" };
@@ -112,8 +108,6 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
   //   stub1.restore();
   //   expect(res.statusCode).to.equal(400);
   // });
-
-
   // it("Test UpdateAccountAndSubscription mobile money ZAMBIA(MTN) should be Okay", async () => {
   //   const stub = sinon.stub(jwt, "jwtVerify").callsFake(() => {
   //     return { email: "blaise12xxxxxx123@gmail.com" };
@@ -128,7 +122,6 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
   //   stub.restore();
   //   expect(res.statusCode).to.equal(201);
   // });
-
   // it("Test UpdateAccountAndSubscription with mobile money ZAMBIA(MTN) should be 400", async () => {
   //   const stub = sinon.stub(jwt, "jwtVerify").callsFake(() => {
   //     return { email: "blaise12xxxxxx123@gmail.com" };
@@ -147,7 +140,6 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
   //   stub1.restore();
   //   expect(res.statusCode).to.equal(400);
   // });
-
   // it("Test UpdateAccountAndSubscription mobile money ZAMBIA(ZAMTEL) should be Okay", async () => {
   //   const stub = sinon.stub(jwt, "jwtVerify").callsFake(() => {
   //     return { email: "blaise12xxxxxx1234@gmail.com" };
@@ -162,7 +154,6 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
   //   stub.restore();
   //   expect(res.statusCode).to.equal(201);
   // });
-
   // it("Test UpdateAccountAndSubscription with mobile money ZAMBIA(ZAMTEL) should be 400", async () => {
   //   const stub = sinon.stub(jwt, "jwtVerify").callsFake(() => {
   //     return { email: "blaise12xxxxxx1234@gmail.com" };
@@ -181,7 +172,6 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
   //   stub1.restore();
   //   expect(res.statusCode).to.equal(400);
   // });
-
   // it("Test UpdateAccountAndSubscription with mobile money ZAMBIA(ZAMTEL) should be 400", async () => {
   //   const stub = sinon.stub(jwt, "jwtVerify").callsFake(() => {
   //     return { email: "blaise12xxxxxx1234@gmail.com" };
@@ -198,7 +188,6 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
   //   stub1.restore();
   //   expect(res.statusCode).to.equal(500);
   // });
-
   // it("Test UpdateAccountAndSubscription mobile money ZAMBIA(ZAMTEL) should be Okay", async () => {
   //   const stub = sinon.stub(jwt, "jwtVerify").callsFake(() => {
   //     return { email: "blaise12xxxxxx12345@gmail.com" };
@@ -213,7 +202,6 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
   //   stub.restore();
   //   expect(res.statusCode).to.equal(201);
   // });
-
   // it("Test UpdateAccountAndSubscription with mobile money ZAMBIA(ZAMTEL) should be 400", async () => {
   //   const stub = sinon.stub(jwt, "jwtVerify").callsFake(() => {
   //     return { email: "blaise12xxxxxx12345@gmail.com" };
@@ -232,7 +220,6 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
   //   stub1.restore();
   //   expect(res.statusCode).to.equal(400);
   // });
-
   // it("Test UpdateAccountAndSubscription mobile money ZAMBIA(ZAMTEL) should be Okay", async () => {
   //   const stub = sinon.stub(jwt, "jwtVerify").callsFake(() => {
   //     return { email: "blaise12xxxxxx123456@gmail.com" };
@@ -247,7 +234,6 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
   //   stub.restore();
   //   expect(res.statusCode).to.equal(201);
   // });
-
   // it("Test UpdateAccountAndSubscription with mobile money ZAMBIA(ZAMTEL) should be 400", async () => {
   //   const stub = sinon.stub(jwt, "jwtVerify").callsFake(() => {
   //     return { email: "blaise12xxxxxx123456@gmail.com" };
@@ -266,7 +252,6 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
   //   stub1.restore();
   //   expect(res.statusCode).to.equal(400);
   // });
-
   // it("Test UpdateAccountAndSubscription mobile money ZAMBIA(ZAMTEL) should be Okay", async () => {
   //   const stub = sinon.stub(jwt, "jwtVerify").callsFake(() => {
   //     return { email: "blaise12xxxxxx1234567@gmail.com" };
@@ -281,7 +266,6 @@ describe("ACTIVATE ACCOUNT AND SUBSCRIPTION", (req, res, status) => {
   //   stub.restore();
   //   expect(res.statusCode).to.equal(201);
   // });
-
   // it("Test UpdateAccountAndSubscription with mobile money ZAMBIA(ZAMTEL) should be 400", async () => {
   //   const stub = sinon.stub(jwt, "jwtVerify").callsFake(() => {
   //     return { email: "blaise12xxxxxx1234567@gmail.com" };
