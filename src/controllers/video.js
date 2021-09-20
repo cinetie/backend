@@ -207,6 +207,7 @@ class Video {
       const { country } = req.headers;
       const { q } = req.query;
       const cached = await get(`cat-${q}-${country}`);
+      console.log(cached);
       if (cached) {
         return util.setSuccessResponse(
           res,

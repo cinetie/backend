@@ -7,7 +7,7 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x -o nodesource_setup.sh
 RUN bash nodesource_setup.sh
 RUN apt-get install nodejs
 RUN apt install -y redis-server
-RUN service redis-server start
+
 
 # use changes to package.json to force Docker not to use the cache
 # when we change our application's nodejs dependencies:
@@ -22,4 +22,4 @@ ADD . /opt/app
 
 EXPOSE 3001
 
-CMD ["npm", "run", "start-prod"]
+CMD ["sh","start.sh"]
