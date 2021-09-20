@@ -115,6 +115,17 @@ class salesController {
       util.setErrorResponse(res, `something went wrong ${error}`, 503);
     }
   }
+  static async getSales(req, res) {
+    try {
+      const sales = await service.getAllSaless();
+      if(Object.values(sales).length < 1) return response.successResponse(res, 400, 'sales Not found', []);
+      return response.successResponse(res, 200, 'sales retrieved successfully', sales);
+      
+    } catch(error) {
+      console.log(error);
+      util.setErrorResponse(res, `something went wrong ${error}`, 503);
+    }
+  }
 }
 
 export default salesController;

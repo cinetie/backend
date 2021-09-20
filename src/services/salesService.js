@@ -79,7 +79,7 @@ class saleService {
     try {
       const sales = await database.sales.findAll({
         attributes: {
-          exclude: ["createdAt", "updatedAt", "id"],
+          exclude: ['createdAt', 'updatedAt']
         },
       });
       if (!sales) return null;

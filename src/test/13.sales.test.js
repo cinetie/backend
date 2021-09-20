@@ -1,11 +1,14 @@
-import chai, { expect } from "chai";
-import chaiHttp from "chai-http";
-import sinon from "sinon";
-import sinonStubPromise from "sinon-stub-promise";
-import httpMocks from "node-mocks-http";
-import sales from "../controllers/sales";
-import service from "../services/salesService";
+import chai, { expect } from 'chai';
+import chaiHttp from 'chai-http';
+import { config } from 'dotenv';
+import sinon  from 'sinon'
+import sinonStubPromise from 'sinon-stub-promise';
+import httpMocks from 'node-mocks-http';
+import sales from '../controllers/sales'
+import service from '../services/salesService';
+import app from '../index';
 
+config();
 chai.use(chaiHttp);
 chai.should();
 sinonStubPromise(sinon);
@@ -134,4 +137,47 @@ describe("SALES CONTROLLER", (req, res, status) => {
     stub.restore();
     expect(res.statusCode).to.equal(503);
   });
-});
+})
+
+describe('ADMIN FETCH ALL SALES', (req, res, status) => {
+    let adminToken;
+    before(async () => {
+      const loginRes = await chai
+        .request(app)
+        .post('/staff/login')
+        .send({
+          email: 'staff@example.com',
+          password: 'izzeddin'
+        });
+      adminToken = loginRes.body.data.token;
+    });
+    it('get all sales if the user is an admin', async () => {
+      const res = await chai
+        .request(app)
+        .get('/sales/all')
+        .set('authorization', `bearer ${adminToken}`);
+      expect(res.statusCode).to.equal(200);
+      expect(res.body).to.have.property('message', 'sales retrieved successfully');
+    });
+    it('should return an empty array if they are not sales', async () => {
+        const stub = sinon.stub(service, 'getAllSaless').callsFake(() => {
+            return []});
+        const res = await chai
+          .request(app)
+          .get('/sales/all')
+          .set('authorization', `bearer ${adminToken}`);
+        stub.restore();
+        expect(res.statusCode).to.equal(400);
+        expect(res.body).to.have.property('message', 'sales Not found');
+      });
+    it('return error message if something goes wrong', async () => {
+        const stub = sinon.stub(service, 'getAllSaless').throws('Something went wrong');
+        const res = await chai
+          .request(app)
+          .get('/sales/all')
+          .set('authorization', `bearer ${adminToken}`);
+        stub.restore();
+        expect(res.statusCode).to.equal(503);
+        expect(res.body).to.have.property('message', 'something went wrong Something went wrong');
+      });
+})
