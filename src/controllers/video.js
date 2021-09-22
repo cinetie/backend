@@ -151,23 +151,23 @@ class Video {
 
   static async getVideosByPopularity(req, res) {
     try {
-      const { type } = req.query;
+      const { type, offset, limit } = req.query;
       const { country } = req.headers;
-      console.log(`pop-${type}-${country}`);
-      const cachedVideos = await get(`pop-${type}-${country}`);
+      console.log(`pop-${type}-${country}-${offset}-${limit}`);
+      const cachedVideos = await get(`pop-${type}-${country}-${offset}-${limit}`);
       if (cachedVideos) {
         return util.setSuccessResponse(res, "videos found", 200, cachedVideos);
       }
       const videos = await videoService.getPopularVideos(
-        req.query.offset,
-        req.query.limit,
+        offset,
+        limit,
         type,
         country
       );
       getAttachedThumbsMultiple(videos);
 
       if (Object.values(videos).length > 0) {
-        await set(`pop-${type}-${country}`, videos);
+        await set(`pop-${type}-${country}-${offset}-${limit}`, videos);
         return util.setSuccessResponse(res, "videos found", 200, videos);
       }
       return util.setErrorResponse(res, "Data not found", 404);
@@ -178,9 +178,9 @@ class Video {
 
   static async getVideosByTrend(req, res) {
     try {
-      const { type } = req.query;
+      const { type, offset, limit } = req.query;
       const { country } = req.headers;
-      const cached = await get(`trend-${type}-${country}`);
+      const cached = await get(`trend-${type}-${country}-${offset}-${limit}`);
       if (cached) {
         return util.setSuccessResponse(res, "videos found", 200, cached);
       }
@@ -193,7 +193,7 @@ class Video {
       getAttachedThumbsMultiple(videos);
 
       if (Object.values(videos).length > 0) {
-        await set(`trend-${type}-${country}`, videos);
+        await set(`trend-${type}-${country}-${offset}-${limit}`, videos);
         return util.setSuccessResponse(res, "videos found", 200, videos);
       }
       return util.setErrorResponse(res, "Data not found", 404);
@@ -239,15 +239,15 @@ class Video {
     try {
       const { q, offset } = req.query;
       const { country } = req.headers;
-      const cached = await get(`search-${q}-${country}`);
+      const cached = await get(`search-${q}-${country}-${offset}`);
       if (cached) {
         util.setSuccessResponse(res, "Videos found", 200, cached);
       }
       const videos = await videoService.search(q, offset, country);
       getAttachedThumbsMultiple(videos);
-
+      console.log(videos);
       if (Object.values(videos).length > 0) {
-        await set(`search-${q}-${country}`);
+        await set(`search-${q}-${country}-${offset}`);
         util.setSuccessResponse(res, "Videos found", 200, videos);
       } else {
         util.setErrorResponse(res, "Data not found", 404);

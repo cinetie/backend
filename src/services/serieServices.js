@@ -52,6 +52,7 @@ class serieServices {
             { suspensionState: false },
           ],
         },
+        order: [['episodeNumber', 'ASC']],
       });
       if (Object.values(data).length > 0) {
         return data;
