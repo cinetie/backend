@@ -1,0 +1,54 @@
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.createTable('Ambassadors', {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER
+      },
+      firstName: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      lastName: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      phoneNumber: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      email: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      password: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      region: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      isVerified: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+      },
+      users: {
+        type: Sequelize.INTEGER,
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      }
+    });
+  },
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable('Ambassadors');
+  }
+};
