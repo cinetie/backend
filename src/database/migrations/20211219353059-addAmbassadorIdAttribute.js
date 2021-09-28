@@ -1,12 +1,12 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.addColumn("videos", "videoKey", {
+    return queryInterface.addColumn("Ambassadors", "ambassadorId", {
       type: Sequelize.STRING,
       defaultValues: "",
     });
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.removeColumn("videos", "videoKey");
+    return queryInterface.removeColumn("Ambassadors", "ambassadorId");
   },
 };

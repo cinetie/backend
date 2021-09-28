@@ -21,7 +21,19 @@ class AmbassadorServices {
     }
   }
 
-
+  static async verifyAmbassador(id) {
+    try {
+      return await database.Ambassador.update(
+        { isVerified: true },
+        {
+          returning: true,
+          where: { id },
+        }
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
 
   static async createNewAmbassador(newAmbassador) {
     try {
