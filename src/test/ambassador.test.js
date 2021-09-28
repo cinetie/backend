@@ -56,7 +56,7 @@ describe("AMBASSADORS SIGNUP", () => {
       })
       .end((err, res) => {
         expect(res).to.have.status(403);
-        expect(res.body).to.have.property("message", "Ambassador already exists");
+        expect(res.body).to.have.property("message", "Email already exists");
         done();
       });
   });

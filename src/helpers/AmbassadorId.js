@@ -1,8 +1,8 @@
-import { customAlphabet } from "nanoid";
+const genUsername = require('unique-username-generator');
 
-const AmbassadorIdGenerator = () => {
-  const nanoid = customAlphabet("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", 10);
-  return nanoid();
+const AmbassadorIdGenerator = (email) => {
+  const ambassadorId = genUsername.generateFromEmail(email, 3);
+  return ambassadorId;
 };
 
 export default AmbassadorIdGenerator;

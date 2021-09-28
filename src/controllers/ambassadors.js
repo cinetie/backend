@@ -15,7 +15,8 @@ class AmbassadorsController {
       if (ambassador)
         return util.setErrorResponse(res, "Email already exists", 403);
 
-      const ambassadorId = AmbassadorIdGenerator();
+      const ambassadorId = AmbassadorIdGenerator(email);
+
       const newAmbassador = {
         firstName,
         lastName,
