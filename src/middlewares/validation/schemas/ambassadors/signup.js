@@ -6,12 +6,12 @@ export default Joi.object()
         .string()
         .min(2)
         .required()
-        .error(() => "Enter name ex: Mike"),
+        .error(() => "Enter first name ex: Mike"),
     lastName: Joi
         .string()
         .min(2)
         .required()
-        .error(() => "Enter name ex: Mike"),
+        .error(() => "Enter Last name ex: Mike"),
     email: Joi.string()
       .email({ minDomainSegments: 2 })
       .required()
