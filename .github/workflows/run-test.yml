@@ -18,7 +18,7 @@ jobs:
         env:
           MYSQL_DATABASE: cinetie_test
           MYSQL_ROOT_PASSWORD: 1234
-          MYSQL_USER: cinetie_user
+          MYSQL_USER: root
 
         options: >-
           --name=mysql-master
@@ -27,7 +27,7 @@ jobs:
           --health-timeout=5s
           --health-retries=3    
     env:
-      TEST_DATABASE_URL: mysql://cinetie_user:1234@0.0.0.0:49153/cinetie_test
+      TEST_DATABASE_URL: mysql://root:1234@0.0.0.0:49153/cinetie_test
       SECRET: ${{ secrets.SECRET }}
       JWT_EXPIRATION: 10000
       EMAIL_USER: app146030787@heroku.com
