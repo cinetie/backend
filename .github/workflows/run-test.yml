@@ -18,6 +18,8 @@ jobs:
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: cinetie_test
+          MYSQL_PASSWORD: 1234
+          MYSQL_USER: cinetie_user
         options: >-
           --name=mysql-master
           --health-cmd="mysqladmin ping"
@@ -25,7 +27,7 @@ jobs:
           --health-timeout=5s
           --health-retries=3    
     env:
-      TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+      TEST_DATABASE_URL: mysql://cinetie_user:1234@127.0.0.1:49153/cinetie_test
       SECRET: ${{ secrets.SECRET }}
       JWT_EXPIRATION: 10000
       EMAIL_USER: app146030787@heroku.com

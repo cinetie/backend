@@ -1200,3 +1200,31 @@ Where:
     9: Mobile Money (GHANA VODAFONE)
     10: Mobile Money (GHANA TIGO)
 ```
+### 25. Admin verify Ambassadors Account: POST Request
+
+Endpoint
+
+```text
+/ambassadors/verify/:id
+```
+
+Headers:
+
+```json
+{
+  "Authorization": "Bearer <User token>",
+  "Content-Type": "application/json"
+}
+```
+
+Body: `None`
+
+Response:
+
+```json
+{
+  "statusCode": 200,
+  "status": "success",
+  "message": "Verified successfully!"
+}
+```

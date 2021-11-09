@@ -3,8 +3,7 @@
 /* eslint-disable consistent-return */
 import path from "path";
 import { v4 as uuid } from "uuid";
-import { decode } from "querystring";
-import { Console } from "console";
+import { config } from 'dotenv';
 import userService from "../services/userServices";
 import tokenService from "../services/tokenService";
 import billingServices from "../services/billingServices";
@@ -21,21 +20,24 @@ import Rave from "../helpers/rave";
 import Fetch from "../helpers/fetch";
 import RavePaymentRequest from "../helpers/RavePaymentRequest";
 import MailingServices from "../services/mailingServices";
-import billing from "../middlewares/billing";
 
+config()
 const util = new Util();
 class userController {
   static async signupUser(req, res) {
     try {
+      const { promoCode } = req.body;
+      const  isOnPromo = promoCode ? true : false
       const newUser = userController.initializeVarsForSignup(req);
       const search = await userService.getUserByMail(newUser.email);
       if (search) {
         util.setErrorResponse(res, "user already exists", 403);
       } else {
         // eslint-disable-next-line no-use-before-define
-        const EmailStatus = await userController.sendEmail(req);
+
         const createdUser = await userService.createNewUser({
           ...newUser,
+          isOnPromo,
           isOnExtension: false,
           permissionLevel: -1,
           isBilledAnnually: false,
@@ -45,7 +47,6 @@ class userController {
         const token = userController.signToken(part1, newUser);
         const tokenToSave = userController.generateTokenToSave(newUser, token);
         await tokenService.createNewToken(tokenToSave, token);
-        if (EmailStatus) util.setErrorResponse(res, EmailStatus, 500);
         const userToken = jwt.jwtSign(
           {
             key: cry.crypto(),

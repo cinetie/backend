@@ -1,0 +1,33 @@
+export default {
+  up: (queryInterface) =>
+    queryInterface.bulkInsert("Ambassadors", [
+      {
+        id: 100,
+        firstName: "user",
+        lastName: "user",
+        email: "user2@example.com",
+        password:"$2b$10$4ukBCeW8NPyCZDENkJOEZ.E7ibNlBPRvl57mqv9.SJU.D7BlH3W7a",
+        region: "Muhima",
+        users: 0,
+        isVerified: true,
+        phoneNumber: "250799887212",
+        updatedAt: new Date(),
+        createdAt: new Date(),
+      },
+      {
+        id: 101,
+        firstName: "user",
+        lastName: "user",
+        email: "user3@example.com",
+        password:"$2b$10$4ukBCeW8NPyCZDENkJOEZ.E7ibNlBPRvl57mqv9.SJU.D7BlH3W7a",
+        region: "Muhima",
+        users: 0,
+        isVerified: false,
+        phoneNumber: "250799887212",
+        updatedAt: new Date(),
+        createdAt: new Date(),
+      },
+    ]),
+  down: (queryInterface) =>
+    queryInterface.bulkDelete("Ambassadors", null, {}),
+};

@@ -18,6 +18,8 @@ module.exports = (sequelize, DataTypes) => {
       customerId: DataTypes.STRING,
       isOnTrial: DataTypes.BOOLEAN,
       isOnExtension: DataTypes.BOOLEAN,
+      isOnPromo: DataTypes.BOOLEAN,
+      promoCode: DataTypes.STRING,
     },
     {}
   );

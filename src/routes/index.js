@@ -17,6 +17,7 @@ import webhooks from './webhooks';
 import earnings from './earnings';
 import staff from './staff';
 import sales from './sales';
+import ambassadors from './ambassadors';
 
 const router = Router();
 
@@ -37,4 +38,5 @@ router.use('/webhooks', webhooks);
 router.use('/earnings', earnings);
 router.use('/staff', staff);
 router.use('/sales', sales);
+router.use('/ambassadors', ambassadors);
 export default router;
