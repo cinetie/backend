@@ -49,6 +49,12 @@ export default joi
       .string()
       .required()
       .error(() => "You have to enter age rating"),
+    language: joi
+      .string()
+      .trim()
+      .min(3)
+      .max(20)
+      .error(() => "Language should be a string"),
     resCountries: joi.string().required(),
   })
   .options({ allowUnknown: false });

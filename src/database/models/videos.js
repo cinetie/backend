@@ -25,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
       EnSubt: DataTypes.STRING,
       FrSubt: DataTypes.STRING,
       licenseEndDate: DataTypes.STRING,
+      language: DataTypes.STRING,
     },
     {}
   );
