@@ -496,46 +496,33 @@ class userController {
         }
 
         case 2: {
+          const txRef = uuid();
+          const data =  {
+            plan: user.plan,
+            isBilledAnnually: user.isBilledAnnually,
+            email: user.email,
+            name: `${user.firstName} ${user.lastName}`,
+            paymentOptions: "card",
+            txRef,
+          }
           const pay = await userController.sendPaymentRequest(
-            paymentData,
+            data,
             token,
             null,
-            "charge/card"
+            "charge/rave-standard"
           );
-          if (pay.status !== 400) {
-            if (pay.meta.authorization.mode === "avs_noauth") {
-              return util.setSuccessResponse(
-                res,
-                "Please provide these details",
-                200,
-                ["city", "address", "state", "country", "zipcode"]
-              );
-            }
-            if (pay.meta.authorization.mode === "pin") {
-              return util.setSuccessResponse(
-                res,
-                "Please provide your pin",
-                200,
-                undefined
-              );
-            }
-            if (pay.meta.authorization.mode === "otp") {
-              await payment.recordTransaction(
-                user,
-                currentSubscription,
-                paymentData.txRef,
-                "pending"
-              );
-              return util.setSuccessResponse(
-                res,
-                pay.data.processor_response,
-                200,
-                { flw_ref: pay.data.flw_ref }
-              );
-            }
-            await userController.removeTrial(email, res, pay);
+          if (pay.status === 200) {
+            await payment.recordTransaction(
+              user,
+              currentSubscription,
+              txRef,
+              "pending"
+            );
+            util.setSuccessResponse(res, "Link generated", 201, {
+              link: pay.data.link,
+            });
           } else {
-            util.setErrorResponse(res, pay.message, 500);
+            util.setErrorResponse(res, "Something went wrong", 400);
           }
           break;
         }
