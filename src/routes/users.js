@@ -8,6 +8,7 @@ import isAdmin from "../middlewares/isAdmin";
 import screenValidator from "../middlewares/screenValidation";
 import * as validation from "../middlewares/validation/user";
 import checkCredentials from "../middlewares/checkCredentials";
+import updateSubscription from '../middlewares/updateSubscription';
 
 const router = new Router();
 
@@ -39,6 +40,7 @@ router.put(
   access.isNormalUser,
   auth.updateAccountAndSubscription
 );
+router.patch('/change/plan', access.isNormalUser, updateSubscription, auth.updateAccountAndSubscription);
 router.put("/update", access.isNormalUser, auth.updateAccount);
 router.get("/users", access.isAdmin, auth.getSubscribersInRange);
 router.get("/users/live", access.isAdmin, auth.getLiveUsers);
