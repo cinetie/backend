@@ -61,7 +61,7 @@ describe("AMBASSADORS SIGNUP", () => {
       });
   });
   it('return error message if something goes wrong', (done) => {
-    const stub = sinon.stub(AmbassadorServices, 'getAmbassadorByMail').throws('Something went wrong');
+    const stub = sinon.stub(AmbassadorServices, 'getAmbassadorByEmail').throws('Something went wrong');
     chai
       .request(app)
       .post(`${prefix}`)
@@ -113,7 +113,7 @@ describe("AMBASSADORS login", () => {
         });
     });
     it('return error message if something goes wrong', (done) => {
-      const stub = sinon.stub(AmbassadorServices, 'getAmbassadorByMail').throws('Something went wrong');
+      const stub = sinon.stub(AmbassadorServices, 'getAmbassadorByEmail').throws('Something went wrong');
       chai
         .request(app)
         .post(`${prefix}`)
