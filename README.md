@@ -115,6 +115,10 @@ MAILCHIMP_AUDIENCE_ID=
 
 - [Get a full season](#12-get-a-full-season-get-request)
 
+### Ambassadors
+
+- [Verify ambassadors](#25-admin-verify-ambassadors-account-post-request)
+
 ## Endpoints
 
 ### 1. Calculate earnings: POST Request
@@ -1212,7 +1216,7 @@ Headers:
 
 ```json
 {
-  "Authorization": "Bearer <User token>",
+  "Authorization": "Bearer <admin token>",
   "Content-Type": "application/json"
 }
 ```

@@ -1,10 +1,58 @@
 @host=http://localhost:3001/auth
 
+POST {{host}}/signup
+Accept: application/json
+Content-Type: application/json
+
+{
+    "email":"alainc3@gmail.com",
+    "password":"{{password}}",
+    "promoCode": "witodim125"
+}
+###
 POST {{host}}/login
 Accept: application/json
 Content-Type: application/json
 
 {
-    "email":"{{username}}",
+    "email":"alainc1@gmail.com",
     "password":"{{password}}"
+}
+###
+PUT {{host}}/update
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+	"isBilledAnnually": false,
+	"plan": "Promo",
+	"phoneNumber": "+250781250004",
+    "paymentMethod": 2
+} 
+
+###
+PUT {{host}}/signup/cont
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "paymentMethod": 2
+}
+
+###
+PUT {{host}}/my-account/activate
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+###
+PATCH {{host}}/change-plan
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "plan": "Promo"
 }

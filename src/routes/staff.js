@@ -10,7 +10,7 @@ import access from "../middlewares/access";
 const router = new Router();
 
 router.post("/login", login, staff.login);
-router.post("/add", access.isAdmin, addStaff, staff.addNewStaff);
+router.post("/add", addStaff, staff.addNewStaff);
 router.put(
   "/password",
   access.isLoggedIn,

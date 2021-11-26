@@ -1,0 +1,12 @@
+HTTP/1.1 400 Bad Request
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, PUT, PATCH, OPTIONS, DELETE
+Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept
+Content-Type: application/json; charset=utf-8
+Content-Length: 75
+ETag: W/"4b-uAFdXY8DklLrU7FxBQTKjvFs8jA"
+Date: Wed, 24 Nov 2021 22:47:46 GMT
+Connection: close
+
+{"statusCode":400,"status":"Error","message":"Ambassador not verified yet"}
