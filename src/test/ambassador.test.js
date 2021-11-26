@@ -92,6 +92,7 @@ describe("AMBASSADORS login", () => {
           password: "user@123",
         })
         .end((err, res) => {
+          console.log(res.body);
           expect(res).to.have.status(200);
           expect(res.body).to.have.property('message', 'Logged in successfully!');
           done();

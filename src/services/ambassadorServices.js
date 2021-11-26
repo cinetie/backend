@@ -5,7 +5,7 @@ class AmbassadorServices {
     console.log(where)
     return await database.Ambassador.findAll({
       attributes: {
-        exclude: ["createdAt", "updatedAt", "password"],
+        exclude: ["createdAt", "updatedAt"],
       },
       where: { ...where },
     });

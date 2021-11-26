@@ -55,14 +55,14 @@ class AmbassadorsController {
       const ambassador = await AmbassadorServices.getAmbassadorByEmail(email);
       if (!ambassador)
         return util.setErrorResponse(res, "Invalid email or password!", 403);
-
-      const status = await bcrypt.compare(password, ambassador.password);
+      console.log(password, ambassador[0]);
+      const status = bcrypt.compare(password, ambassador[0].password);
       if (!status)
         return util.setErrorResponse(res, "Invalid email or password!", 403);
 
-      if (!ambassador.isVerified)
+      if (ambassador[0].isVerified === false) {
         return util.setErrorResponse(res, "Ambassador not verified yet", 400);
-
+      }
       const token = jwt.jwtSign(
         { key: cry.crypto(), email: email },
         process.env.SECRET,
@@ -75,6 +75,7 @@ class AmbassadorsController {
         token
       );
     } catch (error) {
+      console.log(error)
       return util.setErrorResponse(
         res,
         `Something Went wrong, error: ${error}`,
