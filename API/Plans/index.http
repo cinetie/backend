@@ -1,0 +1,14 @@
+@host = http://localhost:3001/plan
+
+
+POST {{host}}/new
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+    "type": "Premium-discounted",
+    "numberOfScreens": 5,
+    "monthlyPrice": 8,
+    "yearlyPrice": 96
+}

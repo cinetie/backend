@@ -61,7 +61,7 @@ describe("AMBASSADORS SIGNUP", () => {
       });
   });
   it('return error message if something goes wrong', (done) => {
-    const stub = sinon.stub(AmbassadorServices, 'getAmbassadorByMail').throws('Something went wrong');
+    const stub = sinon.stub(AmbassadorServices, 'getAmbassadorByEmail').throws('Something went wrong');
     chai
       .request(app)
       .post(`${prefix}`)
@@ -92,6 +92,7 @@ describe("AMBASSADORS login", () => {
           password: "user@123",
         })
         .end((err, res) => {
+          console.log(res.body);
           expect(res).to.have.status(200);
           expect(res.body).to.have.property('message', 'Logged in successfully!');
           done();
@@ -113,7 +114,7 @@ describe("AMBASSADORS login", () => {
         });
     });
     it('return error message if something goes wrong', (done) => {
-      const stub = sinon.stub(AmbassadorServices, 'getAmbassadorByMail').throws('Something went wrong');
+      const stub = sinon.stub(AmbassadorServices, 'getAmbassadorByEmail').throws('Something went wrong');
       chai
         .request(app)
         .post(`${prefix}`)

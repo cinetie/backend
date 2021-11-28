@@ -29,3 +29,8 @@ GET {{host}}/search?q=i&&offset=0&&20
 Accept: application/json
 Authorization: Bearer {{liveTokenUser}}
 country: Rwanda
+###
+GET {{host}}/main/ft?type=movie
+Accept: application/json
+Authorization: Bearer {{liveTokenUser}}
+country:  Rwanda

@@ -1,46 +1,64 @@
-/* eslint-disable no-useless-catch */
 import database from "../database/models";
 
 class AmbassadorServices {
-  static async getAmbassadorByMail(email) {
-    try {
-      const ambassador = await database.Ambassador.findOne({
-        attributes: {
-          exclude: ["createdAt", "updatedAt"],
-        },
-        where: {
-          email,
-        },
-      });
-      if (ambassador) {
-        return ambassador;
-      }
-      return null;
-    } catch (error) {
-      throw error;
+  async getAmbassadorBase(where) {
+    console.log(where)
+    return await database.Ambassador.findAll({
+      attributes: {
+        exclude: ["createdAt", "updatedAt"],
+      },
+      where: { ...where },
+    });
+  }
+  static async getAmbassadorByEmail(email) {
+    const ambassadorService = new AmbassadorServices();
+
+    const ambassador = await ambassadorService.getAmbassadorBase({ email });
+    if (ambassador.length >= 0) {
+      return ambassador;
     }
+    return null;
   }
 
   static async verifyAmbassador(id) {
-    try {
-      return await database.Ambassador.update(
-        { isVerified: true },
-        {
-          returning: true,
-          where: { id },
-        }
-      );
-    } catch (error) {
-      throw error;
-    }
+    return await database.Ambassador.update(
+      { isVerified: true },
+      {
+        returning: true,
+        where: { id },
+      }
+    );
   }
 
   static async createNewAmbassador(newAmbassador) {
-    try {
-      return await database.Ambassador.create(newAmbassador);
-    } catch (error) {
-      throw error;
+    return await database.Ambassador.create(newAmbassador);
+  }
+
+  static async getAllAmbassadors() {
+    const ambassadorService = new AmbassadorServices();
+    const ambassador = await ambassadorService.getAmbassadorBase(undefined);
+    if (ambassador.length >= 0) {
+      return ambassador;
     }
+    return null;
+  }
+
+  static async getAmbassadorById(id) {
+    const ambassadorService = new AmbassadorServices();
+    const ambassador = await ambassadorService.getAmbassadorBase({id});
+    if (ambassador.length >= 0) {
+      return ambassador;
+    }
+    return null;
+  }
+
+  static async getAmbassadorByPromoCode(ambassadorId) {
+    const ambassadorService = new AmbassadorServices();
+    const ambassador = await ambassadorService.getAmbassadorBase({ambassadorId});
+    if (ambassador.length >= 0) {
+      return ambassador;
+    }
+    return null;
   }
 }
 export default AmbassadorServices;

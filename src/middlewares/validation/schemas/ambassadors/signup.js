@@ -23,7 +23,9 @@ export default Joi.object()
       .required()
       .error(
         () =>
-          "You have to enter a valid password with more than 6 characters. Example: qqw12@#!23#frf_e3_@"
+          `You have to enter a valid password with more than 6 characters with capital letters,
+           small letters, numbers and special characters like !@#$.
+           Example: qqw12 @#!23#frf_e3_@`
       ),
       phoneNumber: Joi
         .string()
