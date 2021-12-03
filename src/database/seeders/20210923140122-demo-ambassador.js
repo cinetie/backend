@@ -24,6 +24,7 @@ export default {
         users: 0,
         isVerified: false,
         phoneNumber: "250799887212",
+        ambassadorId: 'example123',
         updatedAt: new Date(),
         createdAt: new Date(),
       },
