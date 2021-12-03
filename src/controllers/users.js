@@ -20,6 +20,8 @@ import Rave from "../helpers/rave";
 import Fetch from "../helpers/fetch";
 import RavePaymentRequest from "../helpers/RavePaymentRequest";
 import MailingServices from "../services/mailingServices";
+import AmbassadorServices from '../services/ambassadorServices';
+import PromoCodeServices from '../services/promoCodeServices';
 
 config()
 const util = new Util();
@@ -367,6 +369,10 @@ class userController {
           subscriptionData
         );
         if (subscriptionDetails) {
+          if (user.isOnPromo && user.plan.includes('discount')) {
+            const ambassador = await AmbassadorServices.getAmbassadorByPromoCode(user.promoCode);
+            const result = await PromoCodeServices.addNewPromoUsage(user.email, ambassador[0].email, user.plan);
+          }
           util.setSuccessResponse(
             res,
             "Completed signup process",
@@ -397,6 +403,13 @@ class userController {
           subscriptionData
         );
         if (subscriptionDetails) {
+            if(user.isOnPromo && user.plan.includes('discount')) {
+              const ambassador = await AmbassadorServices.getAmbassadorByPromoCode(user.promoCode);
+              const promoCodeUsed = await PromoCodeServices.getPromoCodeUtizationByEmail(user.email, ambassador[0].email);
+              if(!promoCodeUsed) {
+                await PromoCodeServices.addNewPromoUsage(user.email, ambassador[0].email, user.plan);
+              }
+            }
           util.setSuccessResponse(
             res,
             "Completed signup process and update",
