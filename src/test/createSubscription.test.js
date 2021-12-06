@@ -1,12 +1,8 @@
 import chai, { expect } from "chai";
 import { config } from "dotenv";
 import chaiHttp from "chai-http";
-import sinon from "sinon";
 import { describe, it } from "mocha";
-import jwt from "../helpers/jwt";
 import app from "../index";
-import temp from "../services/tempSerieService";
-import * as aws from "../helpers/aws";
 
 config();
 chai.use(chaiHttp);
@@ -21,7 +17,7 @@ describe("ADD PROMOCODE UTILIZATION", () => {
     token = loginRes.body.data;
   });
 
-  it("should return 404 if the serie is not found", async () => {
+  it("should add the record promo code utilization to the database and create a subcription when the user is on promo", async () => {
     const res = await chai
       .request(app)
       .put("/auth/signup/cont")

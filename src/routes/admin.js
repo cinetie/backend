@@ -4,6 +4,7 @@ import adminController from "../controllers/admin";
 import sales from "../controllers/sales";
 import access from "../middlewares/access";
 import earningCalculator from "../helpers/calculateEarning";
+import PromoCodeController from '../controllers/promoCode'
 
 const router = Router();
 router.get("/earnings", access.isAdmin, controller.getAllEarnings);
@@ -23,4 +24,5 @@ router.get("/videos", access.isAdmin, adminController.getAllVideos);
 router.get("/sales/all", access.isAdmin, sales.getAllSales);
 router.get("/sales/range", access.isAdmin, sales.getSalesInTimeRange);
 router.post("/gain-access", access.isAdmin, adminController.gainAccess);
+router.get("/promo/all", access.isAdmin, PromoCodeController.getAllPromoCodeUtilizations)
 export default router;

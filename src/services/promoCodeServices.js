@@ -13,5 +13,13 @@ class PromoCodeServices {
       }
     });
   }
+  static async getAllPromoCodeUtizations(userEmail, ambassadorEmail) {
+    return await database.PromoCodeUtilization.findAll();
+  }
+  static async getAllPromoCodeUtizationsByAmbassador(ambassadorEmail) {
+    return await database.PromoCodeUtilization.findAll({ where: {
+      ambassadorEmail
+    }});
+  }
 }
 export default PromoCodeServices;
