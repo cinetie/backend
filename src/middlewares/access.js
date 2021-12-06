@@ -3,6 +3,7 @@ import userService from "../services/userServices";
 import staffService from "../services/staffServices";
 import Util from "../helpers/utilities";
 import cpService from "../services/cpServices";
+import AmbassadorServices from "../services/ambassadorServices";
 
 const util = new Util();
 class Access {
@@ -123,6 +124,26 @@ class Access {
       }
     } catch (error) {
       util.setErrorResponse(res, error.message || error, 500);
+    }
+  }
+
+  static async isAmbassador(req, res, next) {
+    try {
+      const token = req.headers.authorization.slice(7);
+      const decoded = jwt.jwtVerify(token, process.env.SECRET);
+      const { email } = decoded;
+      const ambassador = await AmbassadorServices.getAmbassadorByEmail(email);
+      if (!ambassador[0]) {
+        return util.setErrorResponse(res, "Invalid Token", 400);
+      }
+      if (!ambassador[0].isVerified) {
+        util.setErrorResponse(res, "Access denied ", 403);
+      } else {
+        req.ambassador = ambassador;
+        next();
+      }
+    } catch (error) {
+      util.setErrorResponse(res, error.message, 500);
     }
   }
 }

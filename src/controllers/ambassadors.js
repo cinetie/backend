@@ -55,7 +55,6 @@ class AmbassadorsController {
       const ambassador = await AmbassadorServices.getAmbassadorByEmail(email);
       if (!ambassador)
         return util.setErrorResponse(res, "Invalid email or password!", 403);
-      console.log(password, ambassador[0]);
       const status = bcrypt.compare(password, ambassador[0].password);
       if (!status)
         return util.setErrorResponse(res, "Invalid email or password!", 403);
