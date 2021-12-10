@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       hasHd: DataTypes.BOOLEAN,
       hasUltraHd: DataTypes.BOOLEAN,
+      onPromo: DataTypes.BOOLEAN,
       numberOfScreens: DataTypes.STRING,
       monthlyPrice: DataTypes.FLOAT,
       yearlyPrice: DataTypes.FLOAT,
