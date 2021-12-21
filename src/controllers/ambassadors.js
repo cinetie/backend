@@ -1,10 +1,19 @@
 import bcrypt from "../helpers/bcrypt";
+import path from "path";
 import Util from "../helpers/utilities";
 import AmbassadorServices from "../services/ambassadorServices";
 import jwt from "../helpers/jwt";
 import cry from "../helpers/crypto";
 import mailer from "../helpers/mailer";
-import path from "path";
+import PromoCodeServices from "../services/promoCodeServices";
+import startOfToday from "date-fns/startOfToday";
+import isWithinInterval from "date-fns/isWithinInterval";
+import endOfDay from "date-fns/endOfDay";
+import startOfMonth from "date-fns/startOfMonth";
+import endOfMonth from "date-fns/endOfMonth";
+import endOfYear from "date-fns/endOfYear";
+import startOfYear from "date-fns/startOfYear";
+
 
 const util = new Util();
 class AmbassadorsController {
@@ -135,6 +144,45 @@ class AmbassadorsController {
         "Ambassadors fetched successfully!",
         200,
         ambassadors
+      );
+    } catch (error) {
+      return util.setErrorResponse(
+        res,
+        `Something Went wrong, error: ${error}`,
+        500
+      );
+    }
+  }
+
+  static async getAmbassadorDetails(req, res) {
+    try {
+      const { ambassador } = req;
+      const today = startOfToday();
+      const midnight = endOfDay(today)
+      const currentMonth = startOfMonth(today);
+      const EndOfCurrentMoth = endOfMonth(today);
+      const currentYear = startOfYear(today);
+      const endOfCurrentYear = endOfYear(today);
+
+      const utilization = await PromoCodeServices.getAllPromoCodeUtizationsByAmbassador(ambassador[0].email);
+      const filteredByDailyUsage = utilization.filter(data => isWithinInterval(data.createdAt, { start: today, end: midnight }));
+      const filteredBymonthlyUsage = utilization.filter(data => isWithinInterval(data.createdAt, { start: currentMonth, end: EndOfCurrentMoth}))
+      const filteredByYearlyUsage = utilization.filter(data => isWithinInterval(data.createdAt, { start: currentYear, end: endOfCurrentYear}))
+      const info = {
+        promoCode: ambassador[0].ambassadorId,
+        stats: {
+          totalUsage: utilization.length,
+          today:filteredByDailyUsage.length,
+          monthly: filteredBymonthlyUsage.length,
+          yearly: filteredByYearlyUsage.length
+        }
+      }
+      console.log(info);
+      return util.setSuccessResponse(
+        res,
+        "Ambassadors information fetched successfully!",
+        200,
+        info
       );
     } catch (error) {
       return util.setErrorResponse(

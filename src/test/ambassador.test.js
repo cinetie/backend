@@ -213,3 +213,33 @@ describe("AMBASSADOR'S PROMO CODE USAGE", () => {
     expect(res).to.have.status(500);
   });
 });
+
+//////////////////
+
+describe("AMBASSADOR'S INFO", () => {
+  let token;
+  before(async () => {
+    const loginRes = await chai.request(app).post("/ambassadors/login").send({
+      email: "ambassador4@example.com",
+      password: "user@123",
+    });
+    token = loginRes.body.data;
+  });
+  it('should return ambassador\'s info', async () => {
+    const res = await chai
+      .request(app)
+      .get('/ambassadors/info')
+      .set("Authorization", `Bearer ${token}`)
+    expect(res).to.have.status(200);
+    expect(res.body).to.have.property('message', 'Ambassadors information fetched successfully!');
+  });
+  it('should return 500 if there is a server error', async () => {
+    const stub = sinon.stub(PromoCodeServices, "getAllPromoCodeUtizationsByAmbassador").throws(new Error('something went wrong'));
+    const res = await chai
+      .request(app)
+      .get('/ambassadors/info')
+      .set("Authorization", `Bearer ${token}`)
+    stub.restore()
+    expect(res).to.have.status(500);
+  });
+});
