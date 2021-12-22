@@ -10,6 +10,7 @@ router.post("/signup", validation.signup, AmbassadorsController.signup);
 router.post("/login", userValidation.login, AmbassadorsController.login);
 router.post("/verify/:id", access.isAdmin, AmbassadorsController.verify);
 router.get("/", access.isAdmin, AmbassadorsController.getAmbassadors);
-router.get("/promocode/utilization", access.isAmbassador, promoCodeController.getAmbassadorPromoCodeUtilizations)
+router.get("/promocode/utilization", access.isAmbassador, promoCodeController.getAmbassadorPromoCodeUtilizations);
+router.get("/info", access.isAmbassador, AmbassadorsController.getAmbassadorDetails);
 
 export default router;
