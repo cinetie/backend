@@ -12,5 +12,6 @@ router.post("/verify/:id", access.isAdmin, AmbassadorsController.verify);
 router.get("/", access.isAdmin, AmbassadorsController.getAmbassadors);
 router.get("/promocode/utilization", access.isAmbassador, promoCodeController.getAmbassadorPromoCodeUtilizations);
 router.get("/info", access.isAmbassador, AmbassadorsController.getAmbassadorDetails);
+router.get("/stats/:id", access.isAdmin, AmbassadorsController.getAmbassadorStats);
 
 export default router;

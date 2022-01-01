@@ -192,6 +192,44 @@ class AmbassadorsController {
       );
     }
   }
+
+  static async getAmbassadorStats(req, res) {
+    try {
+      const { id } = req.params;
+      const today = startOfToday();
+      const midnight = endOfDay(today)
+      const currentMonth = startOfMonth(today);
+      const EndOfCurrentMoth = endOfMonth(today);
+      const currentYear = startOfYear(today);
+      const endOfCurrentYear = endOfYear(today);
+      const ambassador = await AmbassadorServices.getAmbassadorById(
+        req.params.id
+      );
+      const utilization = await PromoCodeServices.getAllPromoCodeUtizationsByAmbassador(ambassador[0].email);
+      const filteredByDailyUsage = utilization.filter(data => isWithinInterval(data.createdAt, { start: today, end: midnight }));
+      const filteredBymonthlyUsage = utilization.filter(data => isWithinInterval(data.createdAt, { start: currentMonth, end: EndOfCurrentMoth}))
+      const filteredByYearlyUsage = utilization.filter(data => isWithinInterval(data.createdAt, { start: currentYear, end: endOfCurrentYear}))
+      const info = {
+          totalUsage: utilization.length,
+          today:filteredByDailyUsage.length,
+          monthly: filteredBymonthlyUsage.length,
+          yearly: filteredByYearlyUsage.length
+      }
+      console.log(info);
+      return util.setSuccessResponse(
+        res,
+        "Ambassadors stats fetched successfully!",
+        200,
+        info
+      );
+    } catch (error) {
+      return util.setErrorResponse(
+        res,
+        `Something Went wrong, error: ${error}`,
+        500
+      );
+    }
+  }
 }
 
 export default AmbassadorsController;
