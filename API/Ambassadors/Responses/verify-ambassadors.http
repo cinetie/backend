@@ -1,0 +1,12 @@
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, PUT, PATCH, OPTIONS, DELETE
+Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept
+Content-Type: application/json; charset=utf-8
+Content-Length: 72
+ETag: W/"48-9uimslNcGiSVGTcIptm85dGntrc"
+Date: Wed, 24 Nov 2021 23:18:27 GMT
+Connection: close
+
+{"statusCode":200,"status":"success","message":"Verified successfully!"}

@@ -45,6 +45,17 @@ export default {
         updatedAt: new Date(),
         createdAt: new Date(),
       },
+      {
+        id: 249,
+        type: "Premium_discount",
+        hasHd: true,
+        hasUltraHd: true,
+        numberOfScreens: 300,
+        monthlyPrice: 0,
+        yearlyPrice: 0,
+        updatedAt: new Date(),
+        createdAt: new Date(),
+      },
     ]),
   down: (queryInterface) => queryInterface.bulkDelete("plans", null, {}),
 };

@@ -1,0 +1,12 @@
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, PUT, PATCH, OPTIONS, DELETE
+Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept
+Content-Type: application/json; charset=utf-8
+Content-Length: 658
+ETag: W/"292-q4Q3VTunsDPvy4NkHLOTVsZtT+A"
+Date: Wed, 24 Nov 2021 23:16:40 GMT
+Connection: close
+
+{"statusCode":200,"status":"success","message":"Ambassadors fetched successfully!","data":[{"id":1,"firstName":"Alain","lastName":"Mugisha","phoneNumber":"0789898989","email":"rajamo2794@ineedsa.com","region":"Country","isVerified":false,"users":0,"ambassadorId":"rajamo2794695"},{"id":2,"firstName":"Alain","lastName":"Mugisha","phoneNumber":"0789898989","email":"lenavak795@ineedsa.com","region":"Country","isVerified":false,"users":0,"ambassadorId":"lenavak795600"},{"id":3,"firstName":"Alain","lastName":"Mugisha","phoneNumber":"0789898989","email":"dolag72362@jasmne.com","region":"Country","isVerified":false,"users":0,"ambassadorId":"dolag72362402"}]}

@@ -1,0 +1,12 @@
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, PUT, PATCH, OPTIONS, DELETE
+Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept
+Content-Type: application/json; charset=utf-8
+Content-Length: 243
+ETag: W/"f3-3ZrkJyfyzDHqM9cwem9tp3ESZ0U"
+Date: Wed, 24 Nov 2021 23:21:12 GMT
+Connection: close
+
+{"statusCode":200,"status":"success","message":"Logged in successfully!","data":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6ImRvbGFnNzIzNjJAamFzbW5lLmNvbSIsImlhdCI6MTYzNzc5NjA3Mn0.NZqDv3Gh4HBT1SXy40rbarO6QrnyUzTYTBq97VgnwZU"}
