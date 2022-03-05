@@ -8,7 +8,7 @@ export const get = async (key) => {
   return result ? JSON.parse(result): null;
 };
 
-export const set = async (key, value) => {
-  const result = await redis.setex(key, 86400, JSON.stringify(value));
+export const set = async (key, value, exp) => {
+  const result = await redis.setex(key, exp || 86400, JSON.stringify(value));
   return result;
 };

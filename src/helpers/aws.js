@@ -19,7 +19,7 @@ config({ AWS_ID, AWS_SECRET });
 const S3 = new AWS.S3({ apiVersion: "2006-03-01" });
 
 const getObject = async (Bucket, Key, Expires) => {
-  const cachedUri = await get(Key);
+  const cachedUri = await get(Key, Expires);
   if (cachedUri) {
     return cachedUri;
   }
