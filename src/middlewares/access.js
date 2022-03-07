@@ -37,6 +37,9 @@ class Access {
   // level 1 permission checkpoint
   static async isProducer(req, res, next) {
     try {
+      if (!req.headers.authorization) {
+        return util.setErrorResponse(res, "Invalid access token", 401);
+      }
       const token = req.headers.authorization.slice(7);
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
       const { email, clientId } = decoded;
@@ -55,6 +58,9 @@ class Access {
   // level 0 permission checkpoint
   static async isNormalUser(req, res, next) {
     try {
+      if (!req.headers.authorization) {
+        return util.setErrorResponse(res, "Invalid access token", 401);
+      }
       const token = req.headers.authorization.slice(7);
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
       const { email } = decoded;
@@ -76,6 +82,9 @@ class Access {
 
   static async isLoggedIn(req, res, next) {
     try {
+      if (!req.headers.authorization) { 
+        return util.setErrorResponse(res, "Invalid access token", 401);
+      }
       const token = req.headers.authorization.slice(7);
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
       const { email } = decoded;
@@ -115,6 +124,9 @@ class Access {
 
   static async isPayment(req, res, next) {
     try {
+      if (!req.headers.authorization) {
+        return util.setErrorResponse(res, "Invalid access token", 401);
+      }
       const token = req.headers.authorization.slice(7);
       const user = jwt.jwtVerify(token, process.env.SECRET);
       if (user.role === "payment-api") {
@@ -129,6 +141,9 @@ class Access {
 
   static async isAmbassador(req, res, next) {
     try {
+      if (!req.headers.authorization) {
+        return util.setErrorResponse(res, "Invalid access token", 401);
+      }
       const token = req.headers.authorization.slice(7);
       const decoded = jwt.jwtVerify(token, process.env.SECRET);
       const { email } = decoded;
