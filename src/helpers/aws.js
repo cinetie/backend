@@ -2,9 +2,8 @@ import AWS from "aws-sdk";
 import { v4 as V4 } from "uuid";
 import { get, set } from "./redis";
 
-const { AWS_ID, AWS_SECRET } = process.env;
+const { AWS_ID, AWS_SECRET, AWS_REGION } = process.env;
 
-const AWS_REGION = "eu-west-1";
 function config(credentials) {
   AWS.config.update({
     region: AWS_REGION,
@@ -18,7 +17,7 @@ function config(credentials) {
 config({ AWS_ID, AWS_SECRET });
 const S3 = new AWS.S3({ apiVersion: "2006-03-01" });
 
-const getObject = async (Bucket, Key, Expires) => {
+const getObject = async (Bucket, Key, Expires, Region) => {
   const cachedUri = await get(Key, Expires);
   if (cachedUri) {
     return cachedUri;
