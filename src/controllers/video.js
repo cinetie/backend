@@ -470,7 +470,7 @@ class Video {
 
   static attachThumbnails(key, bucket) {
     try {
-      return `https://${bucket}.s3.eu-west-1.amazonaws.com/${key}`;
+      return `https://${bucket}.s3.amazonaws.com/${key}`;
     } catch (error) {
       throw error;
     }
