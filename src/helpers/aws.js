@@ -66,7 +66,7 @@ const getSignedUrl = async (Bucket, ContentType, extension) => {
   };
   const options = {
     signatureVersion: "v4",
-    region: AWS_REGION,
+    region: 'us-east-1',
     endpoint: new AWS.Endpoint(`${Bucket}.s3-accelerate.amazonaws.com`),
     useAccelerateEndpoint: true,
     apiVersion: "2006-03-01",
