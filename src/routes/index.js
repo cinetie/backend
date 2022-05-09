@@ -19,6 +19,7 @@ import staff from "./staff";
 import sales from "./sales";
 import ambassadors from "./ambassadors";
 import signedUrls from "./signedUrls";
+import subscription from "./subscription";
 
 const router = Router();
 
@@ -41,4 +42,5 @@ router.use("/staff", staff);
 router.use("/sales", sales);
 router.use("/ambassadors", ambassadors);
 router.use("/signed-urls", signedUrls);
+router.use("/subscription", subscription);
 export default router;

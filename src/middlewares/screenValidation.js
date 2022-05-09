@@ -33,7 +33,7 @@ class screenValidation {
       const details = await screenValidation.getEmail(req, res);
       const plan = await planService.getParticalPlan(details.plan);
       const screensAndEmail = {
-        screens: Number(plan.numberOfScreens),
+        screens: plan?.numberOfScreens ? Number(plan.numberOfScreens) : null,
         email: details.email,
       };
       return screensAndEmail;
@@ -58,7 +58,7 @@ class screenValidation {
         if (
           activeSessions.length !== details.screens ||
           user.plan === "Setup" ||
-          subscriptionStatus.state === "pending"
+          subscriptionStatus.state === "pending" || !subscription
         ) {
           next();
         } else {
@@ -69,7 +69,7 @@ class screenValidation {
           );
         }
       } else {
-        next();
+        return next();
       }
     } catch (error) {
       util.setErrorResponse(res, `an error occured  ${error}`, 500);
