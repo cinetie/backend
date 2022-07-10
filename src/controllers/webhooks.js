@@ -12,6 +12,7 @@ import viewingSessions from "../services/viewingSessionsServices";
 import billingService from "../services/billingServices";
 import date from "../helpers/date";
 import Fetch from "../helpers/fetch";
+import xml from "xml";
 
 const util = new Util();
 const rave = new Flutterwave(
@@ -148,7 +149,87 @@ export default class WebHooks {
       return true;
     }
     throw new Error("Sales recording error");
+  }
 
-    throw new Error("Sales recording error");
+  static async registerDPOSales(transaction, user, req, res) {
+    const sales = await Sales.addRecord({
+      plan: user.plan,
+      amount: transaction.paidAmount * 0.3,
+      user: user.email,
+    });
+    if (sales) {
+      return true;
+    }
+  }
+
+  static async DPOwebhook(req, res) {
+    try {
+      const findTransaction = await transactions.getTransactionById(
+        req.body.api3g.transactionref[0]
+      );
+      if (!findTransaction) {
+        return res
+          .set("Content-Type", "text/xml")
+          .send(xml({ API3G: [{ Response: "OK" }] }));
+      }
+      if (findTransaction.transToken !== req.body.api3g.transactiontoken[0]) {
+        return res
+          .set("Content-Type", "text/xml")
+          .send(xml({ API3G: [{ Response: "OK" }] }));
+      }
+
+      await transactions.updateTransaction(req.body.api3g.transactionref[0], {
+        statusDesc: "approved",
+      });
+
+      const user = await UserService.getUserByMail(findTransaction.email);
+
+      let updates = {};
+
+      await billingService.updateSubscription(user.email, {
+        endDate: !user.isBilledAnnually
+          ? date.addMoreDays(30).toDateString()
+          : date.addMoreDays(365).toDateString(),
+        state: "current",
+      });
+
+      updates = await UserService.updateUser(user.email, {
+        permissionLevel: 1,
+      });
+
+      const rates = await Fetch(
+        undefined,
+        { Accept: "application/json" },
+        `https://apilayer.net/api/live?access_key=${process.env.ACCESS_KEY_CURRENCY_LAYER}&currencies=RWF&source=USD&format=1`,
+        "GET"
+      );
+
+      const converted = Math.floor(
+        rates.quotes.USDRWF * findTransaction.paidAmount
+      );
+      const afterRatesAmount = converted;
+
+      const status = await WebHooks.registerDPOSales(
+        findTransaction,
+        user,
+        req,
+        res
+      );
+
+      if (status === true) {
+        await billingService.updateSubscription(user.email, {
+          state: "current",
+        });
+        return res
+          .set("Content-Type", "text/xml")
+          .send(xml({ API3G: [{ Response: "OK" }] }));
+      }
+    } catch (error) {
+      return util.setErrorResponse(
+        res,
+        `Server Error ${error || error.message}`,
+        500
+      );
+    }
   }
 }

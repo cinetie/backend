@@ -13,6 +13,7 @@ import stopLoginSessions from "./helpers/stopLoginSessions";
 import calculateEarnings from "./helpers/calculateEarning";
 import routes from "./routes";
 import endSubscription from "./helpers/endSubscription";
+import xmlparser from "express-xml-bodyparser";
 
 config();
 cron.schedule("0 0 0 * * *", async () => {
@@ -46,6 +47,7 @@ app.enable("trust proxy");
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(xmlparser());
 app.use(
   fileUpload({
     useTempFiles: true,

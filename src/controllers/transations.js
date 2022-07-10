@@ -7,6 +7,9 @@ import Fetch from "../helpers/fetch";
 import jwt from "../helpers/jwt";
 import Users from "../services/userServices";
 import Subscriptions from "../services/billingServices";
+import moment from "moment";
+import axios from "axios";
+import { parseString } from "xml2js";
 
 const util = new Util();
 class transactionsController {
@@ -50,47 +53,85 @@ class transactionsController {
 
   static async getRaveStandardLink(req, res) {
     try {
-      const token = jwt.jwtSign(
-        { role: "main-api", user: req.user },
-        process.env.SECRET,
-        1000
-      );
       const user = await Users.getUserByMail(req.user);
       const currentSubscription = await Subscriptions.getCurrentSubscription(
         user.email,
         "pending"
       );
-      const txRef = uuid();
-      const raw = await Fetch(
-        {
-          plan: user.plan,
-          isBilledAnnually: user.isBilledAnnually,
-          email: user.email,
-          name: `${user.firstName} ${user.lastName}`,
-          paymentOptions: "card",
-          txRef,
+
+      console.log(currentSubscription, "++++++++++++++++++++++++++++ CURRENT");
+
+      var currentDate = new Date();
+
+      const xmlBodyStr = `
+        <API3G>
+          <CompanyToken>${process.env.PAYMENT_COMPANY_TOKEN}</CompanyToken>
+          <Request>createToken</Request>
+          <Transaction>
+              <PaymentAmount>${
+                currentSubscription.dataValues.price
+              }</PaymentAmount>
+              <PaymentCurrency>USD</PaymentCurrency>
+              <CompanyRef>49FKEOA</CompanyRef>
+              <RedirectURL>https://www.cinetie.com/account/payment</RedirectURL>
+              <BackURL>https://www.cinetie.com/account/payment</BackURL>
+              <CompanyRefUnique>0</CompanyRefUnique>
+              <PTL>15</PTL>
+              <PTLtype>hours</PTLtype>
+              <customerEmail>${user.dataValues.email}</customerEmail>
+              <AllowRecurrent>1</AllowRecurrent>
+          </Transaction>
+          <Services>
+              <Service>
+                  <ServiceType>${currentSubscription.serviceCode}</ServiceType>
+                  <ServiceDescription>${
+                    currentSubscription.dataValues.plan
+                  }</ServiceDescription>
+                  <ServiceDate>${`${currentDate.getFullYear()}/${
+                    currentDate.getMonth() + 1
+                  }/${currentDate.getDate()} ${currentDate.getHours()}:${moment(
+                    currentDate
+                  ).format("mm")}`}</ServiceDate>
+              </Service>
+          </Services>
+        </API3G>`;
+
+      var config = {
+        headers: {
+          "Content-Type": "text/xml",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
         },
-        {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        `${process.env.PAY_HOST}/charge/rave-standard`,
-        "POST"
-      );
-      if (raw.status === 200) {
+      };
+      const { self, status } = await axios
+        .post("https://secure.3gdirectpay.com/API/v6/", xmlBodyStr, config)
+        .then((response) => {
+          let self;
+          const status = response.status;
+          parseString(response.data, (err, result) => {
+            self = result;
+          });
+          return { self, status };
+        });
+
+      if (status === 200) {
+        console.log(self, "++++++++++++++++++++++++ SELF");
         await payment.recordTransaction(
-          user,
-          currentSubscription,
-          txRef,
-          "pending"
+          user.email,
+          currentSubscription.dataValues.price,
+          self.API3G.TransRef[0],
+          "pending",
+          self.API3G.TransToken[0]
         );
+
         util.setSuccessResponse(res, "Link generated", 201, {
-          link: raw.data.link,
+          link: `https://secure.3gdirectpay.com/dpopayment.php?ID=${self.API3G.TransToken[0]}`,
         });
       } else {
         util.setErrorResponse(res, "Something went wrong", 400);
       }
     } catch (error) {
+      console.log(error, "+++++++++++++++++++++++ ERROR");
       util.setErrorResponse(res, error, 500);
     }
   }
@@ -141,6 +182,7 @@ class transactionsController {
       }
       return util.setErrorResponse(res, "Something went wrong", 400, raw);
     } catch (error) {
+      console.log("+++++++++++++++++++++++++++++++ ERRROR DDDD");
       return util.setErrorResponse(res, error, 500);
     }
   }

@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       numberOfScreens: DataTypes.STRING,
       monthlyPrice: DataTypes.FLOAT,
       yearlyPrice: DataTypes.FLOAT,
+      serviceCode: DataTypes.FLOAT,
     },
     {}
   );

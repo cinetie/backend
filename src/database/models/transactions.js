@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
       currency: DataTypes.STRING,
       paidAmount: DataTypes.STRING,
       transactionId: DataTypes.STRING,
+      transToken: DataTypes.STRING,
     },
     {}
   );

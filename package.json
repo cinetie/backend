@@ -45,6 +45,7 @@
     "express": "^4.16.3",
     "express-fileupload": "^1.1.6-alpha.6",
     "express-session": "^1.16.2",
+    "express-xml-bodyparser": "^0.3.0",
     "flutterwave-node-v3": "^1.0.6",
     "generate-password": "^1.6.0",
     "image-size": "^0.8.3",
@@ -77,7 +78,9 @@
     "superagent": "^5.2.1",
     "unique-username-generator": "^1.0.1",
     "uuid": "^3.4.0",
-    "vimeo": "^2.1.1"
+    "vimeo": "^2.1.1",
+    "xml": "^1.0.1",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.3",
