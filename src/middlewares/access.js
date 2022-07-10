@@ -76,6 +76,7 @@ class Access {
         next();
       }
     } catch (error) {
+      console.log("+++++++++++++++++++++++++++++++ ERRROR")
       util.setErrorResponse(res, error.message, 500);
     }
   }

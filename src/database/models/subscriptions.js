@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       state: DataTypes.STRING,
       phoneNumber: DataTypes.STRING,
       trialEnds: DataTypes.BIGINT,
+      serviceCode: DataTypes.FLOAT,
     },
     {}
   );

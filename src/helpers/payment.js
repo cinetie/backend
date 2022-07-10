@@ -62,16 +62,20 @@ class payment {
       data.plan = details.plan;
       data.state = "pending";
       data.phoneNumber = details.phoneNumber;
+      data.serviceCode = plan.serviceCode;
+
       if (details.isBilledAnnually === true) {
         data.endDate = date.addMoreDays(365).toDateString();
       } else {
         data.endDate = date.addMoreDays(30).toDateString();
       }
       data.paymentMethod = details.paymentMethod;
+
       const user = await userService.getUserByMail(details.email);
       // if (user.isOnTrial === true) {
       //   data.trialEnds = date.addMoreDays(5).getTime();
       // }
+
       const bill = await billingService.registerSubscription(data);
       if (bill) {
         return bill;
@@ -102,12 +106,19 @@ class payment {
     }
   }
 
-  static async recordTransaction(user, details, requestId, status) {
+  static async recordTransaction(
+    email,
+    price,
+    transactionId,
+    status,
+    transToken
+  ) {
     const result = await transactions.createTransaction({
-      email: user.email,
+      email: email,
       statusDesc: status,
-      paidAmount: details.price,
-      transactionId: requestId,
+      paidAmount: price,
+      transactionId: transactionId,
+      transToken: transToken,
       currency: "USD",
     });
     return result;

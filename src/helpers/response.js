@@ -13,3 +13,4 @@ const errorResponse = (res, status, message = null, error = null) =>
   });
 
 export default { successResponse, errorResponse };
+
