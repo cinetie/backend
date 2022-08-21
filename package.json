@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "Movies for everybody",
   "main": "index.js",
-  "engines": {
-    "npm": "please-use-yarn",
+  "enginesStrict": {
     "yarn": ">= 1.19.1"
   },
   "scripts": {

@@ -4,7 +4,6 @@ src/dist
 storage-cinetie-1ccfe2a73bd4.json
 test.json
 yarn-error.log
-yarn.lock
 yarn.ts
 .nyc_output/
 .vscode/
