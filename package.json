@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Movies for everybody",
   "main": "index.js",
+  "engines": {
+    "npm": "please-use-yarn",
+    "yarn": ">= 1.19.1"
+  },
   "scripts": {
     "build": "rm -rf ./src/dist && babel ./src/. --out-dir ./src/dist --copy-files",
     "start": "export NODE_ENV=staging && npm run migrate:staging && node  ./src/dist/index.js",
