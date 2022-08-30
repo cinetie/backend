@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "Movies for everybody",
   "main": "index.js",
-  "enginesStrict": {
-    "yarn": ">= 1.19.1"
+  "engines": {
+    "yarn": ">= 1.19.1",
+    "node": "14"
   },
   "scripts": {
     "build": "rm -rf ./src/dist && babel ./src/. --out-dir ./src/dist --copy-files",
