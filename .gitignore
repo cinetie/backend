@@ -8,6 +8,5 @@ yarn.ts
 .nyc_output/
 .vscode/
 coverage
-env*
 req.rest
 package-lock.json
