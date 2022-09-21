@@ -25,6 +25,17 @@ class transactionService {
     }
   }
 
+  static async getByNumberId(number) {
+    const data = await database.transactions.findOne({
+      where: {
+        transactionId: {
+          [op.like]: `%${number}%`,
+        },
+      },
+    });
+    return data;
+  }
+
   static async getTransactionsByEmail(email, statusDesc) {
     try {
       const data = await database.transactions.findAll({

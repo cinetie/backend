@@ -164,21 +164,16 @@ export default class WebHooks {
 
   static async DPOwebhook(req, res) {
     try {
-      const findTransaction = await transactions.getTransactionById(
-        req.body.api3g.transactionref[0]
+      const findTransaction = await transactions.getByNumberId(
+        req.body.api3g.customerphone[0]
       );
       if (!findTransaction) {
         return res
           .set("Content-Type", "text/xml")
           .send(xml({ API3G: [{ Response: "OK" }] }));
       }
-      if (findTransaction.transToken !== req.body.api3g.transactiontoken[0]) {
-        return res
-          .set("Content-Type", "text/xml")
-          .send(xml({ API3G: [{ Response: "OK" }] }));
-      }
 
-      await transactions.updateTransaction(req.body.api3g.transactionref[0], {
+      await findTransaction.update({
         statusDesc: "approved",
       });
 

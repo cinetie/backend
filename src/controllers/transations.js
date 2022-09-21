@@ -119,7 +119,7 @@ class transactionsController {
         await payment.recordTransaction(
           user.email,
           currentSubscription.dataValues.price,
-          self.API3G.TransRef[0],
+          user.phoneNumber,
           "pending",
           self.API3G.TransToken[0]
         );
