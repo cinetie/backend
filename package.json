@@ -78,7 +78,7 @@
     "request": "^2.88.0",
     "sequelize": "^6.6.5",
     "sinon": "^9.2.1",
-    "snyk": "^1.685.0",
+    "snyk": "^1.1035.0",
     "superagent": "^5.2.1",
     "unique-username-generator": "^1.0.1",
     "uuid": "^3.4.0",
