@@ -52,7 +52,7 @@
     "express-xml-bodyparser": "^0.3.0",
     "flutterwave-node-v3": "^1.0.6",
     "generate-password": "^1.6.0",
-    "image-size": "^0.8.3",
+    "image-size": "^0.9.7",
     "ioredis": "^4.27.9",
     "iplocation": "^6.1.0",
     "jsonwebtoken": "^8.5.1",
