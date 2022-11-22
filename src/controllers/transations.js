@@ -125,7 +125,7 @@ class transactionsController {
         );
 
         util.setSuccessResponse(res, "Link generated", 201, {
-          link: `https://secure.3gdirectpay.com/dpopayment.php?ID=${self.API3G.TransToken[0]}`,
+          link: `https://secure.3gdirectpay.com/pay.asp?ID=${self.API3G.TransToken[0]}`,
         });
       } else {
         util.setErrorResponse(res, "Something went wrong", 400);
