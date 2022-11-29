@@ -73,8 +73,8 @@ class transactionsController {
               }</PaymentAmount>
               <PaymentCurrency>USD</PaymentCurrency>
               <CompanyRef>49FKEOA</CompanyRef>
-              <RedirectURL>https://www.cinetie.com/account/payment</RedirectURL>
-              <BackURL>https://www.cinetie.com/account/payment</BackURL>
+              <RedirectURL>https://www.cinetie.com/h/home</RedirectURL>
+              <BackURL>https://www.cinetie.com</BackURL>
               <CompanyRefUnique>0</CompanyRefUnique>
               <PTL>15</PTL>
               <PTLtype>hours</PTLtype>
