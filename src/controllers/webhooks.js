@@ -163,6 +163,9 @@ export default class WebHooks {
   }
 
   static async DPOwebhook(req, res) {
+    console.log("================ body start ===============");
+    console.log(req.body)
+    console.log("================ body end =================");
     try {
       const findTransaction = await transactions.getByNumberId(
         req.body.api3g.customerphone[0]

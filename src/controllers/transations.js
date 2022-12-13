@@ -73,8 +73,8 @@ class transactionsController {
               }</PaymentAmount>
               <PaymentCurrency>USD</PaymentCurrency>
               <CompanyRef>49FKEOA</CompanyRef>
-              <RedirectURL>https://www.cinetie.com/account/payment</RedirectURL>
-              <BackURL>https://www.cinetie.com/account/payment</BackURL>
+              <RedirectURL>https://www.cinetie.com/h/home</RedirectURL>
+              <BackURL>https://www.cinetie.com</BackURL>
               <CompanyRefUnique>0</CompanyRefUnique>
               <PTL>15</PTL>
               <PTLtype>hours</PTLtype>
@@ -104,7 +104,7 @@ class transactionsController {
         },
       };
       const { self, status } = await axios
-        .post("https://secure.3gdirectpay.com/API/v6/", xmlBodyStr, config)
+        .post(process.env.DPO_GET_TOKEN, xmlBodyStr, config)
         .then((response) => {
           let self;
           const status = response.status;
@@ -125,7 +125,7 @@ class transactionsController {
         );
 
         util.setSuccessResponse(res, "Link generated", 201, {
-          link: `https://secure.3gdirectpay.com/dpopayment.php?ID=${self.API3G.TransToken[0]}`,
+          link: `${process.env.DPO_GENERATED_LINK}?ID=${self.API3G.TransToken[0]}`,
         });
       } else {
         util.setErrorResponse(res, "Something went wrong", 400);
