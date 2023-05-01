@@ -87,9 +87,5 @@ jobs:
         uses: supercharge/redis-github-action@1.2.0
         with:
           redis-version: ${{matrix.redis-version}}
-      - name: Set up MySQL
-        run: |
-        sudo /etc/init.d/mysql start
-        mysql -e 'CREATE DATABASE ${{ env.MYSQL_DATABASE }};' -u${{ env.MYSQL_USER }} -p${{ env.MYSQL_PASSWORD }}
       - run: npm install
       - run: npm test
