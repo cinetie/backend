@@ -79,6 +79,9 @@ jobs:
       SUBTITLE_BUCKET: cinetie-subtitles
 
     steps:
+      - run: |
+        sudo /etc/init.d/mysql start
+        mysql -e 'CREATE DATABASE ${{ env.MYSQL_DATABASE }};' -u${{ env.MYSQL_USER }} -p${{ env.MYSQL_PASSWORD }}
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
