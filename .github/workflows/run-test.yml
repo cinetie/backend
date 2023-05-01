@@ -82,7 +82,7 @@ jobs:
       - name: Start MySQL Server
         run: sudo /etc/init.d/mysql start
       - name: Create Database
-        run: mysql -e 'CREATE DATABASE ${{ env.MYSQL_DATABASE }};' -u${{ env.MYSQL_USER }} -p${{ env.MYSQL_PASSWORD }}
+        run: mysql -e 'CREATE DATABASE ${{ env.MYSQL_DATABASE }};' -uroot -proot
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
