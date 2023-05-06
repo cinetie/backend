@@ -77,7 +77,6 @@ jobs:
       THUMBNAIL_BUCKET: vod-pipeline-3-thumbnails
       TRAILERS_BUCKET: vod-pipeline-3-trailers
       SUBTITLE_BUCKET: cinetie-subtitles
-
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
