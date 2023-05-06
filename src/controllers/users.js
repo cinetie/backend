@@ -22,6 +22,7 @@ import RavePaymentRequest from "../helpers/RavePaymentRequest";
 import MailingServices from "../services/mailingServices";
 import AmbassadorServices from '../services/ambassadorServices';
 import PromoCodeServices from '../services/promoCodeServices';
+import { createCustomer } from "../helpers/stripe";
 
 config()
 const util = new Util();
@@ -57,6 +58,18 @@ class userController {
           process.env.SECRET,
           "1d"
         );
+        const stripeUser = await createCustomer(createdUser.email);
+        if (stripeUser) {
+          await userService.updateUser(createdUser.email, {
+            stripeId: stripeUser.id,
+          });
+        } else {
+          return util.setErrorResponse(
+            res,
+            "Something went wrong, please try again",
+            500
+          );
+        }
         createdUser.token = userToken;
         delete createdUser.password;
         await MailingServices.addToMailingList(createdUser.email);

@@ -5,7 +5,6 @@ import auth from "../controllers/users";
 import access from "../middlewares/access";
 import billing from "../middlewares/billing";
 import isAdmin from "../middlewares/isAdmin";
-import screenValidator from "../middlewares/screenValidation";
 import * as validation from "../middlewares/validation/user";
 import checkCredentials from "../middlewares/checkCredentials";
 import updateSubscription from "../middlewares/updateSubscription";

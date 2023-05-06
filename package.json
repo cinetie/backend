@@ -5,12 +5,12 @@
   "main": "index.js",
   "engines": {
     "yarn": ">= 1.19.1",
-    "node": "14"
+    "node": ">=14"
   },
   "scripts": {
     "build": "rm -rf ./src/dist && babel ./src/. --out-dir ./src/dist --copy-files",
-    "start": "export NODE_ENV=staging && npm run migrate:staging && node  ./src/dist/index.js",
-    "start-prod": "export NODE_ENV=production && npm run migrate && npm run build && node  ./src/dist/index.js",
+    "staging": "export NODE_ENV=staging && npm run migrate:staging && node  ./src/dist/index.js",
+    "start": "export NODE_ENV=production && npm run migrate && npm run build && node  ./src/dist/index.js",
     "dev": "cross-env NODE_ENV=development nodemon --exec babel-node src/index.js",
     "migrate": "sequelize db:migrate --env production ",
     "migrate:dev": "sequelize db:migrate --env development",
@@ -30,7 +30,7 @@
     "@babel/polyfill": "^7.8.3",
     "@hapi/joi": "^15.1.1",
     "@mailchimp/mailchimp_marketing": "^3.0.44",
-    "aws-sdk": "^2.814.0",
+    "aws-sdk": "^2.1258.0",
     "axios": "^0.21.3",
     "Base64": "^1.1.0",
     "bcrypt": "^5.0.0",
@@ -55,7 +55,7 @@
     "image-size": "^0.8.3",
     "ioredis": "^4.27.9",
     "iplocation": "^6.1.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
     "md5": "2.2.1",
     "moment": "^2.24.0",
@@ -64,7 +64,7 @@
     "mysql2": "2.1.0",
     "node-cron": "^2.0.3",
     "node-fetch": "^2.6.0",
-    "node-forge": "^0.10.0",
+    "node-forge": "^1.3.0",
     "nodemailer": "^6.4.16",
     "nodemailer-express-handlebars": "^5.0.0",
     "passport": "^0.4.0",
@@ -76,15 +76,16 @@
     "pg": "^7.17.1",
     "pg-hstore": "^2.3.3",
     "request": "^2.88.0",
-    "sequelize": "^6.6.5",
+    "sequelize": "^6.25.7",
     "sinon": "^9.2.1",
     "snyk": "^1.1032.0",
+    "stripe": "^12.0.0",
     "superagent": "^5.2.1",
     "unique-username-generator": "^1.0.1",
     "uuid": "^3.4.0",
     "vimeo": "^2.1.1",
     "xml": "^1.0.1",
-    "xml2js": "^0.4.23"
+    "xml2js": "^0.5.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.3",

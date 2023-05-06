@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       isOnExtension: DataTypes.BOOLEAN,
       isOnPromo: DataTypes.BOOLEAN,
       promoCode: DataTypes.STRING,
+      stripeId: DataTypes.STRING,
     },
     {}
   );
