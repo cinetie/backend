@@ -1,0 +1,13 @@
+{
+    "cluster": "webhooks",
+    "service": "stripe",
+    "deploymentConfiguration": {
+        "deploymentCircuitBreaker": {
+            "enable": true,
+            "rollback": true
+        },
+        "maximumPercent": 200,
+        "minimumHealthyPercent": 50,
+        "type": "CODE_DEPLOY"
+    }
+}
