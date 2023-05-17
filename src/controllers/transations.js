@@ -95,6 +95,7 @@ class transactionsController {
       }
       return util.setErrorResponse(res, "Something went wrong", 400);
     } catch (error) {
+      console.log(`Error: ${error}`)
       return util.setErrorResponse(res, error, 500);
     }
   }
