@@ -63,12 +63,14 @@ class transactionsController {
       );
       const plan = await planServices.getParticalPlan(user.plan);
       const stripePlan = await getProduct(plan.stripeId);
-      let stripeUser = await getCustomer(user.stripeId);
-      if (!stripeUser) {
+      let stripeUser;
+      if (!user.stripeId) {
         stripeUser = await createCustomer(user.email);
         await Users.updateUser(user.email, {
           stripeId: stripeUser.id,
         });
+      } else {
+        stripeUser = await getCustomer(user.stripeId);
       }
       if (!stripePlan) {
         return util.setErrorResponse(res, "Something went wrong", 400);
