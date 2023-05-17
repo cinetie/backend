@@ -6,11 +6,13 @@ export const createCustomer = async (email) => {
   const customer = await stripe.customers.create({
     email,
   });
+  console.log(`INFO: STRIPE: CREATE: ${customer.id}`)
   return customer;
 };
 
 export const getCustomer = async (id) => {
   const customer = await stripe.customers.retrieve(id);
+  console.log(`INFO: STRIPE: GET: ${customer.id}`)
   return customer;
 };
 
