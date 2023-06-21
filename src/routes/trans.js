@@ -10,6 +10,11 @@ route.get(
   access.isNormalUser,
   controller.getRaveStandardLink
 );
+route.get(
+  "/rave-flutterwave",
+  access.isNormalUser,
+  controller.getFlutterwaveLink
+);
 route.put(
   "/cancel-subscription",
   access.isNormalUser,

@@ -114,11 +114,22 @@ class payment {
     transToken
   ) {
     const result = await transactions.createTransaction({
-      email: email,
+      email,
       statusDesc: status,
       paidAmount: price,
-      transactionId: transactionId,
-      transToken: transToken,
+      transactionId,
+      transToken,
+      currency: "USD",
+    });
+    return result;
+  }
+
+  static async recordFlutterwaveTransaction(user, details, requestId, status) {
+    const result = await transactions.createTransaction({
+      email: user.email,
+      statusDesc: status,
+      paidAmount: details.price,
+      transactionId: requestId,
       currency: "USD",
     });
     return result;
