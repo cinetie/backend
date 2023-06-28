@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import { v4 as uuid } from "uuid";
 import service from "../services/transactionService";
 import Util from "../helpers/utilities";
 import payment from "../helpers/payment";
@@ -63,12 +64,14 @@ class transactionsController {
       );
       const plan = await planServices.getParticalPlan(user.plan);
       const stripePlan = await getProduct(plan.stripeId);
-      let stripeUser = await getCustomer(user.stripeId);
-      if (!stripeUser) {
+      let stripeUser;
+      if (!user.stripeId) {
         stripeUser = await createCustomer(user.email);
         await Users.updateUser(user.email, {
           stripeId: stripeUser.id,
         });
+      } else {
+        stripeUser = await getCustomer(user.stripeId);
       }
       if (!stripePlan) {
         return util.setErrorResponse(res, "Something went wrong", 400);
@@ -95,8 +98,55 @@ class transactionsController {
       }
       return util.setErrorResponse(res, "Something went wrong", 400);
     } catch (error) {
-      console.log(`Error: ${error}`)
+      console.log(`Error: ${error}`);
       return util.setErrorResponse(res, error, 500);
+    }
+  }
+
+  static async getFlutterwaveLink(req, res) {
+    try {
+      const token = jwt.jwtSign(
+        { role: "main-api", user: req.user },
+        process.env.SECRET,
+        1000
+      );
+      const user = await Users.getUserByMail(req.user);
+      const currentSubscription = await Subscriptions.getCurrentSubscription(
+        user.email,
+        "pending"
+      );
+      const txRef = uuid();
+      const raw = await Fetch(
+        {
+          plan: user.plan,
+          isBilledAnnually: user.isBilledAnnually,
+          email: user.email,
+          name: `${user.firstName} ${user.lastName}`,
+          paymentOptions: "card",
+          txRef,
+        },
+        {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        `${process.env.PAY_HOST}/charge/rave-standard`,
+        "POST"
+      );
+      if (raw.status === 200) {
+        await payment.recordFlutterwaveTransaction(
+          user,
+          currentSubscription,
+          txRef,
+          "pending"
+        );
+        util.setSuccessResponse(res, "Link generated", 201, {
+          link: raw.data.link,
+        });
+      } else {
+        util.setErrorResponse(res, "Something went wrong", 400);
+      }
+    } catch (error) {
+      util.setErrorResponse(res, error, 500);
     }
   }
 
