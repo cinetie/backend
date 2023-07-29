@@ -31,8 +31,8 @@ export default async (
     });
     if (updates[1] > 0) {
       await payment.recordTransaction(
-        user,
-        currentSubscription,
+        user.email,
+        currentSubscription.price,
         requestData.txRef,
         "pending"
       );
