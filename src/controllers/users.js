@@ -497,8 +497,8 @@ class userController {
             });
             if (updates[1] > 0) {
               await payment.recordTransaction(
-                user,
-                currentSubscription,
+                user.email,
+                currentSubscription.price,
                 paymentData.txRef,
                 "pending"
               );
@@ -539,8 +539,8 @@ class userController {
           );
           if (pay.status === 200) {
             await payment.recordTransaction(
-              user,
-              currentSubscription,
+              user.email,
+              currentSubscription.price,
               txRef,
               "pending"
             );
@@ -566,8 +566,8 @@ class userController {
               });
               if (updates[1] === 1) {
                 await payment.recordTransaction(
-                  user,
-                  currentSubscription,
+                  user.email,
+                  currentSubscription.price,
                   pay.data.RequestId,
                   "pending"
                 );

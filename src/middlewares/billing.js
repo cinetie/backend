@@ -141,8 +141,8 @@ class billing {
               const currentSubscription =
                 await billingService.getCurrentSubscription(user.email);
               await payment.recordTransaction(
-                user,
-                currentSubscription,
+                user.email,
+                currentSubscription.price,
                 txRef,
                 "pending"
               );
@@ -182,7 +182,7 @@ class billing {
               if (pay.status === 200) {
                 // await payment.recordTransaction(user, details, pay);
                 await payment.recordTransaction(
-                  user,
+                  user.email,
                   details,
                   pay.data.RequestId,
                   "pending"
@@ -216,8 +216,8 @@ class billing {
               const currentSubscription =
                 await billingService.getCurrentSubscription(user.email);
               await payment.recordTransaction(
-                user,
-                currentSubscription,
+                user.email,
+                currentSubscription.price,
                 txRef,
                 "pending"
               );
@@ -252,8 +252,8 @@ class billing {
               const currentSubscription =
                 await billingService.getCurrentSubscription(user.email);
               await payment.recordTransaction(
-                user,
-                currentSubscription,
+                user.email,
+                currentSubscription.price,
                 txRef,
                 "pending"
               );
@@ -289,8 +289,8 @@ class billing {
               const currentSubscription =
                 await billingService.getCurrentSubscription(user.email);
               await payment.recordTransaction(
-                user,
-                currentSubscription,
+                user.email,
+                currentSubscription.price,
                 txRef,
                 "pending"
               );
@@ -326,8 +326,8 @@ class billing {
               const currentSubscription =
                 await billingService.getCurrentSubscription(user.email);
               await payment.recordTransaction(
-                user,
-                currentSubscription,
+                user.email,
+                currentSubscription.price,
                 txRef,
                 "pending"
               );
@@ -363,8 +363,8 @@ class billing {
               const currentSubscription =
                 await billingService.getCurrentSubscription(user.email);
               await payment.recordTransaction(
-                user,
-                currentSubscription,
+                user.email,
+                currentSubscription.price,
                 txRef,
                 "pending"
               );
@@ -400,8 +400,8 @@ class billing {
               const currentSubscription =
                 await billingService.getCurrentSubscription(user.email);
               await payment.recordTransaction(
-                user,
-                currentSubscription,
+                user.email,
+                currentSubscription.price,
                 txRef,
                 "pending"
               );
@@ -437,8 +437,8 @@ class billing {
               const currentSubscription =
                 await billingService.getCurrentSubscription(user.email);
               await payment.recordTransaction(
-                user,
-                currentSubscription,
+                user.email,
+                currentSubscription.email,
                 txRef,
                 "pending"
               );
