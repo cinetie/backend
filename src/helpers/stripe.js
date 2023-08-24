@@ -6,13 +6,13 @@ export const createCustomer = async (email) => {
   const customer = await stripe.customers.create({
     email,
   });
-  console.log(`INFO: STRIPE: CREATE: ${customer.id}`)
+  console.log(`INFO: STRIPE: CREATE: ${customer.id}`);
   return customer;
 };
 
 export const getCustomer = async (id) => {
   const customer = await stripe.customers.retrieve(id);
-  console.log(`INFO: STRIPE: GET: ${customer.id}`)
+  console.log(`INFO: STRIPE: GET: ${customer.id}`);
   return customer;
 };
 
@@ -35,4 +35,23 @@ export const getSubscription = async (id) => {
 export const getProduct = async (id) => {
   const product = await stripe.products.retrieve(id);
   return product;
+};
+
+export const updateSubscription = async (id, priceId) => {
+  const subscription = await stripe.subscriptions.update(id, {
+    items: [{ price: priceId }],
+  });
+  return subscription;
+};
+
+export const getUserSubscriptions = async (customerId) => {
+  const subscriptions = await stripe.subscriptions.list({
+    customer: customerId,
+  });
+  return subscriptions;
+};
+
+export const cancelSubscription = async (id) => {
+  const subscription = await stripe.subscriptions.del(id);
+  return subscription;
 };

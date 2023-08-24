@@ -12,6 +12,8 @@ import {
   getCustomer,
   createCustomer,
   getProduct,
+  getUserSubscriptions,
+  cancelSubscription,
 } from "../helpers/stripe";
 import planServices from "../services/planServices";
 
@@ -62,8 +64,10 @@ class transactionsController {
         user.email,
         "pending"
       );
+      await Users.updateUser(user.email, { permissionLevel: -1 });
       const plan = await planServices.getParticalPlan(user.plan);
       const stripePlan = await getProduct(plan.stripeId);
+      console.log(stripePlan, "==================");
       let stripeUser;
       if (!user.stripeId) {
         stripeUser = await createCustomer(user.email);
@@ -72,10 +76,17 @@ class transactionsController {
         });
       } else {
         stripeUser = await getCustomer(user.stripeId);
+        const subscriptions = await getUserSubscriptions(stripeUser.id);
+        await Promise.all(
+          subscriptions.data.map((sub) => {
+            return cancelSubscription(sub.id);
+          })
+        );
       }
       if (!stripePlan) {
         return util.setErrorResponse(res, "Something went wrong", 400);
       }
+
       const stripeSubscription = await createSubscription(
         stripeUser.id,
         stripePlan.default_price
@@ -86,7 +97,7 @@ class transactionsController {
       if (stripeSubscription) {
         await payment.recordTransaction(
           user.email,
-          currentSubscription.dataValues.price,
+          currentSubscription?.price,
           user.phoneNumber,
           "pending",
           stripeSubscription.id
