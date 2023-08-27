@@ -1,19 +1,19 @@
 /* eslint-disable no-console */
 import "@babel/polyfill";
+import path from "path";
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import morgan from "morgan";
 import cron from "node-cron";
 import { config } from "dotenv";
-import path from "path";
 import fileUpload from "express-fileupload";
+import xmlparser from "express-xml-bodyparser";
 import response from "./helpers/response";
 import stopLoginSessions from "./helpers/stopLoginSessions";
 import calculateEarnings from "./helpers/calculateEarning";
 import routes from "./routes";
 import endSubscription from "./helpers/endSubscription";
-import xmlparser from "express-xml-bodyparser";
 
 config();
 cron.schedule("0 0 0 * * *", async () => {

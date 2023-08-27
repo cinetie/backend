@@ -155,7 +155,6 @@ class transactionsController {
   static async cancelSubscription(req, res) {
     try {
       const email = req.user;
-      const { permissionLevel } = req.fullUser;
       const user = await userService.getUserByMail(email);
       const subscription = await Subscriptions.getCurrentSubscription(email);
       if (!subscription) {
@@ -165,55 +164,40 @@ class transactionsController {
           400
         );
       }
-      if (permissionLevel === -2) {
-        return util.setErrorResponse(
-          res,
-          "your subscription is already canceled",
-          400
+      await Subscriptions.updateSubscription(email, {
+        state: "cancelled",
+      });
+      if (subscription.paymentMethod === 2) {
+        if (user.stripeId) {
+          const stripeUser = await getCustomer(user.stripeId);
+          const subscriptions = await getUserSubscriptions(stripeUser.id);
+          await Promise.all(
+            subscriptions.data.map((sub) => {
+              return this.cancelSubscription(sub.id);
+            })
+          );
+          return util.setSuccessResponse(res, "Subscription cancelled", 200);
+        }
+        const token = jwt.jwtSign(
+          { role: "main-api", user: email },
+          process.env.SECRET,
+          1000
         );
-      }
-
-      const token = jwt.jwtSign(
-        { role: "main-api", user: email },
-        process.env.SECRET,
-        1000
-      );
-      if (subscription.paymentMethod === 3) {
-        const userUpdate = await Users.updateUser(email, {
-          permissionLevel: -2,
-        });
-        const subscriptionUpdate = await Subscriptions.updateSubscription(
-          email,
-          { state: "canceled" }
+        const raw = await Fetch(
+          { email },
+          {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          `${process.env.PAY_HOST}/charge/cancel-subscription`,
+          "PUT"
         );
-        return util.setSuccessResponse(res, "Cancelled", 200, {
-          userUpdate,
-          subscriptionUpdate,
-        });
+        if (raw.status === 201) {
+          return util.setSuccessResponse(res, "Subscription cancelled", 200);
+        }
+        return util.setErrorResponse(res, "Something went wrong", 400, raw);
       }
-      if (user.stripeId) {
-        const stripeUser = await getCustomer(user.stripeId);
-        const subscriptions = await getUserSubscriptions(stripeUser.id);
-        await Promise.all(
-          subscriptions.data.map((sub) => {
-            return this.cancelSubscription(sub.id);
-          })
-        );
-      }
-      const raw = await Fetch(
-        { email },
-        {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        `${process.env.PAY_HOST}/charge/cancel-subscription`,
-        "PUT"
-      );
-      if (raw.status === 201) {
-        await Users.updateUser(email, { permissionLevel: -2 });
-        return util.setSuccessResponse(res, raw.message, raw.status);
-      }
-      return util.setErrorResponse(res, "Something went wrong", 400, raw);
+      return util.setSuccessResponse(res, "Subscription cancelled", 200);
     } catch (error) {
       console.log("+++++++++++++++++++++++++++++++ ERRROR DDDD");
       return util.setErrorResponse(res, error, 500);

@@ -4,7 +4,11 @@ import db from "../database/models";
 const stopLoginSessions = async () => {
   const subscription = await db.subscriptions.findAll({
     where: {
-      [Op.or]: [{ state: "current" }, { state: "pending" }],
+      [Op.or]: [
+        { state: "current" },
+        { state: "pending" },
+        { state: "cancelled" },
+      ],
     },
   });
   subscription.forEach(async (sub) => {
@@ -13,14 +17,15 @@ const stopLoginSessions = async () => {
         { permissionLevel: -1 },
         { where: { email: sub.email } }
       );
-      sub.state === "pending" &&
-        (await db.subscriptions.update(
+      if (sub.state === "pending") {
+        await db.subscriptions.update(
           { state: "canceled" },
           {
             returning: true,
             where: { id: sub.id },
           }
-        ));
+        );
+      }
     }
   });
 };
