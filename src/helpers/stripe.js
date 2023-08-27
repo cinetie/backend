@@ -36,3 +36,15 @@ export const getProduct = async (id) => {
   const product = await stripe.products.retrieve(id);
   return product;
 };
+
+export const getUserSubscriptions = async (customerId) => {
+  const subscriptions = await stripe.subscriptions.list({
+    customer: customerId,
+  });
+  return subscriptions;
+};
+
+export const cancelSubscription = async (id) => {
+  const subscription = await stripe.subscriptions.del(id);
+  return subscription;
+};

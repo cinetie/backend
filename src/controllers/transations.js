@@ -12,8 +12,10 @@ import {
   getCustomer,
   createCustomer,
   getProduct,
+  getUserSubscriptions,
 } from "../helpers/stripe";
 import planServices from "../services/planServices";
+import userService from "../services/userServices";
 
 const util = new Util();
 class transactionsController {
@@ -154,7 +156,15 @@ class transactionsController {
     try {
       const email = req.user;
       const { permissionLevel } = req.fullUser;
-      const subscription = await Subscriptions.getSubscriptionByEmail(email);
+      const user = await userService.getUserByMail(email);
+      const subscription = await Subscriptions.getCurrentSubscription(email);
+      if (!subscription) {
+        return util.setErrorResponse(
+          res,
+          "You don't have an active subscription",
+          400
+        );
+      }
       if (permissionLevel === -2) {
         return util.setErrorResponse(
           res,
@@ -180,6 +190,15 @@ class transactionsController {
           userUpdate,
           subscriptionUpdate,
         });
+      }
+      if (user.stripeId) {
+        const stripeUser = await getCustomer(user.stripeId);
+        const subscriptions = await getUserSubscriptions(stripeUser.id);
+        await Promise.all(
+          subscriptions.data.map((sub) => {
+            return this.cancelSubscription(sub.id);
+          })
+        );
       }
       const raw = await Fetch(
         { email },
