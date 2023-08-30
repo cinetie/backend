@@ -1,19 +1,23 @@
 /* eslint-disable no-console */
 import "@babel/polyfill";
+import path from "path";
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import morgan from "morgan";
 import cron from "node-cron";
 import { config } from "dotenv";
-import path from "path";
 import fileUpload from "express-fileupload";
+import xmlparser from "express-xml-bodyparser";
 import response from "./helpers/response";
 import stopLoginSessions from "./helpers/stopLoginSessions";
 import calculateEarnings from "./helpers/calculateEarning";
 import routes from "./routes";
 import endSubscription from "./helpers/endSubscription";
-import xmlparser from "express-xml-bodyparser";
+import { getExpiredSubscriptions } from "./services/subscriptionService";
+import planServices from "./services/planServices";
+import transactionService from "./services/transactionService";
+import userService from "./services/userServices";
 
 config();
 cron.schedule("0 0 0 * * *", async () => {
@@ -40,6 +44,36 @@ cron.schedule(
     timezone: "Africa/Cairo",
   }
 );
+cron.schedule("0 */6 * * *", async () => {
+  console.log("cron started");
+  try {
+    const subs = await getExpiredSubscriptions();
+    subs.forEach(async (subscription) => {
+      const latestTransaction =
+        await transactionService.getRecentTransactionsByEmail(
+          subscription.email,
+          "pending"
+        );
+      if (latestTransaction) {
+        console.log("already have a pending transaction");
+        return;
+      }
+      const plan = await planServices.getParticalPlan(subscription.plan);
+      const user = await userService.getUser(subscription.email);
+      await transactionService.createTransaction({
+        currency: "USD",
+        paidAmount: user.isBilledAnnually
+          ? plan.yearlyPrice
+          : plan.monthlyPrice,
+        email: user.email,
+        statusDesc: "pending",
+      });
+    });
+  } catch (error) {
+    console.error(error);
+    console.error("An error occured while creating user transactions");
+  }
+});
 const app = express();
 
 app.enable("trust proxy");
