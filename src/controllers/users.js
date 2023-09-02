@@ -244,6 +244,7 @@ class userController {
     try {
       const { token, id } = req.query;
       jwt.jwtVerify(token, process.env.SECRET);
+      // eslint-disable-next-line no-underscore-dangle
       const user_ = await userService.getUserById(id);
       if (!user_)
         response.errorResponse(res, 404, "User not found!", "user undefined");
@@ -336,6 +337,8 @@ class userController {
       const { paymentMethod } = req.body;
       if (!user) util.setErrorResponse(res, "Can't find that user", 422);
       const newInfo = req.body;
+      const { type } = req.query;
+      if (type === "change") newInfo.permissionLevel = -1;
       if (paymentMethod !== undefined || paymentMethod !== null) {
         await billingServices.updateSubscription(decoded.email, {
           paymentMethod,
@@ -358,12 +361,7 @@ class userController {
         req.headers.authorization.slice(7),
         process.env.SECRET
       );
-      const currentSubscription = await billingServices.getCurrentSubscription(
-        email
-      );
-      const pendingSubscription = await billingServices.getPendingSubscription(
-        email
-      );
+      const { type } = req.query;
       const getSubscription = await billingServices.getSubscription(email);
       const today = new Date();
       const endDate = new Date(getSubscription ? getSubscription.endDate : "");
@@ -385,7 +383,7 @@ class userController {
           if (user.isOnPromo && user.plan.includes("discount")) {
             const ambassador =
               await AmbassadorServices.getAmbassadorByPromoCode(user.promoCode);
-            const result = await PromoCodeServices.addNewPromoUsage(
+            await PromoCodeServices.addNewPromoUsage(
               user.email,
               ambassador[0].email,
               user.plan
@@ -406,7 +404,8 @@ class userController {
         }
       } else if (
         getSubscription.state === "pending" ||
-        endDate.getTime() <= today.getTime()
+        endDate.getTime() <= today.getTime() ||
+        type === "change"
       ) {
         const user = await userService.getUserByMail(email);
         const { paymentMethod } = req.body;
@@ -417,6 +416,7 @@ class userController {
           phoneNumber: user.phoneNumber,
           isBilledAnnually: user.isBilledAnnually,
         };
+        if (type === "change") subscriptionData.state = "pending";
         const subscriptionDetails = await payment.updatePendingSubscription(
           subscriptionData
         );
@@ -458,6 +458,7 @@ class userController {
         );
       }
     } catch (error) {
+      console.log(error, "==========");
       util.setErrorResponse(
         res,
         `Something went sideways totally sideways contact support ${error}`,
@@ -943,6 +944,7 @@ class userController {
         email
       );
 
+      // eslint-disable-next-line no-underscore-dangle
       const _response = await userService.getUser(email);
       _response.paymentMethod = currentSubscription.paymentMethod;
       util.setSuccessResponse(res, "Found", 200, _response);

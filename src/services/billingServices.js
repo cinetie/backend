@@ -69,7 +69,7 @@ class billingServices {
     }
   }
 
-  static async getPendingSubscription(email, state) {
+  static async getPendingSubscription(email) {
     try {
       const currentSubs = await database.subscriptions.findOne({
         where: {
@@ -92,7 +92,7 @@ class billingServices {
     }
   }
 
-  static async getSubscription(email, state) {
+  static async getSubscription(email) {
     try {
       const currentSubs = await database.subscriptions.findOne({
         where: {
