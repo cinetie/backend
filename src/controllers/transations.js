@@ -5,7 +5,6 @@ import Util from "../helpers/utilities";
 import payment from "../helpers/payment";
 import Fetch from "../helpers/fetch";
 import jwt from "../helpers/jwt";
-import Users from "../services/userServices";
 import Subscriptions from "../services/billingServices";
 import {
   createSubscription,
@@ -16,6 +15,8 @@ import {
 } from "../helpers/stripe";
 import planServices from "../services/planServices";
 import userService from "../services/userServices";
+import AmbassadorServices from "../services/ambassadorServices";
+import PromoCodeServices from "../services/promoCodeServices";
 
 const util = new Util();
 class transactionsController {
@@ -59,17 +60,23 @@ class transactionsController {
 
   static async getRaveStandardLink(req, res) {
     try {
-      const user = await Users.getUserByMail(req.user);
+      const user = await userService.getUserByMail(req.user);
       const currentSubscription = await Subscriptions.getCurrentSubscription(
         user.email,
         "pending"
       );
-      const plan = await planServices.getParticalPlan(user.plan);
+      let plan = null;
+      const userUsedPromo = user.isOnPromo && user.plan.includes("discount");
+      if (userUsedPromo) {
+        plan = await planServices.getParticalPlan(user.plan.split("-")[0]);
+      } else {
+        plan = await planServices.getParticalPlan(user.plan);
+      }
       const stripePlan = await getProduct(plan.stripeId);
       let stripeUser;
       if (!user.stripeId) {
         stripeUser = await createCustomer(user.email);
-        await Users.updateUser(user.email, {
+        await userService.updateUser(user.email, {
           stripeId: stripeUser.id,
         });
       } else {
@@ -80,7 +87,8 @@ class transactionsController {
       }
       const stripeSubscription = await createSubscription(
         stripeUser.id,
-        stripePlan.default_price
+        stripePlan.default_price,
+        userUsedPromo
       );
       if (!stripeSubscription) {
         return util.setErrorResponse(res, "Something went wrong", 400);
@@ -93,7 +101,16 @@ class transactionsController {
           "pending",
           stripeSubscription.id
         );
-
+        if (user.isOnPromo) {
+          const ambassador = await AmbassadorServices.getAmbassadorByPromoCode(
+            user.promoCode
+          );
+          await PromoCodeServices.updatePromoCodeUtizationByEmail(
+            user.email,
+            ambassador[0].email,
+            { plan: user.plan }
+          );
+        }
         return util.setSuccessResponse(res, "Link generated", 201, {
           link: stripeSubscription.latest_invoice.hosted_invoice_url,
         });
@@ -112,7 +129,7 @@ class transactionsController {
         process.env.SECRET,
         1000
       );
-      const user = await Users.getUserByMail(req.user);
+      const user = await userService.getUserByMail(req.user);
       const currentSubscription = await Subscriptions.getCurrentSubscription(
         user.email,
         "pending"
@@ -233,7 +250,7 @@ class transactionsController {
         "PUT"
       );
       if (raw.status === 201) {
-        await Users.updateUser(email, { permissionLevel: 1 });
+        await userService.updateUser(email, { permissionLevel: 1 });
         return util.setSuccessResponse(res, raw.message, raw.status);
       }
       return util.setErrorResponse(res, raw.message, 400, raw);

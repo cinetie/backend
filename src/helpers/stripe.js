@@ -6,23 +6,24 @@ export const createCustomer = async (email) => {
   const customer = await stripe.customers.create({
     email,
   });
-  console.log(`INFO: STRIPE: CREATE: ${customer.id}`)
+  console.log(`INFO: STRIPE: CREATE: ${customer.id}`);
   return customer;
 };
 
 export const getCustomer = async (id) => {
   const customer = await stripe.customers.retrieve(id);
-  console.log(`INFO: STRIPE: GET: ${customer.id}`)
+  console.log(`INFO: STRIPE: GET: ${customer.id}`);
   return customer;
 };
 
-export const createSubscription = async (customerId, priceId) => {
+export const createSubscription = async (customerId, priceId, useCoupon) => {
   const subscription = await stripe.subscriptions.create({
     customer: customerId,
     items: [{ price: priceId }],
     payment_behavior: "default_incomplete",
     payment_settings: { save_default_payment_method: "on_subscription" },
     expand: ["latest_invoice.payment_intent"],
+    coupon: useCoupon ? process.env.STRIPE_PREMIUM_COUPON : undefined,
   });
   return subscription;
 };
