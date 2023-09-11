@@ -3,7 +3,7 @@
 /* eslint-disable consistent-return */
 import path from "path";
 import { v4 as uuid } from "uuid";
-import { config } from 'dotenv';
+import { config } from "dotenv";
 import userService from "../services/userServices";
 import tokenService from "../services/tokenService";
 import billingServices from "../services/billingServices";
@@ -20,17 +20,17 @@ import Rave from "../helpers/rave";
 import Fetch from "../helpers/fetch";
 import RavePaymentRequest from "../helpers/RavePaymentRequest";
 import MailingServices from "../services/mailingServices";
-import AmbassadorServices from '../services/ambassadorServices';
-import PromoCodeServices from '../services/promoCodeServices';
+import AmbassadorServices from "../services/ambassadorServices";
+import PromoCodeServices from "../services/promoCodeServices";
 import { createCustomer } from "../helpers/stripe";
 
-config()
+config();
 const util = new Util();
 class userController {
   static async signupUser(req, res) {
     try {
       const { promoCode } = req.body;
-      const  isOnPromo = promoCode ? true : false
+      const isOnPromo = !!promoCode;
       const newUser = userController.initializeVarsForSignup(req);
       const search = await userService.getUserByMail(newUser.email);
       if (search) {
@@ -382,9 +382,14 @@ class userController {
           subscriptionData
         );
         if (subscriptionDetails) {
-          if (user.isOnPromo && user.plan.includes('discount')) {
-            const ambassador = await AmbassadorServices.getAmbassadorByPromoCode(user.promoCode);
-            const result = await PromoCodeServices.addNewPromoUsage(user.email, ambassador[0].email, user.plan);
+          if (user.isOnPromo && user.plan.includes("discount")) {
+            const ambassador =
+              await AmbassadorServices.getAmbassadorByPromoCode(user.promoCode);
+            const result = await PromoCodeServices.addNewPromoUsage(
+              user.email,
+              ambassador[0].email,
+              user.plan
+            );
           }
           util.setSuccessResponse(
             res,
@@ -416,13 +421,22 @@ class userController {
           subscriptionData
         );
         if (subscriptionDetails) {
-            if(user.isOnPromo && user.plan.includes('discount')) {
-              const ambassador = await AmbassadorServices.getAmbassadorByPromoCode(user.promoCode);
-              const promoCodeUsed = await PromoCodeServices.getPromoCodeUtizationByEmail(user.email, ambassador[0].email);
-              if(!promoCodeUsed) {
-                await PromoCodeServices.addNewPromoUsage(user.email, ambassador[0].email, user.plan);
-              }
+          if (user.isOnPromo && user.plan.includes("discount")) {
+            const ambassador =
+              await AmbassadorServices.getAmbassadorByPromoCode(user.promoCode);
+            const promoCodeUsed =
+              await PromoCodeServices.getPromoCodeUtizationByEmail(
+                user.email,
+                ambassador[0].email
+              );
+            if (!promoCodeUsed) {
+              await PromoCodeServices.addNewPromoUsage(
+                user.email,
+                ambassador[0].email,
+                user.plan
+              );
             }
+          }
           util.setSuccessResponse(
             res,
             "Completed signup process and update",
@@ -523,14 +537,14 @@ class userController {
 
         case 2: {
           const txRef = uuid();
-          const data =  {
+          const data = {
             plan: user.plan,
             isBilledAnnually: user.isBilledAnnually,
             email: user.email,
             name: `${user.firstName} ${user.lastName}`,
             paymentOptions: "card",
             txRef,
-          }
+          };
           const pay = await userController.sendPaymentRequest(
             data,
             token,
