@@ -458,7 +458,6 @@ class userController {
         );
       }
     } catch (error) {
-      console.log(error, "==========");
       util.setErrorResponse(
         res,
         `Something went sideways totally sideways contact support ${error}`,
