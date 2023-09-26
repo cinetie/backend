@@ -12,6 +12,7 @@ import {
   createCustomer,
   getProduct,
   getUserSubscriptions,
+  cancelSubscription,
 } from "../helpers/stripe";
 import planServices from "../services/planServices";
 import userService from "../services/userServices";
@@ -81,6 +82,12 @@ class transactionsController {
         });
       } else {
         stripeUser = await getCustomer(user.stripeId);
+        const subscriptions = await getUserSubscriptions(stripeUser.id);
+        await Promise.all(
+          subscriptions.data.map((sub) => {
+            return cancelSubscription(sub.id);
+          })
+        );
       }
       if (!stripePlan) {
         return util.setErrorResponse(res, "Something went wrong", 400);
