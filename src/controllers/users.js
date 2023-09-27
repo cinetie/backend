@@ -23,6 +23,7 @@ import MailingServices from "../services/mailingServices";
 import AmbassadorServices from "../services/ambassadorServices";
 import PromoCodeServices from "../services/promoCodeServices";
 import { createCustomer } from "../helpers/stripe";
+import countryNumbers from "../helpers/countryNumbers";
 
 config();
 const util = new Util();
@@ -744,6 +745,32 @@ class userController {
               email,
               currency: "GHS",
               network: "TIGO",
+            };
+
+            await RavePaymentRequest(
+              req,
+              res,
+              requestData,
+              token,
+              paymentType,
+              email,
+              currentSubscription,
+              user
+            );
+          }
+          break;
+        case 11:
+        case 12:
+        case 13:
+        case 14:
+          {
+            const txRef = uuid();
+            const paymentType = `mobile_money_franco`;
+            const requestData = {
+              txRef,
+              amount: price,
+              email,
+              currency: countryNumbers[currentSubscription.paymentMethod],
             };
 
             await RavePaymentRequest(
