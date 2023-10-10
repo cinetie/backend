@@ -1,4 +1,4 @@
-.env
+.env*
 node_modules
 src/dist
 storage-cinetie-1ccfe2a73bd4.json

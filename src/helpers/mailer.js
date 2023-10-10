@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import ejs from "ejs";
 import nodemailer from "nodemailer";
 
-dotenv.config();
+
 
 const mailer = async (emailToSend) => {
   try {

@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import jwt from "../../helpers/jwt";
 
-dotenv.config();
+
 export default {
   up: (queryInterface) =>
     queryInterface.bulkInsert("tempSeries", [

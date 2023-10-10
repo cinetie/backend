@@ -9,7 +9,7 @@ import temp from "../services/tempSerieService";
 import jwt from "../helpers/jwt";
 import * as aws from "../helpers/aws";
 
-dotenv.config();
+
 
 describe("SERIES TEST", () => {
   describe("CREATE SERIE TEST", () => {

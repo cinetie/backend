@@ -5,7 +5,7 @@ import planServices from '../services/planServices';
 import jwt from '../helpers/jwt';
 import Util from '../helpers/utilities';
 
-dotenv.config();
+
 const util = new Util();
 const updateSubscription = async (req, res, next) => {
     try {
