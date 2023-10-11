@@ -10,7 +10,7 @@
   "scripts": {
     "build": "rm -rf ./src/dist && babel ./src/. --out-dir ./src/dist --copy-files",
     "staging": "export NODE_ENV=staging && npm run migrate:staging && node  ./src/dist/index.js",
-    "start": "npm run migrate && npm run build && node  ./src/dist/index.js",
+    "start": "export NODE_ENV=production && npm run migrate && npm run build && node  ./src/dist/index.js",
     "dev": "cross-env NODE_ENV=development nodemon --exec babel-node src/index.js",
     "migrate": "sequelize db:migrate --env production ",
     "migrate:dev": "sequelize db:migrate --env development",
