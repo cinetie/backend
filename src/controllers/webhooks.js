@@ -78,23 +78,23 @@ export default class WebHooks {
           permissionLevel: -1,
         });
         if (updates) {
-          await mailer([
-            {
-              body: "We would like you to know that your account has been put onhold. \n since your  payment didn't work out",
-              name: `${user.firstName}`,
-            },
-            {
-              from: "Cinetie support",
-              to: user.email,
-              subject: "Update payment details",
-            },
-            {
-              path: `${path.join(
-                __dirname,
-                "../public/templates/notification.ejs"
-              )}`,
-            },
-          ]);
+          // await mailer([
+          //   {
+          //     body: "We would like you to know that your account has been put onhold. \n since your  payment didn't work out",
+          //     name: `${user.firstName}`,
+          //   },
+          //   {
+          //     from: "Cinetie support",
+          //     to: user.email,
+          //     subject: "Update payment details",
+          //   },
+          //   {
+          //     path: `${path.join(
+          //       __dirname,
+          //       "../public/templates/notification.ejs"
+          //     )}`,
+          //   },
+          // ]);
           return util.setSuccessResponse(res, "Payment failed", 400, updates);
         }
         return util.setErrorResponse(
