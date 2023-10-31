@@ -12,24 +12,27 @@ class PromoCodeServices {
   }
 
   static async getPromoCodeUtizationByEmail(userEmail, ambassadorEmail) {
-    return await database.PromoCodeUtilization.findOne({
+    const promoCodeUtilization = await database.PromoCodeUtilization.findOne({
       where: {
         userEmail,
         ambassadorEmail,
       },
     });
+    return promoCodeUtilization;
   }
 
-  static async getAllPromoCodeUtizations(userEmail, ambassadorEmail) {
-    return await database.PromoCodeUtilization.findAll();
+  static async getAllPromoCodeUtizations() {
+    const promoCodeUtilizations = await database.PromoCodeUtilization.findAll();
+    return promoCodeUtilizations;
   }
 
   static async getAllPromoCodeUtizationsByAmbassador(ambassadorEmail) {
-    return await database.PromoCodeUtilization.findAll({
+    const promoCodeUtilizations = await database.PromoCodeUtilization.findAll({
       where: {
         ambassadorEmail,
       },
     });
+    return promoCodeUtilizations;
   }
 
   static async updatePromoCodeUtizationByEmail(
@@ -43,8 +46,9 @@ class PromoCodeServices {
         ambassadorEmail,
       },
     });
-    console.log(promoCodeUtilization, "==============");
-    await promoCodeUtilization.update(updates);
+    if (promoCodeUtilization) {
+      await promoCodeUtilization.update(updates);
+    }
   }
 }
 export default PromoCodeServices;
