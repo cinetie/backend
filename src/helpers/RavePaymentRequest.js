@@ -2,6 +2,8 @@ import Fetch from "./fetch";
 import Util from "./utilities";
 import payment from "./payment";
 import userService from "../services/userServices";
+import AmbassadorServices from "../services/ambassadorServices";
+import PromoCodeServices from "../services/promoCodeServices";
 
 const util = new Util();
 
@@ -36,6 +38,16 @@ export default async (
         requestData.txRef,
         "pending"
       );
+      if (user.isOnPromo) {
+        const ambassador = await AmbassadorServices.getAmbassadorByPromoCode(
+          user.promoCode
+        );
+        await PromoCodeServices.updatePromoCodeUtizationByEmail(
+          user.email,
+          ambassador[0].email,
+          { plan: user.plan }
+        );
+      }
       util.setSuccessResponse(
         res,
         paymentType === "mpesa"

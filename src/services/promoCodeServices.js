@@ -2,12 +2,13 @@ import database from "../database/models";
 
 class PromoCodeServices {
   static async addNewPromoUsage(userEmail, ambassadorEmail, plan) {
-    return await database.PromoCodeUtilization.create({
+    const newPromoCodeUsage = await database.PromoCodeUtilization.create({
       userEmail,
       ambassadorEmail,
       plan,
       status: "pending",
     });
+    return newPromoCodeUsage;
   }
 
   static async getPromoCodeUtizationByEmail(userEmail, ambassadorEmail) {
@@ -42,6 +43,7 @@ class PromoCodeServices {
         ambassadorEmail,
       },
     });
+    console.log(promoCodeUtilization, "==============");
     await promoCodeUtilization.update(updates);
   }
 }

@@ -165,6 +165,16 @@ class transactionsController {
           txRef,
           "pending"
         );
+        if (user.isOnPromo) {
+          const ambassador = await AmbassadorServices.getAmbassadorByPromoCode(
+            user.promoCode
+          );
+          await PromoCodeServices.updatePromoCodeUtizationByEmail(
+            user.email,
+            ambassador[0].email,
+            { plan: user.plan }
+          );
+        }
         util.setSuccessResponse(res, "Link generated", 201, {
           link: raw.data.link,
         });
