@@ -381,7 +381,7 @@ class userController {
           subscriptionData
         );
         if (subscriptionDetails) {
-          if (user.isOnPromo && user.plan.includes("discount")) {
+          if (user.isOnPromo) {
             const ambassador =
               await AmbassadorServices.getAmbassadorByPromoCode(user.promoCode);
             await PromoCodeServices.addNewPromoUsage(
@@ -517,6 +517,17 @@ class userController {
                 paymentData.txRef,
                 "pending"
               );
+              if (user.isOnPromo) {
+                const ambassador =
+                  await AmbassadorServices.getAmbassadorByPromoCode(
+                    user.promoCode
+                  );
+                await PromoCodeServices.updatePromoCodeUtizationByEmail(
+                  user.email,
+                  ambassador[0].email,
+                  { plan: user.plan }
+                );
+              }
               util.setSuccessResponse(
                 res,
                 "Pending subscription  activation with MoMo",
@@ -552,6 +563,15 @@ class userController {
             null,
             "charge/rave-standard"
           );
+          if (user.isOnPromo) {
+            const ambassador =
+              await AmbassadorServices.getAmbassadorByPromoCode(user.promoCode);
+            await PromoCodeServices.updatePromoCodeUtizationByEmail(
+              user.email,
+              ambassador[0].email,
+              { plan: user.plan }
+            );
+          }
           if (pay.status === 200) {
             await payment.recordTransaction(
               user.email,
@@ -586,6 +606,17 @@ class userController {
                   pay.data.RequestId,
                   "pending"
                 );
+                if (user.isOnPromo) {
+                  const ambassador =
+                    await AmbassadorServices.getAmbassadorByPromoCode(
+                      user.promoCode
+                    );
+                  await PromoCodeServices.updatePromoCodeUtizationByEmail(
+                    user.email,
+                    ambassador[0].email,
+                    { plan: user.plan }
+                  );
+                }
                 util.setSuccessResponse(res, pay.message, 200, pay);
               } else {
                 util.setErrorResponse(res, pay.message, 400);
