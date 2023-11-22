@@ -14,11 +14,11 @@ module.exports = (sequelize, DataTypes) => {
       episodeNumber: DataTypes.INTEGER,
       EnSubt: DataTypes.STRING,
       FrSubt: DataTypes.STRING,
+      seriesId: DataTypes.STRING,
+      disabled: DataTypes.BOOLEAN,
     },
     {}
   );
-  series.associate = function (models) {
-    // associations can be defined here
-  };
+
   return series;
 };

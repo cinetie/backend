@@ -39,5 +39,6 @@ export default joi
     resCountries: joi.string(),
     EnSubt: joi.string(),
     FrSubt: joi.string(),
+    disabled: joi.boolean(),
   })
   .options({ allowUnknown: false });

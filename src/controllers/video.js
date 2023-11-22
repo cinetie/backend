@@ -154,7 +154,9 @@ class Video {
       const { type, offset, limit } = req.query;
       const { country } = req.headers;
       console.log(`pop-${type}-${country}-${offset}-${limit}`);
-      const cachedVideos = await get(`pop-${type}-${country}-${offset}-${limit}`);
+      const cachedVideos = await get(
+        `pop-${type}-${country}-${offset}-${limit}`
+      );
       if (cachedVideos) {
         return util.setSuccessResponse(res, "videos found", 200, cachedVideos);
       }
@@ -162,7 +164,8 @@ class Video {
         offset,
         limit,
         type,
-        country
+        country,
+        false
       );
       getAttachedThumbsMultiple(videos);
 
@@ -188,7 +191,8 @@ class Video {
         req.query.offset,
         req.query.limit,
         type,
-        country
+        country,
+        false
       );
       getAttachedThumbsMultiple(videos);
 
@@ -217,7 +221,8 @@ class Video {
       }
       const videos = await videoService.getVideosByCategory(
         req.query.q,
-        country
+        country,
+        false
       );
       getAttachedThumbsMultiple(videos);
       if (Object.values(videos).length > 0) {
@@ -243,7 +248,7 @@ class Video {
       if (cached) {
         util.setSuccessResponse(res, "Videos found", 200, cached);
       }
-      const videos = await videoService.search(q, offset, country);
+      const videos = await videoService.search(q, offset, country, false);
       getAttachedThumbsMultiple(videos);
       console.log(videos);
       if (Object.values(videos).length > 0) {
@@ -287,7 +292,11 @@ class Video {
   static async getMainFeaturedFilm(req, res) {
     try {
       const { type } = req.query;
-      const video = await videoService.getMainFeaturedVideo(type);
+      const video = await videoService.getMainFeaturedVideo(
+        type,
+        undefined,
+        false
+      );
       if (!video.length) {
         return util.setErrorResponse(res, "Video can't be found", 404);
       }
@@ -313,7 +322,11 @@ class Video {
   static async getSecondFeaturedFilm(req, res) {
     try {
       const { type } = req.query;
-      const video = await videoService.getSecondFeaturedVideo(type);
+      const video = await videoService.getSecondFeaturedVideo(
+        type,
+        undefined,
+        false
+      );
       if (!video.length) {
         return util.setErrorResponse(res, "Video can't be found", 404);
       }
@@ -343,7 +356,9 @@ class Video {
       const videos = await videoService.getNewVideos(
         req.query.limit,
         req.query.offset,
-        req.query.type
+        req.query.type,
+        undefined,
+        false
       );
       getAttachedThumbsMultiple(videos);
       if (Object.values(videos).length >= 1) {

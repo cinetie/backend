@@ -26,12 +26,10 @@ module.exports = (sequelize, DataTypes) => {
       FrSubt: DataTypes.STRING,
       licenseEndDate: DataTypes.STRING,
       language: DataTypes.STRING,
+      disabled: DataTypes.BOOLEAN,
     },
     {}
   );
-  // eslint-disable-next-line no-unused-vars
-  videos.associate = function (models) {
-    // associations can be defined here
-  };
+
   return videos;
 };

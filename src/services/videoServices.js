@@ -8,396 +8,401 @@ const op = sequelize.Op;
 // will be changed to adapt a very good search algorithm
 // videos are also called movies
 class videoService {
-  static async getVideoById(videoId) {
-    try {
-      const video = await database.videos.findOne({
-        attributes: {
-          exclude: ["createdAt", "updatedAt"],
-        },
-        where: {
-          videoId,
-        },
-      });
-      if (video) {
-        return video;
-      }
-      return null;
-    } catch (error) {
-      throw error;
+  static async getVideoById(videoId, isDisabledAllowed = true) {
+    const searchData = {
+      videoId,
+    };
+    if (!isDisabledAllowed) {
+      searchData.disabled = true;
     }
+    const video = await database.videos.findOne({
+      attributes: {
+        exclude: ["createdAt", "updatedAt"],
+      },
+      where: searchData,
+    });
+    if (video) {
+      return video;
+    }
+    return null;
   }
 
-  static async getNewVideos(limitValue, offsetValue, type, country) {
-    try {
-      const videos = await database.videos.findAll({
-        offset: Number(offsetValue),
-        limit: Number(limitValue),
-        where: {
-          [op.and]: [
-            {
-              type,
-              videoSuspensionState: "0",
-            },
-          ],
+  static async getNewVideos(
+    limitValue,
+    offsetValue,
+    type,
+    country,
+    isDisabledAllowed = true
+  ) {
+    const searchData = {
+      [op.and]: [
+        {
+          type,
+          videoSuspensionState: "0",
         },
-        order: [["creationTime", "DESC"]],
-      });
-      if (videos) {
-        const results = resCountry(videos, country);
-        return results;
-      }
-      return null;
-    } catch (error) {
-      throw error;
+      ],
+    };
+    if (!isDisabledAllowed) {
+      searchData.disabled = true;
     }
+    const videos = await database.videos.findAll({
+      offset: Number(offsetValue),
+      limit: Number(limitValue),
+      where: searchData,
+      order: [["creationTime", "DESC"]],
+    });
+    if (videos) {
+      const results = resCountry(videos, country);
+      return results;
+    }
+    return null;
   }
 
-  static async getVideosByType(clientId, type) {
-    try {
-      const videos = await database.videos.findAll({
-        where: {
-          [op.and]: [
-            {
-              type,
-              videoClientId: clientId,
-            },
-          ],
+  static async getVideosByType(clientId, type, isDisabledAllowed = true) {
+    const searchData = {
+      [op.and]: [
+        {
+          type,
+          videoClientId: clientId,
         },
-      });
-      if (videos) {
-        return videos;
-      }
-      return null;
-    } catch (error) {
-      throw error;
+      ],
+    };
+    if (!isDisabledAllowed) {
+      searchData.disabled = true;
     }
+    const videos = await database.videos.findAll({
+      where: searchData,
+    });
+    if (videos) {
+      return videos;
+    }
+    return null;
   }
 
-  static async getTrendingVideos(offsetValue, limit, type, country) {
-    try {
-      const videos = await database.videos.findAll({
-        offset: Number(offsetValue),
-        limit: Number(limit),
-        where: {
-          [op.and]: [
-            {
-              videoWatchCount: {
-                [op.gte]: process.env.TRENDING_WATCH_COUNT,
-              },
-              creationTime: {
-                [op.gte]: date.removeDays(365),
-              },
-              type,
-              videoSuspensionState: "0",
-            },
-          ],
+  static async getTrendingVideos(
+    offsetValue,
+    limit,
+    type,
+    country,
+    isDisabledAllowed = true
+  ) {
+    const searchData = {
+      [op.and]: [
+        {
+          videoWatchCount: {
+            [op.gte]: process.env.TRENDING_WATCH_COUNT,
+          },
+          creationTime: {
+            [op.gte]: date.removeDays(365),
+          },
+          type,
+          videoSuspensionState: "0",
         },
-      });
-      if (videos) {
-        const results = resCountry(videos, country);
-        return results;
-      }
-      return null;
-    } catch (error) {
-      throw error;
+      ],
+    };
+    if (!isDisabledAllowed) {
+      searchData.disabled = true;
     }
+    const videos = await database.videos.findAll({
+      offset: Number(offsetValue),
+      limit: Number(limit),
+      where: searchData,
+    });
+    if (videos) {
+      const results = resCountry(videos, country);
+      return results;
+    }
+    return null;
   }
 
-  static async search(query, offset, country) {
-    try {
-      const data = await database.videos.findAll({
-        order: [["id", "DESC"]],
-        offset: Number(offset),
-        limit: 20,
-        where: {
-          [op.and]: [
+  static async search(query, offset, country, isDisabledAllowed = true) {
+    const searchData = {
+      [op.and]: [
+        {
+          [op.col]: Sequelize.where(
+            Sequelize.fn("lower", Sequelize.col("videoName")),
             {
-              [op.col]: Sequelize.where(
-                Sequelize.fn("lower", Sequelize.col("videoName")),
-                {
-                  [op.like]: `%${query}%`,
-                }
-              ),
-              videoSuspensionState: "0",
-            },
-          ],
+              [op.like]: `%${query}%`,
+            }
+          ),
+          videoSuspensionState: "0",
         },
-      });
-      if (data) {
-        const results = resCountry(data, country);
-        return results;
-      }
-      return null;
-    } catch (error) {
-      throw error;
+      ],
+    };
+    if (!isDisabledAllowed) {
+      searchData.disabled = true;
     }
+
+    const data = await database.videos.findAll({
+      order: [["id", "DESC"]],
+      offset: Number(offset),
+      limit: 20,
+      where: searchData,
+    });
+    if (data) {
+      const results = resCountry(data, country);
+      return results;
+    }
+    return null;
   }
 
   static async incrementWatchCountService(videoId) {
-    try {
-      const data = await database.videos.increment("videoWatchCount", {
-        where: {
-          videoId,
-        },
-      });
-      if (data) {
-        return data;
-      }
-      return null;
-    } catch (error) {
-      throw error;
+    const data = await database.videos.increment("videoWatchCount", {
+      where: {
+        videoId,
+      },
+    });
+    if (data) {
+      return data;
     }
+    return null;
   }
 
-  static async getPopularVideos(offSetValue, limitValue, type, country) {
-    try {
-      const data = await database.videos.findAll({
-        offset: Number(offSetValue),
-        limit: Number(limitValue),
-        where: {
-          [op.and]: [
-            {
-              videoWatchCount: {
-                [op.gte]: process.env.TRENDING_WATCH_COUNT,
-              },
-              type,
-              videoSuspensionState: "0",
-            },
-          ],
+  static async getPopularVideos(
+    offSetValue,
+    limitValue,
+    type,
+    country,
+    isDisabledAllowed = true
+  ) {
+    const searchData = {
+      [op.and]: [
+        {
+          videoWatchCount: {
+            [op.gte]: process.env.TRENDING_WATCH_COUNT,
+          },
+          type,
+          videoSuspensionState: "0",
         },
-      });
-
-      if (data) {
-        const results = resCountry(data, country);
-        return results;
-      }
-      return null;
-    } catch (error) {
-      throw error;
+      ],
+    };
+    if (!isDisabledAllowed) {
+      searchData.disabled = true;
     }
+    const data = await database.videos.findAll({
+      offset: Number(offSetValue),
+      limit: Number(limitValue),
+      where: searchData,
+    });
+
+    if (data) {
+      const results = resCountry(data, country);
+      return results;
+    }
+    return null;
   }
 
-  static async getVideosByCategory(category, country) {
-    try {
-      const data = await database.videos.findAll({
-        where: {
-          category,
-        },
-      });
-      if (data) {
-        const results = resCountry(data, country);
-        return results;
-      }
-      return null;
-    } catch (error) {
-      throw error;
+  static async getVideosByCategory(
+    category,
+    country,
+    isDisabledAllowed = true
+  ) {
+    const searchData = {
+      category,
+    };
+    if (!isDisabledAllowed) {
+      searchData.disabled = true;
     }
+    const data = await database.videos.findAll({
+      where: searchData,
+    });
+    if (data) {
+      const results = resCountry(data, country);
+      return results;
+    }
+    return null;
   }
 
   static async createNewVideo(video) {
-    try {
-      return await database.videos.create(video);
-    } catch (error) {
-      throw error;
-    }
+    return database.videos.create(video);
   }
 
   static async updateVideo(videoId, newVideo) {
-    try {
-      return await database.videos.update(newVideo, {
-        where: {
-          videoId,
-        },
-      });
-    } catch (error) {
-      throw error;
-    }
+    return database.videos.update(newVideo, {
+      where: {
+        videoId,
+      },
+    });
   }
 
   static async resetFeaturedVideo(featureType, isFeatured, type) {
-    try {
-      return await database.videos.update(
-        { isFeatured: false },
-        {
-          returning: true,
-          where: {
-            [op.and]: [{ featureType }, { isFeatured }, { type }],
-          },
-        }
-      );
-    } catch (error) {
-      throw error;
-    }
+    return database.videos.update(
+      { isFeatured: false },
+      {
+        returning: true,
+        where: {
+          [op.and]: [{ featureType }, { isFeatured }, { type }],
+        },
+      }
+    );
   }
 
   static async deleteVideo(videoId) {
-    try {
-      return await database.videos.destroy({
-        returning: true,
-        where: {
-          videoId,
-        },
-      });
-    } catch (error) {
-      throw error;
-    }
+    return database.videos.destroy({
+      returning: true,
+      where: {
+        videoId,
+      },
+    });
   }
 
-  static async getAllVideos(videoClientId) {
-    try {
-      return await database.videos.findAll({
-        attributes: {
-          exclude: [
-            "videoLink",
-            "createdAt",
-            "updatedAt",
-            "videoCast",
-            "videoSynopsis",
-            "isFeatured",
-            "videoIdVimeo",
-            "videoClientId",
-            "featureType",
-            "category",
-            "rate",
-          ],
-        },
-        where: {
-          videoClientId,
-        },
-        order: [["id", "DESC"]],
-      });
-    } catch (error) {
-      throw error;
+  static async getAllVideos(videoClientId, isDisabledAllowed = true) {
+    const searchData = {
+      videoClientId,
+    };
+    if (!isDisabledAllowed) {
+      searchData.disabled = true;
     }
+
+    return database.videos.findAll({
+      attributes: {
+        exclude: [
+          "videoLink",
+          "createdAt",
+          "updatedAt",
+          "videoCast",
+          "videoSynopsis",
+          "isFeatured",
+          "videoIdVimeo",
+          "videoClientId",
+          "featureType",
+          "category",
+          "rate",
+        ],
+      },
+      where: searchData,
+      order: [["id", "DESC"]],
+    });
   }
 
-  static async getAllVideosByType(videoClientId, type) {
-    try {
-      return await database.videos.findAll({
-        attributes: {
-          exclude: [
-            "videoLink",
-            "createdAt",
-            "updatedAt",
-            "videoCast",
-            "videoSynopsis",
-            "isFeatured",
-            "videoIdVimeo",
-            "videoClientId",
-            "featureType",
-            "category",
-          ],
-        },
-        where: {
-          [op.and]: [{ videoClientId }, { type }],
-        },
-        order: [["id", "DESC"]],
-      });
-    } catch (error) {
-      throw error;
+  static async getAllVideosByType(
+    videoClientId,
+    type,
+    isDisabledAllowed = true
+  ) {
+    const searchData = {
+      [op.and]: [{ videoClientId }, { type }],
+    };
+    if (!isDisabledAllowed) {
+      searchData.disabled = true;
     }
+
+    return database.videos.findAll({
+      attributes: {
+        exclude: [
+          "videoLink",
+          "createdAt",
+          "updatedAt",
+          "videoCast",
+          "videoSynopsis",
+          "isFeatured",
+          "videoIdVimeo",
+          "videoClientId",
+          "featureType",
+          "category",
+        ],
+      },
+      where: searchData,
+      order: [["id", "DESC"]],
+    });
   }
 
   static async getAllVideosForAdmin() {
-    try {
-      return await database.videos.findAll({
-        attributes: {
-          exclude: [
-            "videoLink",
-            "createdAt",
-            "updatedAt",
-            "videoCast",
-            "videoSynopsis",
-            "isFeatured",
-            "videoIdVimeo",
-            "videoClientId",
-            "featureType",
-            "category",
-          ],
-        },
-        order: [["id", "DESC"]],
-      });
-    } catch (error) {
-      throw error;
-    }
+    return database.videos.findAll({
+      attributes: {
+        exclude: [
+          "videoLink",
+          "createdAt",
+          "updatedAt",
+          "videoCast",
+          "videoSynopsis",
+          "isFeatured",
+          "videoIdVimeo",
+          "videoClientId",
+          "featureType",
+          "category",
+        ],
+      },
+      order: [["id", "DESC"]],
+    });
   }
 
-  static async getMainFeaturedVideo(type, country) {
-    try {
-      const videos = await database.videos.findAll({
-        order: [["id", "DESC"]],
-        limit: 1,
-        attributes: {
-          exclude: [
-            "creationTime",
-            "videoWatchCount",
-            "videoSuspensionState",
-            "createdAt",
-            "updatedAt",
-            "isFeatured",
-            "videoIdVimeo",
-            "videoClientId",
-            "featureType",
-          ],
+  static async getMainFeaturedVideo(type, country, isDisabledAllowed = true) {
+    const searchData = {
+      [op.and]: [
+        {
+          isFeatured: true,
+          type,
+          featureType: 0,
+          videoSuspensionState: "0",
         },
-        where: {
-          [op.and]: [
-            {
-              isFeatured: true,
-              type,
-              featureType: 1,
-              videoSuspensionState: "0",
-            },
-          ],
-        },
-      });
-      if (videos) {
-        const results = resCountry(videos, country);
-        return results;
-      }
-      return null;
-    } catch (error) {
-      throw error;
+      ],
+    };
+    if (!isDisabledAllowed) {
+      searchData.disabled = true;
     }
+    const videos = await database.videos.findAll({
+      order: [["id", "DESC"]],
+      limit: 1,
+      attributes: {
+        exclude: [
+          "creationTime",
+          "videoWatchCount",
+          "videoSuspensionState",
+          "createdAt",
+          "updatedAt",
+          "isFeatured",
+          "videoIdVimeo",
+          "videoClientId",
+          "featureType",
+        ],
+      },
+      where: searchData,
+    });
+    if (videos) {
+      const results = resCountry(videos, country);
+      return results;
+    }
+    return null;
   }
 
-  static async getSecondFeaturedVideo(type, country) {
-    try {
-      const videos = await database.videos.findAll({
-        order: [["id", "DESC"]],
-        limit: 1,
-        attributes: {
-          exclude: [
-            "creationTime",
-            "videoWatchCount",
-            "videoSuspensionState",
-            "createdAt",
-            "updatedAt",
-            "isFeatured",
-            "videoIdVimeo",
-            "videoClientId",
-            "featureType",
-          ],
+  static async getSecondFeaturedVideo(type, country, isDisabledAllowed = true) {
+    const searchData = {
+      [op.and]: [
+        {
+          isFeatured: true,
+          type,
+          featureType: 1,
+          videoSuspensionState: "0",
         },
-        where: {
-          [op.and]: [
-            {
-              isFeatured: true,
-              type,
-              featureType: 2,
-              videoSuspensionState: "0",
-            },
-          ],
-        },
-      });
-      if (videos) {
-        const results = resCountry(videos, country);
-        return results;
-      }
-      return null;
-    } catch (error) {
-      throw error;
+      ],
+    };
+    if (!isDisabledAllowed) {
+      searchData.disabled = true;
     }
+    const videos = await database.videos.findAll({
+      order: [["id", "DESC"]],
+      limit: 1,
+      attributes: {
+        exclude: [
+          "creationTime",
+          "videoWatchCount",
+          "videoSuspensionState",
+          "createdAt",
+          "updatedAt",
+          "isFeatured",
+          "videoIdVimeo",
+          "videoClientId",
+          "featureType",
+        ],
+      },
+      where: searchData,
+    });
+    if (videos) {
+      const results = resCountry(videos, country);
+      return results;
+    }
+    return null;
   }
 }
 export default videoService;

@@ -10,9 +10,9 @@ const router = new Router();
 router.post("/new", access.isAdmin, video.addVideo);
 router.post("/watch-session", access.isNormalUser, video.createNewWatchCount);
 router.get("/all/local", access.isAdmin, video.getAllVideosLocal);
-router.get("/sort/pop",  video.getVideosByPopularity);
-router.get("/sort/category",  video.getVideosByCategory);
-router.get("/sort/trend",  video.getVideosByTrend);
+router.get("/sort/pop", video.getVideosByPopularity);
+router.get("/sort/category", video.getVideosByCategory);
+router.get("/sort/trend", video.getVideosByTrend);
 router.get("/search", video.search);
 
 // router.get('/unique', access.isNormalUser, billing.trial,
@@ -24,7 +24,7 @@ router.get(
   video.getVideoById
 );
 router.get("/cp/unique", access.isAdmin, video.getVideoById);
-router.get("/arrivals",  video.getAllNewVideos);
+router.get("/arrivals", video.getAllNewVideos);
 router.get("/earnings", earnings.getAllEarningsPerVideo);
 router.get("/main/ft", video.getMainFeaturedFilm);
 router.get("/second/ft", video.getSecondFeaturedFilm);
