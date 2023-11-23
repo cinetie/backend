@@ -484,11 +484,7 @@ class Video {
   }
 
   static attachThumbnails(key, bucket) {
-    try {
-      return `https://${bucket}.s3.amazonaws.com/${key}`;
-    } catch (error) {
-      throw error;
-    }
+    return `https://${bucket}.s3.amazonaws.com/${key}`;
   }
 
   // eslint-disable-next-line consistent-return

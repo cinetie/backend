@@ -13,7 +13,7 @@ class videoService {
       videoId,
     };
     if (!isDisabledAllowed) {
-      searchData.disabled = true;
+      searchData.disabled = false;
     }
     const video = await database.videos.findOne({
       attributes: {
@@ -43,7 +43,7 @@ class videoService {
       ],
     };
     if (!isDisabledAllowed) {
-      searchData.disabled = true;
+      searchData.disabled = false;
     }
     const videos = await database.videos.findAll({
       offset: Number(offsetValue),
@@ -68,7 +68,7 @@ class videoService {
       ],
     };
     if (!isDisabledAllowed) {
-      searchData.disabled = true;
+      searchData.disabled = false;
     }
     const videos = await database.videos.findAll({
       where: searchData,
@@ -101,7 +101,7 @@ class videoService {
       ],
     };
     if (!isDisabledAllowed) {
-      searchData.disabled = true;
+      searchData.disabled = false;
     }
     const videos = await database.videos.findAll({
       offset: Number(offsetValue),
@@ -130,7 +130,7 @@ class videoService {
       ],
     };
     if (!isDisabledAllowed) {
-      searchData.disabled = true;
+      searchData.disabled = false;
     }
 
     const data = await database.videos.findAll({
@@ -177,7 +177,7 @@ class videoService {
       ],
     };
     if (!isDisabledAllowed) {
-      searchData.disabled = true;
+      searchData.disabled = false;
     }
     const data = await database.videos.findAll({
       offset: Number(offSetValue),
@@ -201,7 +201,7 @@ class videoService {
       category,
     };
     if (!isDisabledAllowed) {
-      searchData.disabled = true;
+      searchData.disabled = false;
     }
     const data = await database.videos.findAll({
       where: searchData,
@@ -251,7 +251,7 @@ class videoService {
       videoClientId,
     };
     if (!isDisabledAllowed) {
-      searchData.disabled = true;
+      searchData.disabled = false;
     }
 
     return database.videos.findAll({
@@ -284,7 +284,7 @@ class videoService {
       [op.and]: [{ videoClientId }, { type }],
     };
     if (!isDisabledAllowed) {
-      searchData.disabled = true;
+      searchData.disabled = false;
     }
 
     return database.videos.findAll({
@@ -339,7 +339,7 @@ class videoService {
       ],
     };
     if (!isDisabledAllowed) {
-      searchData.disabled = true;
+      searchData.disabled = false;
     }
     const videos = await database.videos.findAll({
       order: [["id", "DESC"]],
@@ -378,7 +378,7 @@ class videoService {
       ],
     };
     if (!isDisabledAllowed) {
-      searchData.disabled = true;
+      searchData.disabled = false;
     }
     const videos = await database.videos.findAll({
       order: [["id", "DESC"]],
