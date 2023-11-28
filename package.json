@@ -54,7 +54,7 @@
     "generate-password": "^1.6.0",
     "image-size": "^0.8.3",
     "ioredis": "^4.27.9",
-    "iplocation": "^6.1.0",
+    "iplocation": "^7.0.0",
     "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
     "md5": "2.2.1",
