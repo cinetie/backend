@@ -35,11 +35,11 @@ class billing {
     const user = await userService.getUserByMail(req.body.email);
     // if (user.isOnExtension === true) {
     await userService.updateUser(req.body.email, { permissionLevel: -1 });
-    await billing.sendBillingNotification(
-      user,
-      req,
-      "We would like you to know that your account has been put onhold . \n since your  payment didn't work out"
-    );
+    // await billing.sendBillingNotification(
+    //   user,
+    //   req,
+    //   "We would like you to know that your account has been put onhold . \n since your  payment didn't work out"
+    // );
     next();
     // } else {
     // Temporarily disable extensions
@@ -676,22 +676,22 @@ class billing {
             permissionLevel: -1,
           });
           if (updates[1] > 0) {
-            await mailer([
-              {
-                body: "We would like you to know that your account has been put onhold. \n since your  trial just ended",
-              },
-              {
-                from: "Cinetie support",
-                to: email,
-                subject: "Update payment details",
-              },
-              {
-                path: `${path.join(
-                  __dirname,
-                  "../public/templates/notification.ejs"
-                )}`,
-              },
-            ]);
+            // await mailer([
+            //   {
+            //     body: "We would like you to know that your account has been put onhold. \n since your  trial just ended",
+            //   },
+            //   {
+            //     from: "Cinetie support",
+            //     to: email,
+            //     subject: "Update payment details",
+            //   },
+            //   {
+            //     path: `${path.join(
+            //       __dirname,
+            //       "../public/templates/notification.ejs"
+            //     )}`,
+            //   },
+            // ]);
             util.setErrorResponse(
               res,
               "Please activate your account as your trial just ended",
