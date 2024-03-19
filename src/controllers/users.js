@@ -817,6 +817,53 @@ class userController {
           }
           break;
 
+        case 15:
+          {
+            const txRef = uuid();
+            const paymentType = `mobile_money_tanzania`;
+            const requestData = {
+              txRef,
+              amount: price,
+              email,
+              currency: "TZS",
+            };
+
+            await RavePaymentRequest(
+              req,
+              res,
+              requestData,
+              token,
+              paymentType,
+              email,
+              currentSubscription,
+              user
+            );
+          }
+          break;
+        case 16:
+          {
+            const txRef = uuid();
+            const paymentType = `mobile_money_malawi`;
+            const requestData = {
+              txRef,
+              amount: price,
+              email,
+              currency: "MWK",
+            };
+
+            await RavePaymentRequest(
+              req,
+              res,
+              requestData,
+              token,
+              paymentType,
+              email,
+              currentSubscription,
+              user
+            );
+          }
+          break;
+
         default:
           util.setErrorResponse(res, "Sorry payment failed", 500);
       }
