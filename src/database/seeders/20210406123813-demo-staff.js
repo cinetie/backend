@@ -1,3 +1,4 @@
+import bcrypt from "../../helpers/bcrypt";
 export default {
   up: (queryInterface) =>
     queryInterface.bulkInsert("Staffs", [
@@ -6,7 +7,8 @@ export default {
         email: "staff@example.com",
         role: "admin",
         password:
-          "$2b$10$z8KWe2xbLDM.pIsswGUhY.myyXumHMO1pTw3JutMiLq9deOZpZIH6",
+        bcrypt.encrypt("Test@123"),
+          // "$2b$10$z8KWe2xbLDM.pIsswGUhY.myyXumHMO1pTw3JutMiLq9deOZpZIH6",
         updatedAt: new Date(),
         createdAt: new Date(),
       },

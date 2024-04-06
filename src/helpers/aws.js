@@ -38,6 +38,7 @@ const deleteObject = async (Bucket, Key) => {
 };
 
 const copyObjects = async (source, destination, Key) => {
+  try {
   config({
     AWS_SECRET: process.env.AWS_UPLOAD_ACCESS_KEY,
     AWS_ID: process.env.AWS_UPLOAD_ID,
@@ -49,7 +50,11 @@ const copyObjects = async (source, destination, Key) => {
   };
   const S3Copy = new AWS.S3({ apiVersion: "2006-03-01" });
   const copy = await S3Copy.copyObject(params).promise();
+  console.log(copy)
   return copy;
+} catch (error) {
+  throw error
+}
 };
 
 const getSignedUrl = async (Bucket, ContentType, extension) => {
