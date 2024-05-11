@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.8
 class SplitEnv:
     """
     This utility is used to split the main .env file into 2 sections based on different environments
