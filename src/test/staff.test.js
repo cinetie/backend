@@ -5,7 +5,7 @@ import { describe, it } from "mocha";
 import app from "../index";
 import jwt from "../helpers/jwt";
 
-dotenv.config();
+
 chai.use(chaiHttp);
 
 describe("STAFF SIGN IN", () => {

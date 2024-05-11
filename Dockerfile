@@ -3,9 +3,9 @@ LABEL Author="Alain Christian(gal1l0)"
 
 # install our dependencies and install nodejs
 RUN apt-get update && apt-get install -y curl
-RUN curl -sL https://deb.nodesource.com/setup_12.x -o nodesource_setup.sh
+RUN curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.sh
 RUN bash nodesource_setup.sh
-RUN apt-get install nodejs
+RUN apt-get install -y nodejs
 RUN apt install -y redis-server
 RUN service redis-server start
 
@@ -22,4 +22,4 @@ ADD . /opt/app
 
 EXPOSE 3001
 
-CMD ["sh","start.sh"]
+CMD ["sh","start.sh", "production"]

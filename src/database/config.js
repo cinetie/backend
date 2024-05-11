@@ -1,6 +1,6 @@
-import { config } from "dotenv";
+import "../config/loadEnv";
 
-config();
+// config({path: `../../.env.${process.env.NODE_ENV}`});
 module.exports = {
   development: {
     use_env_variable: "DEV_DATABASE_URL",

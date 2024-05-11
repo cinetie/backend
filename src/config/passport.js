@@ -8,7 +8,7 @@ const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
 
 const passport = require("passport");
 
-dotenv.config();
+
 
 passport.serializeUser((user, done) => {
   done(null, user);
