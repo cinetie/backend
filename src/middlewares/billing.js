@@ -562,11 +562,11 @@ class billing {
     const updatedSubscription =
       user.isBilledAnnually === true
         ? await billingService.updateSubscription(user.email, {
-            endDate: date.addMoreDays(365).toDateString(),
-          })
+          endDate: date.addMoreDays(365).toDateString(),
+        })
         : await billingService.updateSubscription(user.email, {
-            endDate: date.addMoreDays(30).toDateString(),
-          });
+          endDate: date.addMoreDays(30).toDateString(),
+        });
     if (updates[1] === 1 && updatedSubscription[1] === 1) {
       const status = await webhooks.registerSales(
         {
