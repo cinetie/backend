@@ -2,7 +2,6 @@
 /* eslint-disable no-useless-catch */
 import fetch from "node-fetch";
 import { session } from "passport";
-import { result } from "lodash";
 import viewingSessions from "../services/viewingSessionsServices";
 import videoService from "../services/videoServices";
 import response from "../helpers/response";
