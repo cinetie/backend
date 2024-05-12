@@ -1,22 +1,28 @@
 pipeline {
     agent any
-    tools { nodejs "latest" }
-    stages {
-        stage('install') {
-            steps {
-                sh 'npm install'
-            }
-        }
-        stage('build') {
-            steps {
-                sh 'npm run build'
-            }
-        }
 
-        stage('deploy') {
+    triggers {
+        genericTrigger(
+            genericVariables: [
+                [key: 'branch', value: '$.ref']
+            ],
+            causeString: 'Triggered by Git push to branch $branch'
+        )
+    }
+
+    stages {
+        stage('Filter Branch') {
             steps {
-                sh 'pm2 restart all'
+                script {
+                    def branchName = env.branch.split('/')[-1]
+                    if (!branchName.matches('*-dev')) { // Adjust the pattern as needed
+                        currentBuild.result = 'NOT_BUILT'
+                        error('Skipping build because branch name does not match pattern')
+                    }
+                }
             }
         }
+        
+        // Rest of your build and deployment stages here...
     }
 }
