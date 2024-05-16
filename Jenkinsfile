@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     triggers {
-        genericTrigger(
+        GenericTrigger(
             genericVariables: [
-                [key: 'branch', value: '$.ref']
+                [key: 'branch', value: '$.ref`']
             ],
             causeString: 'Triggered by Git push to branch $branch'
         )
