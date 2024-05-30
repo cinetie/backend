@@ -1,6 +1,4 @@
 import { Router } from "express";
-import passport from "passport";
-import "../config/passport";
 import auth from "../controllers/users";
 import access from "../middlewares/access";
 import billing from "../middlewares/billing";
@@ -10,9 +8,6 @@ import checkCredentials from "../middlewares/checkCredentials";
 import updateSubscription from "../middlewares/updateSubscription";
 
 const router = new Router();
-
-router.use(passport.initialize());
-router.use(passport.session());
 
 router.post("/signup", validation.signup, auth.signupUser);
 router.get("/particular", auth.getUserByEmail);
@@ -50,30 +45,4 @@ router.get("/users", access.isAdmin, auth.getSubscribersInRange);
 router.get("/users/live", access.isAdmin, auth.getLiveUsers);
 router.get("/serve-verify", auth.serveVerifyPassword);
 router.post("/otp-verify", access.isNormalUser, auth.verifyOTP);
-router.get(
-  "/google",
-  passport.authenticate("google", {
-    scope: [
-      "https://www.googleapis.com/auth/userinfo.profile",
-      "https://www.googleapis.com/auth/userinfo.email",
-    ],
-  })
-);
-router.get(
-  "/google/redirect",
-  passport.authenticate("google"),
-  auth.socialLogin
-);
-
-router.get(
-  "/facebook",
-  passport.authenticate("facebook", {
-    scope: ["email"],
-  })
-);
-router.get(
-  "/facebook/redirect",
-  passport.authenticate("facebook"),
-  auth.socialLogin
-);
 export default router;

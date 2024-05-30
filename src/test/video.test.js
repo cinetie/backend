@@ -10,7 +10,7 @@ import jwt from "../helpers/jwt";
 import * as aws from "../helpers/aws";
 
 
-dotenv.config();
+
 describe("VIDEO TEST", () => {
   describe("ADD VIDEO", () => {
     it("should get a 500 statu code when there is a server error", async () => {
