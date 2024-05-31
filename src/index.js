@@ -19,17 +19,20 @@ import planServices from "./services/planServices";
 import transactionService from "./services/transactionService";
 import userService from "./services/userServices";
 
+config({ path: `../.env.${process.env.NODE_ENV}` });
 
-config({path: `../.env.${process.env.NODE_ENV}`});
-
-console.log(process.env.TEST_DATABASE_URL, "======================")
 cron.schedule("0 0 0 * * *", async () => {
   await stopLoginSessions();
 });
 cron.schedule(
   "0 0 * * *",
   async () => {
-    await calculateEarnings();
+    try {
+      await calculateEarnings();
+    } catch (error) {
+      console.error(error);
+      console.log("An error occured while calculating earnings");
+    }
   },
   {
     scheduled: true,
@@ -40,7 +43,12 @@ cron.schedule(
 cron.schedule(
   "0 0 * * *",
   async () => {
-    await endSubscription();
+    try {
+      await endSubscription();
+    } catch (error) {
+      console.error(error);
+      console.log("An error occured while ending subscriptions");
+    }
   },
   {
     scheduled: true,
