@@ -21,7 +21,6 @@ import userService from "./services/userServices";
 
 config({ path: `../.env.${process.env.NODE_ENV}` });
 
-console.log(process.env.TEST_DATABASE_URL, "======================");
 cron.schedule("0 0 0 * * *", async () => {
   await stopLoginSessions();
 });
