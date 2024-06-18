@@ -69,7 +69,7 @@ class SplitEnv:
             for line in self.all_lines:
                 f_dev.write(line)
 
-        with open("../.env.test", "+wt", encoding='utf-8') as f_test:
+        with open(".env.test", "+wt", encoding='utf-8') as f_test:
             for line in self.test_lines:
                 f_test.write(line)
                 f_test.write("NODE_ENV=test\n")
