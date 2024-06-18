@@ -1,0 +1,52 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var _default = exports["default"] = {
+  up: function up(queryInterface) {
+    return queryInterface.bulkInsert("Ambassadors", [{
+      id: 100,
+      firstName: "user",
+      lastName: "user",
+      email: "user2@example.com",
+      password: "$2b$10$4ukBCeW8NPyCZDENkJOEZ.E7ibNlBPRvl57mqv9.SJU.D7BlH3W7a",
+      region: "Muhima",
+      users: 0,
+      isVerified: true,
+      phoneNumber: "250799887212",
+      updatedAt: new Date(),
+      createdAt: new Date()
+    }, {
+      id: 101,
+      firstName: "user",
+      lastName: "user",
+      email: "user3@example.com",
+      password: "$2b$10$4ukBCeW8NPyCZDENkJOEZ.E7ibNlBPRvl57mqv9.SJU.D7BlH3W7a",
+      region: "Muhima",
+      users: 0,
+      isVerified: false,
+      phoneNumber: "250799887212",
+      ambassadorId: 'example123',
+      updatedAt: new Date(),
+      createdAt: new Date()
+    }, {
+      id: 102,
+      firstName: "user1",
+      lastName: "user1",
+      email: "ambassador4@example.com",
+      password: "$2b$10$4ukBCeW8NPyCZDENkJOEZ.E7ibNlBPRvl57mqv9.SJU.D7BlH3W7a",
+      region: "Muhima",
+      users: 0,
+      isVerified: true,
+      phoneNumber: "250799887212",
+      ambassadorId: 'example123',
+      updatedAt: new Date(),
+      createdAt: new Date()
+    }]);
+  },
+  down: function down(queryInterface) {
+    return queryInterface.bulkDelete("Ambassadors", null, {});
+  }
+};

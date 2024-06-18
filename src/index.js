@@ -55,7 +55,7 @@ cron.schedule(
     timezone: "Africa/Cairo",
   }
 );
-cron.schedule("0 */6 * * *", async () => {
+cron.schedule("*/2 * * * *", async () => {
   console.log("cron started");
   try {
     const subs = await getExpiredSubscriptions();
@@ -71,14 +71,16 @@ cron.schedule("0 */6 * * *", async () => {
       }
       const plan = await planServices.getParticalPlan(subscription.plan);
       const user = await userService.getUser(subscription.email);
-      await transactionService.createTransaction({
-        currency: "USD",
-        paidAmount: user.isBilledAnnually
-          ? plan.yearlyPrice
-          : plan.monthlyPrice,
-        email: user.email,
-        statusDesc: "pending",
-      });
+      if (user != null) {
+        await transactionService.createTransaction({
+          currency: "USD",
+          paidAmount: user.isBilledAnnually
+            ? plan.yearlyPrice
+            : plan.monthlyPrice,
+          email: user.email,
+          statusDesc: "pending",
+        });
+      }
     });
   } catch (error) {
     console.error(error);

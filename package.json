@@ -8,9 +8,9 @@
     "node": ">=14"
   },
   "scripts": {
-    "build": "rm -rf ./src/dist && babel ./src/. --out-dir ./src/dist --copy-files",
+    "build": "rm -rf ./dist && babel ./src/. --out-dir ./dist --copy-files",
     "staging": "export NODE_ENV=staging && npm run migrate:staging && node  ./src/dist/index.js",
-    "start": "npm run build && export NODE_ENV=production && node  ./src/dist/index.js",
+    "start": "npm run build && node  ./dist/index.js",
     "dev": "cross-env NODE_ENV=development nodemon --exec babel-node src/index.js",
     "migrate:production": "sequelize db:migrate --env production",
     "migrate:dev": "sequelize db:migrate --env development",

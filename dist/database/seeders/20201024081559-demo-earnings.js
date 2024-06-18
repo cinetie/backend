@@ -1,0 +1,86 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var _default = exports["default"] = {
+  up: function up(queryInterface) {
+    return queryInterface.bulkInsert("earnings", [{
+      id: 9999,
+      videoId: "17e63e02-3b95-46bc-9db7-c1cc0b3369cb",
+      clientId: "0",
+      amount: "30",
+      monthYear: "2020",
+      state: "Active",
+      updatedAt: new Date(),
+      createdAt: new Date()
+    }, {
+      id: 9887,
+      videoId: "d0fe2561-2164-4eb0-8113-f1a7dd4cfa73",
+      clientId: "f9a02384-d04a-4ef6-aaee-afb745630474",
+      amount: "30",
+      monthYear: "2020",
+      state: "inActive",
+      updatedAt: new Date(),
+      createdAt: new Date()
+    }, {
+      id: 8768,
+      videoId: "0d6e7a8c-e4e6-4d11-ab5d-82f536298d24",
+      clientId: "f9a02384-d04a-4ef6-aaee-afb745630474",
+      amount: "30",
+      monthYear: "2020",
+      state: "Active",
+      updatedAt: new Date(),
+      createdAt: new Date()
+    }, {
+      id: 4552,
+      videoId: "67404feb-f743-481c-bb19-9841324188a3",
+      clientId: "f9a02384-d04a-4ef6-aaee-afb745630474",
+      amount: "30",
+      monthYear: "2020",
+      state: "inActive",
+      updatedAt: new Date(),
+      createdAt: new Date()
+    }, {
+      id: 1233,
+      videoId: "67404feb-f743-481c-bb19-9841324188a3",
+      clientId: "1999",
+      amount: "30",
+      monthYear: "2020",
+      state: "inActive",
+      updatedAt: new Date(),
+      createdAt: new Date()
+    }, {
+      id: 1234,
+      videoId: "f367dafg-4fs4-4421-8818-c0f364ca9de1",
+      clientId: "grtgrth1244hy-2sdf3454-45564f-fdg12f56",
+      amount: "1.05",
+      monthYear: "2020",
+      state: "Active",
+      updatedAt: new Date(),
+      createdAt: new Date()
+    }, {
+      id: 1235,
+      videoId: "f367dafg-4fs4-4421-8818-c0f364ca9de1",
+      clientId: "grtgrth1244hy-2sdf3454-45564f-fdg12f56",
+      amount: "1.05",
+      monthYear: "2020",
+      state: "Active",
+      updatedAt: new Date(),
+      createdAt: new Date()
+    }, {
+      id: 1236,
+      videoId: "f367dafg-4fs4-4421-8818-c0f364ca9de1",
+      clientId: "grtgrth1244hy-2sdf3454-45564f-fdg12f56",
+      amount: "1.05",
+      monthYear: "2020",
+      state: "inActive",
+      updatedAt: new Date(),
+      createdAt: new Date()
+    }]);
+  },
+  down: function down(queryInterface) {
+    return queryInterface.bulkDelete("earnings", null, {});
+  }
+};
