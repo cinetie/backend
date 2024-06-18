@@ -1,4 +1,10 @@
 #!/usr/bin/python3.8
+"""
+Utility function that serves as a splitter for environment variables. 
+This accepts a command line argument that explains which environment to split for.
+"""
+import sys
+
 class SplitEnv:
     """
     This utility is used to split the main .env file into 2 sections based on different environments

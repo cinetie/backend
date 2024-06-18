@@ -1,7 +1,9 @@
 #!/bin/bash
 service redis-server start;
+
+# create the correct environment file
 export NODE_ENV=$1
-./tools/split_env.py
+python ./tools/split_env.py
 
 # Check if an environment is provided
 if [ -z $1 ]
