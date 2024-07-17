@@ -55,7 +55,7 @@ cron.schedule(
     timezone: "Africa/Cairo",
   }
 );
-cron.schedule("*/2 * * * *", async () => {
+cron.schedule("0 0 * * *", async () => {
   console.log("cron started");
   try {
     const subs = await getExpiredSubscriptions();
