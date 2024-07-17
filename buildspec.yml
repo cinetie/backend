@@ -14,7 +14,7 @@ phases:
       - echo Build started on `date`
       - echo building docker image
       - aws s3 cp s3://cinetie-config/.env .env
-      - docker build -t $REPOSITORY_URI:latest .
+      - source ./build.sh production $REPOSITORY_URI:latest
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
