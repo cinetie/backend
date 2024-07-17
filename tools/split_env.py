@@ -1,4 +1,10 @@
 #!/usr/bin/python3.8
+"""
+Utility function that serves as a splitter for environment variables. 
+This accepts a command line argument that explains which environment to split for.
+"""
+import sys
+
 class SplitEnv:
     """
     This utility is used to split the main .env file into 2 sections based on different environments
@@ -63,7 +69,7 @@ class SplitEnv:
             for line in self.all_lines:
                 f_dev.write(line)
 
-        with open("../.env.test", "+wt", encoding='utf-8') as f_test:
+        with open(".env.test", "+wt", encoding='utf-8') as f_test:
             for line in self.test_lines:
                 f_test.write(line)
                 f_test.write("NODE_ENV=test\n")

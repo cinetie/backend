@@ -154,7 +154,9 @@ class Video {
       const { type, offset, limit } = req.query;
       const { country } = req.headers;
       console.log(`pop-${type}-${country}-${offset}-${limit}`);
-      const cachedVideos = await get(`pop-${type}-${country}-${offset}-${limit}`);
+      const cachedVideos = await get(
+        `pop-${type}-${country}-${offset}-${limit}`
+      );
       if (cachedVideos) {
         return util.setSuccessResponse(res, "videos found", 200, cachedVideos);
       }
