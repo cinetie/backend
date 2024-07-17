@@ -3,19 +3,22 @@ service redis-server start;
 
 # create the correct environment file
 export NODE_ENV=$1
-python ./tools/split_env.py
+apt install python3
+python3 ./tools/split_env.py
 
 # Check if an environment is provided
 if [ -z $1 ]
 then
 echo "No environment provided"
+
+echo "$1 $STAGE"
 exit 1
 fi
 
 # Check if the environment provided is valid
 if [ $1 != 'test' ] && [ $1 != 'development' ] && [ $1 != 'production' ]
 then
-echo "Invalid environment provided"
+echo "Invalid environment provided {$1}"
 exit 1
 fi
 

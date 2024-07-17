@@ -1,3 +1,3 @@
 #!/bin/bash
 npm run build
-docker build -t cinetie/main-api:$1 .
+docker build --build-arg STAGE=$1 -t $2 .
