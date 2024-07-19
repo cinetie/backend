@@ -211,9 +211,8 @@ class userController {
     try {
       const user = await userService.getUserByMail(req.body.email);
       if (!user) return response.errorResponse(res, 404, "User not found!");
-      // const date = new Date();
-      const newDate = date.addMoreDays(1);
-      const token = jwt.jwtSign(newDate.getTime(), process.env.SECRET);
+      const payload = { userId: user.id };
+      const token = jwt.jwtSign(payload, process.env.SECRET, '2m')
       await mailer([
         {
           link: `${process.env.FRONT_END_USER}/u/new-password/${user.id}/${token}`,
@@ -244,7 +243,13 @@ class userController {
   static async resetPassword(req, res) {
     try {
       const { token, id } = req.query;
-      jwt.jwtVerify(token, process.env.SECRET);
+      var decodedToken = jwt.jwtVerify(token, process.env.SECRET);
+      const tokenIssuedAt = decodedToken.iat * 1000; 
+      const currentTime = Date.now();
+      const tokenExpirationTime = tokenIssuedAt + (2 * 60 * 1000); 
+      if (currentTime > tokenExpirationTime) {
+        return response.errorResponse(res, 400, "Reset password link has expired! Please try again");
+      }
       // eslint-disable-next-line no-underscore-dangle
       const user_ = await userService.getUserById(id);
       if (!user_)
