@@ -9,25 +9,9 @@ jobs:
       fail-fast: true
       matrix:
         redis-version: [6] 
-    services:
       # Label used to access the service container
-      mysql-master:
-        image: mysql:5.7
-        ports:
-          - 3306/tcp
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE: cinetie_test
-          MYSQL_PASSWORD: 1234
-          MYSQL_USER: cinetie_user
-        options: >-
-          --name=mysql-master
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3    
     env:
-      TEST_DATABASE_URL: mysql://cinetie_user:1234@127.0.0.1:32768/cinetie_test
+      TEST_DATABASE_URL: ${{secrets.TEST_DATABASE_URL}}
       SECRET: ${{ secrets.SECRET }}
       JWT_EXPIRATION: 10000
       EMAIL_USER: app146030787@heroku.com
@@ -95,4 +79,5 @@ jobs:
         with:
           redis-version: ${{matrix.redis-version}}
       - run: npm install
+      - run: npm run build
       - run: npm test

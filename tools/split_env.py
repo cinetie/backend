@@ -3,7 +3,6 @@
 Utility function that serves as a splitter for environment variables. 
 This accepts a command line argument that explains which environment to split for.
 """
-import sys
 
 class SplitEnv:
     """
@@ -61,7 +60,7 @@ class SplitEnv:
             for line in self.all_lines:
                 f_staging.write(line)
 
-        with open(".env.dev", "+wt", encoding='utf-8') as f_dev:
+        with open(".env.development", "+wt", encoding='utf-8') as f_dev:
             for line in self.dev_lines:
                 f_dev.write(line)
                 f_dev.write("NODE_ENV=dev\n")
