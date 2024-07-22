@@ -11,7 +11,7 @@ jobs:
         redis-version: [6] 
       # Label used to access the service container
     env:
-      TEST_DATABASE_URL: ${{secret.TEST_DATABASE_URL}}
+      TEST_DATABASE_URL: ${{secrets.TEST_DATABASE_URL}}
       SECRET: ${{ secrets.SECRET }}
       JWT_EXPIRATION: 10000
       EMAIL_USER: app146030787@heroku.com
