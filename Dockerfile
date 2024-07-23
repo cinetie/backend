@@ -15,7 +15,9 @@ RUN apt install python3
 
 # use changes to package.json to force Docker not to use the cache
 # when we change our application's nodejs dependencies:
-RUN mkdir -p /opt/app && cp -a /node_modules /opt/app/
+ADD package*.json /tmp/
+RUN cd /tmp && npm install
+RUN mkdir -p /opt/app && cp -a /tmp/node_modules /opt/app/
 RUN echo $arg_stage
 # From here we load our application's code in, therefore the previous docker
 # "layer" thats been cached will be used if possible
@@ -23,7 +25,7 @@ RUN echo $arg_stage
 WORKDIR /opt/app
 
 RUN mkdir -p dist && mkdir -p tools
-COPY node_modules/ /
+
 COPY dist/ ./dist
 COPY tools/ ./tools
 
