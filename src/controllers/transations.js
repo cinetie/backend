@@ -247,7 +247,6 @@ class transactionsController {
       }
       return util.setSuccessResponse(res, "Subscription cancelled", 200);
     } catch (error) {
-      console.log("+++++++++++++++++++++++++++++++ ERRROR DDDD");
       return util.setErrorResponse(res, error, 500);
     }
   }
