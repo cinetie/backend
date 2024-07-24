@@ -5,15 +5,17 @@ phases:
     commands:
       - echo Loggin to  ECR
       - aws --version
-      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
-      - REPOSITORY_URI=246341951723.dkr.ecr.us-east-2.amazonaws.com/main-api
-      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
+      - $(aws ecr get-login --region $aws_default_region --no-include-email)
+      - repository_uri=246341951723.dkr.ecr.us-east-2.amazonaws.com/main-api
+      - commit_hash=$(echo $codebuild_resolved_source_version | cut -c 1-7)
+      - image_tag=build-$(echo $codebuild_build_id | awk -f":" '{print $2}')
+      - npm install
   build:
     commands:
       - echo Build started on `date`
       - echo building docker image
       - aws s3 cp s3://cinetie-config/.env .env
+      - npm run build
       - source ./build.sh production $REPOSITORY_URI:latest
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
