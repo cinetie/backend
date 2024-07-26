@@ -62,6 +62,12 @@ class transactionsController {
 
   static async getRaveStandardLink(req, res) {
     try {
+      const { currency } = req.query;
+      const allowedCurrency = ["ngn", "usd"];
+      // check if the currency is allowed, skip the check if the currency query is not provided
+      if (currency && !allowedCurrency.includes(currency)) {
+        return util.setErrorResponse(res, "Invalid currency. Allowed currencies [usd, ngn]", 400);
+      }
       const user = await userService.getUserByMail(req.user);
       const currentSubscription = await Subscriptions.getCurrentSubscription(
         user.email,
