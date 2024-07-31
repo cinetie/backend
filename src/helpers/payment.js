@@ -113,24 +113,27 @@ class payment {
     status,
     transToken
   ) {
+    const user = await userService.getUser(email);
+    let curr = user.nationality === "Nigerian" ? "NGN":"USD"
     const result = await transactions.createTransaction({
       email,
       statusDesc: status,
       paidAmount: price,
       transactionId,
       transToken,
-      currency: "USD",
+      currency: curr,
     });
     return result;
   }
 
   static async recordFlutterwaveTransaction(user, details, requestId, status) {
+    let curr = user.nationality === "Nigerian" ? "NGN":"USD"
     const result = await transactions.createTransaction({
       email: user.email,
       statusDesc: status,
       paidAmount: details.price,
       transactionId: requestId,
-      currency: "USD",
+      currency: curr,
     });
     return result;
   }

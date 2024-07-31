@@ -72,8 +72,9 @@ cron.schedule("0 0 * * *", async () => {
       const plan = await planServices.getParticalPlan(subscription.plan);
       const user = await userService.getUser(subscription.email);
       if (user != null) {
+         let curr = user.nationality === "Nigerian" ? "NGN":"USD"
         await transactionService.createTransaction({
-          currency: "USD",
+          currency:  curr,
           paidAmount: user.isBilledAnnually
             ? plan.yearlyPrice
             : plan.monthlyPrice,
