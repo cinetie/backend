@@ -118,6 +118,10 @@ class transactionsController {
             { plan: user.plan }
           );
         }
+        const paymentIntent = stripeSubscription.latest_invoice.payment_intent;
+        
+        if(paymentIntent.status === "succeeded") return res.redirect("https://www.cinetie.com/h/home", 302)
+
         return util.setSuccessResponse(res, "Link generated", 201, {
           link: stripeSubscription.latest_invoice.hosted_invoice_url,
         });
