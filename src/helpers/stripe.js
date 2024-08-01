@@ -28,6 +28,41 @@ export const createSubscription = async (customerId, priceId, useCoupon) => {
   return subscription;
 };
 
+export const createCheckoutSession = async (customerId, priceId, useCoupon) => {
+  try {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "subscription",
+      customer: customerId,
+      line_items: [
+        {
+          price: priceId,
+        },
+      ],
+      discounts: useCoupon
+        ? [{ coupon: process.env.STRIPE_PREMIUM_COUPON }]
+        : undefined,
+      subscription_data: {
+        trial_from_plan: true,
+        metadata: {
+          customer_id: customerId,
+        },
+      },
+      payment_method_options: {
+        card: {
+          setup_future_usage: "off_session",
+        },
+      },
+      success_url: "https://www.cinetie.com/h/home",
+      cancel_url: `${process.env.CANCEL_STRIPE_URL}`,
+    });
+    return session;
+  } catch (error) {
+    console.error("Error creating Checkout Session:", error);
+    throw new Error("Unable to create checkout session");
+  }
+};
+
 export const getSubscription = async (id) => {
   const subscription = await stripe.subscriptions.retrieve(id);
   return subscription;
