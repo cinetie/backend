@@ -37,6 +37,7 @@ export const createCheckoutSession = async (customerId, priceId, useCoupon) => {
       line_items: [
         {
           price: priceId,
+          quantity: 1
         },
       ],
       discounts: useCoupon
@@ -48,13 +49,8 @@ export const createCheckoutSession = async (customerId, priceId, useCoupon) => {
           customer_id: customerId,
         },
       },
-      payment_method_options: {
-        card: {
-          setup_future_usage: "off_session",
-        },
-      },
       success_url: "https://www.cinetie.com/h/home",
-      cancel_url: `${process.env.CANCEL_STRIPE_URL}`,
+      cancel_url: `https://www.cinetie.com/account/payment`,
     });
     return session;
   } catch (error) {
