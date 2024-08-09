@@ -968,7 +968,6 @@ class userController {
     try {
       const users = await userService.getAllUsers();
       return response.successResponse(res, 200, "List of users", users);
-     
     } catch (error) {
       util.setErrorResponse(res, error, 503);
     }
