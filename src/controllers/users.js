@@ -964,10 +964,11 @@ class userController {
     return result;
   }
 
-  static async getAllAccounts(res) {
+  static async getAllAccounts(req, res) {
     try {
       const users = await userService.getAllUsers();
-      response.successResponse(res, 200, "List of users", users);
+      return response.successResponse(res, 200, "List of users", users);
+     
     } catch (error) {
       util.setErrorResponse(res, error, 503);
     }
