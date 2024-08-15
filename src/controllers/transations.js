@@ -13,6 +13,7 @@ import {
   getProduct,
   getUserSubscriptions,
   cancelSubscription,
+  createCheckoutSession,
 } from "../helpers/stripe";
 import planServices from "../services/planServices";
 import userService from "../services/userServices";
@@ -61,6 +62,12 @@ class transactionsController {
 
   static async getRaveStandardLink(req, res) {
     try {
+      const { currency } = req.query;
+      const allowedCurrency = ["ngn", "usd"];
+      // check if the currency is allowed, skip the check if the currency query is not provided
+      if (currency && !allowedCurrency.includes(currency)) {
+        return util.setErrorResponse(res, "Invalid currency. Allowed currencies [usd, ngn]", 400);
+      }
       const user = await userService.getUserByMail(req.user);
       const currentSubscription = await Subscriptions.getCurrentSubscription(
         user.email,
@@ -92,37 +99,50 @@ class transactionsController {
       if (!stripePlan) {
         return util.setErrorResponse(res, "Something went wrong", 400);
       }
+
+      // checkout session
+      const checkoutSession = await createCheckoutSession(
+        stripeUser.id,
+        stripePlan.default_price,
+        userUsedPromo
+      );
+
+      // subscription
       const stripeSubscription = await createSubscription(
         stripeUser.id,
         stripePlan.default_price,
         userUsedPromo
       );
-      if (!stripeSubscription) {
+
+      if (!checkoutSession && !stripeSubscription)
         return util.setErrorResponse(res, "Something went wrong", 400);
-      }
-      if (stripeSubscription) {
-        await payment.recordTransaction(
-          user.email,
-          currentSubscription.dataValues.price,
-          user.phoneNumber,
-          "pending",
-          stripeSubscription.id
+
+      await payment.recordTransaction(
+        user.email,
+        currentSubscription.dataValues.price,
+        user.phoneNumber,
+        "pending",
+        stripeSubscription.id
+      );
+
+      if (user.isOnPromo) {
+        const ambassador = await AmbassadorServices.getAmbassadorByPromoCode(
+          user.promoCode
         );
-        if (user.isOnPromo) {
-          const ambassador = await AmbassadorServices.getAmbassadorByPromoCode(
-            user.promoCode
-          );
-          await PromoCodeServices.updatePromoCodeUtizationByEmail(
-            user.email,
-            ambassador[0].email,
-            { plan: user.plan }
-          );
-        }
-        return util.setSuccessResponse(res, "Link generated", 201, {
-          link: stripeSubscription.latest_invoice.hosted_invoice_url,
-        });
+        await PromoCodeServices.updatePromoCodeUtizationByEmail(
+          user.email,
+          ambassador[0].email,
+          { plan: user.plan }
+        );
       }
-      return util.setErrorResponse(res, "Something went wrong", 400);
+
+      // Return both the hosted invoice URL and the checkout session URL
+      return res.status(201).json({
+        message: "Links generated",
+        checkoutSessionId: checkoutSession.id,
+        checkoutUrl: checkoutSession.url,
+        hostedInvoiceUrl: stripeSubscription.latest_invoice.hosted_invoice_url,
+      });
     } catch (error) {
       console.log(`Error: ${error}`);
       return util.setErrorResponse(res, error, 500);
@@ -233,7 +253,6 @@ class transactionsController {
       }
       return util.setSuccessResponse(res, "Subscription cancelled", 200);
     } catch (error) {
-      console.log("+++++++++++++++++++++++++++++++ ERRROR DDDD");
       return util.setErrorResponse(res, error, 500);
     }
   }
