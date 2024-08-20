@@ -306,8 +306,6 @@ class transactionsController {
       await db.sequelize.transaction(async t => {
 
         const email = req.user;
-        console.log(email)
-        console.log(req.fullUser)
         const { permissionLevel } = req.fullUser;
         if (permissionLevel !== 1) {
           return util.setErrorResponse(
@@ -370,7 +368,6 @@ class transactionsController {
 
 
     } catch (error) {
-      console.log(error);
       return util.setErrorResponse(res, error, 500);
     }
   }
@@ -380,8 +377,6 @@ class transactionsController {
       await db.sequelize.transaction(async t => {
 
         const email = req.user;
-        console.log(email)
-        console.log(req.fullUser)
         const { permissionLevel } = req.fullUser;
         if (permissionLevel !== -1) {
           return util.setErrorResponse(
@@ -411,7 +406,6 @@ class transactionsController {
           );
         }
 
-        console.log(currentActiveSubscription.endDate, 'end date string')
         const pauseDuration = new Date() - currentActiveSubscription.pauseDate;
         const endDate = new Date(currentActiveSubscription.endDate);
         const newEndDate = new Date(endDate.getTime() + pauseDuration);
