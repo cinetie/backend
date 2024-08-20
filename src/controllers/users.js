@@ -1031,6 +1031,7 @@ class userController {
             paymentMethod: subscription.paymentMethod || "null",
             price: subscription.price || "null",
             subscritption: subscription.state,
+            fullSubscription: subscription,
           });
         } else {
           util.setSuccessResponse(res, "Found", 200, { user });
