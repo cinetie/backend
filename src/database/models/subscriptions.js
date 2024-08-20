@@ -12,6 +12,10 @@ module.exports = (sequelize, DataTypes) => {
       phoneNumber: DataTypes.STRING,
       trialEnds: DataTypes.BIGINT,
       serviceCode: DataTypes.FLOAT,
+      pauseDate: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      }
     },
     {}
   );

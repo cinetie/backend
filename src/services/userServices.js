@@ -44,11 +44,12 @@ class userService {
     }
   }
 
-  static async updateUser(email, updates) {
+  static async updateUser(email, updates, t) {
     try {
       return await database.User.update(updates, {
         returning: true,
         where: { email },
+        transaction: t,
       });
     } catch (error) {
       throw error;

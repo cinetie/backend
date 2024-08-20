@@ -14,11 +14,14 @@ import {
   getUserSubscriptions,
   cancelSubscription,
   createCheckoutSession,
+  cancelAllSubscriptions,
 } from "../helpers/stripe";
 import planServices from "../services/planServices";
 import userService from "../services/userServices";
 import AmbassadorServices from "../services/ambassadorServices";
 import PromoCodeServices from "../services/promoCodeServices";
+import { updateSubscription } from "../services/subscriptionService";
+import db from "../database/models";
 
 const util = new Util();
 class transactionsController {
@@ -290,6 +293,141 @@ class transactionsController {
         return util.setSuccessResponse(res, raw.message, raw.status);
       }
       return util.setErrorResponse(res, raw.message, 400, raw);
+    } catch (error) {
+      return util.setErrorResponse(res, error, 500);
+    }
+  }
+
+
+  static async pauseSubscription(req, res) {
+
+    try {
+
+      await db.sequelize.transaction(async t => {
+
+        const email = req.user;
+        console.log(email)
+        console.log(req.fullUser)
+        const { permissionLevel } = req.fullUser;
+        if (permissionLevel !== 1) {
+          return util.setErrorResponse(
+            res,
+            "You don't have any active subscription",
+            400
+          );
+        }
+
+        const currentActiveSubscription = await Subscriptions.getCurrentSubscription(
+          email,
+          "current"
+        );
+        if (!currentActiveSubscription) {
+          return util.setErrorResponse(
+            res,
+            "You don't have any active subscription",
+            400
+          );
+        }
+
+        if (currentActiveSubscription?.pauseDate) {
+          return util.setErrorResponse(
+            res,
+            "Subscription already paused",
+            400
+          );
+        }
+
+
+        await updateSubscription(currentActiveSubscription?.id, {
+          pauseDate: new Date(),
+        }, t);
+
+        await userService.updateUser(email, { permissionLevel: -1 }, t);
+
+        if (req.fullUser?.stripeId) {
+          await cancelAllSubscriptions(req.fullUser?.stripeId);
+        } else {
+          const token = jwt.jwtSign(
+            { role: "main-api", user: email },
+            process.env.SECRET,
+            1000
+          );
+          const raw = await Fetch(
+            { email },
+            {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            `${process.env.PAY_HOST}/charge/cancel-subscription`,
+            "PUT"
+          );
+
+        }
+
+        return util.setSuccessResponse(res, "Subscription paused", 200);
+      });
+
+
+
+    } catch (error) {
+      console.log(error);
+      return util.setErrorResponse(res, error, 500);
+    }
+  }
+
+  static async resumeSubscription(req, res) {
+    try {
+      await db.sequelize.transaction(async t => {
+
+        const email = req.user;
+        console.log(email)
+        console.log(req.fullUser)
+        const { permissionLevel } = req.fullUser;
+        if (permissionLevel !== -1) {
+          return util.setErrorResponse(
+            res,
+            "Your subscription is not yet paused",
+            400
+          );
+        }
+
+        const currentActiveSubscription = await Subscriptions.getCurrentSubscription(
+          email,
+          "current"
+        );
+        if (!currentActiveSubscription) {
+          return util.setErrorResponse(
+            res,
+            "You don't have any active subscription",
+            400
+          );
+        }
+
+        if (!currentActiveSubscription?.pauseDate) {
+          return util.setErrorResponse(
+            res,
+            "Your subscription is not yet paused",
+            400
+          );
+        }
+
+        console.log(currentActiveSubscription.endDate, 'end date string')
+        const pauseDuration = new Date() - currentActiveSubscription.pauseDate;
+        const endDate = new Date(currentActiveSubscription.endDate);
+        const newEndDate = new Date(endDate.getTime() + pauseDuration);
+
+
+        await userService.updateUser(email, { permissionLevel: 1 }, t);
+        await updateSubscription(currentActiveSubscription.id, {
+          endDate: newEndDate.toDateString(),
+          pauseDate: null,
+        }, t);
+        return util.setSuccessResponse(res, "Subscription resumed", 200);
+
+      });
+
+
+
     } catch (error) {
       return util.setErrorResponse(res, error, 500);
     }

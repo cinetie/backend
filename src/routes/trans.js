@@ -26,4 +26,7 @@ route.put(
   controller.reactivateSubscription
 );
 
+route.put("/pause-subscription", access.isNormalUser, controller.pauseSubscription);
+route.put("/resume-subscription", access.isNormalUser, controller.resumeSubscription);
+
 export default route;

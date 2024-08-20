@@ -11,3 +11,14 @@ export async function getExpiredSubscriptions() {
   });
   return subs;
 }
+
+
+export async function updateSubscription(id, updates, t) {
+  const data = await database.subscriptions.update(updates, {
+    where: {
+      id,
+    },
+    transaction: t,
+  });
+  return data;
+}

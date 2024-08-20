@@ -87,3 +87,13 @@ export const cancelSubscription = async (id) => {
   const subscription = await stripe.subscriptions.del(id);
   return subscription;
 };
+
+export const cancelAllSubscriptions = async (stripeUserId) => {
+  const stripeUser = await getCustomer(stripeUserId);
+  const subscriptions = await getUserSubscriptions(stripeUser.id);
+  await Promise.all(
+    subscriptions.data.map((sub) => {
+      return cancelSubscription(sub.id);
+    })
+  );
+}
