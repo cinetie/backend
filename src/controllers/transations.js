@@ -327,17 +327,11 @@ class transactionsController {
           );
         }
 
-        if (currentActiveSubscription?.pauseDate) {
-          return util.setErrorResponse(
-            res,
-            "Subscription already paused",
-            400
-          );
-        }
 
 
         await updateSubscription(currentActiveSubscription?.id, {
           pauseDate: new Date(),
+          state: "paused",
         }, t);
 
         await userService.updateUser(email, { permissionLevel: -1 }, t);
@@ -386,35 +380,28 @@ class transactionsController {
           );
         }
 
-        const currentActiveSubscription = await Subscriptions.getCurrentSubscription(
+        const pausedSubscription = await Subscriptions.getCurrentSubscription(
           email,
-          "current"
+          "paused"
         );
-        if (!currentActiveSubscription) {
+        if (!pausedSubscription) {
           return util.setErrorResponse(
             res,
-            "You don't have any active subscription",
+            "You don't have any paused subscription",
             400
           );
         }
 
-        if (!currentActiveSubscription?.pauseDate) {
-          return util.setErrorResponse(
-            res,
-            "Your subscription is not yet paused",
-            400
-          );
-        }
-
-        const pauseDuration = new Date() - currentActiveSubscription.pauseDate;
-        const endDate = new Date(currentActiveSubscription.endDate);
+        const pauseDuration = new Date() - pausedSubscription.pauseDate;
+        const endDate = new Date(pausedSubscription.endDate);
         const newEndDate = new Date(endDate.getTime() + pauseDuration);
 
 
         await userService.updateUser(email, { permissionLevel: 1 }, t);
-        await updateSubscription(currentActiveSubscription.id, {
+        await updateSubscription(pausedSubscription.id, {
           endDate: newEndDate.toDateString(),
           pauseDate: null,
+          state: "current",
         }, t);
         return util.setSuccessResponse(res, "Subscription resumed", 200);
 
