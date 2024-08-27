@@ -1,12 +1,13 @@
 import response from "../helpers/response";
 import planServices from "../services/planServices";
 import Util from "../helpers/utilities";
+import userService from "../services/userServices";
 
 const util = new Util();
 class planController {
   static async addPlan(req, res) {
     try {
-      const getPlan = await planServices.getParticalPlan(req.body.type);
+      const getPlan = await planServices.getParticalPlan(req.body.type); 
       if (getPlan) {
         util.setErrorResponse(
           res,
@@ -82,6 +83,42 @@ class planController {
       );
     } catch (error) {
       util.setErrorResponse(res, `Something went wrong : ${error}`, 503);
+    }
+  }
+  static async downgradePlan(req, res) {
+    try {
+      const { userId, newPlanType } = req.body;
+      const user = await userService.getUserById(userId);
+      
+      if (!user) {
+        util.setErrorResponse(res, "User not found", 404);
+        return;
+      }
+      const currentPlan = await planServices.getParticalPlan(newPlanType);
+     
+      if (!currentPlan) {
+        util.setErrorResponse(res, "Plan not found", 404);
+        return;
+      }
+      const plansHierarchy = ['Promo', 'Standard', 'Premium'];
+      const currentPlanIndex = plansHierarchy.indexOf(user.plan);
+      
+      const newPlanIndex = plansHierarchy.indexOf(newPlanType);
+     
+      if (currentPlanIndex < newPlanIndex) {
+        util.setErrorResponse(res, "You cannot downgrade to a higher plan", 400);
+        return;
+      }
+      const downgradeResult = await planServices.downgradePlan(user, currentPlan);
+      
+      if (downgradeResult.success) {
+        util.setSuccessResponse(res, "Plan downgrade scheduled successfully", 200, downgradeResult.job);
+      } else {
+        util.setErrorResponse(res, "Failed to schedule plan downgrade", 500);
+      }
+    } catch (error) {
+        
+      util.setErrorResponse(res, `Something went wrong: ${error.message}`, 503);
     }
   }
 }

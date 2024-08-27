@@ -10,5 +10,6 @@ router.get("/:id", planController.getParticularPlan);
 router.post("/new", access.isAdmin, validation.addPlan, planController.addPlan);
 router.delete("/:id", access.isAdmin, planController.deleteAplan);
 router.put("/:id", access.isAdmin, planController.updatePlan);
+router.post('/downgrade', planController.downgradePlan);
 
 export default router;
