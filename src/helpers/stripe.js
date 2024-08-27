@@ -69,6 +69,14 @@ export const getProduct = async (id) => {
   return product;
 };
 
+export const getPrices = async (id) => {
+  const result = await stripe.prices.list({
+    product: id,
+    active: true,
+  });
+  return result.data;
+}
+
 export const updateSubscription = async (id, priceId) => {
   const subscription = await stripe.subscriptions.update(id, {
     items: [{ price: priceId }],
