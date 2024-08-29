@@ -30,7 +30,7 @@ router.get("/verify", auth.verify);
 router.get("/my-account", auth.getUserProfile);
 router.put("/signup/cont", access.isNormalUser, auth.createSubcription);
 router.put(
-  "/activate",
+  "/my-account/activate",
   access.isNormalUser,
   auth.updateAccountAndSubscription
 );
