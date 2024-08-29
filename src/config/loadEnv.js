@@ -6,4 +6,5 @@ let envFile = ".env";
 
 envFile = `.env.${NODE_ENV}`
 
-dotenv.config(process.cwd(), envFile);
+dotenv.config({"path": envFile});
+console.log(process.env.DIALECT);

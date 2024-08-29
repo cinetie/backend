@@ -368,19 +368,20 @@ class userController {
         process.env.SECRET
       );
       const { type } = req.query;
+      const { plan, isBilledAnnually, paymentMethod, phoneNumber } = req.body;
       const getSubscription = await billingServices.getSubscription(email);
       const today = new Date();
       const endDate = new Date(getSubscription ? getSubscription.endDate : "");
 
       if (!getSubscription) {
+	console.log("Didn't find a subscription");
         const user = await userService.getUserByMail(email);
-        const { paymentMethod } = req.body;
         const subscriptionData = {
           paymentMethod,
           email,
-          plan: user.plan,
-          phoneNumber: user.phoneNumber,
-          isBilledAnnually: user.isBilledAnnually,
+          plan,
+          phoneNumber: phoneNumber,
+          isBilledAnnually: isBilledAnnually,
         };
         const subscriptionDetails = await payment.registerNewSubscription(
           subscriptionData
@@ -484,7 +485,7 @@ class userController {
         plan: user.plan,
         isBilledAnnually: user.isBilledAnnually,
       };
-      const price = await payment.getPlanPricing(subscriptionData);
+      //let price = await payment.getPlanPricing(subscriptionData);
       const currentSubscription = await billingServices.getCurrentSubscription(
         email,
         "pending"
@@ -492,17 +493,15 @@ class userController {
       // if (user.isOnTrial === false) {
       //   util.setErrorResponse(res, 'account is already activated', 400);
       // } else {
-      const paymentData = userController.getAndSetPaymentData(
-        req,
-        price,
-        user,
-        email
-      );
+      const { phoneNumber, price } = currentSubscription.dataValues;
+      const paymentData = { amount: price, currency: "RWF", phoneNumber, email, txRef: uuid(), fullname: "N/A" }
+      console.log(paymentData, price);
       const token = jwt.jwtSign(
         { role: "main-api", user: email },
         process.env.SECRET,
         1000
       );
+      console.log(token)
       switch (Number(currentSubscription.paymentMethod)) {
         case 1: {
           const momoData = await userController.sendPaymentRequest(
@@ -511,6 +510,7 @@ class userController {
             null,
             "charge/momo"
           );
+	  console.log(momoData) 
           if (momoData.status === 200) {
             const updates = await userService.updateUser(email, {
               isOnTrial: false,
