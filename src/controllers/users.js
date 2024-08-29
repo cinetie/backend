@@ -244,9 +244,9 @@ class userController {
     try {
       const { token, id } = req.query;
       var decodedToken = jwt.jwtVerify(token, process.env.SECRET);
-      const tokenIssuedAt = decodedToken.iat * 1000; 
+      const tokenIssuedAt = decodedToken.iat * 1000;
       const currentTime = Date.now();
-      const tokenExpirationTime = tokenIssuedAt + (2 * 60 * 1000); 
+      const tokenExpirationTime = tokenIssuedAt + (2 * 60 * 1000);
       if (currentTime > tokenExpirationTime) {
         return response.errorResponse(res, 400, "Reset password link has expired! Please try again");
       }
@@ -368,14 +368,14 @@ class userController {
         process.env.SECRET
       );
       const { type } = req.query;
-      const { plan, isBilledAnnually, paymentMethod, phoneNumber } = req.body;
+      const user = await userService.getUserByMail(email);
+      const { plan, isBilledAnnually, paymentMethod, phoneNumber } = user;
       const getSubscription = await billingServices.getSubscription(email);
       const today = new Date();
       const endDate = new Date(getSubscription ? getSubscription.endDate : "");
 
       if (!getSubscription) {
-	console.log("Didn't find a subscription");
-        const user = await userService.getUserByMail(email);
+        console.log("Didn't find a subscription");
         const subscriptionData = {
           paymentMethod,
           email,
@@ -403,12 +403,14 @@ class userController {
             subscriptionDetails
           );
         } else {
+          console.log(`ERROR:406:Subscription registration failed`)
           util.setErrorResponse(
             res,
             "Something went sideways completing the signup",
             400
           );
         }
+        console.log(`SUBSCRIPTION CREATED ${subscriptionDetails}`)
       } else if (
         getSubscription.state === "pending" ||
         endDate.getTime() <= today.getTime() ||
@@ -465,6 +467,7 @@ class userController {
         );
       }
     } catch (error) {
+      console.log(`ERROR:468:${error}`);
       util.setErrorResponse(
         res,
         `Something went sideways totally sideways contact support ${error}`,
@@ -510,7 +513,7 @@ class userController {
             null,
             "charge/momo"
           );
-	  console.log(momoData) 
+          console.log(momoData)
           if (momoData.status === 200) {
             const updates = await userService.updateUser(email, {
               isOnTrial: false,
