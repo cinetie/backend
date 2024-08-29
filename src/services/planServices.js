@@ -1,7 +1,6 @@
 import Sequelize from "sequelize";
 import database from "../database/models";
-import { getCustomer, getProduct, getUserSubscriptions,updateSubscription} from "../helpers/stripe";
-import cron from "node-cron";
+import { getCustomer, getProduct, getUserSubscriptions, updateSubscription } from "../helpers/stripe";
 
 const op = Sequelize.Op;
 class planServices {
@@ -59,39 +58,22 @@ class planServices {
   }
 
   static async downgradePlan(user, newPlan) {
-
     try {
       const stripeUser = await getCustomer(user.stripeId);
       const subscriptions = await getUserSubscriptions(stripeUser.id);
       const getProd = await getProduct(newPlan.stripeId);
       const activeSubscription = subscriptions.data.find(sub => sub.status === 'active');
-      const currentPeriodEnd = new Date(activeSubscription.current_period_end * 1000);
-      const newEndDate = new Date(currentPeriodEnd.getTime() + 2 * 24 * 60 * 60 * 1000);
       await updateSubscription(activeSubscription.id, getProd.default_price);
-
-      const cronTime = `${newEndDate.getMinutes()} ${newEndDate.getHours()} ${newEndDate.getDate()} ${newEndDate.getMonth() + 1} *`;
-      
-      const job = cron.schedule(cronTime, async () => {
-        try {
-          await user.update({
-            plan: newPlan.type,
-          });
-          job.stop();
-        } catch (error) {
-          console.error("Error in cron job:", error);
-        }
-      }, {
-        scheduled: false
+      await user.update({
+        plan: newPlan.type,
       });
-
-      job.start();
 
       return {
         success: true,
-        message: `Downgrade scheduled. Current plan will end on ${newEndDate}`
+        message: `Downgrade to ${newPlan.type} scheduled for the end of the current billing period.`
       };
     } catch (error) {
-      
+      console.log("err", error);
       return { success: false, error: error.message };
     }
   }
