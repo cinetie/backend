@@ -368,8 +368,9 @@ class userController {
         process.env.SECRET
       );
       const { type } = req.query;
+      const { paymentMethod } = req.body;
       const user = await userService.getUserByMail(email);
-      const { plan, isBilledAnnually, paymentMethod, phoneNumber } = user;
+      const { plan, isBilledAnnually, phoneNumber } = user;
       const getSubscription = await billingServices.getSubscription(email);
       const today = new Date();
       const endDate = new Date(getSubscription ? getSubscription.endDate : "");
