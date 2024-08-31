@@ -78,5 +78,30 @@ const getSignedUrl = async (Bucket, ContentType, extension) => {
     Key,
   };
 };
+// Create a DynamoDB document client
+const docClient = new AWS.DynamoDB.DocumentClient();
+const getHlsUrlFromDynamoDB = async (srcVideo) => {
+  const params = {
+      TableName: 'vod-pipeline-v5',
+      FilterExpression: 'srcVideo = :srcVideoValue',
+      ExpressionAttributeValues: {
+          ':srcVideoValue': srcVideo
+      },
+      ProjectionExpression: 'hlsUrl'
+  };
 
-export { getObject, deleteObject, copyObjects, getSignedUrl };
+  try {
+      const data = await docClient.scan(params).promise();
+      if (data.Items.length > 0) {
+          return data.Items[0].hlsUrl;
+      } else {
+          console.log('No HLS URL found for the specified srcVideo.');
+          return null;
+      }
+  } catch (err) {
+      console.error('Failed to read HLS URL from DynamoDB:', err);
+      return null;
+  }
+};
+
+export { getObject, getHlsUrlFromDynamoDB, deleteObject, copyObjects, getSignedUrl };
