@@ -14,6 +14,7 @@ import {
   getUserSubscriptions,
   cancelSubscription,
   createCheckoutSession,
+  getPrices,
 } from "../helpers/stripe";
 import planServices from "../services/planServices";
 import userService from "../services/userServices";
@@ -100,17 +101,25 @@ class transactionsController {
         return util.setErrorResponse(res, "Something went wrong", 400);
       }
 
+      const prices = await getPrices(stripePlan.id);
+
+      const selectedPrice = prices?.find((price) => {
+        return price.currency === currency && (price.recurring.interval === (req.fullUser?.isBilledAnnually ? "year" : "month"));
+      });
+
+      const priceId = selectedPrice?.id ?? stripePlan.default_price;
+
       // checkout session
       const checkoutSession = await createCheckoutSession(
         stripeUser.id,
-        stripePlan.default_price,
+        priceId,
         userUsedPromo
       );
 
       // subscription
       const stripeSubscription = await createSubscription(
         stripeUser.id,
-        stripePlan.default_price,
+        priceId,
         userUsedPromo
       );
 
