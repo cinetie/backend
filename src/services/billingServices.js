@@ -7,7 +7,7 @@ const op = sequelize.Op;
 
 class billingServices {
   static async registerSubscription(newSubscription) {
-    // eslint-disable-next-line no-useless-catch
+    // eslint-disable-next-line no-useless-catch 
     try {
       const added = await database.subscriptions.create(newSubscription);
       if (added) {
@@ -205,5 +205,40 @@ class billingServices {
       throw error;
     }
   }
+  /**
+   * Cancels a subscription in Flutterwave using the provided subscription ID.
+   * 
+   * @param {string} flutterwaveId - The ID of the Flutterwave subscription to be canceled.
+   * 
+   * @returns {Promise<Response>} - A promise that resolves to the response of the cancellation request.
+   * 
+   * @throws {Error} - Logs an error if the cancellation request fails.
+   */
+  static async cancelSubscription(flutterwaveId) {
+    try {
+      /**
+       * Sends a PUT request to Flutterwave's API to cancel the subscription with the given ID.
+       * 
+       * @type {Response}
+       */
+      const cancelSubscription = await fetch(
+        `https://api.flutterwave.com/v3/subscriptions/${flutterwaveId}/cancel`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${process.env.FLUTTERWAVE_SECRET_KEY}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      // Returns the response of the cancellation request.
+      return cancelSubscription;
+    } catch (error) {
+      // Logs an error message if the cancellation request fails.
+      console.log("error", error);
+    }
+  }
+
 }
 export default billingServices;
