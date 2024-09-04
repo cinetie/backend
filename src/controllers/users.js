@@ -499,13 +499,11 @@ class userController {
       // } else {
       const { phoneNumber, price } = currentSubscription.dataValues;
       const paymentData = { amount: price, currency: "RWF", phoneNumber, email, txRef: uuid(), fullname: "N/A" }
-      console.log(paymentData, price);
       const token = jwt.jwtSign(
         { role: "main-api", user: email },
         process.env.SECRET,
         1000
       );
-      console.log(token)
       switch (Number(currentSubscription.paymentMethod)) {
         case 1: {
           const momoData = await userController.sendPaymentRequest(
@@ -514,7 +512,6 @@ class userController {
             null,
             "charge/momo"
           );
-          console.log(momoData)
           if (momoData.status === 200) {
             const updates = await userService.updateUser(email, {
               isOnTrial: false,
