@@ -119,7 +119,6 @@ class planServices {
       };
     } catch (error) {
       // Logs any errors encountered and returns an error response.
-      console.log("err", error);
       return { success: false, error: error.message };
     }
   }
@@ -144,7 +143,6 @@ class planServices {
        * @type {Object} 
        */
       const currentSubscription = await billingServices.getCurrentSubscription(user.id);
-      console.log("currentSubscription", currentSubscription);
 
       // Checks if there is no active subscription found for the user.
       if (!currentSubscription) {
@@ -257,7 +255,6 @@ class planServices {
       };
     } catch (error) {
       // Logs any errors encountered and returns an error response.
-      console.log("err", error);
       return {
         success: false, error: error.message
       };

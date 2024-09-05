@@ -115,7 +115,6 @@ class planController {
        * @type {Object}
        */
       const subscription = await subscriptions.getSubscription(user.email);
-      console.log("subscription", subscription);
 
       // Checks if the user exists. If not, returns a 404 error response.
       if (!user) {
@@ -157,7 +156,7 @@ class planController {
       let downgradeResult;
 
       // Determines the payment method and processes the downgrade accordingly.
-      if (subscriptions.paymentMethod === 2) {
+      if (subscription.paymentMethod === 2) {
         downgradeResult = await planServices.downgradeStripePlan(user, currentPlan);
       } else {
         downgradeResult = await planServices.downgradeFlutterwavePlan(user, currentPlan);
