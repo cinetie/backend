@@ -376,7 +376,6 @@ class userController {
       const endDate = new Date(getSubscription ? getSubscription.endDate : "");
 
       if (!getSubscription) {
-        console.log("Didn't find a subscription");
         const subscriptionData = {
           paymentMethod,
           email,
@@ -874,7 +873,6 @@ class userController {
           util.setErrorResponse(res, "Sorry payment failed", 500);
       }
     } catch (error) {
-      console.log(error);
       return response.errorResponse(
         res,
         500,
