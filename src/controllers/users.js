@@ -244,9 +244,9 @@ class userController {
     try {
       const { token, id } = req.query;
       var decodedToken = jwt.jwtVerify(token, process.env.SECRET);
-      const tokenIssuedAt = decodedToken.iat * 1000; 
+      const tokenIssuedAt = decodedToken.iat * 1000;
       const currentTime = Date.now();
-      const tokenExpirationTime = tokenIssuedAt + (2 * 60 * 1000); 
+      const tokenExpirationTime = tokenIssuedAt + (2 * 60 * 1000);
       if (currentTime > tokenExpirationTime) {
         return response.errorResponse(res, 400, "Reset password link has expired! Please try again");
       }
@@ -368,19 +368,20 @@ class userController {
         process.env.SECRET
       );
       const { type } = req.query;
+      const { paymentMethod } = req.body;
+      const user = await userService.getUserByMail(email);
+      const { plan, isBilledAnnually, phoneNumber } = user;
       const getSubscription = await billingServices.getSubscription(email);
       const today = new Date();
       const endDate = new Date(getSubscription ? getSubscription.endDate : "");
 
       if (!getSubscription) {
-        const user = await userService.getUserByMail(email);
-        const { paymentMethod } = req.body;
         const subscriptionData = {
           paymentMethod,
           email,
-          plan: user.plan,
-          phoneNumber: user.phoneNumber,
-          isBilledAnnually: user.isBilledAnnually,
+          plan,
+          phoneNumber: phoneNumber,
+          isBilledAnnually: isBilledAnnually,
         };
         const subscriptionDetails = await payment.registerNewSubscription(
           subscriptionData
@@ -402,12 +403,14 @@ class userController {
             subscriptionDetails
           );
         } else {
+          console.log(`ERROR:406:Subscription registration failed`)
           util.setErrorResponse(
             res,
             "Something went sideways completing the signup",
             400
           );
         }
+        console.log(`SUBSCRIPTION CREATED ${subscriptionDetails}`)
       } else if (
         getSubscription.state === "pending" ||
         endDate.getTime() <= today.getTime() ||
@@ -464,6 +467,7 @@ class userController {
         );
       }
     } catch (error) {
+      console.log(`ERROR:468:${error}`);
       util.setErrorResponse(
         res,
         `Something went sideways totally sideways contact support ${error}`,
@@ -484,7 +488,7 @@ class userController {
         plan: user.plan,
         isBilledAnnually: user.isBilledAnnually,
       };
-      const price = await payment.getPlanPricing(subscriptionData);
+      //let price = await payment.getPlanPricing(subscriptionData);
       const currentSubscription = await billingServices.getCurrentSubscription(
         email,
         "pending"
@@ -492,12 +496,8 @@ class userController {
       // if (user.isOnTrial === false) {
       //   util.setErrorResponse(res, 'account is already activated', 400);
       // } else {
-      const paymentData = userController.getAndSetPaymentData(
-        req,
-        price,
-        user,
-        email
-      );
+      const { phoneNumber, price } = currentSubscription.dataValues;
+      const paymentData = { amount: price, currency: "RWF", phoneNumber, email, txRef: uuid(), fullname: "N/A" }
       const token = jwt.jwtSign(
         { role: "main-api", user: email },
         process.env.SECRET,
@@ -873,7 +873,6 @@ class userController {
           util.setErrorResponse(res, "Sorry payment failed", 500);
       }
     } catch (error) {
-      console.log(error);
       return response.errorResponse(
         res,
         500,

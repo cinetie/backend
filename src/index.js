@@ -1,12 +1,12 @@
 /* eslint-disable no-console */
 import "@babel/polyfill";
+import './config/loadEnv';
 import path from "path";
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import morgan from "morgan";
 import cron from "node-cron";
-import { config } from "dotenv";
 import fileUpload from "express-fileupload";
 import xmlparser from "express-xml-bodyparser";
 import response from "./helpers/response";
@@ -19,7 +19,6 @@ import planServices from "./services/planServices";
 import transactionService from "./services/transactionService";
 import userService from "./services/userServices";
 
-config({ path: `../.env.${process.env.NODE_ENV}` });
 
 cron.schedule("0 0 0 * * *", async () => {
   await stopLoginSessions();

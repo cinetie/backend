@@ -29,7 +29,8 @@ RUN mkdir -p dist && mkdir -p tools
 COPY dist/ ./dist
 COPY tools/ ./tools
 
-ADD start.sh .env package.json .sequelizerc /opt/app/
+ADD start.sh .env.$arg_stage package.json .sequelizerc /opt/app/
 EXPOSE 3001
 
-ENTRYPOINT ["/bin/sh", "-c", "./start.sh $arg_stage"]
+#CMD ["sh", "start.sh", $arg_stage]
+ENTRYPOINT sh start.sh $arg_stage
