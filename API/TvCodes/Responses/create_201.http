@@ -1,0 +1,13 @@
+HTTP/1.1 201 Created
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, PUT, PATCH, OPTIONS, DELETE
+Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept
+Content-Type: application/json; charset=utf-8
+Content-Length: 260
+ETag: W/"104-zvb6IH28g/d60OkQh/LT3FSNJ84"
+Date: Sat, 14 Sep 2024 08:25:10 GMT
+Connection: keep-alive
+keep-alive: timeout=5
+
+{"statusCode":201,"status":"success","message":"TvCode created successfully","data":{"code":{"id":10,"code":7376,"email":"willsmith@gmail.com","expires":"2024-09-15T08:25:08.230Z","updatedAt":"2024-09-14T08:25:08.231Z","createdAt":"2024-09-14T08:25:08.231Z"}}}
