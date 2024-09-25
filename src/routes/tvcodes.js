@@ -11,9 +11,9 @@ import access from "../middlewares/access";
 const router = new Router();
 const controller = new Controller();
 
-router.post("/create", access.isLoggedIn, (req, res) => controller.createTvCode(req, res));
-router.get("/get", access.isLoggedIn, (req, res) => controller.getTvCode(req, res));
-router.delete("/delete/:id", access.isLoggedIn, (req, res) => controller.deleteTvCode(req, res));
-router.get("/validate/:code", access.isLoggedIn, (req, res) => controller.validateTvCode(req, res));
+router.post("/create", access.isLoggedIn,  controller.createTvCode);
+router.get("/get", access.isLoggedIn, controller.getTvCode);
+router.delete("/delete/:id", access.isLoggedIn, controller.deleteTvCode);
+router.get("/validate/:code", access.isLoggedIn, controller.validateTvCode);
 
 export default router;

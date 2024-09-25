@@ -16,11 +16,12 @@ class Controller {
         this.service = new TvCode();
         this.util = new Util();
 
-        // Bind the methods to the class
+        // Bind the methods to the class, 
+        // This is to allow NodeJS to know in which context the methods are being called
         this.createTvCode = this.createTvCode.bind(this);
         this.getTvCode = this.getTvCode.bind(this);
         this.deleteTvCode = this.deleteTvCode.bind(this);
-
+        this.validateTvCode = this.validateTvCode.bind(this);
     }
 
     async createTvCode(req, res) {
@@ -71,7 +72,6 @@ class Controller {
          */
         try {
             const code = await this.service.remove(req.params.id.toString());
-            console.log(code);
             if (code) {
                 return this.util.setSuccessResponse(res, "TvCode deleted successfully", 200);
             }

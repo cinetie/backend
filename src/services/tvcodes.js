@@ -24,7 +24,6 @@ class Service {
          * @returns {Object} The newly created TvCode
          */
         try {
-            console.log()
             const code = await TvCodes.create(data);
             return code;
         } catch (error) {
