@@ -14,6 +14,6 @@ const controller = new Controller();
 router.post("/create", access.isLoggedIn,  controller.createTvCode);
 router.get("/get", access.isLoggedIn, controller.getTvCode);
 router.delete("/delete/:id", access.isLoggedIn, controller.deleteTvCode);
-router.get("/validate/:code", access.isLoggedIn, controller.validateTvCode);
+router.get("/validate/:code", controller.validateTvCode);
 
 export default router;

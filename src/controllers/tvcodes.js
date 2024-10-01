@@ -6,7 +6,7 @@
 import math from '../helpers/math';
 import TvCode from '../services/tvcodes';
 import Util from '../helpers/utilities';
-
+import jwt from '../helpers/jwt'
 
 class Controller {
     /**
@@ -97,7 +97,14 @@ class Controller {
             if (code.expires < new Date()) {
                 return this.util.setErrorResponse(res, "TvCode has expired CTV-3:1", 404);
             }
-            return this.util.setSuccessResponse(res, "TvCode validated successfully", 200);
+	    const token = jwt.jwtSign(
+		    {
+		      email:code.email
+		    },
+		    process.env.SECRET,
+		    "3hr"
+	    )
+            return this.util.setSuccessResponse(res, "TvCode validated successfully", 200, token);
         } catch (error) {
             console.log(error);
             return this.util.setErrorResponse(res, "CTV-3:2", 500);

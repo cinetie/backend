@@ -7,7 +7,7 @@ const op = sequelize.Op;
 
 class billingServices {
   static async registerSubscription(newSubscription) {
-    // eslint-disable-next-line no-useless-catch
+     
     try {
       const added = await database.subscriptions.create(newSubscription);
       if (added) {

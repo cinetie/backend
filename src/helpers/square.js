@@ -1,4 +1,4 @@
-/* eslint-disable camelcase */
+ 
 import Fetch from "node-fetch";
 import Crypto from "crypto";
 

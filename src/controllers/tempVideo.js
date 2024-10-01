@@ -1,5 +1,5 @@
-/* eslint-disable no-plusplus */
-/* eslint-disable no-await-in-loop */
+ 
+ 
 import { config } from "dotenv";
 import services from "../services/tempVideoServices";
 import videoService from "../services/videoServices";

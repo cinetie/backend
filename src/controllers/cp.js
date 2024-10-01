@@ -80,7 +80,7 @@ class cpController {
     }
   }
 
-  // eslint-disable-next-line consistent-return
+   
   static async verify(req, res) {
     try {
       const { id } = req.query;
@@ -303,7 +303,7 @@ class cpController {
     try {
       const cps = await cp.getAllCps();
       for (let i = 0; i < cps.length; i += 1) {
-        // eslint-disable-next-line no-await-in-loop
+         
         cps[i].password = undefined;
       }
       util.setSuccessResponse(res, "success", 200, cps);
@@ -326,7 +326,7 @@ class cpController {
     }
   }
 
-  // eslint-disable-next-line consistent-return
+   
   static async serveVerifyPassword(req, res) {
     try {
       return res.render("ResetPassword", {

@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+ 
 import "@babel/polyfill";
 import './config/loadEnv';
 import path from "path";

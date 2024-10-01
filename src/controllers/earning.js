@@ -1,6 +1,6 @@
-/* eslint-disable no-plusplus */
-/* eslint-disable vars-on-top */
-/* eslint-disable no-var */
+ 
+ 
+ 
 /* eslint-disable no-useless-catch */
 import date from "../helpers/date";
 import jwt from "../helpers/jwt";

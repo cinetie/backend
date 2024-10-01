@@ -1,6 +1,5 @@
 @host = http://localhost:3001/tvcodes
 @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiIiLCJlbWFpbCI6IndpbGxzbWl0aEBnbWFpbC5jb20iLCJpYXQiOjE1ODAxMjM2MTZ9.j5IE3XakTXTTAzrQsVsVQ42JJ02AGWuXsevtCKGLiDs
-
 POST {{host}}/create HTTP/1.1
 Accept: application/json
 Authorization: Bearer {{token}}
@@ -11,7 +10,7 @@ Accept: application/json
 Authorization: Bearer {{token}}
 ###
 
-GET {{host}}/validate/9681 HTTP/1.1
+GET {{host}}/validate/4775 HTTP/1.1
 Accept: application/json
 Authorization: Bearer {{token}}
 ###

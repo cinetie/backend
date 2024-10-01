@@ -1,4 +1,4 @@
-/* eslint-disable quotes */
+ 
 import sequelize from "sequelize";
 import database from "../database/models";
 

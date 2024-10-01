@@ -1,6 +1,6 @@
-/* eslint-disable no-console */
-/* eslint-disable no-shadow */
-/* eslint-disable consistent-return */
+ 
+ 
+ 
 import path from "path";
 import { v4 as uuid } from "uuid";
 import { config } from "dotenv";
@@ -37,7 +37,7 @@ class userController {
       if (search) {
         util.setErrorResponse(res, "user already exists", 403);
       } else {
-        // eslint-disable-next-line no-use-before-define
+         
 
         const createdUser = await userService.createNewUser({
           ...newUser,
@@ -101,7 +101,7 @@ class userController {
   }
 
   static async sendEmail(req) {
-    // eslint-disable-next-line no-return-await
+     
     return await mailer([
       {
         link: `${process.env.HOST}/auth/verify?token=${jwt.jwtSign(
@@ -250,7 +250,7 @@ class userController {
       if (currentTime > tokenExpirationTime) {
         return response.errorResponse(res, 400, "Reset password link has expired! Please try again");
       }
-      // eslint-disable-next-line no-underscore-dangle
+       
       const user_ = await userService.getUserById(id);
       if (!user_)
         response.errorResponse(res, 404, "User not found!", "user undefined");
@@ -916,7 +916,7 @@ class userController {
             400,
             "BAD_REQUEST"
           );
-          // eslint-disable-next-line no-else-return
+           
         } else {
           await userController.removeTrial(email, res, otpStatus);
           return util.setSuccessResponse(
@@ -1052,7 +1052,7 @@ class userController {
         email
       );
 
-      // eslint-disable-next-line no-underscore-dangle
+       
       const _response = await userService.getUser(email);
       _response.paymentMethod = currentSubscription.paymentMethod;
       util.setSuccessResponse(res, "Found", 200, _response);

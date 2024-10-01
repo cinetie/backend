@@ -1,7 +1,7 @@
-/* eslint-disable no-dupe-class-members */
-/* eslint-disable no-return-await */
-/* eslint-disable no-param-reassign */
-/* eslint-disable consistent-return */
+ 
+ 
+ 
+ 
 import path from "path";
 import { v4 as uuid } from "uuid";
 import Util from "../helpers/utilities";
@@ -474,7 +474,7 @@ class billing {
       recentTransactions[recentTransactions.length - 1].transactionId,
       token
     );
-    // eslint-disable-next-line no-console
+     
     if (
       recentTransaction.data.Status === "Approved" ||
       recentTransaction.data.Status === "TransactionVerified"
@@ -534,7 +534,7 @@ class billing {
         next();
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
+       
       util.setErrorResponse(res, error.message, 500);
     }
   }

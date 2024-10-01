@@ -1,6 +1,6 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-plusplus */
-/* eslint-disable max-len */
+ 
+ 
+ 
 import fetch from "node-fetch";
 import { config } from "dotenv";
 import response from "../helpers/response";
@@ -417,7 +417,7 @@ class Video {
     }
   }
 
-  // eslint-disable-next-line consistent-return
+   
   static async updateVideos(req, res) {
     try {
       const returned = await videoService.getVideoById(req.query.id);
@@ -437,7 +437,7 @@ class Video {
     }
   }
 
-  // eslint-disable-next-line consistent-return
+   
   static async featureVideo(req, res) {
     try {
       const { featureType, isFeatured, type } = req.body;
@@ -478,7 +478,7 @@ class Video {
     }
   }
 
-  // eslint-disable-next-line consistent-return
+   
   static async createNewWatchCount(req, res) {
     try {
       const { ip } = req.headers;

@@ -1,5 +1,5 @@
 /* eslint-disable no-useless-catch */
-/* eslint-disable no-console */
+ 
 import dotenv from "dotenv";
 import ejs from "ejs";
 import nodemailer from "nodemailer";
