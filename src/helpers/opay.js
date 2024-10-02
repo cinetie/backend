@@ -1,5 +1,5 @@
-/* eslint-disable no-useless-catch */
-/* eslint-disable quotes */
+ 
+ 
 import fetch from "node-fetch";
 import uuid from "./uuid";
 

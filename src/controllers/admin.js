@@ -1,7 +1,7 @@
-/* eslint-disable eqeqeq */
-/* eslint-disable vars-on-top */
-/* eslint-disable no-plusplus */
-/* eslint-disable no-var */
+ 
+ 
+ 
+ 
 import earningService from "../services/earningServices";
 import videoService from "../services/videoServices";
 import Util from "../helpers/utilities";

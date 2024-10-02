@@ -1,0 +1,13 @@
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, PUT, PATCH, OPTIONS, DELETE
+Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept
+Content-Type: application/json; charset=utf-8
+Content-Length: 79
+ETag: W/"4f-ot/AKtpDHUHzEsSPoNR9l9h18g0"
+Date: Sat, 14 Sep 2024 08:22:16 GMT
+Connection: keep-alive
+keep-alive: timeout=5
+
+{"statusCode":200,"status":"success","message":"TvCode validated successfully"}

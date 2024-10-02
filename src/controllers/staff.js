@@ -103,7 +103,7 @@ class StaffController {
   }
 
   static async sendEmail(email, password) {
-    // eslint-disable-next-line no-return-await
+     
     return await mailer([
       {
         email,

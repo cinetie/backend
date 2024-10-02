@@ -1,4 +1,4 @@
-/* eslint-disable quotes */
+ 
 import dotenv from "dotenv";
 import { v2 as cloudinary } from "cloudinary";
 
@@ -24,7 +24,7 @@ const upload = async (file, type) => {
   return uploadedFile;
 };
 
-// eslint-disable-next-line camelcase
+ 
 const destroy = async (publicId, resource_type) => {
   await cloudinary.uploader.destroy(
     publicId,

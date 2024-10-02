@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
-/* eslint-disable no-plusplus */
-/* eslint-disable no-param-reassign */
+ 
+ 
 
 const attachThumbnails = (key, bucket) => {
   return `https://${bucket}.s3.amazonaws.com/${key}`;

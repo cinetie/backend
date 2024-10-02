@@ -1,3 +1,7 @@
+/**
+ * @description This file contains all the routes in the application
+ * @exports Router
+ */
 import { Router } from "express";
 import users from "./users";
 import profile from "./profile";
@@ -19,6 +23,7 @@ import staff from "./staff";
 import sales from "./sales";
 import ambassadors from "./ambassadors";
 import signedUrls from "./signedUrls";
+import tvcodes from "./tvcodes";
 
 const router = Router();
 
@@ -41,4 +46,6 @@ router.use("/staff", staff);
 router.use("/sales", sales);
 router.use("/ambassadors", ambassadors);
 router.use("/signed-urls", signedUrls);
+router.use("/tvcodes", tvcodes);
+
 export default router;

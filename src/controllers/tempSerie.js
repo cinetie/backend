@@ -1,5 +1,5 @@
-/* eslint-disable no-plusplus */
-/* eslint-disable no-await-in-loop */
+ 
+ 
 import { config } from "dotenv";
 import Helpers from "../helpers/utilities";
 import services from "../services/tempSerieService";

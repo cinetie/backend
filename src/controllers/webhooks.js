@@ -22,7 +22,7 @@ const rave = new Flutterwave(
 );
 export const { Transaction } = rave;
 export default class WebHooks {
-  // eslint-disable-next-line consistent-return
+   
   static async flutterWave(req, res) {
     try {
       const response = req.body.data ? req.body.data : req.body;

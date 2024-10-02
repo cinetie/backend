@@ -1,0 +1,13 @@
+HTTP/1.1 404 Not Found
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, PUT, PATCH, OPTIONS, DELETE
+Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept
+Content-Type: application/json; charset=utf-8
+Content-Length: 72
+ETag: W/"48-OCfcDQJRUM8MZ+uQOUSNHM2/vFg"
+Date: Sat, 14 Sep 2024 08:28:11 GMT
+Connection: keep-alive
+keep-alive: timeout=5
+
+{"statusCode":404,"status":"Error","message":"TvCode not found CTV-2:0"}

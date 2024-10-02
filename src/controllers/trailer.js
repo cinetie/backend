@@ -1,5 +1,5 @@
-/* eslint-disable no-plusplus */
-/* eslint-disable quotes */
+ 
+ 
 import { config } from "dotenv";
 import Util from "../helpers/utilities";
 import { deleteObject, getSignedUrl, getObject } from "../helpers/aws";
@@ -37,7 +37,7 @@ class Trailers {
       const { id } = req.query;
       const trailers = await trailerServices.getAllTrailers(id);
       for (let i = 0; i < trailers.length; i++) {
-        // eslint-disable-next-line no-await-in-loop
+         
         trailers[i].trailerLink = Trailers.attachThumbnails(
           trailers[i].trailerLink,
           process.env.TRAILERS_BUCKET
@@ -137,7 +137,7 @@ class Trailers {
     }
   }
 
-  // eslint-disable-next-line consistent-return
+   
   static async getTrailerUploadLink(req, res) {
     try {
       const url = await getSignedUrl(

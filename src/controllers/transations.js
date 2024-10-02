@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+ 
 import { v4 as uuid } from "uuid";
 import service from "../services/transactionService";
 import Util from "../helpers/utilities";

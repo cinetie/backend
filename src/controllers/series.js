@@ -1,4 +1,4 @@
-/* eslint-disable no-plusplus */
+ 
 import { config } from "dotenv";
 import services from "../services/serieServices";
 import Util from "../helpers/utilities";

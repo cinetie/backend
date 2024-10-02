@@ -1,4 +1,4 @@
-/* eslint-disable consistent-return */
+ 
 // this middleware checks whether the user hasn't exceeded the amount of simultaneus screens
 // this middleware implements the number of screens feature of cinetie
 import Util from "../helpers/utilities";
