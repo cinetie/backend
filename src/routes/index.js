@@ -24,6 +24,9 @@ import sales from "./sales";
 import ambassadors from "./ambassadors";
 import signedUrls from "./signedUrls";
 import tvcodes from "./tvcodes";
+import investors from "./investors";
+import investments from "./investments";
+import withdrawals from "./withdrawals";
 
 const router = Router();
 
@@ -47,5 +50,8 @@ router.use("/sales", sales);
 router.use("/ambassadors", ambassadors);
 router.use("/signed-urls", signedUrls);
 router.use("/tvcodes", tvcodes);
+router.use("/investors", investors);
+router.use("/investments", investments)
+router.use("/withdrawals", withdrawals);
 
 export default router;

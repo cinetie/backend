@@ -4,6 +4,7 @@ import staffService from "../services/staffServices";
 import Util from "../helpers/utilities";
 import cpService from "../services/cpServices";
 import AmbassadorServices from "../services/ambassadorServices";
+import InvestorServices from "../services/investorServices";
 
 const util = new Util();
 class Access {
@@ -83,7 +84,7 @@ class Access {
 
   static async isLoggedIn(req, res, next) {
     try {
-      if (!req.headers.authorization) { 
+      if (!req.headers.authorization) {
         return util.setErrorResponse(res, "Invalid access token", 401);
       }
       const token = req.headers.authorization.slice(7);
@@ -159,6 +160,30 @@ class Access {
         next();
       }
     } catch (error) {
+      util.setErrorResponse(res, error.message, 500);
+    }
+  }
+
+
+  static async isInvestor(req, res, next) {
+    try {
+      if (!req.headers.authorization) {
+        return util.setErrorResponse(res, "Invalid access token", 401);
+      }
+      const token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.jwtVerify(token, process.env.SECRET);
+      const { id } = decoded;
+      const data = await InvestorServices.getInvestorById(id);
+      if (!data) {
+        return util.setErrorResponse(res, "Invalid access token", 401);
+      }
+      const investor = data?.dataValues ?? data;
+      req.investor = investor;
+      next();
+    } catch (error) {
+      if (error.name === 'JsonWebTokenError') {
+        return util.setErrorResponse(res, "Invalid access token", 401);
+      }
       util.setErrorResponse(res, error.message, 500);
     }
   }

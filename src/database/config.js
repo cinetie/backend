@@ -3,7 +3,7 @@ import '../config/loadEnv';
 module.exports = {
   development: {
     use_env_variable: "DEV_DATABASE_URL",
-    dialect: "postgres",
+    dialect: "mysql",
     dialectOptions: {
       typeCast: true,
     },

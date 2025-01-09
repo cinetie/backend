@@ -13,6 +13,8 @@ import billingService from "../services/billingServices";
 import date from "../helpers/date";
 import Fetch from "../helpers/fetch";
 import xml from "xml";
+import InvestmentServices from "../services/investmentServices";
+import WithdrawalsServices from "../services/withdrawalsServices";
 
 const util = new Util();
 const rave = new Flutterwave(
@@ -22,7 +24,7 @@ const rave = new Flutterwave(
 );
 export const { Transaction } = rave;
 export default class WebHooks {
-   
+
   static async flutterWave(req, res) {
     try {
       const response = req.body.data ? req.body.data : req.body;
@@ -47,9 +49,9 @@ export default class WebHooks {
         const userUpdates =
           response["event.type"] === "CARD_TRANSACTION"
             ? {
-                permissionLevel: 1,
-                card_nonce: transVerification.data.card.token,
-              }
+              permissionLevel: 1,
+              card_nonce: transVerification.data.card.token,
+            }
             : { permissionLevel: 1 };
         updates = await UserService.updateUser(user.email, userUpdates);
         // creating sales
@@ -229,5 +231,28 @@ export default class WebHooks {
         500
       );
     }
+  }
+
+
+  static async investmentFlutterwave(req, res) {
+    const { status, txRef } = req.body;
+    console.log(req.body, '=========== transaction')
+    if (req.body["event.type"] === "Transfer") {
+      await WithdrawalsServices.verifyWithdrawal(req.body?.transfer);
+      return res.status(200).json({
+        message: "withdrawal verified successfully"
+      })
+    }
+    if (status !== 'successful') {
+      return res.status(400).json({
+        message: "Payment not successful"
+      })
+    }
+
+    console.log(req.body);
+    await InvestmentServices.verifyInvestment(txRef);
+    return res.status(200).json({
+      message: "Payment verified successfully"
+    })
   }
 }
