@@ -1,4 +1,6 @@
 import BadRequestError from "../errors/BadRequestError";
+import ConflictError from "../errors/ConflictError";
+import NotFoundError from "../errors/NotFoundError";
 import WithdrawalsServices from "../services/withdrawalsServices";
 
 export default class WithdrawalsController {
@@ -25,9 +27,23 @@ export default class WithdrawalsController {
             const data = await WithdrawalsServices.createBankWithDrawal({ investor, amount, callback_url, bankCode, accountNumber, beneficiaryName, destinationBranchCode });
             return res.json(data);
         } catch (error) {
-            console.log(error, '====errror')
             if (error instanceof BadRequestError) {
-                return res.status(400).json({ error: error.message });
+                return res.status(400).json({
+                    status: "error",
+                    message: error.message
+                });
+            }
+            if (error instanceof ConflictError) {
+                return res.status(409).json({
+                    status: "error",
+                    message: error.message
+                });
+            }
+            if (error instanceof NotFoundError) {
+                return res.status(404).json({
+                    status: "error",
+                    message: error.message
+                });
             }
             res.status(500).json({ error: "Internal server error" });
         }

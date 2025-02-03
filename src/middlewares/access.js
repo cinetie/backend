@@ -181,7 +181,8 @@ class Access {
       req.investor = investor;
       next();
     } catch (error) {
-      if (error.name === 'JsonWebTokenError') {
+      console.log(error)
+      if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
         return util.setErrorResponse(res, "Invalid access token", 401);
       }
       util.setErrorResponse(res, error.message, 500);

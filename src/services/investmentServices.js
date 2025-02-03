@@ -6,45 +6,44 @@ import { countries, getCountryCode } from "countries-list";
 import convert from "../helpers/currency";
 import { supportedCurrencies } from "../helpers/flutterwave";
 
-
-
-
 export default class InvestmentServices {
     static async create({ shares, investor, redirect_url }) {
-        const t = await database.sequelize.transaction();
-        let amount = shares * 100;
-        const ref = uuid()
-        const firstInvestment = await database.Investment.findOne({
-            where: { investorId: investor.id, marketingFeeIncluded: true }
-        }, { transaction: t })
+        return database.sequelize.transaction(async (t) => {
+            let amount = shares * 100;
+            const ref = uuid()
+            const firstInvestment = await database.Investment.findOne({
+                where: { investorId: investor.id, marketingFeeIncluded: true }
+            }, { transaction: t })
 
-        if (!firstInvestment) {
-            amount = amount + 50;
+            if (!firstInvestment) {
+                amount = amount + 50;
+                const investment = await database.Investment.create({
+                    investorId: investor.id,
+                    shares,
+                    amount,
+                    marketingFeeIncluded: true,
+                    paymentReference: ref,
+                    status: "pending"
+                });
+                return InvestmentServices.createInvestmentLink(investment?.dataValues ?? investment, investor, redirect_url, t)
+
+            }
+
+            if (firstInvestment?.status === "pending") {
+                throw new BadRequestError("You have pending first investment. Please complete the payment or cancel the investment to create a new one");
+            }
+
             const investment = await database.Investment.create({
                 investorId: investor.id,
                 shares,
                 amount,
-                marketingFeeIncluded: true,
+                marketingFeeIncluded: false,
                 paymentReference: ref,
                 status: "pending"
             });
-            return InvestmentServices.createInvestmentLink(investment?.dataValues ?? investment, investor, redirect_url, t)
-
-        }
-
-        if (firstInvestment?.status === "pending") {
-            throw new BadRequestError("You have pending first investment. Please complete the payment or cancel the investment to create a new one");
-        }
-
-        const investment = await database.Investment.create({
-            investorId: investor.id,
-            shares,
-            amount,
-            marketingFeeIncluded: false,
-            paymentReference: ref,
-            status: "pending"
+            return InvestmentServices.createInvestmentLink(investment, investor, redirect_url, t);
         });
-        return InvestmentServices.createInvestmentLink(investment, investor, redirect_url, t);
+
     }
 
     static async payInvestment({
@@ -52,28 +51,30 @@ export default class InvestmentServices {
         investor,
         redirect_url
     }) {
-        const t = await database.sequelize.transaction();
-        const investment = await database.Investment.findOne({
-            where: { id: investmentId, investorId: investor.id }
-        }, { transaction: t });
+        return database.sequelize.transaction(async (t) => {
+            const investment = await database.Investment.findOne({
+                where: { id: investmentId, investorId: investor.id }
+            }, { transaction: t });
 
-        if (!investment) {
-            throw new BadRequestError("Investment not found");
-        }
+            if (!investment) {
+                throw new BadRequestError("Investment not found");
+            }
 
-        if (investment.status === "completed") {
-            throw new BadRequestError("Investment already completed");
-        }
+            if (investment.status === "completed") {
+                throw new BadRequestError("Investment already completed");
+            }
 
-        if (investment.status === "canceled") {
-            throw new BadRequestError("Investment already canceled");
-        }
+            if (investment.status === "canceled") {
+                throw new BadRequestError("Investment already canceled");
+            }
 
-        if (investment.status === "pending") {
-            return InvestmentServices.createInvestmentLink(investment, investor, redirect_url, t);
-        }
+            if (investment.status === "pending") {
+                return InvestmentServices.createInvestmentLink(investment, investor, redirect_url, t);
+            }
 
-        throw new BadRequestError("Investment status not supported");
+            throw new BadRequestError("Investment status not supported");
+        });
+
 
     }
 
@@ -85,11 +86,11 @@ export default class InvestmentServices {
 
         const shares = investments.reduce((acc, investment) => {
             if (investment.status === "completed") {
-            return acc + investment.shares;
+                return acc + investment.shares;
             }
             return acc;
         }
-        , 0);
+            , 0);
         const totalAmount = shares * 100;
 
         return { investments, shares, totalAmount }
@@ -111,9 +112,8 @@ export default class InvestmentServices {
         const currency = supportedCurrencies.includes(countryCurrency) ? countryCurrency : "USD";
         const amount = currency === "USD" ? investment.amount : await convert(investment.amount, currency);
         const data = {
-            // amount: investment.amount,
-            // dummy amount for test
-            amount: 500,
+            amount: amount,
+            // amount: 100,
             currency: currency,
             tx_ref: investment.paymentReference,
             redirect_url,
@@ -132,7 +132,7 @@ export default class InvestmentServices {
 
         const response = await axios.post('https://api.flutterwave.com/v3/payments', data, {
             headers: {
-                Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
+                Authorization: `Bearer ${process.env.RAVE_SECRET}`,
                 'Content-Type': 'application/json',
             }
         })
@@ -142,19 +142,15 @@ export default class InvestmentServices {
 
     static async verifyInvestment(reference, transaction) {
         try {
-            console.log(reference, '========================= i got here');
             const res = await axios.get(`https://api.flutterwave.com/v3/transactions/verify_by_reference?tx_ref=${reference}`, {
                 headers: {
-                    Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
+                    Authorization: `Bearer ${process.env.RAVE_SECRET}`,
                     'Content-Type': 'application/json',
                 }
             })
 
-            console.log(res, '============= the result ====')
 
             const data = res.data;
-
-            console.log(data, '=========================', reference);
 
             if (data.status === "success") {
                 await database.Investment.update({
@@ -170,7 +166,6 @@ export default class InvestmentServices {
                 status: data.status
             }
         } catch (error) {
-            console.log(error, '===================== error');
             if (error instanceof AxiosError) {
                 return { status: "not found" }
             }
@@ -180,20 +175,39 @@ export default class InvestmentServices {
     }
 
 
-    static async cancelPayment(investment) {
-        if (investment.status === "completed") {
-            throw new BadRequestError("You can not cancel a completed payment");
-        }
-        const { status } = await InvestmentServices.verifyInvestment(investment.paymentReference);
-        if (status === "success") {
-            throw new BadRequestError("You can not cancel a completed payment");
-        }
-        return axios.post(`https://api.flutterwave.com/v3/payments/${investment.paymentReference}/cancel`, {
-            headers: {
-                Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
-                'Content-Type': 'application/json',
+    static async cancelPayment(id, investor) {
+        database.sequelize.transaction(async (t) => {
+            const investment = await database.Investment.findOne({
+                where: { id, investorId: investor.id }
+            }, { transaction: t });
+            if (!investment) {
+                throw new BadRequestError("Investment not found");
             }
+            if (investment.status === "completed") {
+                throw new BadRequestError("You can not cancel a completed payment");
+            }
+            if (investment.status === "canceled") {
+                throw new BadRequestError("You can not cancel a canceled payment");
+            }
+            const { status } = await InvestmentServices.verifyInvestment(investment.paymentReference, t);
+            if (status === "success") {
+                throw new BadRequestError("You can not cancel a completed payment");
+            }
+            await axios.post(`https://api.flutterwave.com/v3/payments/${investment.paymentReference}/cancel`, {
+                headers: {
+                    Authorization: `Bearer ${process.env.RAVE_SECRET}`,
+                    'Content-Type': 'application/json',
+                }
+            })
+            await database.Investment.update({
+                status: "canceled"
+            }, {
+                where: { paymentReference: investment.paymentReference }
+            }, {
+                transaction: t
+            });
         })
+
     }
 
     static async getFirstInvestment(investorId) {

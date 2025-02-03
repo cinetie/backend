@@ -1,5 +1,7 @@
 
+import BadRequestError from "../errors/BadRequestError";
 import ConflictError from "../errors/ConflictError";
+import NotFoundError from "../errors/NotFoundError";
 import UnauthorizedError from "../errors/UnauthorizedError";
 import InvestorServices from "../services/investorServices";
 
@@ -21,8 +23,20 @@ export default class InvestorsController {
                 data: result
             });
         } catch (error) {
+            if (error instanceof BadRequestError) {
+                return res.status(400).json({
+                    status: "error",
+                    message: error.message
+                });
+            }
             if (error instanceof ConflictError) {
                 return res.status(409).json({
+                    status: "error",
+                    message: error.message
+                });
+            }
+            if (error instanceof NotFoundError) {
+                return res.status(404).json({
                     status: "error",
                     message: error.message
                 });
@@ -49,9 +63,26 @@ export default class InvestorsController {
                 data: result,
             });
         } catch (error) {
-            console.log(error);
             if (error instanceof UnauthorizedError) {
                 return res.status(401).json({
+                    status: "error",
+                    message: error.message
+                });
+            }
+            if (error instanceof BadRequestError) {
+                return res.status(400).json({
+                    status: "error",
+                    message: error.message
+                });
+            }
+            if (error instanceof ConflictError) {
+                return res.status(409).json({
+                    status: "error",
+                    message: error.message
+                });
+            }
+            if (error instanceof NotFoundError) {
+                return res.status(404).json({
                     status: "error",
                     message: error.message
                 });
@@ -68,7 +99,6 @@ export default class InvestorsController {
 
     static async getInvestor(req, res) {
         const { investor } = req;
-        console.log(investor);
         return res.json({
             status: "success",
             data: investor

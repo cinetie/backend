@@ -235,8 +235,7 @@ export default class WebHooks {
 
 
   static async investmentFlutterwave(req, res) {
-    const { status, txRef } = req.body;
-    console.log(req.body, '=========== transaction')
+    const { status, tx_ref } = req.body.data ?? req.body;
     if (req.body["event.type"] === "Transfer") {
       await WithdrawalsServices.verifyWithdrawal(req.body?.transfer);
       return res.status(200).json({
@@ -249,8 +248,7 @@ export default class WebHooks {
       })
     }
 
-    console.log(req.body);
-    await InvestmentServices.verifyInvestment(txRef);
+    await InvestmentServices.verifyInvestment(tx_ref);
     return res.status(200).json({
       message: "Payment verified successfully"
     })

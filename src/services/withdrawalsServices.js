@@ -9,7 +9,7 @@ import convert from "../helpers/currency";
 
 const countriesWithBranches = ["BJ", "CM", "TD", "CI", "CD", "GA", "GH", "MW", "RW", "SN", "SL", "TZ", "UG"]
 
-const fw = new Flutterwave(process.env.FLW_PUBLIC_KEY, process.env.FLW_SECRET_KEY);
+const fw = new Flutterwave(process.env.RAVE_PUBLIC, process.env.RAVE_SECRET);
 
 // database.Withdrawals: name of the db model
 
@@ -31,9 +31,10 @@ export default class WithdrawalsServices {
         throw new BadRequestError("Insufficient balance. Please reduce the amount you want to withdraw");
       }
 
-
-      const tx_ref = uuid() + "_PMCK_DU_2";
+      // test uuids
+      // const tx_ref = uuid() + "_PMCK_DU_2";
       // const tx_ref = uuid() + "_PMCK_ST_FDU_2"
+      const tx_ref = uuid()
       const countryCode = getCountryCode(investor.country);
       const country = countries[countryCode]
       const countryCurrency = country?.currency[0];
@@ -160,7 +161,6 @@ export default class WithdrawalsServices {
     const balance = numberOfReferees * 50;
     const withdrawnBalance = await WithdrawalsServices.getFundsWithdrawned(investor, t);
     const availableBalance = balance - withdrawnBalance;
-    console.log(balance, '========');
     return { balance, withdrawnBalance, availableBalance, numberOfReferees };
   }
 
