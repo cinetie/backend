@@ -11,8 +11,6 @@ const countriesWithBranches = ["BJ", "CM", "TD", "CI", "CD", "GA", "GH", "MW", "
 
 const fw = new Flutterwave(process.env.RAVE_PUBLIC, process.env.RAVE_SECRET);
 
-// database.Withdrawals: name of the db model
-
 export default class WithdrawalsServices {
   static async createBankWithDrawal({
     amount,
@@ -23,7 +21,6 @@ export default class WithdrawalsServices {
     destinationBranchCode,
     investor,
   }) {
-    // const t = await database.sequelize.transaction();
 
     database.sequelize.transaction(async (t) => {
       const { availableBalance } = await WithdrawalsServices.getAvailableBalance(investor, t);

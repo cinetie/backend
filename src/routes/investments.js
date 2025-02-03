@@ -1,6 +1,4 @@
 import { Router } from "express";
-// import * as validation from "../middlewares/validation/investors";
-// import InvestorsController from "../controllers/investors";
 import Access from "../middlewares/access";
 import InvestmentController from "../controllers/investments";
 
