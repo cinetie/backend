@@ -12,10 +12,6 @@ module.exports = {
       investorId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-          model: 'investors',
-          key: 'id'
-        }
       },
       amount: {
         type: Sequelize.INTEGER,

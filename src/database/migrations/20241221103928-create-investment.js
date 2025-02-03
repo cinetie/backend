@@ -11,13 +11,8 @@ module.exports = {
       },
       investorId: {
         type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'investors',
-          key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
+        allowNull: false
+
       },
       shares: {
         type: Sequelize.INTEGER,
