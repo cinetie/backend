@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import Flutterwave from "flutterwave-node-v3";
+
 import path from "path";
 import axios from "axios";
 import UserService from "../services/userServices";
@@ -17,12 +17,7 @@ import InvestmentServices from "../services/investmentServices";
 import WithdrawalsServices from "../services/withdrawalsServices";
 
 const util = new Util();
-const rave = new Flutterwave(
-  process.env.RAVE_PUBLIC,
-  process.env.RAVE_SECRET,
-  Boolean(process.env.RAVE_PRODUCTION)
-);
-export const { Transaction } = rave;
+
 export default class WebHooks {
 
   static async flutterWave(req, res) {

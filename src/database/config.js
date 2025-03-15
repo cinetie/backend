@@ -1,11 +1,17 @@
 import '../config/loadEnv';
 
+console.log("DEV_DATABASE_URL:", process.env.DEV_DATABASE_URL);
+
 module.exports = {
   development: {
     use_env_variable: "DEV_DATABASE_URL",
-    dialect: "postgres",
+    dialect: "mysql",
     dialectOptions: {
       typeCast: true,
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      }
     },
     logging: false,
   },

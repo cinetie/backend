@@ -8,7 +8,6 @@ import cors from "cors";
 import morgan from "morgan";
 import cron from "node-cron";
 import fileUpload from "express-fileupload";
-import xmlparser from "express-xml-bodyparser";
 import response from "./helpers/response";
 import stopLoginSessions from "./helpers/stopLoginSessions";
 import calculateEarnings from "./helpers/calculateEarning";
@@ -93,7 +92,6 @@ app.enable("trust proxy");
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(xmlparser());
 app.use(
   fileUpload({
     useTempFiles: true,
